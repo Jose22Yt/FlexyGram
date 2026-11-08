@@ -26925,12 +26925,16 @@ public class ChatActivity extends BaseFragment implements
     private void checkTranslation(boolean force) {
         // Do not scan the loaded history during a drag/fling, even after the old 1s timeout.
         // Explicit language/translation changes still run immediately.
-        translationCheckDeferred = !force && isTranslationScrollActive();
-        if (!translationCheckDeferred && System.currentTimeMillis() - lastTranslationCheck > 1000) {
+        if (!force && isTranslationScrollActive()) {
+            translationCheckDeferred = true;
+            return;
+        }
+        translationCheckDeferred = false;
+        if (System.currentTimeMillis() - lastTranslationCheck > 1000) {
             force = true;
         }
         AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
-        AndroidUtilities.runOnUIThread(checkTranslationRunnable, force && !translationCheckDeferred ? 0 : 150);
+        AndroidUtilities.runOnUIThread(checkTranslationRunnable, force ? 0 : 150);
     }
     private Runnable checkTranslationRunnable = () -> {
         if (translationCheckDeferred && isTranslationScrollActive()) {
@@ -29384,6 +29388,20 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
+    private static final int[] OPEN_ALLOWED_NOTIFICATIONS_0 = new int[]{
+            NotificationCenter.dialogsNeedReload, NotificationCenter.closeChats,
+            NotificationCenter.botKeyboardDidLoad, NotificationCenter.needDeleteDialog,
+            NotificationCenter.messagesDidLoad
+    };
+    private static final int[] OPEN_ALLOWED_NOTIFICATIONS_1 = new int[]{
+            NotificationCenter.dialogsNeedReload, NotificationCenter.closeChats,
+            NotificationCenter.botKeyboardDidLoad, NotificationCenter.needDeleteDialog
+    };
+    private static final int[] CLOSE_ALLOWED_NOTIFICATIONS_SELF = new int[]{
+            NotificationCenter.dialogsNeedReload, NotificationCenter.closeChats, NotificationCenter.botKeyboardDidLoad,
+            NotificationCenter.needDeleteDialog, NotificationCenter.mediaDidLoad
+    };
+
     long startMs;
     @Override
     public void onTransitionAnimationStart(boolean isOpen, boolean backward) {
@@ -29400,16 +29418,9 @@ public class ChatActivity extends BaseFragment implements
                 updateMessagesVisiblePart(false);
             }
             if (transitionAnimationIndex == 0) {
-                alowedNotifications = new int[]{
-                        NotificationCenter.dialogsNeedReload, NotificationCenter.closeChats,
-                        NotificationCenter.botKeyboardDidLoad, NotificationCenter.needDeleteDialog,
-                        NotificationCenter.messagesDidLoad
-                };
+                alowedNotifications = OPEN_ALLOWED_NOTIFICATIONS_0;
             } else {
-                alowedNotifications = new int[]{
-                        NotificationCenter.dialogsNeedReload, NotificationCenter.closeChats,
-                        NotificationCenter.botKeyboardDidLoad, NotificationCenter.needDeleteDialog
-                };
+                alowedNotifications = OPEN_ALLOWED_NOTIFICATIONS_1;
             }
             openAnimationEnded = false;
             if (!backward) {
@@ -29417,10 +29428,7 @@ public class ChatActivity extends BaseFragment implements
             }
         } else {
             if (UserObject.isUserSelf(currentUser)) {
-                alowedNotifications = new int[]{
-                        NotificationCenter.dialogsNeedReload, NotificationCenter.closeChats, NotificationCenter.botKeyboardDidLoad,
-                        NotificationCenter.needDeleteDialog, NotificationCenter.mediaDidLoad
-                };
+                alowedNotifications = CLOSE_ALLOWED_NOTIFICATIONS_SELF;
             }
             if (chatActivityEnterView != null) {
                 chatActivityEnterView.onBeginHide();

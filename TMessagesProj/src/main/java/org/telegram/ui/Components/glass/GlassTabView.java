@@ -133,7 +133,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
         }
     }
 
-    private static final RectF tmpRectF = new RectF();
+    private final RectF tmpRectF = new RectF();
 
     private boolean hasGestureSelectedOverride;
     private float gestureSelectedOverride;

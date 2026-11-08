@@ -4975,14 +4975,14 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 summaryBounce.setPressed(true);
                 if (summaryReplySelector != null) {
                     summaryReplySelector.setHotspot(x, y);
-                    summaryReplySelector.setState(new int[]{android.R.attr.state_pressed, android.R.attr.state_enabled});
+                    summaryReplySelector.setState(pressedState);
                 }
             }
         } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
             if (summaryBounce.isPressed() && !summarySelectorRect.contains(x, y)) {
                 summaryBounce.setPressed(false);
                 if (summaryReplySelector != null) {
-                    summaryReplySelector.setState(new int[]{});
+                    summaryReplySelector.setState(StateSet.NOTHING);
                 }
             }
         } else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -4991,12 +4991,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
             summaryBounce.setPressed(false);
             if (summaryReplySelector != null) {
-                summaryReplySelector.setState(new int[]{});
+                summaryReplySelector.setState(StateSet.NOTHING);
             }
         } else if (event.getAction() == MotionEvent.ACTION_CANCEL) {
             summaryBounce.setPressed(false);
             if (summaryReplySelector != null) {
-                summaryReplySelector.setState(new int[]{});
+                summaryReplySelector.setState(StateSet.NOTHING);
             }
         }
         return summaryBounce.isPressed();
@@ -5044,7 +5044,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     postDelayed(() -> {
                         if (replyPressed && !replySelectorPressed && replySelectorCanBePressed) {
                             replySelectorPressed = true;
-                            replySelector.setState(new int[]{android.R.attr.state_pressed, android.R.attr.state_enabled});
+                            replySelector.setState(pressedState);
                         }
                     }, ViewConfiguration.getTapTimeout() / 6);
                     invalidate();
@@ -5064,13 +5064,13 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 replyPressed = false;
                 if (replySelector != null) {
                     if (!replySelectorPressed) {
-                        replySelector.setState(new int[]{android.R.attr.state_pressed, android.R.attr.state_enabled});
+                        replySelector.setState(pressedState);
                         post(() -> {
-                            replySelector.setState(new int[]{});
+                            replySelector.setState(StateSet.NOTHING);
                             invalidate();
                         });
                     } else {
-                        replySelector.setState(new int[]{});
+                        replySelector.setState(StateSet.NOTHING);
                     }
                     replySelectorPressed = false;
                     replySelectorCanBePressed = false;
@@ -5100,7 +5100,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             replyPressed = false;
             replySelectorPressed = false;
             if (replySelector != null) {
-                replySelector.setState(new int[]{});
+                replySelector.setState(StateSet.NOTHING);
             }
             invalidate();
             if (replyBounce != null) {
@@ -5112,14 +5112,18 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 replySelectorPressed = false;
                 replySelectorCanBePressed = false;
                 if (replySelector != null) {
-                    replySelector.setState(new int[]{});
+                    replySelector.setState(StateSet.NOTHING);
                 }
                 invalidate();
                 if (replyBounce != null) {
                     replyBounce.setPressed(false);
                 }
-            } else if (replySelector != null && replySelectorCanBePressed && Math.sqrt(Math.pow(x - replyTouchX, 2) + Math.pow((y + getY()) - replyTouchY, 2)) > 0.75f) {
-                replySelectorCanBePressed = false;
+            } else if (replySelector != null && replySelectorCanBePressed) {
+                final float dX = x - replyTouchX;
+                final float dY = (y + getY()) - replyTouchY;
+                if (dX * dX + dY * dY > 0.75f * 0.75f) {
+                    replySelectorCanBePressed = false;
+                }
             }
         }
         return replyPressed;
@@ -12808,13 +12812,13 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             replyPressed = false;
             if (replySelector != null) {
                 if (!replySelectorPressed) {
-                    replySelector.setState(new int[]{android.R.attr.state_pressed, android.R.attr.state_enabled});
+                    replySelector.setState(pressedState);
                     post(() -> {
-                        replySelector.setState(new int[]{});
+                        replySelector.setState(StateSet.NOTHING);
                         invalidate();
                     });
                 } else {
-                    replySelector.setState(new int[]{});
+                    replySelector.setState(StateSet.NOTHING);
                 }
                 replySelectorPressed = false;
                 replySelectorCanBePressed = false;

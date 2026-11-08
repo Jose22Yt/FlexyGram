@@ -49,6 +49,12 @@ Todas las correcciones se implementaron sin introducir dependencias externas, pr
 | **UX-02** | Interfaz / Dock | **Alta** | **Corregido** | `MainTabsActivity.java`, `FragmentContextView.java` | Eliminación de tarjetas flotantes sobre la barra inferior (`PlayerMiniView`) y restauración de la barra nativa compacta de 36dp de Telegram (`FragmentContextView`), eliminando conflictos de posición y lag al salir. |
 | **UX-03** | Animación / Fluidez | **Alta** | **Corregido** | `PlayerSheet.java`, `Md3Player.java` | Apertura y cierre "súper smooth" mediante animación de traslación por hardware de `BottomSheet`, eliminando capturas de bitmap pesadas, morphing y congelamientos de superficies de desenfoque (`MusicBlurSurface`). |
 | **ARCH-02** | Navegación / Reproducción | **Media** | **Corregido** | `LiquidNavigationDestinations.java`, `LiquidNavigationTabs.java`, `FlexyMusicLibrary.java` | Eliminación del destino `MUSIC` del dock (`COUNT = 11`) y preservación estricta de la reproducción acotada al chat activo (comportamiento Telegram nativo sin escaneo global de almacenamiento). |
+| **PERF-08** | Interacción / Táctil | **Media** | **Corregido** | `ChatMessageCell.java` | Asignaciones de arrays efímeros `new int[]{...}` y `new int[]{}` en cada evento táctil (`ACTION_DOWN`, `ACTION_MOVE`, `ACTION_UP`, `ACTION_CANCEL`) de `summaryReplySelector` y `replySelector`, reemplazados por `pressedState` y `StateSet.NOTHING`. |
+| **PERF-09** | Matemáticas / Rendimiento | **Baja** | **Corregido** | `ChatMessageCell.java` | Llamadas trascendentales `Math.sqrt(...)` y `Math.pow(..., 2)` en cada evento `ACTION_MOVE` para calcular radio de toque, sustituidas por comparación cuadrática directa `dX * dX + dY * dY > 0.75f * 0.75f`. |
+| **PERF-10** | Hilo UI / Desplazamiento | **Alta** | **Corregido** | `ChatActivity.java` | Inundación de la cola del `Handler` principal en `checkTranslation()` en cada micro-evento de scroll. Se difiere la ejecución hasta que el desplazamiento finaliza en `SCROLL_STATE_IDLE`, erradicando el jank de flings. |
+| **PERF-11** | Transición / Memoria | **Media** | **Corregido** | `ChatActivity.java` | Asignación de arrays `new int[]{}` de notificaciones permitidas en `onTransitionAnimationStart()` en cada apertura y cierre de chat. Reemplazados por constantes estáticas inmutables para transiciones suaves a 120 Hz. |
+| **PERF-12** | Concurrencia / Vistas | **Media** | **Corregido** | `GlassTabView.java` | `tmpRectF` era un campo `static` compartido entre todas las instancias de pestañas concurrentes en el dock. Desacoplado a campo inmutable de instancia para evitar colisiones durante renderizado paralelo. |
+| **PERF-13** | Animación / CPU | **Baja** | **Corregido** | `FastMotion.java` | Consulta e iteración continua de `animator.getListeners().contains(restoreOnEnd)` en cada animación iniciada, optimizado mediante flag `listenerAdded` en el estado `Timing`. |
 
 ---
 
@@ -101,6 +107,18 @@ Todas las correcciones se implementaron sin introducir dependencias externas, pr
 - **`DeleteMotionOverlay.java`**:
   1. Se eliminó la creación repetitiva de arrays primitivos `new int[2]` dentro del método `onDraw()`.
   2. Se implementaron buffers de coordenadas reutilizables `tmpAt` y `tmpOrigin`, evitando sobrecargar el recolector de basura (GC) durante animaciones continuas a 60/120 Hz.
+
+### 4.9. Optimización Integral de Conversación y Pantalla Principal (Scroll, Gestos y Transiciones)
+- **`ChatMessageCell.java`**:
+  1. Erradicación de asignaciones en caliente de `new int[]{...}` y `new int[]{}` en `summaryReplySelector` y `replySelector` durante eventos táctiles (`ACTION_DOWN`, `ACTION_MOVE`, `ACTION_UP`, `ACTION_CANCEL`) y pulsación prolongada, sustituyéndolos por `pressedState` inmutable y `StateSet.NOTHING`.
+  2. Eliminación de llamadas trascendentales costosas `Math.sqrt()` y `Math.pow()` dentro de `ACTION_MOVE`, reemplazadas por evaluación de distancia euclidiana cuadrática directa (`dX * dX + dY * dY > 0.75f * 0.75f`).
+- **`ChatActivity.java`**:
+  1. Prevención de saturación de la cola de eventos del hilo principal (`Handler`) por `checkTranslation()` en cada micro-evento de scroll. Se difiere y despacha únicamente cuando el desplazamiento se detiene (`SCROLL_STATE_IDLE`).
+  2. Sustitución de asignaciones efímeras de arrays `new int[]{}` en `onTransitionAnimationStart()` por constantes estáticas inmutables (`OPEN_ALLOWED_NOTIFICATIONS_0`, `OPEN_ALLOWED_NOTIFICATIONS_1`, `CLOSE_ALLOWED_NOTIFICATIONS_SELF`), eliminando pausas de GC al abrir y cerrar conversaciones a 120 Hz.
+- **`GlassTabView.java`**:
+  1. Desacoplamiento de `tmpRectF` de campo `static` compartido entre todas las pestañas a un campo inmutable de instancia (`private final RectF tmpRectF = new RectF();`), garantizando concurrencia limpia sin interferencias de estado.
+- **`FastMotion.java`**:
+  1. Seguimiento mediante bandera `listenerAdded` en la clase de estado `Timing`, erradicando la clonación e iteración reiterada de `animator.getListeners().contains(restoreOnEnd)` en cada animación iniciada en la interfaz de usuario.
 
 ---
 
