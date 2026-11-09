@@ -61,6 +61,7 @@ public final class SignatureSmartPreviews {
         return groupedMessages == null || groupedMessages.size() <= 1;
     }
     public static int kind(MessageObject message) {
+        if (mode() == SignatureSmartPreviewPalette.OFF) return SignatureSmartPreviewPalette.NONE;
         if (message == null || message.messageOwner == null || message.hasHighlightedWords()
                 || message.needDrawBluredPreview()) return SignatureSmartPreviewPalette.NONE;
         TLRPC.Message owner = message.messageOwner;

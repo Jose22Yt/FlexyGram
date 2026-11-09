@@ -283,6 +283,10 @@ public final class SignatureWallpaperBlur {
         public void prepare(Drawable drawable, boolean motion, int backgroundColor) {
             if (closed) return;
             if (!BubbleConfig.backgroundBlur() && entry == null && source == null) return;
+            if (source == drawable && sourceBitmap != null && !sourceBitmap.isRecycled()
+                    && generation == sourceBitmap.getGenerationId() && background == backgroundColor) {
+                return;
+            }
             // Native motion gradients use a frozen bounded frame. Parallax does
             // not invalidate the source image; the native draw updates mapping.
             Bitmap bitmap = null;

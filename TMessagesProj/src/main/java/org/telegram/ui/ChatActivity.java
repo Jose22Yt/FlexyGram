@@ -32154,7 +32154,7 @@ public class ChatActivity extends BaseFragment implements
         if (chatActivityFadeView != null) {
             chatActivityFadeView.setFlexyEdgeBlur(false, glassBackgroundDrawableFactoryFrosted);
         }
-        if (chatListView != null) chatListView.invalidateViews();
+        if (chatListView != null) chatListView.invalidate();
         updateFolderUnreadBadge();
         cachedIsGestureNavigation = AndroidUtil.isGestureNavigation(getContext());
         checkShowBlur(false);

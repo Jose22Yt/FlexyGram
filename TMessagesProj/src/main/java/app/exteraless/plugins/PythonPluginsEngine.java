@@ -125,7 +125,7 @@ public class PythonPluginsEngine extends com.exteragram.messenger.plugins.Python
                     Python.start(new AndroidPlatform(appContext));
                     FileLog.d("PluginsEngine: Python started in " + (System.currentTimeMillis() - t0) + " ms");
                 }
-                Python.getInstance().getModule("sys").callAttr("setswitchinterval", 0.001);
+                Python.getInstance().getModule("sys").callAttr("setswitchinterval", 0.005);
                 loader = Python.getInstance().getModule("extera_utils.plugin_loader");
                 started = true;
                 AndroidUtilities.runOnUIThread(PythonThreadState::pinCurrentThread);

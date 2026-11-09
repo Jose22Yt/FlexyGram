@@ -21,6 +21,9 @@ public final class BubbleConfig {
         return ApplicationLoader.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE);
     }
     public static void load() {
+        reload();
+    }
+    public static void reload() {
         SharedPreferences p = preferences();
         surfaceEffect = normalizeSurfaceEffect(p.getInt(SURFACE_EFFECT, DEFAULT));
         smallTimestamps = p.getBoolean("small_timestamp", false);

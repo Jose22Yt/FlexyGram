@@ -252,3 +252,33 @@ Mediante ingeniería inversa y análisis del pipeline de renderizado por hardwar
   - `test_cherrygram_port_audit`: **ALL PASS**
   - Simulaciones cinemáticas a 60, 90, 120 y 144 Hz (4,140 fotogramas simulados): **PASS**
 
+---
+
+## 9. Integración Oficial de FlexyGram v1.0.0-beta.29 (Build 1318): Suite Integral de Mejoras de Rendimiento y UI
+
+Se integró el paquete integral de mejoras oficiales proveniente de la entrega canónica `beta.29` (Build `1318`), optimizando múltiples subsistemas críticos:
+
+1. **Eliminación de Reconstrucción Continua de Trazados en Mensajes Agrupados (`MessageDrawable.java`):**
+   - En `invalidatePath()`, se suprimió la condición `|| !drawFullTop || !drawFullBottom`, la cual forzaba la reconstrucción matemática por software de las curvas Bézier en cada fotograma del scroll para todos los mensajes encadenados. El trazado ahora se preserva en caché GPU mientras la geometría dimensional no mute.
+2. **Eliminación de Recorte en Partículas de Borrado (`BubbleFractureRenderer.java`):**
+   - Se reemplazó el `c.clipPath(path) + drawBitmap()` por un `BitmapShader` nativo aplicado a `c.drawPath(path, piecePaint)`, eliminando el estarcido de GPU en cada fragmento durante las animaciones de borrado de mensajes.
+3. **Caché de Wallpaper Blur (`SignatureWallpaperBlur.java`):**
+   - Se implementó la verificación de identidad del fondo, color y generación de bitmap en `prepare()`, evitando reprocesamiento de desenfoque de pantalla cuando el fondo permanece idéntico.
+4. **Soporte de Frecuencia de Cuadros Dinámica para Pantallas LTPO (`ScrollFrameRateHint.java`):**
+   - Para Android 11+ (API 30+), se incorporó `owner.setFrameContentVelocity(scrolling ? 1000.0f : 0.0f)`, activando la aceleración instantánea a 120/144 Hz en paneles variables al detectar desplazamiento.
+5. **Arranque en Frío Optimizado (`ApplicationLoader.java`):**
+   - Desacople de la configuración de `osmdroid` del hilo principal hacia el pool asíncrono `Utilities.globalQueue`.
+6. **Invalidación Eficiente de Lista (`ChatActivity.java`):**
+   - Reemplazo de `invalidateViews()` por `invalidate()`, eliminando el re-layout innecesario de las celdas hijas.
+7. **Estabilidad de Navegación Predictiva (`ActionBarLayout.java`):**
+   - Desactivación de `useImmediateChatNavigation` para garantizar transiciones suaves sin colisiones con gestos del sistema.
+8. **Filtro de Entrada Numérica en Conversor (`InlineConversionController.java`):**
+   - Incorporación de pre-filtro `hasDigits()` y caché atómica por componente de clave.
+9. **Recarga Dinámica de Burbujas (`BubbleConfig.java`):**
+   - Implementación de método `reload()` preservando la coherencia de lectura ante mutaciones dinámicas de preferencias.
+10. **Alineación de Conmutación en GIL Python (`PythonPluginsEngine.java`):**
+    - `sys.setswitchinterval(0.005)` reduciendo la degradación de CPU por cambio de contexto nativo.
+11. **Retorno Temprano en Celdas de Diálogo (`SignatureSmartPreviews.java` / `DialogCell.java`):**
+    - Salto inmediato de procesamiento de spans cuando las previsualizaciones están desactivadas.
+
+

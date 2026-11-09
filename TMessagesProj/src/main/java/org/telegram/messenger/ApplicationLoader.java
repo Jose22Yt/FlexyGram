@@ -511,10 +511,15 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
 
         applicationHandler = new Handler(applicationContext.getMainLooper());
 
-        org.osmdroid.config.Configuration.getInstance().setUserAgentValue("FlexyGram/" + BuildConfig.VERSION_NAME + " (+https://github.com/Jose22Yt/FlexyGram)");
-        final File osmdroidBasePath = new File(ApplicationLoader.applicationContext.getCacheDir(), "osmdroid");
-        org.osmdroid.config.Configuration.getInstance().setOsmdroidBasePath(osmdroidBasePath);
-        org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(new File(osmdroidBasePath, "tiles"));
+        Utilities.globalQueue.postRunnable(() -> {
+            try {
+                org.osmdroid.config.Configuration.getInstance().setUserAgentValue("FlexyGram/" + BuildConfig.VERSION_NAME + " (+https://github.com/Jose22Yt/FlexyGram)");
+                final File osmdroidBasePath = new File(ApplicationLoader.applicationContext.getCacheDir(), "osmdroid");
+                org.osmdroid.config.Configuration.getInstance().setOsmdroidBasePath(osmdroidBasePath);
+                org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(new File(osmdroidBasePath, "tiles"));
+            } catch (Throwable ignore) {
+            }
+        });
 
         // Reconciliation checks every alias via binder; it is not a prerequisite for opening chats.
         Utilities.globalQueue.postRunnable(LauncherIconController::tryFixLauncherIconIfNeeded);

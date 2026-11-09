@@ -36,6 +36,14 @@ public final class InlineConversionController {
     private InlineConversionPopover popover;
     public InlineConversionController(View anchor,Theme.ResourcesProvider theme){this.anchor=anchor;this.theme=theme;slop=ViewConfiguration.get(anchor.getContext()).getScaledTouchSlop();weak=new WeakReference<>(this);}
     public static void clearCache(){CACHE.clear();}
+    private static boolean hasDigits(CharSequence s) {
+        if (s == null) return false;
+        for (int i = 0, len = s.length(); i < len; i++) {
+            char c = s.charAt(i);
+            if (c >= '0' && c <= '9') return true;
+        }
+        return false;
+    }
     private static final class Input {
         final String text;final int[][] excluded;
         Input(CharSequence value){
@@ -52,21 +60,32 @@ public final class InlineConversionController {
             }
             excluded=ranges.toArray(new int[0][]);
         }
-        String key(){return text+"\u0000"+Arrays.deepToString(excluded);}
+        String key(){return excluded.length==0 ? text+"\u0000[]" : text+"\u0000"+Arrays.deepToString(excluded);}
     }
     public void prepare(CharSequence text,CharSequence captionText,int account,long dialog,int message,int editDate){
         InlineConversionConfig.Snapshot config=InlineConversionConfig.get();
         if(!config.enabled){release();return;}
+        boolean hasA=hasDigits(text),hasB=hasDigits(captionText);
+        if(!hasA&&!hasB){
+            release();preparedKey="";revision=config.revision;body=caption=Collections.emptyList();
+            return;
+        }
         Input a=new Input(text),b=new Input(captionText);
         Locale locale=LocaleController.getInstance().getCurrentLocale();if(locale==null)locale=Locale.getDefault();
         String scope=account+":"+dialog+":"+message+":"+editDate+":"+locale.toLanguageTag()+":"+config.revision+":";
-        String key=scope+a.key()+"\u0001"+b.key();
+        String keyA=scope+a.key(),keyB=scope+b.key();
+        String key=keyA+"\u0001"+keyB;
         if(key.equals(preparedKey))return;
         release();preparedKey=key;revision=config.revision;
+        List<InlineConversionMatch> cachedFirst=CACHE.get(keyA),cachedSecond=CACHE.get(keyB);
+        if(cachedFirst!=null&&cachedSecond!=null){
+            body=cachedFirst;caption=cachedSecond;
+            return;
+        }
         final int token=generation;final Locale region=locale;
         final WeakReference<InlineConversionController> owner=weak;
         task=()->{
-            List<InlineConversionMatch> first=read(scope+a.key(),a,region),second=read(scope+b.key(),b,region);
+            List<InlineConversionMatch> first=read(keyA,a,region),second=read(keyB,b,region);
             AndroidUtilities.runOnUIThread(()->{
                 InlineConversionController c=owner.get();
                 if(c==null||c.generation!=token||!c.anchor.isAttachedToWindow()||!InlineConversionConfig.get().enabled||InlineConversionConfig.get().revision!=config.revision)return;

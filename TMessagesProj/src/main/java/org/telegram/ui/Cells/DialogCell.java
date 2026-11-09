@@ -2799,32 +2799,34 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 && app.flexygram.home.SignatureSmartPreviews.allowsSingleMessagePreview(groupMessages)
                 && (message.messageOwner.restriction_reason == null || message.messageOwner.restriction_reason.isEmpty())) {
             int candidate = app.flexygram.home.SignatureSmartPreviews.kind(message);
-            float senderDesiredWidth = inlineSender ? Layout.getDesiredWidth(messageString, 0, senderEnd, currentMessagePaint) : 0;
-            if (candidate != 0 && (!inlineSender || senderDesiredWidth < messageWidth * .35f)) {
-                String snippet = app.flexygram.home.SignatureSmartPreviews.snippet(message, candidate, groupMessages);
-                if (!TextUtils.isEmpty(snippet)) {
-                    float senderWidth = inlineSender ? senderDesiredWidth + dp(5) : 0;
-                    int thumbnailReserve = thumbsCount > 0 ? dp((thumbSize + 2) * thumbsCount + 6) : 0;
-                    int free = app.flexygram.home.SignatureSmartPillLayout.remaining(messageWidth, senderWidth, thumbnailReserve, 0, dp(8));
-                    if (free >= dp(36)) {
-                        boolean isMiddleEllipsize = app.flexygram.home.SignatureMiniPillClassifier.isFileKind(candidate);
-                        TextUtils.TruncateAt truncateAt = isMiddleEllipsize ? TextUtils.TruncateAt.MIDDLE : TextUtils.TruncateAt.END;
-                        app.flexygram.home.SignatureSmartPillSpan capsule =
-                                new app.flexygram.home.SignatureSmartPillSpan(candidate, snippet, free, resourcesProvider, isMiddleEllipsize);
-                        SpannableStringBuilder pill = new SpannableStringBuilder();
-                        int capsuleStart = pill.length();
-                        pill.append("\ufffc");
-                        pill.setSpan(capsule,capsuleStart,capsuleStart+1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        CharSequence withThumbs = applyThumbs(pill);
-                        SpannableStringBuilder combined = new SpannableStringBuilder();
-                        if (inlineSender) {
-                            combined.append(messageString, 0, senderEnd);
-                            combined.append(" ");
+            if (candidate != 0) {
+                float senderDesiredWidth = inlineSender ? Layout.getDesiredWidth(messageString, 0, senderEnd, currentMessagePaint) : 0;
+                if (!inlineSender || senderDesiredWidth < messageWidth * .35f) {
+                    String snippet = app.flexygram.home.SignatureSmartPreviews.snippet(message, candidate, groupMessages);
+                    if (!TextUtils.isEmpty(snippet)) {
+                        float senderWidth = inlineSender ? senderDesiredWidth + dp(5) : 0;
+                        int thumbnailReserve = thumbsCount > 0 ? dp((thumbSize + 2) * thumbsCount + 6) : 0;
+                        int free = app.flexygram.home.SignatureSmartPillLayout.remaining(messageWidth, senderWidth, thumbnailReserve, 0, dp(8));
+                        if (free >= dp(36)) {
+                            boolean isMiddleEllipsize = app.flexygram.home.SignatureMiniPillClassifier.isFileKind(candidate);
+                            TextUtils.TruncateAt truncateAt = isMiddleEllipsize ? TextUtils.TruncateAt.MIDDLE : TextUtils.TruncateAt.END;
+                            app.flexygram.home.SignatureSmartPillSpan capsule =
+                                    new app.flexygram.home.SignatureSmartPillSpan(candidate, snippet, free, resourcesProvider, isMiddleEllipsize);
+                            SpannableStringBuilder pill = new SpannableStringBuilder();
+                            int capsuleStart = pill.length();
+                            pill.append("\ufffc");
+                            pill.setSpan(capsule,capsuleStart,capsuleStart+1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            CharSequence withThumbs = applyThumbs(pill);
+                            SpannableStringBuilder combined = new SpannableStringBuilder();
+                            if (inlineSender) {
+                                combined.append(messageString, 0, senderEnd);
+                                combined.append(" ");
+                            }
+                            combined.append(withThumbs);
+                            smartPreviewKind = candidate;
+                            messageString = combined;
+                            checkMessage = false;
                         }
-                        combined.append(withThumbs);
-                        smartPreviewKind = candidate;
-                        messageString = combined;
-                        checkMessage = false;
                     }
                 }
             }
