@@ -26,7 +26,7 @@ public final class FlexyStudioActivity extends SignatureMatteSettingsActivity {
     private Future<?> work;
     private int generation;
     @Override protected String getActionBarTitle(){return getString(R.string.FlexyStudioTitle);}
-    @Override protected void updateRows(){super.updateRows();header=addRow();export=addRow("flexystudioExport");importRow=addRow("flexystudioImport");share=addRow("flexystudioShare");shadow=addRow();motionHeader=addRow();fastMotion=addRow("flexystudioFastMotion");motionShadow=addRow();tools=files=help=toolsShadow=-1;}
+    @Override protected void updateRows(){super.updateRows();header=addRow();export=addRow("flexystudioExport");importRow=addRow("flexystudioImport");share=addRow("flexystudioShare");shadow=addRow();motionHeader=fastMotion=motionShadow=tools=files=help=toolsShadow=-1;}
     @Override public View createView(Context context){View v=super.createView(context);actionBar.centerTitle();listView.setSections(AndroidUtilities.dp(16),AndroidUtilities.dp(20),true);listView.setItemAnimator(null);return v;}
     @Override protected BaseListAdapter createAdapter(Context context){return new Adapter(context);}
     @Override protected void onItemClick(View view,int position,float x,float y) {
