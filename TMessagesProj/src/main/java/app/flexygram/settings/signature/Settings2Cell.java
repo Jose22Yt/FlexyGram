@@ -137,11 +137,7 @@ public final class Settings2Cell extends FrameLayout {
         int secondary = Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2, provider);
         if (!foregroundInitialized || lastIconColor != foreground) {
             title.setTextColor(foreground);
-            if (!(icon.getDrawable() instanceof SettingsCategoryIcon) || !((SettingsCategoryIcon) icon.getDrawable()).isStandalone()) {
-                icon.setColorFilter(foreground);
-            } else {
-                icon.setColorFilter(null);
-            }
+            icon.setColorFilter(foreground);
             lastIconColor = foreground;
         }
         if (!foregroundInitialized || lastDescriptionColor != secondary) {
