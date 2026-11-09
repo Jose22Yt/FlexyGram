@@ -77,11 +77,7 @@ public final class InlineConversionController {
         String key=keyA+"\u0001"+keyB;
         if(key.equals(preparedKey))return;
         release();preparedKey=key;revision=config.revision;
-        List<InlineConversionMatch> cachedFirst=CACHE.get(keyA),cachedSecond=CACHE.get(keyB);
-        if(cachedFirst!=null&&cachedSecond!=null){
-            body=cachedFirst;caption=cachedSecond;
-            return;
-        }
+
         final int token=generation;final Locale region=locale;
         final WeakReference<InlineConversionController> owner=weak;
         task=()->{
