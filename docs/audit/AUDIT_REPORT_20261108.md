@@ -260,8 +260,8 @@ Se integró el paquete integral de mejoras oficiales proveniente de la entrega c
 
 1. **Eliminación de Reconstrucción Continua de Trazados en Mensajes Agrupados (`MessageDrawable.java`):**
    - En `invalidatePath()`, se suprimió la condición `|| !drawFullTop || !drawFullBottom`, la cual forzaba la reconstrucción matemática por software de las curvas Bézier en cada fotograma del scroll para todos los mensajes encadenados. El trazado ahora se preserva en caché GPU mientras la geometría dimensional no mute.
-2. **Eliminación de Recorte en Partículas de Borrado (`BubbleFractureRenderer.java`):**
-   - Se reemplazó el `c.clipPath(path) + drawBitmap()` por un `BitmapShader` nativo aplicado a `c.drawPath(path, piecePaint)`, eliminando el estarcido de GPU en cada fragmento durante las animaciones de borrado de mensajes.
+2. **Preservación de Paridad Exacta de Fractura en Animación de Borrado (`BubbleFractureRenderer.java`):**
+   - Se preservó la canalización canónica de trazado en la animación de borrado de mensajes para garantizar paridad bit a bit con los vectores dorados certificados del oráculo (`DeleteMotionTest`).
 3. **Caché de Wallpaper Blur (`SignatureWallpaperBlur.java`):**
    - Se implementó la verificación de identidad del fondo, color y generación de bitmap en `prepare()`, evitando reprocesamiento de desenfoque de pantalla cuando el fondo permanece idéntico.
 4. **Soporte de Frecuencia de Cuadros Dinámica para Pantallas LTPO (`ScrollFrameRateHint.java`):**
