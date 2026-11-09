@@ -28,29 +28,7 @@ public final class UIUtil {
         if (view == null) {
             return;
         }
-
-        final float pressedScale = 1f - scale;
-
-        final AnimatorSet pressed = new AnimatorSet();
-        pressed.playTogether(
-                ObjectAnimator.ofFloat(view, View.SCALE_X, pressedScale),
-                ObjectAnimator.ofFloat(view, View.SCALE_Y, pressedScale)
-        );
-        pressed.setDuration(80);
-
-        final AnimatorSet released = new AnimatorSet();
-        released.playTogether(
-                ObjectAnimator.ofFloat(view, View.SCALE_X, 1f),
-                ObjectAnimator.ofFloat(view, View.SCALE_Y, 1f)
-        );
-        released.setInterpolator(new OvershootInterpolator(tension));
-        released.setDuration(350);
-
-        final StateListAnimator animator = new StateListAnimator();
-        animator.addState(new int[]{android.R.attr.state_pressed}, pressed);
-        animator.addState(new int[0], released);
-
-        view.setStateListAnimator(animator);
+        view.setStateListAnimator(null);
     }
 
     /**

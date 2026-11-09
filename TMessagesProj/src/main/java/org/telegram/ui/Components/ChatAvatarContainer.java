@@ -499,13 +499,11 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     public boolean onTouchEvent(MotionEvent ev) {
         if (ev.getAction() == MotionEvent.ACTION_DOWN && canSearch()) {
             pressed = true;
-            bounce.setPressed(true);
             AndroidUtilities.cancelRunOnUIThread(this.onLongClick);
             AndroidUtilities.runOnUIThread(this.onLongClick, ViewConfiguration.getLongPressTimeout());
             return true;
         } else if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL) {
             if (pressed) {
-                bounce.setPressed(false);
                 pressed = false;
                 if (ev.getAction() == MotionEvent.ACTION_UP && isClickable()) {
                     openProfile(false);
@@ -519,16 +517,11 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     @Override
     public void setPressed(boolean pressed) {
         super.setPressed(pressed);
-        bounce.setPressed(pressed);
     }
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        canvas.save();
-        final float s = bounce.getScale(.02f);
-        canvas.scale(s, s, getPivotX(), getHeight() - ActionBar.getCurrentActionBarHeight() / 2f);
         super.dispatchDraw(canvas);
-        canvas.restore();
         if (signatureFusionActive()) signatureHeader.drawForeground(canvas);
     }
 
@@ -542,12 +535,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             fusionLayer = signaturePhotoMask.begin(canvas, child.getX(), child.getY(),
                     child.getX() + child.getWidth(), child.getY() + child.getHeight());
         }
-        final boolean unscaleAvatar = glassMode && isCentered() && (child == avatarImageView || child == timeItem || child == communityItem);
-        if (unscaleAvatar) {
-            final float scale = bounce.getScale(.02f);
-            canvas.save();
-            canvas.scale(1f / scale, 1f / scale, getWidth() / 2f, getHeight() - ActionBar.getCurrentActionBarHeight() / 2f);
-        }
+        final boolean unscaleAvatar = false;
         final boolean b;
         if (child == avatarImageView) {
             final boolean hasTimer = timeItem != null && timeItem.getVisibility() == VISIBLE;

@@ -47,7 +47,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
     private void build(){
         switch(category){
             case "chat":
-                links(new String[]{"composer_style","header_style","bubble_style","context"},new int[]{R.string.FlexyInterfaceLower,R.string.FlexyInterfaceUpper,R.string.FlexyBubblesTitle,R.string.FlexyMenuTitle},new int[]{R.drawable.fg_settings_chat,R.drawable.fg_settings_home,R.drawable.msg_discussion_solar,R.drawable.fg_settings_chat});
+                links(new String[]{"composer_style","header_style","bubble_style","context"},new int[]{R.string.FlexyInterfaceLower,R.string.FlexyInterfaceUpper,R.string.FlexyBubblesTitle,R.string.FlexyMenuTitle},new int[]{R.drawable.fg_settings_chats,R.drawable.fg_settings_estilo_de_interfaz,R.drawable.fg_settings_chats,R.drawable.fg_settings_chats});
                 add(new app.flexygram.effects.GlareSettingsSection());
                 add(new app.flexygram.memberlens.MemberLensSettingsSection());
                 add(new app.flexygram.inlineconverter.InlineConversionSettingsSection());
@@ -70,16 +70,16 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
                 add(scope(new OpenExteraOtherActivity(),"other","advanced"));
                 add(new SignatureLauncherSettingsActivity());
                 extra("ng","general_extra","advanced_extra","appearance_extra");extra("nx","advanced_extra");
-                links(new String[]{"icon_packs","emoji","cloud","passcode"},new int[]{R.string.Settings2_icon_packs,R.string.Settings2_emoji,R.string.Settings2_cloud,R.string.Settings2_passcode},new int[]{R.drawable.settings3_stack,R.drawable.settings3_chat,R.drawable.settings3_document,R.drawable.settings3_info});break;
+                links(new String[]{"icon_packs","emoji","cloud","passcode"},new int[]{R.string.Settings2_icon_packs,R.string.Settings2_emoji,R.string.Settings2_cloud,R.string.Settings2_passcode},new int[]{R.drawable.fg_settings_iconos,R.drawable.fg_settings_chats,R.drawable.fg_settings_otros,R.drawable.fg_settings_general});break;
             case "ayu":add(new GhostModeActivity());add(new OpenExteraAyuMomentsActivity());break;
             case "navigation":
                 add(new app.flexygram.navigation.BottomTabsSettingsActivity());
                 add(new OpenExteraAppNavigationActivity.NativeControls());
                 add(scope(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_SIGNATURE_MESSAGES),"chats","gestures"));
                 extra("ng","navigation_extra");extra("nx","navigation_extra");
-                links(new String[]{"navigationEditor"},new int[]{R.string.Settings2_app_navigation},new int[]{R.drawable.settings3_hand});break;
+                links(new String[]{"navigationEditor"},new int[]{R.string.Settings2_app_navigation},new int[]{R.drawable.fg_settings_estilo_de_interfaz});break;
             case "plugins":
-                links(new String[]{"plugins","ai","translator","pillstack"},new int[]{R.string.Settings2_plugins,R.string.Settings2_ai,R.string.Settings2_translator,R.string.Settings2_pillstack},new int[]{R.drawable.settings3_plugins,R.drawable.settings3_sliders,R.drawable.settings3_chat,R.drawable.settings3_stack});
+                links(new String[]{"plugins","ai","translator","pillstack"},new int[]{R.string.Settings2_plugins,R.string.Settings2_ai,R.string.Settings2_translator,R.string.Settings2_pillstack},new int[]{R.drawable.fg_settings_plugins,R.drawable.fg_settings_general,R.drawable.fg_settings_chats,R.drawable.fg_settings_apariencia});
                 add(scope(new OpenExteraGeneralActivity(),"general","translation_options"));break;
             default:throw new IllegalArgumentException("Not a direct settings category");
         }

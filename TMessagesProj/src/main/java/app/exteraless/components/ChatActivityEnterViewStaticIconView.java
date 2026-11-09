@@ -108,12 +108,7 @@ public class ChatActivityEnterViewStaticIconView extends FrameLayout {
      * Анимации остаются, только пока не выбран ни встроенный набор, ни пользовательский пак.
      */
     public static boolean isStaticIconsEnabled() {
-        try {
-            return BaseIconPacks.getSelected() != BaseIconPacks.BASE_DEFAULT
-                    || IconPackManager.getInstance().hasReplacements();
-        } catch (Throwable ignored) {
-            return false;
-        }
+        return true;
     }
 
     public static State fromAnimatedState(ChatActivityEnterViewAnimatedIconView.State state) {

@@ -13,14 +13,14 @@ public final class SignatureSettingsRegistry {
     }
     private static final Map<String,Entry> ENTRIES=new LinkedHashMap<>();
     static {
-        add(new Entry("appearance","root",R.string.Settings2Group_personal,R.string.Settings2_appearance,R.string.Settings2Desc_appearance,R.drawable.msg_palette,0xFF8B50DE));
-        add(new Entry("navigation","root",R.string.Settings2Group_personal,R.string.Settings2_navigation,R.string.Settings2Desc_navigation,R.drawable.settings2_gesture,0xFF168BEA));
-        add(new Entry("conversations","root",R.string.Settings2Group_personal,R.string.Settings2_conversations,R.string.Settings2Desc_conversations,R.drawable.settings2_messages,0xFF21BC65));
-        add(new Entry("studio","root",R.string.Settings2Group_tools,R.string.Settings2_studio,R.string.Settings2Desc_studio,R.drawable.settings2_studio,0xFF7372DF));
-        add(new Entry("files","root",R.string.Settings2Group_tools,R.string.Settings2_files,R.string.Settings2Desc_files,R.drawable.settings2_files,0xFF12A8DB));
-        add(new Entry("extensions","root",R.string.Settings2Group_tools,R.string.Settings2_extensions,R.string.Settings2Desc_extensions,R.drawable.msg_plugins,0xFFDF408B));
-        add(new Entry("general","root",R.string.Settings2Group_system,R.string.Settings2_general,R.string.Settings2Desc_general,R.drawable.msg_language,0xFFF39A22));
-        add(new Entry("advanced","root",R.string.Settings2Group_system,R.string.Settings2_advanced,R.string.Settings2Desc_advanced,R.drawable.settings2_advanced,0xFF8198BE));
+        add(new Entry("appearance","root",R.string.Settings2Group_personal,R.string.Settings2_appearance,R.string.Settings2Desc_appearance,R.drawable.fg_settings_apariencia,0xFF8B50DE));
+        add(new Entry("navigation","root",R.string.Settings2Group_personal,R.string.Settings2_navigation,R.string.Settings2Desc_navigation,R.drawable.fg_settings_estilo_de_interfaz,0xFF168BEA));
+        add(new Entry("conversations","root",R.string.Settings2Group_personal,R.string.Settings2_conversations,R.string.Settings2Desc_conversations,R.drawable.fg_settings_chats,0xFF21BC65));
+        add(new Entry("studio","root",R.string.Settings2Group_tools,R.string.Settings2_studio,R.string.Settings2Desc_studio,R.drawable.fg_settings_estilo_de_interfaz,0xFF7372DF));
+        add(new Entry("files","root",R.string.Settings2Group_tools,R.string.Settings2_files,R.string.Settings2Desc_files,R.drawable.fg_settings_otros,0xFF12A8DB));
+        add(new Entry("extensions","root",R.string.Settings2Group_tools,R.string.Settings2_extensions,R.string.Settings2Desc_extensions,R.drawable.fg_settings_plugin,0xFFDF408B));
+        add(new Entry("general","root",R.string.Settings2Group_system,R.string.Settings2_general,R.string.Settings2Desc_general,R.drawable.fg_settings_general,0xFFF39A22));
+        add(new Entry("advanced","root",R.string.Settings2Group_system,R.string.Settings2_advanced,R.string.Settings2Desc_advanced,R.drawable.fg_settings_otros,0xFF8198BE));
         add(new Entry("chat_list","appearance",R.string.Settings2Group_home,R.string.Settings2_chat_list,R.string.Settings2Desc_chat_list,R.drawable.msg_media,0xFF8B50DE));
         add(new Entry("avatars","appearance",R.string.Settings2Group_home,R.string.Settings2_avatars,R.string.Settings2Desc_avatars,R.drawable.msg_contacts,0xFF198DE4));
         add(new Entry("folders","appearance",R.string.Settings2Group_home,R.string.Settings2_folders,R.string.Settings2Desc_folders,R.drawable.msg_folders,0xFFDB4092));

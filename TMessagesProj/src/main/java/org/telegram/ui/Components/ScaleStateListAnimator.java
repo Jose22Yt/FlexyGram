@@ -16,41 +16,13 @@ public class ScaleStateListAnimator {
         if (view == null) {
             return;
         }
-
-        // Icon feedback owns only the glyph; do not also spring the button/background.
-        if(app.exteraless.icons.BaseIconPacks.getSelected() == app.exteraless.icons.BaseIconPacks.BASE_CUPERTINO
-                && (view instanceof android.widget.ImageView
-                || view instanceof app.flexygram.icons.IconPressFeedback.Target
-                || view instanceof org.telegram.ui.ActionBar.ActionBarMenuItem)){
-            view.setStateListAnimator(null);
-            return;
-        }
-
-        AnimatorSet pressedAnimator = new AnimatorSet();
-        pressedAnimator.playTogether(
-                ObjectAnimator.ofFloat(view, View.SCALE_X, 1f - scale),
-                ObjectAnimator.ofFloat(view, View.SCALE_Y, 1f - scale)
-        );
-        pressedAnimator.setDuration(80);
-
-        AnimatorSet defaultAnimator = new AnimatorSet();
-        defaultAnimator.playTogether(
-                ObjectAnimator.ofFloat(view, View.SCALE_X, 1f),
-                ObjectAnimator.ofFloat(view, View.SCALE_Y, 1f)
-        );
-        defaultAnimator.setInterpolator(new OvershootInterpolator(tension));
-        defaultAnimator.setDuration(350);
-
-        StateListAnimator scaleStateListAnimator = new StateListAnimator();
-
-        scaleStateListAnimator.addState(new int[]{android.R.attr.state_pressed}, pressedAnimator);
-        scaleStateListAnimator.addState(new int[0], defaultAnimator);
-
-        view.setStateListAnimator(scaleStateListAnimator);
+        view.setStateListAnimator(null);
     }
 
     public static void reset(View view) {
-        view.setStateListAnimator(null);
+        if (view != null) {
+            view.setStateListAnimator(null);
+        }
     }
 
 }
