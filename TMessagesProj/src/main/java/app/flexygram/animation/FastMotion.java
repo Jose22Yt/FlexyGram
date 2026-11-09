@@ -170,10 +170,5 @@ public final class FastMotion {
     }
     public static void startSpring(DynamicAnimation<?> animation) {
         animation.start();
-        // Only decorative settling springs, never fling/scroller physics or a live back gesture.
-        if (FastMotionTiming.isEnabled() && animation instanceof SpringAnimation) {
-            SpringAnimation spring=(SpringAnimation)animation;
-            if (spring.canSkipToEnd()) spring.skipToEnd();
-        }
     }
 }

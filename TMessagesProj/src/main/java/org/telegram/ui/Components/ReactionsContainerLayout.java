@@ -1629,7 +1629,6 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
         setAlpha(1f);
         setTransitionProgress(from);
         if(Math.abs(from-target)<.001f){setTransitionProgress(target);return;}
-        setLayerType(View.LAYER_TYPE_HARDWARE, null);
         notificationsLocker.lock();
         final ObjectAnimator animator=ObjectAnimator.ofFloat(this,TRANSITION_PROGRESS_VALUE,from,target);
         signatureTransitionAnimator=animator;
@@ -1641,7 +1640,6 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
                 signatureTransitionAnimator=null;
                 setTransitionProgress(target);
                 notificationsLocker.unlock();
-                setLayerType(View.LAYER_TYPE_NONE, null);
             }
         });
         animator.start();
@@ -2025,7 +2023,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
                 @Override
                 protected void dispatchDraw(Canvas canvas) {
                     super.dispatchDraw(canvas);
-                    if (imageReceiver.getLottieAnimation() != null && !waitingAnimation) {
+                    if (imageReceiver.getLottieAnimation() != null && !waitingAnimation && (transitionProgress >= 0.75f || !signatureTransitionOpening)) {
                         imageReceiver.getLottieAnimation().start();
                     }
                     if (shouldSwitchToLoopView && !switchedToLoopView && imageReceiver.getLottieAnimation() != null && imageReceiver.getLottieAnimation().isLastFrame() && loopImageView.imageReceiver.getLottieAnimation() != null && loopImageView.imageReceiver.getLottieAnimation().hasBitmap()) {

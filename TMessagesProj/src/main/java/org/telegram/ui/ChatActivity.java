@@ -7651,10 +7651,6 @@ public class ChatActivity extends BaseFragment implements
                 if (dx != 0 || dy != 0) finishBubbleReturnForInput();
                 final ChatActivity chatToUpdate = parentChatActivity != null ? parentChatActivity : ChatActivity.this;
 
-                chatListView.invalidate();
-                if (contentView != null) {
-                    contentView.updateBlurContent();
-                }
                 if (chatListThanosEffect != null) {
                     chatListThanosEffect.scroll(dx, dy);
                 }

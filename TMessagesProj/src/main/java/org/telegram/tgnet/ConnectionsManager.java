@@ -908,7 +908,7 @@ public class ConnectionsManager extends BaseController {
                 }
                 pauseNetworkRunnable = null;
             };
-            AndroidUtilities.runOnUIThread(pauseNetworkRunnable, 5000);
+            AndroidUtilities.runOnUIThread(pauseNetworkRunnable, 45000);
         } else {
             if (pauseNetworkRunnable != null) {
                 AndroidUtilities.cancelRunOnUIThread(pauseNetworkRunnable);
@@ -920,7 +920,7 @@ public class ConnectionsManager extends BaseController {
             if (BuildVars.LOGS_ENABLED) {
                 FileLog.d("reset app pause time");
             }
-            if (lastPauseTime != 0 && System.currentTimeMillis() - lastPauseTime > 5000) {
+            if (lastPauseTime != 0 && System.currentTimeMillis() - lastPauseTime > 45000) {
                 getContactsController().checkContacts();
             }
             lastPauseTime = 0;

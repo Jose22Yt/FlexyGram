@@ -4906,9 +4906,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                     checkListLoad(viewPage);
                     invalidateScrollY = true;
-                    if (fragmentView != null) {
-                        fragmentView.invalidate();
-                    }
                     if (initialDialogsType != DIALOGS_TYPE_WIDGET && wasManualScroll && recyclerView.getChildCount() > 0) {
                         if (firstVisiblePosition != RecyclerView.NO_POSITION) {
                             RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(firstVisiblePosition);

@@ -2059,7 +2059,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                 pendingUpdatingConnectionRunnable = null;
                 applyConnectionStateTitle(finalTitle);
             };
-            AndroidUtilities.runOnUIThread(pendingUpdatingConnectionRunnable, 1200);
+            AndroidUtilities.runOnUIThread(pendingUpdatingConnectionRunnable, 3000);
         } else {
             applyConnectionStateTitle(title);
         }

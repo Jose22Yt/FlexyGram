@@ -2315,17 +2315,9 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                     }
                 }
             });
-            if (!preview) {
-                containerView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-                containerViewBack.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-            }
             currentSpringAnimation.addEndListener((animation, canceled, value, velocity) -> {
                 if (animation != currentSpringAnimation) {
                     return;
-                }
-                if (!preview) {
-                    containerView.setLayerType(View.LAYER_TYPE_NONE, null);
-                    containerViewBack.setLayerType(View.LAYER_TYPE_NONE, null);
                 }
                 springRouteBackgroundDrawable = null;
                 containerView.setScaleX(1f);
@@ -2814,7 +2806,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                                 }
                             };
                         }
-                        AndroidUtilities.runOnUIThread(waitingForKeyboardCloseRunnable, 250);
+                        AndroidUtilities.runOnUIThread(waitingForKeyboardCloseRunnable, 40);
                     } else if (fragment.needDelayOpenAnimation()) {
                         delayedOpenAnimationRunnable = new Runnable() {
                             @Override
@@ -2827,7 +2819,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                                 startLayoutAnimation(true, true, preview);
                             }
                         };
-                        AndroidUtilities.runOnUIThread(delayedOpenAnimationRunnable, 200);
+                        AndroidUtilities.runOnUIThread(delayedOpenAnimationRunnable, 40);
                     } else {
                         startLayoutAnimation(true, true, preview);
                     }
@@ -3286,7 +3278,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                                 startLayoutAnimation(false, true, false);
                             }
                         };
-                        AndroidUtilities.runOnUIThread(waitingForKeyboardCloseRunnable, 200);
+                        AndroidUtilities.runOnUIThread(waitingForKeyboardCloseRunnable, 40);
                     } else {
                         startLayoutAnimation(false, true, inPreviewMode || transitionAnimationPreviewMode);
                     }

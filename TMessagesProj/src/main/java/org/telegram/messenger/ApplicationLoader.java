@@ -601,6 +601,9 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         super.onTrimMemory(level);
         app.flexygram.bubbles.SignatureWallpaperBlur.trimMemory(level);
         app.flexygram.performance.TextLayoutPrecompute.trimMemory(level);
+        if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
+            ImageLoader.getInstance().clearMemory();
+        }
     }
 
     @Override
@@ -608,6 +611,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         super.onLowMemory();
         app.flexygram.bubbles.SignatureWallpaperBlur.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
         app.flexygram.performance.TextLayoutPrecompute.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
+        ImageLoader.getInstance().clearMemory();
     }
 
     @Override
