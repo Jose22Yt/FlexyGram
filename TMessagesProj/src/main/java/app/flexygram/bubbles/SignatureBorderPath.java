@@ -55,7 +55,7 @@ public final class SignatureBorderPath {
                 boolean nextInside = belongs(next, position);
                 if (inside != nextInside) {
                     float lo = previous, hi = next;
-                    for (int n = 0; n < 10; n++) {
+                    for (int n = 0; n < 6; n++) {
                         float mid = (lo + hi) * .5f;
                         if (belongs(mid, position) == inside) lo = mid; else hi = mid;
                     }

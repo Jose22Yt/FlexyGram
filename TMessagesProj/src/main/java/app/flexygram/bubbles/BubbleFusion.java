@@ -20,16 +20,10 @@ public final class BubbleFusion {
             previousFill=fill;previousEdge=edge;previousStrength=strength;previousAdapt=adapt;
             outerColor=adapt?mix(fill,edge,25):edge;middleColor=adapt?mix(fill,edge,55):edge;
         }
-        int outerA=Math.round(alpha*strength*.0016f);
-        if(outerA>0){
-            paint.setStrokeWidth(stroke*(1.6f+strength*.020f));
-            paint.setColor((outerColor&0xffffff)|(outerA<<24));
-            canvas.drawPath(path,paint);
-        }
-        int midA=Math.round(alpha*strength*.0032f);
-        if(midA>0){
-            paint.setStrokeWidth(stroke*(1.2f+strength*.010f));
-            paint.setColor((middleColor&0xffffff)|(midA<<24));
+        int haloA=Math.round(alpha*strength*.0042f);
+        if(haloA>0){
+            paint.setStrokeWidth(stroke*(1.35f+strength*.014f));
+            paint.setColor((middleColor&0xffffff)|(haloA<<24));
             canvas.drawPath(path,paint);
         }
         paint.setStrokeWidth(stroke);paint.setColor(edge);

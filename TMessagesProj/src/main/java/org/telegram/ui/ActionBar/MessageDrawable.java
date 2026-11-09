@@ -725,16 +725,10 @@ public class MessageDrawable extends Drawable {
                             app.flexygram.bubbles.BubbleConfig.fusionIntensity(), app.flexygram.bubbles.BubbleConfig.fusionAdapt());
                 } else if (app.flexygram.bubbles.BubbleConfig.fuseGlass() && app.flexygram.bubbles.BubbleConfig.outlineStyle() != 0) {
                     int edgeAlpha = Color.alpha(edgeColor);
-                    int outerAlpha = Math.round(edgeAlpha * .12f);
-                    if (outerAlpha > 0) {
-                        flexyBorderPaint.setStrokeWidth(stroke * 2.5f);
-                        flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(edgeColor, outerAlpha));
-                        canvas.drawPath(contourPath, flexyBorderPaint);
-                    }
-                    int midAlpha = Math.round(edgeAlpha * .26f);
-                    if (midAlpha > 0) {
-                        flexyBorderPaint.setStrokeWidth(stroke * 1.6f);
-                        flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(edgeColor, midAlpha));
+                    int haloAlpha = Math.round(edgeAlpha * .32f);
+                    if (haloAlpha > 0) {
+                        flexyBorderPaint.setStrokeWidth(stroke * 1.9f);
+                        flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(edgeColor, haloAlpha));
                         canvas.drawPath(contourPath, flexyBorderPaint);
                     }
                 }

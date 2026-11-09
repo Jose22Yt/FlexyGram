@@ -191,17 +191,23 @@ public final class SignatureWallpaperBlur {
         for (int line = 0; line < lines; line++) {
             if (entry.canceled) return false;
             int red = 0, green = 0, blue = 0;
+            int lineOffset = horizontal ? line * width : line;
             for (int j = -RADIUS; j <= RADIUS; j++) {
                 int position = Math.max(0, Math.min(length - 1, j));
-                int color = source[horizontal ? line * width + position : position * width + line];
-                red += Color.red(color); green += Color.green(color); blue += Color.blue(color);
+                int color = source[horizontal ? lineOffset + position : position * width + lineOffset];
+                red += (color >>> 16) & 0xff;
+                green += (color >>> 8) & 0xff;
+                blue += color & 0xff;
             }
             for (int position = 0; position < length; position++) {
-                target[horizontal ? line * width + position : position * width + line] = Color.rgb(red / divisor, green / divisor, blue / divisor);
+                int targetIdx = horizontal ? lineOffset + position : position * width + lineOffset;
+                target[targetIdx] = 0xff000000 | ((red / divisor) << 16) | ((green / divisor) << 8) | (blue / divisor);
                 int remove = Math.max(0, position - RADIUS), add = Math.min(length - 1, position + RADIUS + 1);
-                int old = source[horizontal ? line * width + remove : remove * width + line];
-                int next = source[horizontal ? line * width + add : add * width + line];
-                red += Color.red(next) - Color.red(old); green += Color.green(next) - Color.green(old); blue += Color.blue(next) - Color.blue(old);
+                int old = source[horizontal ? lineOffset + remove : remove * width + lineOffset];
+                int next = source[horizontal ? lineOffset + add : add * width + lineOffset];
+                red += ((next >>> 16) & 0xff) - ((old >>> 16) & 0xff);
+                green += ((next >>> 8) & 0xff) - ((old >>> 8) & 0xff);
+                blue += (next & 0xff) - (old & 0xff);
             }
         }
         return true;
