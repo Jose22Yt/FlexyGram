@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="FlexyStudioTitle">FlexyStudio</string>
-    <string name="FlexyStudioMotion">ANIMATIONS</string>
-    <string name="FlexyStudioFastMotion">Reduce animations</string>
-    <string name="FlexyStudioFastMotionInfo">Shorten animations for a more immediate response. Turn off to use Android animation speed.</string>
+    <string name="FlexyStudioMotion">ANIMATIONS &amp; FLUIDITY</string>
+    <string name="FlexyStudioFastMotion">Native immediate response (120/144Hz)</string>
+    <string name="FlexyStudioFastMotionInfo">Active by default in FlexyGram architecture. Reduces animation timings to a minimum for instantaneous response and maximum 120/144 FPS smoothness with zero lag.</string>
     <string name="FlexyStudioConfiguration">CONFIGURATION</string>
     <string name="FlexyStudioExport">Export configuration</string>
     <string name="FlexyStudioImport">Import configuration</string>

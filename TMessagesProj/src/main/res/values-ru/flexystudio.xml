@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="FlexyStudioTitle">FlexyStudio</string>
-    <string name="FlexyStudioMotion">АНИМАЦИИ</string>
-    <string name="FlexyStudioFastMotion">Сократить анимации</string>
-    <string name="FlexyStudioFastMotionInfo">Сокращает анимации для более быстрого отклика. Выключите, чтобы использовать скорость анимации Android.</string>
+    <string name="FlexyStudioMotion">АНИМАЦИИ И СКОРОСТЬ</string>
+    <string name="FlexyStudioFastMotion">Мгновенный нативный отклик (120/144Гц)</string>
+    <string name="FlexyStudioFastMotionInfo">Включено по умолчанию в архитектуре FlexyGram. Сокращает время анимации для мгновенного отклика и максимальной плавности при 120/144 FPS без задержек.</string>
     <string name="FlexyStudioConfiguration">КОНФИГУРАЦИЯ</string>
     <string name="FlexyStudioExport">Экспорт конфигурации</string>
     <string name="FlexyStudioImport">Импорт конфигурации</string>
