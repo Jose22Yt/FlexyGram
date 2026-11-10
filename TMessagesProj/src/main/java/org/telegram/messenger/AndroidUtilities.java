@@ -6115,6 +6115,11 @@ public class AndroidUtilities {
     /** View drawing stays on UI. With asyncBlur, pixel blur and its callback run on
      * the existing theme worker; the caller must publish view changes on UI. */
     public static void makeGlobalBlurBitmap(Utilities.Callback<Bitmap> onBitmapDone, float downscale, int amount, View forView, List<View> exclude, boolean asyncBlur) {
+        makeGlobalBlurBitmap(onBitmapDone, downscale, amount, forView, exclude, asyncBlur, null);
+    }
+
+    /** Regional capture in screen coordinates; view traversal stays on UI, blur may run off UI. */
+    public static void makeGlobalBlurBitmap(Utilities.Callback<Bitmap> onBitmapDone, float downscale, int amount, View forView, List<View> exclude, boolean asyncBlur, Rect screenRegion) {
         if (onBitmapDone == null) {
             return;
         }
@@ -6132,7 +6137,10 @@ public class AndroidUtilities {
         try {
             int w;
             int h;
-            if (forView == null) {
+            if (screenRegion != null) {
+                w = Math.max(1, (int) Math.ceil(screenRegion.width() / downscale));
+                h = Math.max(1, (int) Math.ceil(screenRegion.height() / downscale));
+            } else if (forView == null) {
                 w = (int) (AndroidUtilities.displaySize.x / downscale);
                 h = (int) ((AndroidUtilities.displaySize.y + AndroidUtilities.statusBarHeight + AndroidUtilities.navigationBarHeight) / downscale);
             } else {
@@ -6142,7 +6150,9 @@ public class AndroidUtilities {
             int[] location = new int[2];
             Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
-            if (forView != null) {
+            if (screenRegion != null) {
+                canvas.translate(-screenRegion.left / downscale, -screenRegion.top / downscale);
+            } else if (forView != null) {
                 forView.getLocationOnScreen(location);
                 canvas.translate(-location[0] / downscale, -location[1] / downscale);
             }
@@ -6164,7 +6174,8 @@ public class AndroidUtilities {
 
                 canvas.save();
                 view.getLocationOnScreen(location);
-                canvas.translate(location[0] / downscale, location[1] / downscale);
+                canvas.translate(screenRegion == null ? location[0] / downscale : location[0],
+                        screenRegion == null ? location[1] / downscale : location[1]);
                 try {
                     view.draw(canvas);
                 } catch (Exception e) {

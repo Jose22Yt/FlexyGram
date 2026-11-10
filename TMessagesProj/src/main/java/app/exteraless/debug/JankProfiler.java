@@ -65,7 +65,7 @@ public final class JankProfiler {
     private static final int REPORT_FOLDED = 4000;
     private static final String REPORT_PREFIX = "jank-";
     private static final String[] APP_PACKAGES = {
-            "org.telegram.", "app.exteraless.", "tw.nekomimi.", "xyz.nextalone.",
+            "org.telegram.", "app.flexygram.", "app.exteraless.", "tw.nekomimi.", "xyz.nextalone.",
             "com.exteragram.", "com.radolyn.", "me.vkryl."
     };
 

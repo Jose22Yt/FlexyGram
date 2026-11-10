@@ -31,6 +31,7 @@ public class ChatActivityContainer extends FrameLayout {
     public final ChatActivity chatActivity;
     private final INavigationLayout parentLayout;
     private View fragmentView;
+    private final app.flexygram.performance.ChatNavigationGate chatNavigation = new app.flexygram.performance.ChatNavigationGate();
 
     public ChatActivityContainer(
         Context context,
@@ -69,6 +70,9 @@ public class ChatActivityContainer extends FrameLayout {
     }
 
     protected void initChatActivity() {
+        if (fragmentView != null) return;
+        if (chatNavigation.defer(chatActivity, () -> isAttachedToWindow() && isActive,
+                this::initChatActivity, () -> {})) return;
         if (!chatActivity.onFragmentCreate()) {
             return;
         }
@@ -96,6 +100,7 @@ public class ChatActivityContainer extends FrameLayout {
 
     private boolean isActive = true;
     public void onPause() {
+        chatNavigation.cancel();
         isActive = false;
         if (fragmentView != null) {
             chatActivity.onPause();
@@ -104,6 +109,10 @@ public class ChatActivityContainer extends FrameLayout {
 
     public void onResume() {
         isActive = true;
+        if (fragmentView == null) {
+            if (isAttachedToWindow()) initChatActivity();
+            return;
+        }
         if (fragmentView != null) {
             chatActivity.onResume();
         }
@@ -111,6 +120,7 @@ public class ChatActivityContainer extends FrameLayout {
 
     @Override
     protected void onDetachedFromWindow() {
+        chatNavigation.cancel();
         super.onDetachedFromWindow();
     }
 }

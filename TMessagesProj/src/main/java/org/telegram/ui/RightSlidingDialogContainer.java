@@ -37,6 +37,7 @@ import org.telegram.ui.Components.CubicBezierInterpolator;
 public abstract class RightSlidingDialogContainer extends FrameLayout {
 
     BaseFragment currentFragment;
+    private final app.flexygram.performance.ChatNavigationGate chatNavigation = new app.flexygram.performance.ChatNavigationGate();
     View currentFragmentView;
     View currentFragmentFullscreenView;
     ActionBar currentActionBarView;
@@ -56,10 +57,18 @@ public abstract class RightSlidingDialogContainer extends FrameLayout {
         super(context);
     }
 
+    @Override protected void onDetachedFromWindow() {
+        chatNavigation.cancel();
+        super.onDetachedFromWindow();
+    }
+
     public void presentFragment(INavigationLayout navigationLayout, BaseFragment fragment) {
         if (isPaused) {
             return;
         }
+        BaseFragment anchor = currentFragment;
+        if (chatNavigation.defer(fragment, () -> !isPaused && isAttachedToWindow() && currentFragment == anchor,
+                () -> presentFragment(navigationLayout, fragment), () -> {})) return;
         this.navigationLayout = navigationLayout;
         if (fragment.onFragmentCreate()) {
             fragment.setInPreviewMode(true);
@@ -271,6 +280,7 @@ public abstract class RightSlidingDialogContainer extends FrameLayout {
     }
 
     public void finishPreviewInernal() {
+        chatNavigation.cancel();
         isOpenned = false;
         if (!SharedConfig.animationsEnabled()) {
             openedProgress = 0;
@@ -477,6 +487,7 @@ public abstract class RightSlidingDialogContainer extends FrameLayout {
     }
 
     public void onPause() {
+        chatNavigation.cancel();
         isPaused = true;
         if (currentFragment != null) {
             currentFragment.onPause();

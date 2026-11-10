@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Matrix;
 import android.os.Build;
 import android.view.View;
 import androidx.annotation.RequiresApi;
@@ -20,6 +22,8 @@ final class MusicGlassRenderer {
     private final BlurredBackgroundDrawable drawable;
     private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     private Bitmap recorded;
+    private final RectF recordedSource = new RectF(), destination = new RectF();
+    private final Matrix cropMatrix = new Matrix();
     private int width,height,surface,outline;
     MusicGlassRenderer(View target,float radius){
         BlurredBackgroundDrawableViewFactory factory=new BlurredBackgroundDrawableViewFactory(source);factory.setLiquidGlassEffectAllowed(true);
@@ -30,10 +34,10 @@ final class MusicGlassRenderer {
             public int getStrokeColorBottom(){return outline;}
         }).setRadius(radius).setPadding(0);
     }
-    void draw(Canvas canvas,Bitmap bitmap,Rect bounds,int color,int stroke){
-        if(recorded!=bitmap||width!=bounds.width()||height!=bounds.height()){
+    void draw(Canvas canvas,Bitmap bitmap,RectF sourceRect,Rect bounds,int color,int stroke){
+        if(recorded!=bitmap||!recordedSource.equals(sourceRect)||width!=bounds.width()||height!=bounds.height()){
             width=bounds.width();height=bounds.height();Canvas capture=source.beginRecording(width,height);
-            try{capture.drawBitmap(bitmap,null,bounds,paint);}finally{source.endRecording();}recorded=bitmap;
+            try{destination.set(bounds);cropMatrix.setRectToRect(sourceRect,destination,Matrix.ScaleToFit.FILL);capture.drawBitmap(bitmap,cropMatrix,paint);}finally{source.endRecording();}recorded=bitmap;recordedSource.set(sourceRect);
         }
         if(surface!=color||outline!=stroke){surface=color;outline=stroke;drawable.updateColors();}
         drawable.setBounds(bounds);drawable.draw(canvas);

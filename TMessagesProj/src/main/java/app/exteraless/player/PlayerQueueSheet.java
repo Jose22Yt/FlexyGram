@@ -64,8 +64,12 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
     private final EditText search;
     private final GradientDrawable searchBackground = new GradientDrawable();
     private final boolean focusSearch;
-    private final ArrayList<MessageObject> allItems = new ArrayList<>(), visibleItems = new ArrayList<>();
-    private final ArrayList<String> searchIndex = new ArrayList<>();
+    private final ArrayList<MessageObject> allItems = new ArrayList<>();
+    private ArrayList<MessageObject> visibleItems = new ArrayList<>();
+    private final MusicQueueSearch queueSearch = new MusicQueueSearch();
+    private long queueVersion;
+    private int publicationGeneration;
+    private boolean searchPending;
     private ArrayList<MessageObject> dragOriginal;
     private boolean dismissed;
     private ItemTouchHelper touchHelper;
@@ -188,6 +192,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         search.addTextChangedListener(new TextWatcher() {
             public void beforeTextChanged(CharSequence text,int start,int count,int after) { }
             public void onTextChanged(CharSequence text,int start,int before,int count) {
+                publicationGeneration++;queueSearch.cancel();searchPending=true;
                 AndroidUtilities.cancelRunOnUIThread(searchTask);AndroidUtilities.runOnUIThread(searchTask,120);
             }
             public void afterTextChanged(Editable text) { }
@@ -223,12 +228,12 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
             @Override public boolean isLongPressDragEnabled(){return false;}
             @Override public int getMovementFlags(RecyclerView recycler, RecyclerView.ViewHolder holder) {
                 int position=holder.getAdapterPosition();
-                return search.length()!=0 || position<0 || position>=visibleItems.size()
+                return searchPending || search.length()!=0 || position<0 || position>=visibleItems.size()
                         || MusicQueueOrder.same(visibleItems.get(position),MediaController.getInstance().getPlayingMessageObject())
                         ? 0 : super.getMovementFlags(recycler,holder);
             }
             @Override public void onSelectedChanged(RecyclerView.ViewHolder holder,int state) {
-                if(state==ItemTouchHelper.ACTION_STATE_DRAG){dragOriginal=new ArrayList<>(visibleItems);search.setEnabled(false);container.requestDisallowInterceptTouchEvent(true);}
+                if(state==ItemTouchHelper.ACTION_STATE_DRAG){publicationGeneration++;queueSearch.cancel();dragOriginal=new ArrayList<>(visibleItems);search.setEnabled(false);container.requestDisallowInterceptTouchEvent(true);}
                 super.onSelectedChanged(holder,state);
             }
             @Override public boolean onMove(RecyclerView recycler,RecyclerView.ViewHolder from,RecyclerView.ViewHolder to) {
@@ -283,6 +288,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
     @Override
     public void dismiss() {
         dismissed=true;
+        publicationGeneration++;queueSearch.cancel();
         AndroidUtilities.cancelRunOnUIThread(searchTask);AndroidUtilities.hideKeyboard(search);
         if(touchHelper!=null)touchHelper.attachToRecyclerView(null);
         super.dismiss();
@@ -345,18 +351,27 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
 
     private void refreshQueue() {
         if(dismissed||dragOriginal!=null)return;
-        allItems.clear();allItems.addAll(MediaController.getInstance().getMusicQueueSnapshot());searchIndex.clear();
-        for(MessageObject item:allItems)searchIndex.add(MusicQueueOrder.normalize(item.getMusicTitle()+"\n"+item.getMusicAuthor()+"\n"+item.getFileName()));
+        allItems.clear();allItems.addAll(MediaController.getInstance().getMusicQueueSnapshot());
+        queueVersion++;
         applySearch(false);
     }
     private void applySearch(boolean userSearch) {
         if(dismissed||dragOriginal!=null)return;
-        String[] tokens=MusicQueueOrder.normalize(search.getText().toString()).split("\\s+");
-        visibleItems.clear();
-        for(int i=0;i<allItems.size();i++)if(MusicQueueOrder.matches(searchIndex.get(i),tokens))visibleItems.add(allItems.get(i));
-        adapter.notifyDataSetChanged();
-        subtitle.setText(visibleItems.isEmpty()?getString(R.string.FlexyQueueEmpty):LocaleController.formatPluralString("OEPlayerTracks",visibleItems.size()));
-        if(userSearch)list.scrollToPosition(0);
+        AndroidUtilities.cancelRunOnUIThread(searchTask);
+        searchPending=true;
+        final int ticket=++publicationGeneration;
+        queueSearch.submit(allItems,queueVersion,visibleItems,search.getText().toString(),result -> {
+            Runnable apply = () -> {
+                if(dismissed||dragOriginal!=null||ticket!=publicationGeneration)return;
+                searchPending=false;
+                visibleItems=result.items;
+                result.changes.dispatchUpdatesTo(adapter);
+                subtitle.setText(visibleItems.isEmpty()?getString(R.string.FlexyQueueEmpty):LocaleController.formatPluralString("OEPlayerTracks",visibleItems.size()));
+                for(int i=0;i<list.getChildCount();i++)if(list.getChildAt(i) instanceof Row)((Row)list.getChildAt(i)).updateState();
+                if(userSearch)list.scrollToPosition(0);
+            };
+            if(list.isComputingLayout())list.post(apply);else apply.run();
+        });
     }
     private MessageObject itemAt(int position) {return position>=0&&position<visibleItems.size()?visibleItems.get(position):null;}
     private MessageObject currentItem() {return MediaController.getInstance().getPlayingMessageObject();}
@@ -477,7 +492,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
             addView(handle,LayoutHelper.createFrame(36,48,Gravity.RIGHT|Gravity.CENTER_VERTICAL));
             handle.setOnClickListener(v->{if(message!=null)showTrackMenu(handle,message);});
             handle.setOnTouchListener((v,event)->{
-                if(event.getActionMasked()==MotionEvent.ACTION_DOWN&&search.length()==0&&!MusicQueueOrder.same(message,currentItem())){
+                if(event.getActionMasked()==MotionEvent.ACTION_DOWN&&!searchPending&&search.length()==0&&!MusicQueueOrder.same(message,currentItem())){
                     RecyclerView.ViewHolder holder=list.findContainingViewHolder(this);if(holder!=null){touchHelper.startDrag(holder);return true;}
                 }return false;
             });

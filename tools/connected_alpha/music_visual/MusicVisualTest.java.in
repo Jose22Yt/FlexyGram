@@ -91,13 +91,13 @@ public class MusicVisualTest {
    Bitmap under=Bitmap.createBitmap(360,760,Bitmap.Config.ARGB_8888);root.draw(new Canvas(under));assertEquals(0xff164e36,under.getPixel(28,28));
    Bitmap backdrop=Bitmap.createBitmap(16,8,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(backdrop);c.drawColor(0xffef2244);Paint paint=new Paint();paint.setColor(0xff2266ee);c.drawRect(8,0,16,8,paint);return backdrop;
   };
-  Object surface=bar.getBackground();java.lang.reflect.Method pre=surface.getClass().getDeclaredMethod("onPreDraw");pre.setAccessible(true);
-  pre.invoke(surface);Shadows.shadowOf(Looper.getMainLooper()).idle();assertEquals(1,AndroidUtilities.blurRequests);
-  for(int i=0;i<100;i++)pre.invoke(surface);assertEquals(1,AndroidUtilities.blurRequests);
+  Object surface=bar.getBackground();Object capture=field(surface,"capture");java.lang.reflect.Method pre=capture.getClass().getDeclaredMethod("onPreDraw");pre.setAccessible(true);
+  pre.invoke(capture);Shadows.shadowOf(Looper.getMainLooper()).idle();assertEquals(1,AndroidUtilities.blurRequests);
+  for(int i=0;i<100;i++)pre.invoke(capture);assertEquals(1,AndroidUtilities.blurRequests);
   ((android.graphics.drawable.Drawable)surface).setBounds(0,0,320,64);Bitmap rendered=Bitmap.createBitmap(320,64,Bitmap.Config.ARGB_8888);surface.getClass().getMethod("draw",Canvas.class).setAccessible(true);
   ((android.graphics.drawable.Drawable)surface).draw(new Canvas(rendered));assertNotEquals(rendered.getPixel(40,32),rendered.getPixel(280,32));
-  org.robolectric.shadows.ShadowSystemClock.advanceBy(java.time.Duration.ofMillis(200));pre.invoke(surface);assertEquals(1,AndroidUtilities.blurRequests);
-  java.lang.reflect.Method scroll=surface.getClass().getDeclaredMethod("onScrollChanged");scroll.setAccessible(true);scroll.invoke(surface);pre.invoke(surface);assertEquals(2,AndroidUtilities.blurRequests);
+  org.robolectric.shadows.ShadowSystemClock.advanceBy(java.time.Duration.ofMillis(200));pre.invoke(capture);assertEquals(1,AndroidUtilities.blurRequests);
+  java.lang.reflect.Method scroll=capture.getClass().getDeclaredMethod("onScrollChanged");scroll.setAccessible(true);scroll.invoke(capture);pre.invoke(capture);assertEquals(2,AndroidUtilities.blurRequests);
   Bitmap pending=(Bitmap)field(surface,"bitmap");root.removeView(bar);Shadows.shadowOf(Looper.getMainLooper()).idle();assertNull(field(surface,"bitmap"));assertFalse((Boolean)field(surface,"attached"));
  }
  @Test public void sleepTimerOutlivesPlayerViewAndCancelsOnAccountChange()throws Exception{

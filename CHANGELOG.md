@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.0.0-beta.39 — preparación, build 1328
+
+- Navegación: precarga asíncrona de peers desde ActionBarLayout (presentación y restauración de pila), panel lateral y chats incrustados; se descartan respuestas obsoletas al navegar, pausar, cerrar o cambiar de cuenta.
+- Reproductor Orbit: una captura regional compartida entre superficies visibles, resolución acotada, desenfoque asíncrono y recorte fraccionario por superficie. Observadores compartidos y liberación al cerrar; sin sondeo en reposo.
+- Cola musical: normalización, filtrado y cálculo de diferencias fuera de UI; publicación de filas mediante DiffUtil y cancelación inmediata de consultas antiguas, cierres y arrastres.
+- Perfilador: los módulos app.flexygram participan en la clasificación de código propio.
+- Caché de la silueta de las superficies del reproductor; se conservan diseño, glass y animaciones existentes. Pruebas de concurrencia, recorte y ciclo de vida; sin APK nueva.
+
 ## 1.0.0-beta.38 — preparación, build 1327
 
 - Iconos predeterminados del ZIP del propietario: 119 símbolos originales en cinco densidades, con 477 asociaciones semánticas revisadas. Se conservan los estados o acciones sin equivalente en las hojas.

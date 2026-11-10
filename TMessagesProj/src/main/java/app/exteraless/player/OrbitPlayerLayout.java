@@ -67,7 +67,8 @@ public final class OrbitPlayerLayout extends FrameLayout {
         compactSong=new TextView(context);compactSong.setTextSize(11);compactSong.setSingleLine(true);compactSong.setEllipsize(TextUtils.TruncateAt.END);
         header=new Header(context,back,more);addView(header,new LayoutParams(-1,dp(56)));
         surfaceViews=new View[]{back,more,header.pill};
-        for(int i=0;i<surfaces.length;i++){surfaces[i]=new MusicBlurSurface(surfaceViews[i],dp(28),true);surfaceViews[i].setBackground(surfaces[i]);}
+        MusicBlurCapture sharedCapture=new MusicBlurCapture(this);
+        for(int i=0;i<surfaces.length;i++){surfaces[i]=new MusicBlurSurface(surfaceViews[i],dp(28),true,sharedCapture);surfaceViews[i].setBackground(surfaces[i]);}
         artwork=new OrbitArtwork(context,cover);
         addView(artwork,new LayoutParams(dp(280),dp(280)));
         remove(lyricsPanel);addView(lyricsPanel,new LayoutParams(-1,-1));lyricsPanel.setVisibility(GONE);

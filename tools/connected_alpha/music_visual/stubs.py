@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 import shutil
 
-PRODUCTION = ('MusicBlurSurface','MusicProgressView','MusicSleepTimer','SignatureMusicStyle','SignatureMusicPresentation','SignatureMusicBubble',
+PRODUCTION = ('MusicBlurCapture','MusicBlurSurface','MusicProgressView','MusicSleepTimer','SignatureMusicStyle','SignatureMusicPresentation','SignatureMusicBubble',
               'SignatureMusicHost','ControlsRow','MorphButton','PlayerIcon','Spring',
               'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage','SignatureCoverFade','SignatureMusicActions','CompactPlayerQueue','OrbitMotion','OrbitArtwork','LuminousProgressRing','OrbitPlayerLayout')
 
@@ -17,7 +17,7 @@ def write_stubs(source, root):
     player=root/'TMessagesProj/src/main/java/app/exteraless/player'
     for name in PRODUCTION:
         put('app/exteraless/player/'+name+'.java',(player/(name+'.java')).read_text())
-    put('app/exteraless/player/MusicGlassRenderer.java','package app.exteraless.player;class MusicGlassRenderer{MusicGlassRenderer(android.view.View v,float r){throw new AssertionError("GPU glass bridge is not software rendering");}void draw(android.graphics.Canvas c,android.graphics.Bitmap b,android.graphics.Rect r,int x,int y){throw new AssertionError();}void clear(){}}')
+    put('app/exteraless/player/MusicGlassRenderer.java','package app.exteraless.player;class MusicGlassRenderer{MusicGlassRenderer(android.view.View v,float r){throw new AssertionError("GPU glass bridge is not software rendering");}void draw(android.graphics.Canvas c,android.graphics.Bitmap b,android.graphics.RectF source,android.graphics.Rect r,int x,int y){throw new AssertionError();}void clear(){}}')
     code='\n'.join((player/(n+'.java')).read_text() for n in PRODUCTION)
     names=sorted(set(re.findall(r'R.string.(\w+)',code)))
     put('org/telegram/messenger/R.java','package org.telegram.messenger; public class R {public static class string {'+''.join(f'public static final int {n}={i+1};' for i,n in enumerate(names))+'}public static class drawable{public static final int msg_search=android.R.drawable.ic_menu_search;}}')
@@ -38,6 +38,8 @@ public static android.graphics.Point displaySize=new android.graphics.Point(400,
 public static void runOnUIThread(Runnable r){new android.os.Handler(android.os.Looper.getMainLooper()).post(r);}
 public static int blurRequests;public static java.util.function.Function<android.view.View,android.graphics.Bitmap> blurCapture;
 public static void makeGlobalBlurBitmap(org.telegram.messenger.Utilities.Callback<android.graphics.Bitmap> c,float s,int amount,android.view.View v,java.util.List<android.view.View> e,boolean async){blurRequests++;c.run(blurCapture==null?null:blurCapture.apply(v));}
+// Regional-capture fixture only: no global-window traversal is exercised here.
+public static void makeGlobalBlurBitmap(org.telegram.messenger.Utilities.Callback<android.graphics.Bitmap> c,float s,int amount,android.view.View v,java.util.List<android.view.View> e,boolean async,android.graphics.Rect region){makeGlobalBlurBitmap(c,s,amount,v,e,async);}
 public static android.graphics.Typeface bold(){return android.graphics.Typeface.create("sans-serif",1);}
 }''')
     put('org/telegram/messenger/Utilities.java','package org.telegram.messenger;public class Utilities{public interface Callback<T>{void run(T value);}}')

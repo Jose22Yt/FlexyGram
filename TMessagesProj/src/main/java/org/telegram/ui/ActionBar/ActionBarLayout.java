@@ -1057,6 +1057,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public void onPause() {
+        chatNavigation.cancel();
         if (!fragmentsStack.isEmpty()) {
             BaseFragment lastFragment = fragmentsStack.get(fragmentsStack.size() - 1);
             lastFragment.onPause();
@@ -2473,8 +2474,20 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         return isInPreviewMode() && previewMenu != null;
     }
 
+    private final app.flexygram.performance.ChatNavigationGate chatNavigation = new app.flexygram.performance.ChatNavigationGate();
+    private boolean chatNavigationOwnerValid(BaseFragment anchor) {
+        return parentActivity != null && !parentActivity.isFinishing() && !parentActivity.isDestroyed()
+                && getLastFragment() == anchor;
+    }
+    private void chatNavigationFailed() {
+        android.widget.Toast.makeText(getContext(), org.telegram.messenger.LocaleController.getString(org.telegram.messenger.R.string.ErrorOccurred), android.widget.Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public boolean presentFragment(NavigationParams params) {
+        BaseFragment anchor = getLastFragment();
+        if (chatNavigation.defer(params.fragment, () -> chatNavigationOwnerValid(anchor),
+                () -> presentFragment(params), this::chatNavigationFailed)) return true;
         finishNavigationForInput();
         BaseFragment fragment = params.fragment;
         boolean removeLast = params.removeLast;
@@ -2882,6 +2895,10 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public boolean addFragmentToStack(BaseFragment fragment, int position) {
+        final int requestedPosition = position;
+        BaseFragment anchor = getLastFragment();
+        if (chatNavigation.defer(fragment, () -> chatNavigationOwnerValid(anchor),
+                () -> addFragmentToStack(fragment, requestedPosition), this::chatNavigationFailed)) return true;
         if (delegate != null && !delegate.needAddFragmentToStack(fragment, this) || !fragment.onFragmentCreate()) {
             return false;
         }
@@ -3149,6 +3166,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     public void closeLastFragment(boolean animated, boolean forceNoAnimation) {
+        chatNavigation.cancel();
         finishNavigationForInput();
         if (finishClosingPreview()) return;
         BaseFragment fragment = getLastFragment();
@@ -3461,6 +3479,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     public void removeAllFragments() {
+        chatNavigation.cancel();
         for (int a = 0; a < fragmentsStack.size(); a++) {
             removeFragmentFromStackInternal(fragmentsStack.get(a), false);
             a--;
@@ -4029,6 +4048,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     protected void onDetachedFromWindow() {
+        chatNavigation.cancel();
         super.onDetachedFromWindow();
         attached = false;
     }
