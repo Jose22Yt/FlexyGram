@@ -118,17 +118,18 @@ jobs:
           data = None
           if b64:
               try:
-                  data = json.loads(base64.b64decode(b64))
+                  parsed = json.loads(base64.b64decode(b64))
                   has_client = any(
                       c.get("client_info", {}).get("android_client_info", {}).get("package_name") == "com.flexygram.messenger"
-                      for c in data.get("client", [])
+                      for c in parsed.get("client", [])
                   )
-                  if not has_client and data.get("client"):
-                      c = json.loads(json.dumps(data["client"][0]))
-                      c.setdefault("client_info", {}).setdefault("android_client_info", {})["package_name"] = "com.flexygram.messenger"
-                      data["client"].append(c)
+                  if has_client:
+                      data = parsed
+                  else:
+                      print("REJECTED: Firebase configuration contains no client for com.flexygram.messenger; discarding incompatible secret.")
+                      data = None
               except Exception as e:
-                  print("Could not parse ALPHA_FIREBASE_JSON_B64:", e)
+                  print("Could not parse Firebase secret:", e)
                   data = None
           if not data:
               data = {
