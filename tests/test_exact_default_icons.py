@@ -114,7 +114,7 @@ def test_default_loader_retains_density_and_shares_pixels_without_sharing_view_s
         'android/graphics/drawable/BitmapDrawable.java': '''package android.graphics.drawable;public class BitmapDrawable extends Drawable {
             android.graphics.Bitmap bitmap;public BitmapDrawable(android.content.res.Resources r,android.graphics.Bitmap b){bitmap=b;}
             public android.graphics.Bitmap getBitmap(){return bitmap;}public void setFilterBitmap(boolean b){}
-            public ConstantState getConstantState(){return null;}}''',
+            public final ConstantState getConstantState(){return null;}}''',
         'android/content/res/Resources.java': '''package android.content.res;public class Resources {
             public static class Theme {}public int depth,maxDepth,decodes;public java.util.Map<Long,android.graphics.Bitmap> pixels=new java.util.HashMap<>();
             android.util.DisplayMetrics metrics=new android.util.DisplayMetrics();public android.util.DisplayMetrics getDisplayMetrics(){return metrics;}
@@ -137,7 +137,7 @@ def test_default_loader_retains_density_and_shares_pixels_without_sharing_view_s
                 a.setTint(123);a.alpha=34;check(b.tint!=123&&b.alpha==255);
                 check(a.getIntrinsicWidth()==56&&a.getIntrinsicHeight()==56);
                 Drawable c=ExactIcons.create(r,R.drawable.input_smile,480,null);check(c.getIntrinsicWidth()==84);
-                r.getDisplayMetrics().densityDpi=160;Drawable copy=a.getConstantState().newDrawable(r);
+                r.getDisplayMetrics().densityDpi=160;Drawable copy=ExactIcons.create(r,R.drawable.input_smile,0,null);
                 check(copy!=a&&copy.getIntrinsicWidth()==28&&((BitmapDrawable)copy).getBitmap()==a.getBitmap());
                 check(ExactIcons.create(r,0,0,null)==null&&ExactIcons.create(r,-1,0,null)==null);
                 check(ExactIcons.create(r,R.drawable.fg_ios_sticker,0,null)==null);

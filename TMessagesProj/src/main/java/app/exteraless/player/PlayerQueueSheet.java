@@ -222,7 +222,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
             @Override public boolean isLongPressDragEnabled(){return false;}
             @Override public int getMovementFlags(RecyclerView recycler, RecyclerView.ViewHolder holder) {
-                int position=holder.getBindingAdapterPosition();
+                int position=holder.getAdapterPosition();
                 return search.length()!=0 || position<0 || position>=visibleItems.size()
                         || MusicQueueOrder.same(visibleItems.get(position),MediaController.getInstance().getPlayingMessageObject())
                         ? 0 : super.getMovementFlags(recycler,holder);
@@ -232,7 +232,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
                 super.onSelectedChanged(holder,state);
             }
             @Override public boolean onMove(RecyclerView recycler,RecyclerView.ViewHolder from,RecyclerView.ViewHolder to) {
-                int a=from.getBindingAdapterPosition(),b=to.getBindingAdapterPosition();
+                int a=from.getAdapterPosition(),b=to.getAdapterPosition();
                 if(a<0||b<0||a>=visibleItems.size()||b>=visibleItems.size()
                         ||MusicQueueOrder.same(visibleItems.get(b),MediaController.getInstance().getPlayingMessageObject()))return false;
                 visibleItems.add(b,visibleItems.remove(a));adapter.notifyItemMoved(a,b);return true;

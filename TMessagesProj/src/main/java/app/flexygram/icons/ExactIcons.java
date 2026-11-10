@@ -23,11 +23,9 @@ public final class ExactIcons {
 
     /** Independent tint/bounds per view, shared immutable pixels and original UI dimensions. */
     private static final class Icon extends BitmapDrawable {
-        private final State state;
         private final int width, height;
         Icon(Resources resources, Bitmap bitmap, ExactIconMap.Entry entry, int density) {
             super(resources, bitmap);
-            state = new State(bitmap, entry, density);
             width = Math.round(entry.width * density / 160f);
             height = Math.round(entry.height * density / 160f);
             setFilterBitmap(true);
@@ -36,20 +34,5 @@ public final class ExactIcons {
         }
         @Override public int getIntrinsicWidth() { return width; }
         @Override public int getIntrinsicHeight() { return height; }
-        @Override public ConstantState getConstantState() { return state; }
-    }
-
-    private static final class State extends Drawable.ConstantState {
-        final Bitmap bitmap;
-        final ExactIconMap.Entry entry;
-        final int density;
-        State(Bitmap bitmap, ExactIconMap.Entry entry, int density) {
-            this.bitmap = bitmap; this.entry = entry; this.density = density;
-        }
-        @Override public Drawable newDrawable() { return new Icon(null, bitmap, entry, density); }
-        @Override public Drawable newDrawable(Resources resources) {
-            return new Icon(resources, bitmap, entry, resources.getDisplayMetrics().densityDpi);
-        }
-        @Override public int getChangingConfigurations() { return 0; }
     }
 }
