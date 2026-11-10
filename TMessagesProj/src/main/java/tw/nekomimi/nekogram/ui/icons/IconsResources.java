@@ -55,6 +55,8 @@ public class IconsResources extends Resources {
      */
     @Nullable
     public Drawable getOriginalDrawableForDensity(int id, int density, @Nullable Theme theme) {
+        Drawable exact = app.flexygram.icons.ExactIcons.create(this, id, density, theme);
+        if (exact != null) return exact;
         Drawable cupertino = app.flexygram.icons.CupertinoIcons.create(this, id);
         if (cupertino != null) return cupertino;
         int converted = getConversion(id);

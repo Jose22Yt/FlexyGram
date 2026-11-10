@@ -9,9 +9,9 @@ public final class ComposerIcons {
         switch (state) {
             case "VOICE": return R.drawable.flexy_composer_voice;
             case "VIDEO": return R.drawable.flexy_composer_video;
-            case "SMILE": return reference ? R.drawable.flexy_composer_folded : R.drawable.flexy_composer_smile;
+            case "SMILE": return R.drawable.flexy_composer_folded;
             case "KEYBOARD": return R.drawable.flexy_composer_keyboard;
-            case "STICKER": return reference ? R.drawable.flexy_composer_folded : R.drawable.flexy_composer_sticker;
+            case "STICKER": return R.drawable.flexy_composer_folded;
             default: return fallback; // GIF/menu retain their native, labelled meaning.
         }
     }

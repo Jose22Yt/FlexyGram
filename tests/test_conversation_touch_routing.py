@@ -83,4 +83,4 @@ def test_header_actions_and_preview_gap_have_distinct_native_callbacks():
     assert 'signatureMessageGap.setOnClickListener(preview -> closeMenu());' in chat
     assert 'signaturePreviewViewport.setDismissRequest(() -> closeMenu());' in chat
     icons = (JAVA / 'app/flexygram/composer/ComposerIcons.java').read_text()
-    assert 'case "STICKER": return reference ? R.drawable.flexy_composer_folded' in icons
+    assert 'case "STICKER": return R.drawable.flexy_composer_folded' in icons

@@ -94,7 +94,7 @@ public final class BaseIconPacks {
         if (type == BASE_REMIX) {
             return "Remix-Design";
         }
-        return type == BASE_CUPERTINO ? "Vladimir Kharlampidi · MIT" : "Telegram";
+        return type == BASE_CUPERTINO ? "Vladimir Kharlampidi · MIT" : "FlexyGram";
     }
 
     /** Карта выбранного набора или null, если подмены нет. */

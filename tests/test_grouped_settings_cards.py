@@ -43,6 +43,6 @@ public class Probe {
    if(card==page||(card>>>24)!=255)throw new AssertionError("card disappeared into page");
   }
   if(SettingsCardStyle.surface(0xff22313f,0xff151f28)!=0xff22313f)throw new AssertionError("unnecessary palette change");
-  if(SettingsCardStyle.ICON!=24||SettingsCardStyle.GAP!=4)throw new AssertionError("compact sizing");
+  if(SettingsCardStyle.ICON!=36||SettingsCardStyle.GAP!=4)throw new AssertionError("compact sizing");
  }
 }'''}, [JAVA/'app/flexygram/settings/signature/SettingsCardStyle.java'])

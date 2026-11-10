@@ -80,13 +80,13 @@ public class SettingsIconsRegression extends CompactSettingsTextCell {
         SettingsIconsRegression cell=new SettingsIconsRegression();
         cell.setTextAndIcon("Conversaciones",1000,true);cell.onMeasure(360,64);cell.dispatchDraw(new Canvas());
         require(cell.imageView.resource==R.drawable.fg_settings_chat,"replace known category with outline icon");
-        require(cell.imageView.size==24&&cell.imageLeft==20&&cell.offset==60,"normalize native colour tiles after binding");
+        require(cell.imageView.size==36&&cell.imageLeft==20&&cell.offset==72,"normalize native colour tiles after binding");
         require(cell.imageView.background==null&&cell.imageView.padding==0,"avoid duplicate image backgrounds and padding");
         Theme.foreground=0xfff1f3f5;cell.dispatchDraw(new Canvas());
         require(cell.imageView.resource==R.drawable.fg_settings_chat,"theme changes preserve the assigned native tile");
         cell.setTextAndValueAndIcon("Copias","Configurado",false,1001,true);
         cell.onMeasure(360,64);cell.dispatchDraw(new Canvas());
-        require(cell.imageView.size==24&&cell.imageView.resource==R.drawable.fg_settings_cloud,"recycling restores the semantic tile");
+        require(cell.imageView.size==36&&cell.imageView.resource==R.drawable.fg_settings_cloud,"recycling restores the semantic tile");
         require("Configurado".contentEquals(cell.value),"preserve setting values");
         cell.setTextAndIcon("Plugin",1002,false);require(cell.imageView.resource==1002,"preserve unfamiliar plugin icon semantics");
         require(SettingsIcons.resolve(new Context(),0)==0,"retain absent icons");

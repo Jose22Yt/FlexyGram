@@ -16,6 +16,8 @@ public final class ConversationControlIcons {
 
     public static Drawable load(Context context, int resource) {
         Resources resources = context.getResources();
+        Drawable exact = ExactIcons.create(resources, resource, 0, context.getTheme());
+        if (exact != null) return exact;
         try (XmlResourceParser parser = resources.getXml(resource)) {
             return Drawable.createFromXml(resources, parser, context.getTheme());
         } catch (IOException | XmlPullParserException error) {
@@ -26,6 +28,8 @@ public final class ConversationControlIcons {
     /** Decode the original packaged bitmap, keeping density and bypassing icon packs. */
     public static Drawable loadBitmap(Context context, int resource) {
         Resources resources = context.getResources();
+        Drawable exact = ExactIcons.create(resources, resource, 0, context.getTheme());
+        if (exact != null) return exact;
         TypedValue value = new TypedValue();
         try (InputStream stream = resources.openRawResource(resource, value)) {
             Drawable icon = Drawable.createFromResourceStream(resources, value, stream, null);

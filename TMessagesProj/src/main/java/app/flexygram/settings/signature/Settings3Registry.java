@@ -12,11 +12,11 @@ public final class Settings3Registry {
     private static final List<Entry> ENTRIES=Collections.unmodifiableList(Arrays.asList(
         new Entry("chat",R.string.Settings3Group_personal,R.string.Settings3_chat,R.string.Settings3Desc_chat,R.drawable.fg_settings_chats),
         new Entry("home",R.string.Settings3Group_personal,R.string.Settings3_home,R.string.Settings3Desc_home,R.drawable.fg_settings_home),
-        new Entry("navigation",R.string.Settings3Group_personal,R.string.Settings3_navigation,R.string.Settings3Desc_navigation,R.drawable.fg_settings_estilo_de_interfaz),
+        new Entry("navigation",R.string.Settings3Group_personal,R.string.Settings3_navigation,R.string.Settings3Desc_navigation,R.drawable.fg_settings_gesture),
         new Entry("ayu",R.string.Settings3Group_functions,R.string.Settings3_ayu,R.string.Settings3Desc_ayu,R.drawable.fg_settings_canales),
         new Entry("plugins",R.string.Settings3Group_functions,R.string.Settings3_plugins,R.string.Settings3Desc_plugins,R.drawable.fg_settings_plugin),
-        new Entry("flexyfiles",R.string.Settings3Group_functions,R.string.Settings3_flexyfiles,R.string.Settings3Desc_flexyfiles,R.drawable.fg_settings_iconos),
-        new Entry("files",R.string.Settings3Group_system,R.string.Settings3_files,R.string.Settings3Desc_files,R.drawable.fg_settings_otros),
+        new Entry("flexyfiles",R.string.Settings3Group_functions,R.string.Settings3_flexyfiles,R.string.Settings3Desc_flexyfiles,R.drawable.fg_settings_folder),
+        new Entry("files",R.string.Settings3Group_system,R.string.Settings3_files,R.string.Settings3Desc_files,R.drawable.fg_settings_download),
         new Entry("universal",R.string.Settings3Group_system,R.string.Settings3_universal,R.string.Settings3Desc_universal,R.drawable.fg_settings_general),
         new Entry("studio",R.string.Settings3Group_system,R.string.Settings3_studio,R.string.Settings3Desc_studio,R.drawable.fg_settings_layers),
         new Entry("about",R.string.Settings3Group_information,R.string.Settings3_about,R.string.Settings3Desc_about,R.drawable.fg_settings_comunidad)));

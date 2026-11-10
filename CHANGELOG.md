@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.0.0-beta.38 — preparación, build 1327
+
+- Iconos predeterminados del ZIP del propietario: 119 símbolos originales en cinco densidades, con 477 asociaciones semánticas revisadas. Se conservan los estados o acciones sin equivalente en las hojas.
+- Entrada de texto: sticker de esquina doblada para abrir el panel; se conserva el teclado para volver a escribir.
+- Ajustes: iconos de 36 dp con categorías coherentes, tinte del tema y espacio para títulos largos/RTL; se eliminan las capas de fondo de los símbolos.
+- Bitmaps compartidos mediante la caché nativa de recursos, sin decodificación durante el dibujo ni relojes nuevos. Los packs elegidos por el usuario conservan su prioridad.
+- Integridad de PNG, regeneración, densidad, aislamiento de tinte y regresiones de ajustes comprobados sin generar APK.
+
 ## 1.0.0-beta.37 — preparación, build 1326
 
 - Cola temporal: reproducir a continuación, añadir al final, quitar pendientes y reordenar mediante asa o acciones accesibles. Conserva canción, posición, aleatorio y repetición; no modifica listas guardadas.

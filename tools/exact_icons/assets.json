@@ -1,0 +1,2977 @@
+[
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_enviar.png",
+    "sha256": "823b207a564a0ac510e7aeb0fc66520b4b5cba3d229da013aab0072e4805e9a6",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_enviar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_inicio.png",
+    "sha256": "c1523241cb776962bda860ab3de52b1babefeb3284e225bd1cb567bdcf384a40",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_inicio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_mensaje_tres_puntos.png",
+    "sha256": "5e091ce2cfb93464a9d9625f2b606eed119f4dd3c4280eb936be90da6ad985f9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_mensaje_tres_puntos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_chats_dobles.png",
+    "sha256": "fcf6fa717c32b8b2558b38a77684c48aea53ceeac7cae1552c388aac581f30a7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_chats_dobles.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_llamar.png",
+    "sha256": "cb069a01a74ff62a56e26ae7716c84c85b514fca25a583cca65fb55afb747aa6",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_llamar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_videollamada.png",
+    "sha256": "96ee2fd95c4b5a290806912a9a808d70d8f670753b3f5eea2e1fc4770ffed17b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_videollamada.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_perfil.png",
+    "sha256": "de33092d52229e071121143214ab4522cadc09edbc0295bcf2875e2181be225e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_perfil.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_contactos.png",
+    "sha256": "f3b28908a7fbf86e56b7f45ac8995e405061ef49a38e6bbf4772e5b14991b551",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_contactos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_grupo.png",
+    "sha256": "987dce4572b6825f6cfc104e83e1cb3f4f31101356e24f9394a53dc5aeef3f80",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_grupo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_agregar_contacto.png",
+    "sha256": "b608f90466dacfeabd5fa273a7d69ec2233f89fb7f1bc293b606e490f68d304f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_agregar_contacto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_escanear.png",
+    "sha256": "ecc19d2168d11ac43907e06ef0b1267e5c435bb4178c50949f9694d7a6086b58",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_escanear.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_buscar.png",
+    "sha256": "0ecce56c6e71fdd2c40264dfe5bec4041a3517c25554dd8d597b0a176c3e56d4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_buscar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_notificaciones.png",
+    "sha256": "86b01ae4b58388c71fdc9abd290abf271ecdb80ef3e3221c1f5a6f6f28697ae6",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_notificaciones.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_notificaciones_silenciadas.png",
+    "sha256": "2f932d81127d2b152926eb12fdb8d19883340c6f833d3d75f08e79712be448fa",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_notificaciones_silenciadas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_calendario.png",
+    "sha256": "3a41db6f505f4bddf737aaa03918838b509b023f256cd566277f23bd4dcc02ca",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_calendario.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_reloj.png",
+    "sha256": "132453339106c21453a6a3bae6c5e333c8d63937bd41abd7a3dcd6821bd547c0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_reloj.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_guardados.png",
+    "sha256": "1f2fc033fc43c8222fdfa9cf50a79ac3d2524d1b97484f939bad206425637617",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_guardados.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_favoritos.png",
+    "sha256": "a88566a2db721aa5f04bb9f7e457fb93a314be376ed4e33e53a77b042d8da951",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_favoritos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_corazon.png",
+    "sha256": "03552c5ba2c3f342a673560e1b6d3402831a03c182e6a202c9160027c0ae22bb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_corazon.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_fijar.png",
+    "sha256": "1610c7b92a43c8cd75f6df3021437c3e3aa9a2d4059e937e82cf47e036c4dc2e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_fijar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_ajustes.png",
+    "sha256": "5ec6374e187c1a42da39447ce4855a0cbf2759137319a3e8d0cab5a96ab339c7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_ajustes.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_controles.png",
+    "sha256": "137fdcd44899576cc04862580b0aa27ecc6607fb4c5a71ba12d11d7089af3211",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_controles.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_apariencia.png",
+    "sha256": "b308d41ec99a9a974607341cf5993b103868113fd8d30335b93cc8e84a6cf638",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_apariencia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_pincel.png",
+    "sha256": "b1f9fd9a81286d3cca828b55c5f4792cb834063c486a44ececb491636469de3d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_pincel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_imagen.png",
+    "sha256": "70b804858fc5031799801dbbaedec5b4595bac8526d33aa1017106d4a8997d5c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_imagen.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_camara.png",
+    "sha256": "c81aa07238d7581d3d6a65b1ede15537b9d91708ff01d308a34c06b07731ac3f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_camara.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_video.png",
+    "sha256": "45d1bcf886a37d0a985e532e1b9b54501701a673521df666072c884c40933150",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_video.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_musica.png",
+    "sha256": "cfed3b2ae7bc101daa41834d7a4bfe3256895f0f81722b8559b3bcbf61bcdd28",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_musica.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_documento.png",
+    "sha256": "0502cf264eb658ee05332527b588f85780854a1388d754b10ffdbb6312ea3a28",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_documento.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_archivo_comprimido.png",
+    "sha256": "015d3ec2bc207c85b2d82c24e68d96fa4b745301e2d4fdf24c2902faaa6a5961",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_archivo_comprimido.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_estadisticas.png",
+    "sha256": "a5032dc86fbe37acb25f028c8b4dc77202eff9bdda722d2585bb9af054d426b5",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_estadisticas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_grafico.png",
+    "sha256": "cdb8f6ef8d1596e9f85aa52748e0eb61473fc04af1d3433f9f446b05eefc33a0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_grafico.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_carpeta.png",
+    "sha256": "8814cae970acb91db6c0856e75304fe41e4b68f1e7047fc10da44a74b6c46a90",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_carpeta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_descargar.png",
+    "sha256": "9ebe6582b83353fd3c3e262f06b69f3a7443f1bdf2dc9f3d3fcb2567e0b2849a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_descargar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_subir.png",
+    "sha256": "c84139c8d058a43b8e79aaddaa1cd6ec077ba3c50c479fdd331634d14d4222fd",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_subir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_nube_sincronizar.png",
+    "sha256": "7ad173516dbc6c7723ee4e5bb8fefdb604f36c6f5240e561860e3ccd98d89ae8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_nube_sincronizar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_agenda_contactos.png",
+    "sha256": "9c1a280c44e610958fefc8ef7ea58460efdc85f58ff97c9097e7af8c868209a4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_agenda_contactos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_contacto_nuevo.png",
+    "sha256": "3d5cb0a6c54e15665d05e2886384087b6d4fe84ffa8baff9d87b60fc9dd9a87e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_contacto_nuevo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_grupos.png",
+    "sha256": "c816e04b2150c228bc1715030582afe7940872bdef25a0844b69424d4c42d779",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_grupos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_grupo_nuevo.png",
+    "sha256": "471d1d0cccf2f87952b0bdcb8bce268dfecd8f900da0a17ac613ba8526c02699",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_grupo_nuevo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_anuncios.png",
+    "sha256": "0e796ba02a0de9542a1fc460adb40aefcf26f2e205a20ca13a2c458fcd9f4fd9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_anuncios.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_transmision.png",
+    "sha256": "b7492edfef41c736044c348a2f46c04967c44cf4fa0aa0a123f92f431c97339c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_transmision.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_altavoz.png",
+    "sha256": "e5edf39490130e62a116205736d6bbc69ed990c47c096aedc6811ec103940a5e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_altavoz.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_bot.png",
+    "sha256": "4f87c471c902fd82f1bc5641adc0fd66f73d4bc725a0601c3357853ac3b7f48a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_bot.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_bot_ia.png",
+    "sha256": "0807bf0e0aaf35f2f507077165eed8cf742c83e904224a93089393b10c9f493d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_bot_ia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_destellos_ia.png",
+    "sha256": "4fe3b9587b95ffb36df8ee94bf7f6a37a64abebb8c0c29ad45a7fb3f69712e65",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_destellos_ia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_panel.png",
+    "sha256": "c91dea2836cd8b43e3b3b02268bc330a5389746f79e22ba02e480791a0f154da",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_panel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_capas.png",
+    "sha256": "333dbf4484abdcfbe4600ddfc0fdf19088847dacd0ce916ca42c156e57606a07",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_capas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_proteccion.png",
+    "sha256": "db4a6bf5568c80aa17d07a1dc0ad049c36f4e38ff63e3c81721e27f0929ad1ba",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_proteccion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_candado.png",
+    "sha256": "775cd7258b06c56bdda54c7ac4b1f1cbff522b3cf9b28bd9e5f1e123b8fb67e6",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_candado.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_clave.png",
+    "sha256": "9dee925edb7d53b336161140a944159a5c87cf70a947882b516c792662e5e5b8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_clave.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_huella.png",
+    "sha256": "931a8d954b4d7f156c3b9178fea8ce024d2e6fec7cdafa4475982db3cd1d9e24",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_huella.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_escaner.png",
+    "sha256": "ebfe037f18ab51a9ccf3c1c1eb204e072513677c21692c1747e3f8338d2d6893",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_escaner.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_codigo_qr.png",
+    "sha256": "6bcfd5c570a75fc227bfeb7fec8aa654897dcdcd387893f8bf4283a236ef939f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_codigo_qr.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_enlace.png",
+    "sha256": "bf403e95dcdb76b6752195092bb832e4c7a3af52e6810f83edcb2961a6592dcc",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_enlace.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_desenlazar.png",
+    "sha256": "ece46b38aad1d04ad26e6ce1f9c6997ce663319a37b17aa091216c9999d0dbf4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_desenlazar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_etiqueta.png",
+    "sha256": "5cd34ecdf88872ae68bda712cd36ebc126300b1951b7cb190d1b982af140ee78",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_etiqueta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_eliminar.png",
+    "sha256": "82162eeeb1617fcd53759bba517a88f4d9634c6087eba23a7851f59617a19b62",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_eliminar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_lapiz.png",
+    "sha256": "33697d49b5297a08b1174a4995482966b5607801ddd23e450c4556e9de52c982",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_lapiz.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_editar.png",
+    "sha256": "3778e6f9db63e23e3865566c32672327b3f986e7cf55efd052b4653f2af9ee80",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_editar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_retroceder.png",
+    "sha256": "c505eaf615b75bb0d3ee13a8e9d83d95e47cad79564278fe7337a288c9258879",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_retroceder.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_avanzar.png",
+    "sha256": "82af5c4fba80caf390accd278902bdf3468c8060ec94106656e05b0ad183ed44",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_avanzar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_arriba.png",
+    "sha256": "b760cb7de5b080054aea9df7c73ed0cd06eeaea745dc08998437f43410224a16",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_arriba.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_abajo.png",
+    "sha256": "e1886d2c6e5f41d474f177f4950204fb80394ae6fbdd7a98df0040c4876982f1",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_abajo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_tres_puntos_vertical.png",
+    "sha256": "ee209691f2fca1fe3bc9526c897db14c3b36d59892c268e0d62bdcf044acfeee",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_tres_puntos_vertical.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_tres_puntos_horizontal.png",
+    "sha256": "74ee806116ba6f52fea5b75763d30541047db3ad6c6e7b7e13241eccf2097806",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_tres_puntos_horizontal.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_filtro.png",
+    "sha256": "b40e98f8d4e512463325a679e2890488c12c01e8ac3149771a2cb2a640ead135",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_filtro.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_ordenar.png",
+    "sha256": "d7ac9b5ac7d28399f09fca77c8d04b57598d9c2708fb1213a25fd9236cdd7390",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_ordenar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_lista.png",
+    "sha256": "1f3accf7be96e42311907617dfbbb650935ebbea0f76085c7489f92b80952d18",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_lista.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_lista_numerada.png",
+    "sha256": "94776dc73d02b9740eb40c2a4513718f4e6c805f52e06753d33b6bad9f0159ad",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_lista_numerada.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_cuadricula.png",
+    "sha256": "078bf62cc5a568a5cd8ed40e8d55848cb9b737af7d9cd19c63ccaaf006a64f3f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_cuadricula.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_tarjeta.png",
+    "sha256": "a3493645cea76add950d53384a63d7dd971377a87eada5164c5addad0b843eff",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_tarjeta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_microfono.png",
+    "sha256": "22b0b8169b5ecb81bb3c5cd4c3596b3f8def0aa2a7828b0537b963b0030cf129",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_microfono.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_microfono_desactivado.png",
+    "sha256": "a93d2d3d2af068cfa8dde494a6a8df73ca477fc3278b14efc0959f550c401f73",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_microfono_desactivado.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_volumen.png",
+    "sha256": "2c55aba5bef0aa71e9aad7e8846bedba57c7386c3554c166803554a050a50203",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_volumen.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_silencio.png",
+    "sha256": "a6fee53b39c7b54ac16714e41e877fbb205aa6d5c759d7e5bfc31b9bcb028030",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_silencio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_audifonos.png",
+    "sha256": "5e647d239f4e43535ff6c527d8070cda22c72ec8a4c54a021caeab2f7dbb8fa0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_audifonos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_reproducir.png",
+    "sha256": "212932cdb5d8a53aba4e55a247d1e5f9c65017bc3ac4614c0f167e6d219465a0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_reproducir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_pausar.png",
+    "sha256": "95c92f0081ff54cea16243e7223e54345b3185ecfdacb9c830b05f90ae4b5ffa",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_pausar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_detener.png",
+    "sha256": "a790cb717f7329221659c0cba362b4b498780bb263c10e6dc22b5d7e23e71400",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_detener.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_repetir.png",
+    "sha256": "e8727860867af46c55093e7c3bd6183a08d1e5fc4913873bdf5ac21b7993bc77",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_repetir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_aleatorio.png",
+    "sha256": "a2894fddaaeafd9a4bdb090c30e3eb948b21ecb71aed4fc90ceba1df9a178798",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_aleatorio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_temporizador.png",
+    "sha256": "aba630797b1f6b16fd30ba5399f2f4e014f8270d14f7d77b0414ff1ea885525d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_temporizador.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_infinito.png",
+    "sha256": "cf1685ac4d8e7941422c5b1e2f1f4e98e65534e024b82a4b3c5f421edf1696de",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_infinito.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_emoji.png",
+    "sha256": "a8793fff8b6366bad54cb7ebc04ecbf0310971af7ac197e3fa8dccdef56ee3be",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_emoji.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_sticker.png",
+    "sha256": "94c2fb07b8fb6c0e3e026ccaac4b23bce58dfc54e42259fedcd87d5dc61d7e41",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_sticker.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_gif.png",
+    "sha256": "3adb35ba61f59a5f8185ca230d0c1c67e0cfd8e5d442461b4cfdfb025c618d15",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_gif.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_adjuntar.png",
+    "sha256": "88145b1ac0bd099b16f964c9f453acb1f57986c74859d59ae88b0239bfb94ace",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_adjuntar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_mensaje_texto.png",
+    "sha256": "a89ef504098520e3810594a64e12a0e631ea84fc7224459440ed444ee8e92c28",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_mensaje_texto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_ubicacion.png",
+    "sha256": "442f4dd43dd9a2f0d090b0aaf41976451da5e8c8de5775bbca974bb6f2d03702",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_ubicacion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_avion_papel.png",
+    "sha256": "14d2399a03cdbde4d875595c5f5bd9ada1bc82c08ba070d235b47b5ef9da15ef",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_avion_papel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_idioma.png",
+    "sha256": "0062290a4f316245ea1e5b95bb82afdd61ada5cb74c04d258484731396eb9bba",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_idioma.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_mencion.png",
+    "sha256": "1fc507e6a12892d6eb9f239cce6b46737b79016da63140a7e7744a011ecdb8f3",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_mencion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_hashtag.png",
+    "sha256": "4bb5f9ebeff0daca696aeec4dd4959c04540163f1ae54d58eb7377ca2ee0f2f7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_hashtag.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_tipografia.png",
+    "sha256": "51abf47c57462d9a06fc657b2e504104e43b575c2aa361f7477b818eaa62f9fb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_tipografia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_traducir.png",
+    "sha256": "9d11031e28e18026e00c52ed9a4eff751a4e24ad0773eb42178695c9881a255a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_traducir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_llamada_saliente.png",
+    "sha256": "b1e4df0c11903a32f33fcbe139e056d323416f21d0ad3743221cff9c043706fa",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_llamada_saliente.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_llamada_entrante.png",
+    "sha256": "60f945e5d6aa0eb4164907d8b2a71c2fbdc2f701d11a45ce405bd5b6cf5afb34",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_llamada_entrante.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_llamada_perdida.png",
+    "sha256": "ca5f14939aa4c8a0a13f1cb845f1a9cd242ba973b515baecfb280b71dd89defb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_llamada_perdida.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_llamada_agregar.png",
+    "sha256": "95b77a72cd5f57f8310d83ed701aa720458c13f18ed3967b32b0d19316d89bb9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_llamada_agregar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_videollamada_contacto.png",
+    "sha256": "617650b5bc4564542dd81ea55ab7bb45844194d65e4195df08e0b44e08fdacc9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_videollamada_contacto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_compartir_pantalla.png",
+    "sha256": "da2f1d5b02ebf61c015144890867cd411b58f6fd2c207db338f485a902299b47",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_compartir_pantalla.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_transmitir_pantalla.png",
+    "sha256": "e6853919162e79234831b1a1bc946e760d3d029113ae8741f37a5ec4407e0cf2",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_transmitir_pantalla.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_monitor.png",
+    "sha256": "ad489d97527dba9eaa6c7e74f03543a3ba607617299757743bef18464e42734c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_monitor.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_portatil.png",
+    "sha256": "9d549affe9cb16b2ea84cc46da2c587921768cb2e0eb8229eb35b4cc2678ef64",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_portatil.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_telefono.png",
+    "sha256": "0ccbd1263593fa8e31a6ec8294e3f8187a502d507483febd6406952c950ae525",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_telefono.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_dispositivos.png",
+    "sha256": "5bdfc0428966f8a9aabec2dd64722579d38f17097aa40178ce5cd5a247c547f8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_dispositivos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_ayuda.png",
+    "sha256": "95fdebdd56d93e307106fae89be57f6d2d538a64430c456230209563bd729b14",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_ayuda.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_informacion.png",
+    "sha256": "80fb6b826168f1688a3c682cc359c41bfad2445b0d35f0855859d2645f256b76",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-mdpi/fg_ios_informacion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_plugin.png",
+    "sha256": "6a48d920fea9963d1bc75ea837f117c716309936c832bd10409389565a64eb27",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-mdpi/fg_refb_r08_c09.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_archivo.png",
+    "sha256": "dadfc00f51bcd54e49894977172dcf638a18ee5525c0d576af5cd375584a439d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-mdpi/fg_refb_r02_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_sol.png",
+    "sha256": "5b539299e01780402a8e4753d9861c13c62c6fcd5747cbebf3644cb80128fb89",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-mdpi/fg_refb_r06_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_luna.png",
+    "sha256": "2329e307827d8e524565d2748db794d9bbc034f04eeb8fbaa080177be56af4b0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-mdpi/fg_refb_r06_c10.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_regalo.png",
+    "sha256": "8e95d8833a2c6069864efbb5d2bf9e94e4d75147b7ca4c0d14a23af6675be204",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-mdpi/fg_refb_r07_c10.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_base_datos.png",
+    "sha256": "c0198167bfd1c3c7e16ae417486081a5e7274b22cb686628da080c8b166c7aaf",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-mdpi/fg_refb_r08_c06.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_codigo.png",
+    "sha256": "676402ea1e76beb409c295ed6f7a60cad0f50f0e4ac821945d083643db37822f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-mdpi/fg_refb_r08_c07.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_cubo.png",
+    "sha256": "969969600a519403a2fbf5823218b942e5d604591402e3f7e9b10fc0e96b1344",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-mdpi/fg_refb_r08_c08.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_actualizar.png",
+    "sha256": "d7295d2e3c6e410ed223450bd754c5002fa97d29cba6644c19c8d32453c298be",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-mdpi/fg_refb_r08_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_agregar.png",
+    "sha256": "4412e06d34c6ae1480f3c6e7675bc41f9051137e970f570ea6d37477045960c7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-mdpi/fg_refb_r04_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_enviar.png",
+    "sha256": "17e86ee5f5948c0fb56b8f9fc62bce278d519d480814b3f6826d817e0a18a482",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_enviar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_inicio.png",
+    "sha256": "e37fe93392d3416196e32ca4fd042ae9e60cad39a59579d609bf75b9ad7039b8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_inicio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_mensaje_tres_puntos.png",
+    "sha256": "f19eb5827cc8fc47b6a54dc2ff1cf6d313f7397e9a8e466b831f5f38fa9327fe",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_mensaje_tres_puntos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_chats_dobles.png",
+    "sha256": "c51acff2f681b3eef1292c193831219b3e9dacf006200c6a8b1bcb75c5296957",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_chats_dobles.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_llamar.png",
+    "sha256": "6967221b0e345a16ceb52223a095c09aa33b7f3f8ba0879eb30abe5a7e4a2c1b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_llamar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_videollamada.png",
+    "sha256": "271fa9535468031acf23fa2fb344080f149314fd9cd5ba80989ae69f3d4bea40",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_videollamada.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_perfil.png",
+    "sha256": "f95e0b46d8637b5df15ca6516c312a14122fc5b5405d2963d257493a6e9d90fb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_perfil.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_contactos.png",
+    "sha256": "2c3e73f9f71cf8e322887baf012256b779f18fd86cacfea50803624216218a10",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_contactos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_grupo.png",
+    "sha256": "9a0c0ece111ea86a6e4d2c0fa8af23c9331e184f26bac9d4a3a9c76107253ebc",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_grupo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_agregar_contacto.png",
+    "sha256": "b4b4b6a6d3172d7f0ac44940215a3eab20786f2ba36dad356fb39138e5793af9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_agregar_contacto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_escanear.png",
+    "sha256": "4a2cf58fb031096b219b77823430d4d7bd8a4806b0a5fe240a69d1d8068ed3ba",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_escanear.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_buscar.png",
+    "sha256": "2dca6bcbd043710a7de614216d688a936726570ed599bc730756a5b2ca0ffe80",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_buscar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_notificaciones.png",
+    "sha256": "a8548a2270cdbd63cc876050c36780d36b71230e1d2d1961e56746f2b98ee34f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_notificaciones.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_notificaciones_silenciadas.png",
+    "sha256": "6278bc200f57d2842626975de0021e843083fde48164ca29fb67351f26feb63d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_notificaciones_silenciadas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_calendario.png",
+    "sha256": "002c9623cdd0fdb8110ef015e034d881e5f5601dcdc43299b583de8edf46d1fb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_calendario.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_reloj.png",
+    "sha256": "546c74cd44507a0b29b8e1e280180b100445c93e24fad00d11019b57c3c2ea18",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_reloj.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_guardados.png",
+    "sha256": "0db97dda78222b3f8aaf15d20b363f421e1886047a7f6922e063d8479bb75f74",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_guardados.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_favoritos.png",
+    "sha256": "2fa415d964a0c82710b34faed2dd87bd26f8d77a0ae1e3bed616b039339e3155",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_favoritos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_corazon.png",
+    "sha256": "1f3bad939162d14c3bfe8aeea6b53a29a8dca3f5b784c3ced723367977a373bc",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_corazon.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_fijar.png",
+    "sha256": "80f0257cca992f86a9ed05052d468fe61bfb2b970d88f8a243f93baa5d78ae7e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_fijar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_ajustes.png",
+    "sha256": "9a0edb1e6a7b4b14fb4c4fa2d7de0f3efd8e14dd96cebe1aadfc7c8a999dbfb8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_ajustes.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_controles.png",
+    "sha256": "109b8a20392d56db8bff0be02543ee3f20bd615268ba8c6d7ce6896794d2808a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_controles.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_apariencia.png",
+    "sha256": "955995ebdbbb66a8dd4573c651396eede84449f3a0594fe7e009f143a2fdf1b5",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_apariencia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_pincel.png",
+    "sha256": "fb624f0bf06826960b039584a648b9699755b9dcf3c076c6dfcde93e583f5d0b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_pincel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_imagen.png",
+    "sha256": "1d01c05d158425e4f51be179a041447ded9087b2c4ba2696d625c9aed42e9514",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_imagen.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_camara.png",
+    "sha256": "7ed00b4b61685aea887777d41afce19e8282f47a3730c43b3e735dc6a4195f6f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_camara.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_video.png",
+    "sha256": "9065fadaa33a3c2504ab4d1189a0d39957c52dba878bf132345dddeba5a4657c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_video.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_musica.png",
+    "sha256": "9c6534ddeaf958296a0dde462e48ea0fcc8013c522231f5437f5c12a66da3763",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_musica.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_documento.png",
+    "sha256": "07cd3ccbb355df5ad5b706d4d676d1c932511a916fba836bde507ce218820a8f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_documento.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_archivo_comprimido.png",
+    "sha256": "eae39b0dc076115023667c25cae60017ac0e99c543ae55ad21109a27556d0fc2",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_archivo_comprimido.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_estadisticas.png",
+    "sha256": "516f7fc207f5a2c9f86c2c38a68507e4a99df1c4e2544b624ec1e427912b7731",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_estadisticas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_grafico.png",
+    "sha256": "02f1e77ffd213d3e8504e15b6fb8a1dc253a8015db9932117d79fc15fdc3ebd7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_grafico.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_carpeta.png",
+    "sha256": "d5f65a676222ab300afa8e473d1d2f6d8873b753ccd0d7cd3aeefef33e90e652",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_carpeta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_descargar.png",
+    "sha256": "8550bfb1b009d3cd8de92020426cc3d4d4b7580ad353a886c0d05718ed4ca3da",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_descargar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_subir.png",
+    "sha256": "5b011c60884a2a713790a8fda748b7b141b0cf844e5c547f8b2abc840ddf1126",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_subir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_nube_sincronizar.png",
+    "sha256": "ea2191958c90393563d1163bcada3b580cab4aafffbca0f993ca12c44186283d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_nube_sincronizar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_agenda_contactos.png",
+    "sha256": "656e4ba317695e53056c2d32bd193c6a88f794d13265f7851e507d5adb9c6ef5",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_agenda_contactos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_contacto_nuevo.png",
+    "sha256": "de924539ca792c07c95eba3b64ba10827346f5d7b1f5f58900f94adaf616edb0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_contacto_nuevo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_grupos.png",
+    "sha256": "210b9cdd83116a8b666dc930a271af0432c63cfb4532c034809e37b4dbe7e76e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_grupos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_grupo_nuevo.png",
+    "sha256": "566772cf37dec99afcc2cfef072f3ccdb36cbbb7108bbbe2c66e55d9a06e6fa8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_grupo_nuevo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_anuncios.png",
+    "sha256": "6aea8c46c6f0b394d65ba0ad6b1cd02f742235ac679dcc5a43c07faff7aa8557",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_anuncios.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_transmision.png",
+    "sha256": "e6237605e9599d60416895412222960ee1defa51b2618c5ea29575714927d7dd",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_transmision.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_altavoz.png",
+    "sha256": "a639be3c7216eb1666b092c387af2fc8b63d7654b1c2d9cbd5e57e33e7150137",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_altavoz.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_bot.png",
+    "sha256": "9cccd1dd3108c2d2f5d762471ec7fc5646033a4fe31ab2daffede3123a286bec",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_bot.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_bot_ia.png",
+    "sha256": "11a03410299b92f9123a363f6aba96bb7da63b7c9753264416da78e9304cbf1b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_bot_ia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_destellos_ia.png",
+    "sha256": "9c13adf7a9e92ca774d426384345301b5e4fcf2102c1553cb1fd48d664747b24",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_destellos_ia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_panel.png",
+    "sha256": "97d8223a6d56a634437ddc1bfd4723312333ef87d8408d5ad7c2c5ef7d94ba19",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_panel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_capas.png",
+    "sha256": "49d82ad6701e88a2844a08cf6e6738dfc60427e68c1abf87212948cbc96ee6df",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_capas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_proteccion.png",
+    "sha256": "9791dadce218e6e0e64ac380e3772fbde9a6e215fd8c14c93cd8d4c55248f2aa",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_proteccion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_candado.png",
+    "sha256": "6ab03875c055a8bff82249369ea69c84a1e9412f8b9b07cb3077016272e0aefb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_candado.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_clave.png",
+    "sha256": "ef436c33639741f88c7a7efee82463d9cc328bedd5a925ca01335e6496148103",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_clave.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_huella.png",
+    "sha256": "375912073fb9ccb818740e2dc5242f60046623e12d6d489d830022bd0ea9fe62",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_huella.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_escaner.png",
+    "sha256": "67651fe9ec5c5355345d92f85c0d7ce1ae2b17c98d5033a915d9c3d52264da67",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_escaner.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_codigo_qr.png",
+    "sha256": "5ca8628b6d89b39e4ba7777539cb33a5bb7f8d69ba8dd41ba408edb37f33a16a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_codigo_qr.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_enlace.png",
+    "sha256": "187bc47fbc3c0a9009cd3bc7cecf5bcefd723febd72e69e6bd0b1bf04eb1a0cb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_enlace.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_desenlazar.png",
+    "sha256": "7be3932c4e7ad2a6c0d108707dedba50133d3c8648d57c41db769c0bab557c42",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_desenlazar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_etiqueta.png",
+    "sha256": "669d27691a179df194b8d1f2836a85dde4a2c29c4d67b2e0be7f6e00c13939c7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_etiqueta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_eliminar.png",
+    "sha256": "6e96ee2c460c1d30cd31d7abc2dacaaeb143c6201763848cd5302651e0051954",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_eliminar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_lapiz.png",
+    "sha256": "731b96dd7a834a5730759cad6ca652bd978e0580814f882f0721805d184409e0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_lapiz.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_editar.png",
+    "sha256": "ac2b732816d89f9632c00d7b2c34fe0704e0f8f5f80ed690a360b49afe69514f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_editar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_retroceder.png",
+    "sha256": "1d5693056a10b58b31a44bdf0727681c108a6568f23941a7440ecaf8e837c037",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_retroceder.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_avanzar.png",
+    "sha256": "b462d46e45faae707d14fc7c16f4db25436e3ddf4a4ac3b0ef05b73a9accbc40",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_avanzar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_arriba.png",
+    "sha256": "a1348608088960dc362ef164406220a12bf1b38b827fb8161ae4e055da409462",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_arriba.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_abajo.png",
+    "sha256": "90a3dd21c388cb4838472d216671105ced20a86465ec4b03c42e4536178a3ff4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_abajo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_tres_puntos_vertical.png",
+    "sha256": "ea2c65e419e0a26e603e7a2919bb6b433f34c0ceb42c5e0441958cee48527685",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_tres_puntos_vertical.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_tres_puntos_horizontal.png",
+    "sha256": "65abcadaf0f5a52447385cd1459b0831de8df23a4116c07d6011dfec14326e1d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_tres_puntos_horizontal.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_filtro.png",
+    "sha256": "6847b4e269ca33c861c708e73365ef5f791a15ec32acc5e06a4f242e8cb2de5f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_filtro.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_ordenar.png",
+    "sha256": "306dfce7384592c7eb266d3b3b604d4f0ae41795ee64142aa60d66c38c946e85",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_ordenar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_lista.png",
+    "sha256": "1eac3cd6bec8ad146f837aa09927cd0163cdedbaa0169c133d2fcd90d9df209e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_lista.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_lista_numerada.png",
+    "sha256": "31118de3c94a23237a39f9e156c625a49f87388981f3051023a52743c41157ca",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_lista_numerada.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_cuadricula.png",
+    "sha256": "0f800a31c82bc51d347db9d82720f0bf3a79d5fa7dd20ae4f5ca21bb91216f7a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_cuadricula.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_tarjeta.png",
+    "sha256": "bd97f078533367f9d67fc1f402ccc1fd057b53f99d1849444d59f02067d5a446",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_tarjeta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_microfono.png",
+    "sha256": "ff0234eb713cdf2e1878905254a8255edf7195c4dfc161f0a987632f50952a58",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_microfono.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_microfono_desactivado.png",
+    "sha256": "8112bdde2d3b1a20b8adee47067684db9ecfdb4cdaa4aefa32efa7a84c71b246",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_microfono_desactivado.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_volumen.png",
+    "sha256": "5f5ae3cee82dca10cdc761240ef7df738311db1fdbe8a266200505429ccaaa18",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_volumen.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_silencio.png",
+    "sha256": "513a8844e5d7d7e7c566c4f6dc8b401c94a57a041bb9830252d63a2f6d750a3c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_silencio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_audifonos.png",
+    "sha256": "66fbaaf0f5a43953b13ae1d50a502faf349496e1f405ec25299ec278061a7c21",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_audifonos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_reproducir.png",
+    "sha256": "ba581fe2eb5a9091c97fc50c37b9e0dbd1947a47c30ce1e1693c4f3d1b24732a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_reproducir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_pausar.png",
+    "sha256": "ad1bcf699dfa23e0231f9a737a62e3193fd397ed14b3467a7cb231cbb1269b00",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_pausar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_detener.png",
+    "sha256": "a20928107f443a5d033b841894f1a9884d1ac9a30b3ea7519d348b5c250ebe5a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_detener.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_repetir.png",
+    "sha256": "f0fd3e2191bcb1c2d9aad8d9804ff00f347e91a3d029e9faab803d2643ce609d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_repetir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_aleatorio.png",
+    "sha256": "e2cff995253db25200f5caf7ea0a70beba811e61efcfc0d4d4ef26a0efdf23b1",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_aleatorio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_temporizador.png",
+    "sha256": "c7bd43c2e0f330de29cefc0b527ca4b23d24d19b571ca890afca34dd3bf3f471",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_temporizador.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_infinito.png",
+    "sha256": "cbf20085d639cedc58ce270168846819bb6e25bea0f0a6d7ab74c7ac38946563",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_infinito.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_emoji.png",
+    "sha256": "e20b587d700d8f4ae829063cbf332e3dbf5db643e0b2ff9f3b94e97f25d9f5dc",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_emoji.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_sticker.png",
+    "sha256": "7087faf677399f3e78d0a3cfedbcc4e6ac3014d1c65c654905102e2633b23bbb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_sticker.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_gif.png",
+    "sha256": "363e562de9092fe3fb5eaee4819e12a8676a367712a439c66576659dcfdf0725",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_gif.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_adjuntar.png",
+    "sha256": "e288af75f2eb064d138379140e654458ed05b9c7afeacf4dc3dc3880f7c58cd4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_adjuntar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_mensaje_texto.png",
+    "sha256": "01d1d12bede618977c521f9c700f0e6249b34defdc9f472d80385a0417e26317",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_mensaje_texto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_ubicacion.png",
+    "sha256": "b341ffb02761810a284978baf917acd0922fff0b4c7bbbfb71b80c6989fe50dc",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_ubicacion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_avion_papel.png",
+    "sha256": "5975732bc24c049b68b99117a4cbbdcfda0d0fba7a3d8f861ab58063e27c9817",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_avion_papel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_idioma.png",
+    "sha256": "4b6191152abb6f0371e9e26350e3626fea52ce3211794fef831d2ed6db86f0e2",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_idioma.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_mencion.png",
+    "sha256": "7cae8bdaae795b162b5fc2a75139c2f8d23aab6c08d9eabef265e2a73be66471",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_mencion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_hashtag.png",
+    "sha256": "ef19f4c3d80f79f5fa2346dfeeedc298f473e20f0976aecc0effe77c08072dd3",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_hashtag.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_tipografia.png",
+    "sha256": "96ea0a5d032356f031eb9a6a2e7361067d128f773304efb88ddf59186e143f2d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_tipografia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_traducir.png",
+    "sha256": "6fe7907c0b7c965f037286df2be892f91061a75370a01f1f698a481b2a8fd215",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_traducir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_llamada_saliente.png",
+    "sha256": "1dc670668d59561934c5e5e7c4f667784934b84c693ec62145c87a2cab38a720",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_llamada_saliente.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_llamada_entrante.png",
+    "sha256": "81ca5c9812da4473f53b34c64a2b68f1806a988d12dede678f6e83ceebdf8f71",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_llamada_entrante.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_llamada_perdida.png",
+    "sha256": "ce9e409bdda9c4ae7647b9c0c7fbcead16f28c239af77d3d9f1c948b83610a29",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_llamada_perdida.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_llamada_agregar.png",
+    "sha256": "ca87a845c1e4ff9f099a76cd70cdc487b94e4dddd579c46f9041a29b8ffa06d3",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_llamada_agregar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_videollamada_contacto.png",
+    "sha256": "62d01c895fddf3c290eea2069a3ee48c019e578b52c03446cd3abda45909309b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_videollamada_contacto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_compartir_pantalla.png",
+    "sha256": "a712f2a838714237cae5a3c69b73e6e5f236ed9fd02a742994ea5dfa87f29e38",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_compartir_pantalla.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_transmitir_pantalla.png",
+    "sha256": "8aa8f2b024e96e57d94b5f82c3ec478b56f15613fc61c6a65f2e2542527c2c06",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_transmitir_pantalla.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_monitor.png",
+    "sha256": "b89d5ef5ffa48d29430fd712df3eed9dd57384d317d5e7111dab4e4a6618c125",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_monitor.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_portatil.png",
+    "sha256": "93618846423faaa13eecfad3bebf663fe3c7181c25ed399fa772f7264c7729b9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_portatil.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_telefono.png",
+    "sha256": "0fa42e003a2532c0e5ef4b6e32705860fd14955ca68495f4798d42e2622f869d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_telefono.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_dispositivos.png",
+    "sha256": "b84102cd293e323c278ba641c255338815d25f96179c2978f0fcd9eff7e31d5b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_dispositivos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_ayuda.png",
+    "sha256": "57c3526cb870b67709a0de885b29e10dab4d1f5c76c47ec4e645275fed79f2fd",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_ayuda.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_informacion.png",
+    "sha256": "403b7e3bf4daabc633333047875fb6602281ae582c04ced7fea20f265d059861",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-hdpi/fg_ios_informacion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_plugin.png",
+    "sha256": "feaa10cfa01da140e27ea1f12e8a86b93d9335a1706645d9e5f64a3a28c54897",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-hdpi/fg_refb_r08_c09.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_archivo.png",
+    "sha256": "c1dbf898b17dea7bfc6202a54f2e2afec363348f46e108f00555c21dbdf6c7fe",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-hdpi/fg_refb_r02_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_sol.png",
+    "sha256": "ef864037b7972f3ce287624df730c187409924350865bada777d73fa58677fb9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-hdpi/fg_refb_r06_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_luna.png",
+    "sha256": "261058e027441f37e8f313e664ec3065c04f4211c0cab2df73154b7def3ab415",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-hdpi/fg_refb_r06_c10.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_regalo.png",
+    "sha256": "a6e89475843c8e18972280f0fdb708f315d4d8924b346811ce93359f21d09a2b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-hdpi/fg_refb_r07_c10.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_base_datos.png",
+    "sha256": "f776cd5fcd4fa531fa30320cae9ad8e361ac895add610ef623f605ca35f02f4b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-hdpi/fg_refb_r08_c06.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_codigo.png",
+    "sha256": "bb15ace1c70ba2b13cba540acc8ee3ecf095ea6703eb68d70807a2e784f4ba58",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-hdpi/fg_refb_r08_c07.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_cubo.png",
+    "sha256": "86eef4c029f135e878d0685c6b73939805f80a8963b1fefd4a97dac66d934ba4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-hdpi/fg_refb_r08_c08.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_actualizar.png",
+    "sha256": "f1f0bf863e6a3427ca0d4e39f5110bfd0cd0085503dad83e176b864dddb2e9ea",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-hdpi/fg_refb_r08_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_agregar.png",
+    "sha256": "6c9613a371d1eb177ce302646daacb8a8c31ce629a863c7d30980c1450760277",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-hdpi/fg_refb_r04_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_enviar.png",
+    "sha256": "77c0ba5dd47ba40f0502d12f01193e241832f4139f1a29739dd3626b82e9dd4a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_enviar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_inicio.png",
+    "sha256": "00915d4d282c62263a2f63a9fc76a91147d2da8a5ee68a7831a36047caf27cbf",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_inicio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_mensaje_tres_puntos.png",
+    "sha256": "54aeb8462aefc3e4744c28f13efbdfdc06a3dd83992bae3d07b302d612eb864d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_mensaje_tres_puntos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_chats_dobles.png",
+    "sha256": "90c87d47529ae870cd0a62fcb838fabc22db59b6663a33819ee9d63b08e44970",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_chats_dobles.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_llamar.png",
+    "sha256": "4e8b98ac99e225f8da02b96f4043cac1e386485ddcc4151bd4dc752d40df138c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_llamar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_videollamada.png",
+    "sha256": "1b3631eb0b20891c05f1391a9bbd322c52fb2878015ab50e7897cebc5342a412",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_videollamada.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_perfil.png",
+    "sha256": "28df0b4179990766e28ac219905d34869239b3630c92e6d29ee9e21f9ceca3b1",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_perfil.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_contactos.png",
+    "sha256": "7cc6b1c7121d1ccb50f68f310bbfb512ef863c4ae68e3a55af944abd54a4ab75",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_contactos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_grupo.png",
+    "sha256": "632513900fddfbe2bdd48adf607aea4dced4831c5a611825d223daf092d1e193",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_grupo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_agregar_contacto.png",
+    "sha256": "081e692ace2cc7b1c991b7754c4bbb304a0ac54a42ebb0ac1c328bcc29605488",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_agregar_contacto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_escanear.png",
+    "sha256": "4f3dd54101a556e5e815be4e0dd43743d2398f7581a17d6b10ce2ba2c4a74c92",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_escanear.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_buscar.png",
+    "sha256": "c6e45beb038461a854d498e18dde0710899a91cbb800f3fb6b309e69076b12e5",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_buscar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_notificaciones.png",
+    "sha256": "e554ed0a45c345001b7813ea1d9771eaf8e873e34b992b47fe0cd5cbda18afb7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_notificaciones.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_notificaciones_silenciadas.png",
+    "sha256": "6f491b51ba10662e59baf8088165424ac7bb57a50616b2f4718d1610be107728",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_notificaciones_silenciadas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_calendario.png",
+    "sha256": "69f2e4b0feb31718f8269cf6a419e88f93863dfb3b9c66cab0022433a6457cdc",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_calendario.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_reloj.png",
+    "sha256": "557e05a6d32a28d7237887a646c5d30e9bb2ac462f902a636883a65f46294fdf",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_reloj.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_guardados.png",
+    "sha256": "04fee8ca4bca6a049f5cf878950bf6f7ca6b5e6a8d003ec4cda9da691594e7d2",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_guardados.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_favoritos.png",
+    "sha256": "93d85894c491a9758aa46e097e267e33220cb8c85673125877d372e958cb942b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_favoritos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_corazon.png",
+    "sha256": "fb1f6e8637510c8a24c0f02d3fafb40e5bb4bc6c001429b6f446667b130789c8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_corazon.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_fijar.png",
+    "sha256": "5fc9a70510faf855577dab117f491a6c9ea155edc47942b03b6f73cc1069314d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_fijar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_ajustes.png",
+    "sha256": "b0f1e7cb0a18fa97e168662373985bae32f5019e343c23f8141659cdf5556e3a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_ajustes.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_controles.png",
+    "sha256": "ed2c05f934d56ff41f90bb3f01cac65e773652ee24df3b9134a57b7ac54e2594",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_controles.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_apariencia.png",
+    "sha256": "ce0156b7b4f7538a3bd93e7e966fe7ac604a5b49c529912cbcf7e85cd2df5635",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_apariencia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_pincel.png",
+    "sha256": "0d847bd6bf3a598d2d560ce0363afd6ecd55286828ce0df3a51802e243ad04c8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_pincel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_imagen.png",
+    "sha256": "d101f78bc18bb6046bbe20b95836a81dad7c7c312860d378d002b41045147335",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_imagen.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_camara.png",
+    "sha256": "e06a110eaa544d9355c8cc4e62145b58cefc03aff14e8d1de6c3bb81bf761436",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_camara.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_video.png",
+    "sha256": "90e2973a47f4654d702ecf84c057c159fc5af0c9301e26039310837bfbe6bf34",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_video.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_musica.png",
+    "sha256": "920d910744fd51aa62dce2b25d87a2babdbb1f5e93e7fe435a5e322a23da6b1e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_musica.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_documento.png",
+    "sha256": "f9d967de2f2163b20b631cc1be431e6629eb4935e5e5494b97e7c5d9cac20b07",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_documento.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_archivo_comprimido.png",
+    "sha256": "4e8b15236618be907cc892e3241373c85641bd2adb77ab48d79552777f45a281",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_archivo_comprimido.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_estadisticas.png",
+    "sha256": "d1b35bd927b8cee66311e4e839b3385700366819eea83be7d6b9784fca9900b7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_estadisticas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_grafico.png",
+    "sha256": "fe5515fae317671fe45a34e79c1167c0054248da82d7710f7a6613843bdf20b7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_grafico.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_carpeta.png",
+    "sha256": "2c342fc03bca28fad81256d1fa0d7681c483e66178056093911c0999462a7b68",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_carpeta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_descargar.png",
+    "sha256": "a22e8c48ed1bae4b982c7a362a13376e2d8e90a4f36c5978f709cdf5f05e3acf",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_descargar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_subir.png",
+    "sha256": "dd04a5556329e78480359e3f284f77d75b0a39fc1f7ff3209c6d0a565b966098",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_subir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_nube_sincronizar.png",
+    "sha256": "9b781c16f9aee31bb8a0164a9f0ce2df6bf4c6dbcc2b5383ba0b4d8cb823c2a3",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_nube_sincronizar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_agenda_contactos.png",
+    "sha256": "d4d64f4330ebc08ae54339b96b72f8a5a3bd3cdd8364d72b9736ef580fd3ca92",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_agenda_contactos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_contacto_nuevo.png",
+    "sha256": "f53005d5190bccc4cdee3cf9e803d4895ca83f1c9d9314e8af325fd295073339",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_contacto_nuevo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_grupos.png",
+    "sha256": "347f5a0f6c3c3861eb10334def46b6bd9f8fcc7a499d46b502c5c55545038b08",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_grupos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_grupo_nuevo.png",
+    "sha256": "4d6babe6d67dd5e57a5c6fbcd92927939a04c834169a6e8ce4eed417c741a50f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_grupo_nuevo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_anuncios.png",
+    "sha256": "100f3234ca70a309daf8e94dad4e64036c5d64275f537865015d5b7c4970b010",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_anuncios.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_transmision.png",
+    "sha256": "c902186320c21bd40dce1073ee9f080364e942d01d99142f9c0a2be24f779a36",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_transmision.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_altavoz.png",
+    "sha256": "ed87ce95cf157b9628e81265490ef6f870d572b75b9257330ec6508b8eaa9f49",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_altavoz.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_bot.png",
+    "sha256": "3eee550585b905a44fe707d53290212cc0f9c5ec6622e1d1a28522a6b0c63ece",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_bot.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_bot_ia.png",
+    "sha256": "0c37a6aea8db3bd43533d6ccb581d92014dc3b4f7f32c076549c2e5bd638e9e0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_bot_ia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_destellos_ia.png",
+    "sha256": "8f908b655616bfbc33230f6661b73f02ebd11fd219e3861599df26457eaded8c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_destellos_ia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_panel.png",
+    "sha256": "59543123d1aa9ff9cbe7271bef1cc6173a01d96ae7add8cbd5e32ecb8e4aeda3",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_panel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_capas.png",
+    "sha256": "9c5f93ecf573d433a076fee0da857e81fae435744b6f4f6c418d0ff092493700",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_capas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_proteccion.png",
+    "sha256": "d3ed15c0eafd5c87f4e5133893286a9eef6d1821b1413afb849b8c1d2747b0fe",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_proteccion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_candado.png",
+    "sha256": "756686f7dde0b1672f1f2edcd9c21383e5fcf62893bb95f5464b3c8000ffc38c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_candado.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_clave.png",
+    "sha256": "1a60c4112acf951d7d856fddc9d5c308f67e148b0f1daf934fce4b823b61b9a5",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_clave.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_huella.png",
+    "sha256": "bb891be886b23d6b34454f5f149ca8cc39859415f5f9997d56073415073471ad",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_huella.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_escaner.png",
+    "sha256": "d9251a1945bd8005d04b1624cdbfa7ca35320436160a55d735c0c424b911a1cb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_escaner.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_codigo_qr.png",
+    "sha256": "38953352789c402c5ed2461da75e8fe87bdb653c85032c9a631d5e0ac868c854",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_codigo_qr.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_enlace.png",
+    "sha256": "e4ddb68098467836205333dea63afd49c38c7efc6b274aa879243c7e77b42d1f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_enlace.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_desenlazar.png",
+    "sha256": "5a8d5e2e960866f1c8385695d56bc33b3707b31d2767871a132b62ec70e92c7d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_desenlazar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_etiqueta.png",
+    "sha256": "ffd4331a7122d38dc37ac39db593ca4fe217b3dc65a71ab1f9534801161030ac",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_etiqueta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_eliminar.png",
+    "sha256": "1a58394e0e66bd1e481b050eccfc9dba828d78bafb360ab051bfe71413e33d1e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_eliminar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_lapiz.png",
+    "sha256": "b7b4aee8da2cc9bbd3e07c67788b0595ec3d88aba61597f1be5a5624dcd9c20a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_lapiz.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_editar.png",
+    "sha256": "bd0d10b570a7a9885d9c52cd2865ec8f11c9751174ed696b41cf45464a6147c5",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_editar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_retroceder.png",
+    "sha256": "fa878ef6430f61e66302caf2f6a72ec7a9903ce911c1103d46437f6470f9849d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_retroceder.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_avanzar.png",
+    "sha256": "3a6dc2698e284218ac3cef9a219f833ebea2df56d43d918aba6c1b9fc9e6a23f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_avanzar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_arriba.png",
+    "sha256": "c66d8450a6a7232e2426f8144b55ba28205b2df05b354c25ddd38900a9e6268e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_arriba.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_abajo.png",
+    "sha256": "66b6edf2f3d1df7cc6de5d729653f25ca8bf2769c5b5043cc665233202e973cd",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_abajo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_tres_puntos_vertical.png",
+    "sha256": "2b94804aabd9738371a504cb84b2d09c25b789b601eb7658aeecdc1679455956",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_tres_puntos_vertical.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_tres_puntos_horizontal.png",
+    "sha256": "45fe98c44e0db57dd622dbc075c25c9d2cb2a7a490b1ee1da1463a9903640cea",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_tres_puntos_horizontal.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_filtro.png",
+    "sha256": "d125dc97ccf36be4e4169638cc91a0d2d565649c2610d87cef99069402f2d81c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_filtro.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_ordenar.png",
+    "sha256": "790b597ac14ee414b5fec319d6d117d909945af31b10629d6bac0a50f858bdcb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_ordenar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_lista.png",
+    "sha256": "070c2af9c7b7e46f609976c94553e656edaddbd853ebdd9bdf5884ab60bff157",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_lista.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_lista_numerada.png",
+    "sha256": "98df8661cd4d0dc9c718b5733f705ba0decd383548d2125c9d3a9db8d18a88fc",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_lista_numerada.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_cuadricula.png",
+    "sha256": "1809c9d4d638002758550e6ac20e51746bc78565ca5baf62a67aefd29988afe0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_cuadricula.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_tarjeta.png",
+    "sha256": "df56854694e3e1b45d2054e1f5fcd107e761963192ba56e36c5180616f2a828f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_tarjeta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_microfono.png",
+    "sha256": "25bc341df02d7980aee36771bbad26677dcb3d01dd8a5738cbc312341c67e2d0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_microfono.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_microfono_desactivado.png",
+    "sha256": "e8a61783c8092abf516be032d7b512f9585b0da8d04cfc9461eb1f1339dd6a87",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_microfono_desactivado.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_volumen.png",
+    "sha256": "ed265b2b3b25822974ffd84928033c61d13ab1a8e0b84e9994c6cff8e0b7fb00",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_volumen.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_silencio.png",
+    "sha256": "cd73750be7ebcedf10893b4918cb16f1a9a98856d640e2c0822517ec65e4efe6",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_silencio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_audifonos.png",
+    "sha256": "d04aa7fed5239ba997a572711c5ed49745886618183fdcd148fc4c5a8dd2ced4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_audifonos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_reproducir.png",
+    "sha256": "8ebaf9eddbc8a6c20ed284a5d3100c843ba41950382b77250d58907a7d903134",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_reproducir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_pausar.png",
+    "sha256": "81ad771ee5bc0285a1a45e327681983a697852424f51059fd4c7a4717aa0cdc7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_pausar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_detener.png",
+    "sha256": "3c04760c593908ed90e57af1ed84df4a8322a3cf29d866534994078e532f0a93",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_detener.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_repetir.png",
+    "sha256": "b61657297ea6f35a02c0a95dc00aed36b035acd5f762a678095efeb8e6cedd7a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_repetir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_aleatorio.png",
+    "sha256": "eb25b5e51ac2f918accb6e3361e553c945a4e41543ce53699cf1410f30d36324",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_aleatorio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_temporizador.png",
+    "sha256": "f9eeeca857a39e58784d6f2fb6882611088ad469919fde13a7597841919bb9c6",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_temporizador.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_infinito.png",
+    "sha256": "e7ec9f6e9d355c86322d88cd655475a84ee8c48744977acfdc48ee7acb0488c3",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_infinito.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_emoji.png",
+    "sha256": "85b1a90ba4ab031d92a7dd1604fab7646be54b774ba1e3ba550fb6469e739582",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_emoji.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_sticker.png",
+    "sha256": "ab1fc23de960f5f3064601923a113155796eae898e9a6fcc56ab71b6002a71f3",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_sticker.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_gif.png",
+    "sha256": "48d60dc638e39d4aa7ca97a85135ca815e1351afb44d9e101866ebeef7a77639",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_gif.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_adjuntar.png",
+    "sha256": "1216f6f9ca7039674bf73ecb327c52cf42b651e1f219f98a513d6f6c8e894d28",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_adjuntar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_mensaje_texto.png",
+    "sha256": "05f7f7df487d178b558332c6c8fe441ef2817c6f7f3467b29b3678736c6c1e06",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_mensaje_texto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_ubicacion.png",
+    "sha256": "8baddbe0ef061850fccf563e54770579d827e45ccf23b6c0d1398258565ad805",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_ubicacion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_avion_papel.png",
+    "sha256": "1f581785e9287026e548a576af18a7a4c87452f36e7fece5aaffb1d66031a71b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_avion_papel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_idioma.png",
+    "sha256": "2739d2993769742ab99501589e89e0dc9e723f365f8aceff9afc859f616a2a69",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_idioma.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_mencion.png",
+    "sha256": "eb0fe98131ce8ddb6667072a102029bedba2693e9014a47efa00fc8931da3150",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_mencion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_hashtag.png",
+    "sha256": "602435ebcddd1641687a78248aff72c22c6cffeb6c433c140dc6db8fe8aed293",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_hashtag.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_tipografia.png",
+    "sha256": "57e6ae0b3f0ded40f36d886f335dddb0259aa58d2f888be82f3c9b14dbaaf9a1",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_tipografia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_traducir.png",
+    "sha256": "c1cc470a7f85827a911dc34a8fb7582884340551348749349ad8554751c2eba5",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_traducir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_llamada_saliente.png",
+    "sha256": "c15af7ff56000fc4f740ac311966ae722cd2ccdc1d9228184d8d493fec8885bb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_llamada_saliente.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_llamada_entrante.png",
+    "sha256": "90b6d2fd833318aeaccf968aaf3d736b571ab22f15977e58995bfca47e84fe42",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_llamada_entrante.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_llamada_perdida.png",
+    "sha256": "ac66fb0aa5f010808b9ec1a69cd0e324482ac2946922ceffbce97291b46ea23a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_llamada_perdida.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_llamada_agregar.png",
+    "sha256": "539a37be1ebb76b1cec8d4afbff59e8faa313567f52c4060b5d85a82408b2ccf",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_llamada_agregar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_videollamada_contacto.png",
+    "sha256": "47403fc71262b53f201c1a789a5a4d9f75c7a8037c4100c92ee8fd7cb42f636f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_videollamada_contacto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_compartir_pantalla.png",
+    "sha256": "c23f5496b51e76ec129a1a0c20e6a6f1bd12482b94a7c246be875492f26816b8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_compartir_pantalla.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_transmitir_pantalla.png",
+    "sha256": "a12949b6935736c5595102bb2c3c930db41cc26f9e618ec81d5c6e9a541fa87c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_transmitir_pantalla.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_monitor.png",
+    "sha256": "a91b95d4d6394be87383675652c4da14359e57c8841472d4a88f8089ebe85268",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_monitor.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_portatil.png",
+    "sha256": "f28bbeece32e35cae187576dc7e8bb4d0fc4c8c4eb0135b80dd0c7f631552de9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_portatil.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_telefono.png",
+    "sha256": "fcd1805b5eaa352341be641adb23f34228ef31f235424e39a96ddabe85063321",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_telefono.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_dispositivos.png",
+    "sha256": "a77cee575818c3474ee052cc3f385c9aedf9812160db7e5757aececded66370c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_dispositivos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_ayuda.png",
+    "sha256": "5dc50ad8afa582dd5efd31e9bbca1ff9520c5c50ca306f419dae3c7e33ca04a8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_ayuda.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_informacion.png",
+    "sha256": "20b739267580f531e6a140142c4a8522d604f0f8deeb59de77fe8a0f09bb8da0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xhdpi/fg_ios_informacion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_plugin.png",
+    "sha256": "c6eaaef306453d137ea317975b5bc761821ba246c6377f47ab0eb937b692e8bf",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xhdpi/fg_refb_r08_c09.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_archivo.png",
+    "sha256": "a065e18e774def7f0886b3e2fe398bfa07a8e280c8b241dbeb6b081035319ee9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xhdpi/fg_refb_r02_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_sol.png",
+    "sha256": "84723c974c49f717fe7b0b8e0b36fa9b07a91a0ae6818b0692096506a447df15",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xhdpi/fg_refb_r06_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_luna.png",
+    "sha256": "68d7c6473e8c6600ecb80e27029c9cb6c7c4d4f77c0f5d1f99a8d48e45b382ec",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xhdpi/fg_refb_r06_c10.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_regalo.png",
+    "sha256": "e85f9f6965843007c570642b9fe3ec8676956d06a629168404c6f5b24216e56f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xhdpi/fg_refb_r07_c10.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_base_datos.png",
+    "sha256": "96357fff8773712f6751706ea8bee66b19721d6e8ff074c01c9ae5923648d8f9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xhdpi/fg_refb_r08_c06.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_codigo.png",
+    "sha256": "b83524b5d3e25ce3ee5c0e60068bb644038d3a89975886aed86648d005ac6246",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xhdpi/fg_refb_r08_c07.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_cubo.png",
+    "sha256": "d1b20677161ddba95faf0f26bbdfa245bed98c02c04d940d7d85694f30c2c059",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xhdpi/fg_refb_r08_c08.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_actualizar.png",
+    "sha256": "f85a452a38f4c873a59f722e21cbe7602278853ae01cfb1f58523cea0fb06c6f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xhdpi/fg_refb_r08_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_agregar.png",
+    "sha256": "56ffd13e8e147d5e6eed1646431c4a4dfb44832743d2bd3621ef6c6d1cabde46",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xhdpi/fg_refb_r04_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_enviar.png",
+    "sha256": "617f90ef5879464ade8927c2f5813ab01106e0567a13175f377a50534c17a1f7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_enviar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_inicio.png",
+    "sha256": "9c481bd52fc46af504ec4d2b7f5f5c31190162ea9e22752564fb4cbacb9741fc",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_inicio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_mensaje_tres_puntos.png",
+    "sha256": "1f2c0be1acca0f2ca760e8c23ebddc23c8834d48b7a068cb4bbc269556764636",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_mensaje_tres_puntos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_chats_dobles.png",
+    "sha256": "99c0dbe10514e3dee060fadc77e8e102782c38e1218fce9b1caa20a4f220d9ae",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_chats_dobles.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_llamar.png",
+    "sha256": "41e57574ff27a72dbd2e2e8450ff9c1a2ab2bdf03442dca6815b65b91e9a96e6",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_llamar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_videollamada.png",
+    "sha256": "4ba414e6142be8338dd4ad716b04cd85979b25e97e0658da59aa319bc723d64c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_videollamada.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_perfil.png",
+    "sha256": "dd1227475bb8703a67fdfa90166d6dad391ec0f69ed06df885f4f0b8b006f3d7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_perfil.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_contactos.png",
+    "sha256": "ce3f65b0d32b5165e1a7f0b065a590fb2c8f87eafaf9d210a5224ae68e35954f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_contactos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_grupo.png",
+    "sha256": "41bf335a14dc1aeb4797eeb2b6251aa1ae23c2ce9bb53a2dea01fe8df7977222",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_grupo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_agregar_contacto.png",
+    "sha256": "9cea5b35df5637098fcda0e6b010a08379fa59296a9207a27a7414de33b08cb5",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_agregar_contacto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_escanear.png",
+    "sha256": "607554ef541d3572209afd94376aefa1d168391370a5c85647b94505914db4ee",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_escanear.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_buscar.png",
+    "sha256": "4f75ae9a7bb1badf2a0a611c6ab1ace7abee949d88da86ffca876496b1179304",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_buscar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_notificaciones.png",
+    "sha256": "c4fbe1c8f9f00a9b013bdd9ccad5d39f6fffd868b863b8426626c9470f87b89d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_notificaciones.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_notificaciones_silenciadas.png",
+    "sha256": "1c7d4c7d9ca8b24560778f5966a1b15c9d90e0fa55a5efc04dcc9497049dbbf0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_notificaciones_silenciadas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_calendario.png",
+    "sha256": "6b799c09b0caa8779060249784d7cee74d241f865fe196caca44b04b6aa85ea5",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_calendario.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_reloj.png",
+    "sha256": "0af4ddb76131751dabbcd766fb10d0b318061830eaf3c9caf3abf93e860cd4f2",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_reloj.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_guardados.png",
+    "sha256": "cd51736c9359607b590fec04ee7025baf7dab168c26949d1d61f1d6f7b27ceb7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_guardados.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_favoritos.png",
+    "sha256": "eafce16d7379ac94fd373be57a758b11d329645c8ba1c0868435210dc8b41498",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_favoritos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_corazon.png",
+    "sha256": "a34b18ec7b0887001ecbc55cc8119b8234f5b6d395117e2dd5feef6fbafc5903",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_corazon.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_fijar.png",
+    "sha256": "9e29fe3bc2b76c2b4989d5e586ff874276c150367158ceaaab34b7ace29a25f9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_fijar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_ajustes.png",
+    "sha256": "636134e4d9b93b5115fe3634fedf69d0e0d712fb03be4e56eae0cb180b385832",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_ajustes.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_controles.png",
+    "sha256": "c79a01f5ef28d375180d8925de25cbc0fcc212910beafcc1bdc32fd46b8eb28a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_controles.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_apariencia.png",
+    "sha256": "8741fcea07014c2ba59574b94b3c943e609b22b8d8d5b152ff2f9cfbe72eed1b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_apariencia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_pincel.png",
+    "sha256": "8c742d75fd60b01230e879b6c1907fb36cd98ad477515f2240cfc3663195d006",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_pincel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_imagen.png",
+    "sha256": "8a7165653c55eda038536b2c0ec8b0d70308d3790b187e5c15456325b3d94600",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_imagen.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_camara.png",
+    "sha256": "99292a289911da3eacf5e7789355aecb12643b2f47857104488ef4eec6282e14",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_camara.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_video.png",
+    "sha256": "baaed9515a4cde8fcd9b2dd88fc5f079cbbb8a8ed6e550cb6b9c7937aaa090b1",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_video.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_musica.png",
+    "sha256": "d5f1ae83dd0538b52b30bdc3ba17e189233ea21569bf4b73129d32bf4461958f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_musica.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_documento.png",
+    "sha256": "daf100a33565811545d5837d5cad937ef10fab3f76d7fac108b598130e02d6e4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_documento.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_archivo_comprimido.png",
+    "sha256": "038b2d91a05cba4d10741c732d3e047e8cd6848b39eb291cc2e18391244d3e30",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_archivo_comprimido.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_estadisticas.png",
+    "sha256": "28c89b3b276c52d500ee5f4ef81708b0454e00f0b5291a8095ca32071292ab9e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_estadisticas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_grafico.png",
+    "sha256": "beb75118e59911b02f6033fbbdfcc1fd9613d2ccdd313ba8688045bc91e8f14e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_grafico.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_carpeta.png",
+    "sha256": "580427e8d7ac629fdc95bc497b55051066ee146f8843fe8ddfed24797a590e96",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_carpeta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_descargar.png",
+    "sha256": "8ede3646588089cbf5ad37b5ccfac1f85469d3e722a4d1e7f52b4b7fb0c7231a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_descargar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_subir.png",
+    "sha256": "b710e15d09b0713ecfdd9d0c077dfff143171c50d8fc1f5e0bc19ec15a14186c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_subir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_nube_sincronizar.png",
+    "sha256": "15b095d5af91c388b7182fbbe1f74d771fed44599bbb2e6bda056808226cf762",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_nube_sincronizar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_agenda_contactos.png",
+    "sha256": "87fdb212a599db764091518b4ea6308161051e30cfe5d4a3f42aedbe83b5cdd1",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_agenda_contactos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_contacto_nuevo.png",
+    "sha256": "8c8ca178b4043965eb59a8d20dc9efa659c1166c0de3b5c7eb78b947d7557977",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_contacto_nuevo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_grupos.png",
+    "sha256": "5afc5bd3414deb7f80de6a54be93fa8fb6514278de86ad1d57fae9bd637d6a69",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_grupos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_grupo_nuevo.png",
+    "sha256": "c7d6af7119cc5b4a93340889cd4e27e02c0a93110b6cd5b27eb30b547917cc55",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_grupo_nuevo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_anuncios.png",
+    "sha256": "47c16cab4ecd5ce13ecb6217b37e945315f05833c3abf9b035cbd971e7487062",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_anuncios.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_transmision.png",
+    "sha256": "cb678a63936cc6fed4b0d9dc12a0d47a4c2cf9a6fd316a31c48d23b7b42d62a2",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_transmision.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_altavoz.png",
+    "sha256": "313949c64ee2ef12a91ce23e1c9ab9542271c0c2b0a0f7eca8d05dceffefce27",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_altavoz.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_bot.png",
+    "sha256": "2507367459d505d0d9f78d583a948e3d043c5413039220ca821af184d36d61a4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_bot.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_bot_ia.png",
+    "sha256": "3132ed8bf7b5a5b02463e22d9124ac5370dc6ddb093695fc5f106b868f8eab18",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_bot_ia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_destellos_ia.png",
+    "sha256": "6f59deae0f0f9d293f78c7a486a44431a56870d09bff5ed969a5b284e45dd435",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_destellos_ia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_panel.png",
+    "sha256": "67b8160930e6ed00d8c4e570a6fa66e382d4ff1a5518b0f83b5064bf77ac2ca8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_panel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_capas.png",
+    "sha256": "a0eb0aa871ab3c1756a598909e5a6f2e6e36a91a62a4ab7cbd0d2d762cd710d7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_capas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_proteccion.png",
+    "sha256": "9c870c5b4eddd2820180b3a40cf80ae1c675e94145c87c523b4df8e0956b3fae",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_proteccion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_candado.png",
+    "sha256": "1e01b13cd18044af8233976155122809d3a6b2034b00911a6575ab2f8aa606ef",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_candado.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_clave.png",
+    "sha256": "17bb7497d83dab3d469bac87b2b7f4bfe797192d00288faef1c32d62cdd0020c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_clave.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_huella.png",
+    "sha256": "66a5e374ffecca79b75ca2ee77f96f2f906efeece8c7a90d4709422572c3408e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_huella.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_escaner.png",
+    "sha256": "78f521bf79a9c390fd293a6675441490d71c0856f5367d811fc907c334ba10ce",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_escaner.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_codigo_qr.png",
+    "sha256": "899adb5d02e7eb9d685c4502f5fa674c7a5a65de1ec1114819033a363c168741",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_codigo_qr.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_enlace.png",
+    "sha256": "f651530c7e3d18d88dbf3ec71e5a50f76d2e410215e4b5bfb6650bf42112ddde",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_enlace.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_desenlazar.png",
+    "sha256": "c9231ccc2ead03cecd4f9f645c4bc134aee164f89cc0651cb52242badaa83bf4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_desenlazar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_etiqueta.png",
+    "sha256": "f195761388aaa7a56afd9b6d3d1537b723bcc16a4f056b2ddb0c7037692fe661",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_etiqueta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_eliminar.png",
+    "sha256": "f435511bd64534816005f72775b65b42d5ca343b78693435a5a3a9f2d9c3eb8a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_eliminar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_lapiz.png",
+    "sha256": "255170eef8ac7c156c256c104087bfbac81871f77e0f194860ebe91e9d3c863f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_lapiz.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_editar.png",
+    "sha256": "b0a74e9905d4835b8e3c1ae1774fda76bfa462d176a68aee975f5ac892a6d38c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_editar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_retroceder.png",
+    "sha256": "290aeb8dcac2b4925ecb42ea835a9899e888ef366cdb0a6ea03ae3b230307c5d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_retroceder.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_avanzar.png",
+    "sha256": "a507b811ab25512ff145abad98f414455d3fca315ee19199eb82599a1cda7dbd",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_avanzar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_arriba.png",
+    "sha256": "43a1c741fffc33d83ec0680db68d982b591aa3a9b3c99c80afda61f34b321c60",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_arriba.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_abajo.png",
+    "sha256": "3727c0750322307d4fab06ed75ef5584d15360266207df6d88b464e2f24b0304",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_abajo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_tres_puntos_vertical.png",
+    "sha256": "5efe018721e98aaae92cefdbc9c1f2c37e88b6d76fa92ed6b415cda87e305524",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_tres_puntos_vertical.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_tres_puntos_horizontal.png",
+    "sha256": "2066870ab2279af2d9ca5ef483fc54ba126f9b1fc1ccf489a4a1fb05d5ad1d58",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_tres_puntos_horizontal.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_filtro.png",
+    "sha256": "fb607348ff4def9d5766936440b7d160ce40fed4586c22824d70b418392fb619",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_filtro.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_ordenar.png",
+    "sha256": "55ae80927e1ed305b19043912636e2cea4e4d2bcbdad79fa00bef6f8fa762c6a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_ordenar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_lista.png",
+    "sha256": "5bdc3dafa1e71518a49ea8120f678e99f8d397b70618d0f4c715a292c42953b9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_lista.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_lista_numerada.png",
+    "sha256": "5139b66feba5e5a5b327cb0d070e0348d90cb06543ec4a371900c71967a5edd6",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_lista_numerada.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_cuadricula.png",
+    "sha256": "63ab741f4cf459cfcb3901a4ff9d3a72ef8e6d1e4b97ab5807bbd6726d7ec647",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_cuadricula.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_tarjeta.png",
+    "sha256": "680f1192e93b202f5e56c44de931241e0c387de984a471995ad5aea38325625d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_tarjeta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_microfono.png",
+    "sha256": "1efc572d4aaf7906d309655bac6dca0d43d9892575d372176359c3e422834d7c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_microfono.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_microfono_desactivado.png",
+    "sha256": "8faaceb79c69ae3eaac8c75eb07a26b457d089249a510f2e1df0222e9f396be0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_microfono_desactivado.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_volumen.png",
+    "sha256": "86a2f5c0db471073567ca37fd6923f473f8a802727fbb674452b7dc9efe2bb74",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_volumen.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_silencio.png",
+    "sha256": "5f6845257b7dbba21ce55818398ec89f1b35a40544610d161ae19a73c34f21d4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_silencio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_audifonos.png",
+    "sha256": "3e913bb2375eab6a95d21138fc40910e0c81b9271a00562b984955e30f431eeb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_audifonos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_reproducir.png",
+    "sha256": "6d27032cacf7662ebaef4b9bf333a9e1b33705df34a931d7f369bbb671bb6c0d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_reproducir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_pausar.png",
+    "sha256": "8d410e091f9ceaad35086e440d63d4ca88080abcefb77a6b33515d3ec1c4c081",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_pausar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_detener.png",
+    "sha256": "4b115c6c0ea5e474d69b66bd7a2a66b324051b0afb3890198c20938dfbd7bf86",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_detener.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_repetir.png",
+    "sha256": "4e72a5c72d1009b1df8c03b67b2756ab100eada41081acf69de5888b93b439af",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_repetir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_aleatorio.png",
+    "sha256": "9a7cbc92269b7dfdc7e3934ad4eb2b8b6baa09074cf60f6a3aa30be3c42c0842",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_aleatorio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_temporizador.png",
+    "sha256": "4700f1b4c8759ae71e33d716edbcbb2801e714d775afc3513fd078b2469f4353",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_temporizador.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_infinito.png",
+    "sha256": "9a45be430d851189da2ac81d6dd680c26c584e6e0f133d8b1d12937b088d2014",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_infinito.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_emoji.png",
+    "sha256": "43182ce556a24bb3fbe80e6d74ea8888a40762321cf087f02e704de6214a541f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_emoji.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_sticker.png",
+    "sha256": "6a2dfbcb1bce479c6b55cdbe8a41648144913cb1676b1db7c245e85769ac11c2",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_sticker.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_gif.png",
+    "sha256": "d82e3c52c9d4e2e0f1c154607be259dc8a745b1e78bc3194285091ad4dbc9ef6",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_gif.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_adjuntar.png",
+    "sha256": "33f74ac209f06fcebdf4c235d7dbd66e6a17b1fe441aeef4a96ec3aeadb38e2b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_adjuntar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_mensaje_texto.png",
+    "sha256": "87cc02f7c9b9686a510f7192f6626fbd42dadca18a2ebef2515b14627c800f86",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_mensaje_texto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_ubicacion.png",
+    "sha256": "7c38eeac5e6e3a6357bdfb1475d77050c6c48d9f909d0ddb65e2585a3683687e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_ubicacion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_avion_papel.png",
+    "sha256": "b644002a0168fbbe3c12c08345eaab0ede53c847b81de47ed410e153f4ab358d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_avion_papel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_idioma.png",
+    "sha256": "9bbb7cf1e2dd354a7ac89798be8b4285998e3898b5d8f8ca20fd500c5c217c99",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_idioma.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_mencion.png",
+    "sha256": "f4e63e630004669c21bbd8784b85788a618d8a0b318a95e0f7ee06f0183c7635",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_mencion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_hashtag.png",
+    "sha256": "8a109b002c65e01d6b8557a86c4b12a9dc772d5ef032b9d7aa7d0a8cb52fb8b4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_hashtag.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_tipografia.png",
+    "sha256": "7ecab6886892e3f4735388c1d452cee6aab60ce5927e9442ea042adfa07421a8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_tipografia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_traducir.png",
+    "sha256": "d34970ce1180868fecf48c72b512eab96b05e2694b1fc1f8bf0e04514a0c76fd",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_traducir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_llamada_saliente.png",
+    "sha256": "6dae49d25456ed865b8109222a35070236378712733b483508caa01b42d7fb2d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_llamada_saliente.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_llamada_entrante.png",
+    "sha256": "321f058db22ec86f6ca878678f4541a9bf88fb0bc4e25d4682cb703a771a2c94",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_llamada_entrante.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_llamada_perdida.png",
+    "sha256": "c0c7d64940218147208039f1f33794281aea7d4f7f40e88544bdd7cbdc419c2b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_llamada_perdida.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_llamada_agregar.png",
+    "sha256": "35d152c206b57802a96cead7b1db2c73aabf9649300351a74d596181a88f025d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_llamada_agregar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_videollamada_contacto.png",
+    "sha256": "4c21b7681364bbc3397fa14994e66f3642a126b484391d95e4428ccbcad8c768",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_videollamada_contacto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_compartir_pantalla.png",
+    "sha256": "328e0467639b7ecc6d67e5e9e3d236eda138d531a43e5af0ea05bdc18a9c588f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_compartir_pantalla.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_transmitir_pantalla.png",
+    "sha256": "f2ba783a449ec0bce6490c16a9ac4397bf45b3dc2cf5704da205b9db74572afb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_transmitir_pantalla.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_monitor.png",
+    "sha256": "df3f494f4402007ebff1421d26b3c44df920dc241682ba4f816e9b6e3db58ece",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_monitor.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_portatil.png",
+    "sha256": "75558324f9fe05b73e10415ad850ff64e7634a71d73143fa8970c7814a1c40e5",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_portatil.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_telefono.png",
+    "sha256": "9e1de7a50752fd7a358d8a69443c9e9245d0df8a083ebc73bfb4ebd5032789d0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_telefono.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_dispositivos.png",
+    "sha256": "e7309854f29e9e465a6eace734242d58a818942ab75b8473703deadae6322537",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_dispositivos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_ayuda.png",
+    "sha256": "8b032ea0b82e7fbc0547ed7a2146c8c7a011b6dd866ca5160e1ce116f85320d1",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_ayuda.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_informacion.png",
+    "sha256": "e505051c0d17de6334faf0e4e7bdde13dc8be644c3bd131ba9f0518367cdbd5b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxhdpi/fg_ios_informacion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_plugin.png",
+    "sha256": "6aa7426217a56dcd10f5664620b61f27903be73110591fc079b33c492edfaed7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxhdpi/fg_refb_r08_c09.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_archivo.png",
+    "sha256": "f33d8bc7dab1f633b90a85e56a2e1bdaa82cd291f8f4ed5713b59500a048c514",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxhdpi/fg_refb_r02_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_sol.png",
+    "sha256": "404695a18c46dd980ac2abcaa0c0d56ca036191c2a34c9ce5aaa07100af6633b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxhdpi/fg_refb_r06_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_luna.png",
+    "sha256": "6386889791c2d98af602e9827d306254bdfe3731bb446cc5be43e5429c6fc9f2",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxhdpi/fg_refb_r06_c10.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_regalo.png",
+    "sha256": "08eb0dd54fa7b4edccb6ada0753193442d008414254502f0847726e32abb54a2",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxhdpi/fg_refb_r07_c10.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_base_datos.png",
+    "sha256": "42e5d964d020303ec553c75713e5a4a88df81968bd58fcf0b6f54905b9931267",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxhdpi/fg_refb_r08_c06.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_codigo.png",
+    "sha256": "10a550aee7ddd4041983fbb2253940e35ab96f17c353d98dc0ae46294ee10a05",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxhdpi/fg_refb_r08_c07.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_cubo.png",
+    "sha256": "c53bf435c8869a5f2f82ca6f38c0e966e7da87e46bd894aec49c2bd77234047c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxhdpi/fg_refb_r08_c08.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_actualizar.png",
+    "sha256": "0efae367168f3d63f7c4b529c0ec84eed3ba71abac532a18d443cadde91500a7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxhdpi/fg_refb_r08_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_agregar.png",
+    "sha256": "8016fcb5b9adb327af606f32e10d7fd5bb28e2401efd15a93ff7cad9d02dce08",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxhdpi/fg_refb_r04_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_enviar.png",
+    "sha256": "bd11ddbe3945f6e9f7a393bdadaa5b9045e46e3e5b30e21acd3092553984f2c1",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_enviar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_inicio.png",
+    "sha256": "593fb4c562524e2e39b47a3f9d6ee68c5c20df9823b0a79cc1058ee3ba0f82d9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_inicio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_mensaje_tres_puntos.png",
+    "sha256": "9a760335d486ae0e3222e42166ecff5c8bfbaf5017d760b87375cbe8c9b5f0fb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_mensaje_tres_puntos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_chats_dobles.png",
+    "sha256": "ac36034d8b7fe53be51d1f71618e84b164073fc4cb7343a1680f746228e37b62",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_chats_dobles.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_llamar.png",
+    "sha256": "0b7a2cf71d1890e4d7f958c5d72187c64197e77324d5ce727f4ae32f8bfaf6a3",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_llamar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_videollamada.png",
+    "sha256": "e5a96abf3177ded69d4ac0cf211985ff452620076f6427ce95b41ae33e1ef4f4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_videollamada.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_perfil.png",
+    "sha256": "fa4da20295309ab26c9302716c6f3404a6b6ae75bc22ebc7982e2278ee19afab",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_perfil.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_contactos.png",
+    "sha256": "03c34c7b952d107499dca9b7a096398df2b4eebdcbc6fcd74fe5522dc8cadeb6",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_contactos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_grupo.png",
+    "sha256": "746c20f9c5343c6b955aa26a5568d29f7f3ec4bf55223fb3929de24043d6aff4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_grupo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_agregar_contacto.png",
+    "sha256": "7d214e6f63c37c42ea41d9508ccedbec5a03d4edc06e6b7df356a0ded1003cda",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_agregar_contacto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_escanear.png",
+    "sha256": "f88e6a6640ae3eaeb09650ea8f163ad047ea7165dfd9e1998bc2119ef07de2f1",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_escanear.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_buscar.png",
+    "sha256": "67dc229760aeba345200ddd3a87bc804cc4a667b553c5742c4430b855c432380",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_buscar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_notificaciones.png",
+    "sha256": "20680c86b50c134330aa1de7f1cf11e02bcc4ceeb8de3c2af25e669d78ecbce6",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_notificaciones.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_notificaciones_silenciadas.png",
+    "sha256": "7d62ffea981b28b6fcbb711b913a9c1ac40029cdc19c878797e346ae3735d39a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_notificaciones_silenciadas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_calendario.png",
+    "sha256": "45f06ed4a18d7e2428607d4bcb42b8533cb84bdcb70464a64509a6862ebb4875",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_calendario.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_reloj.png",
+    "sha256": "d4594d94b604531f41572b6c9d6f298db7646d27d5b226c9e55b10cb2d3e37ef",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_reloj.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_guardados.png",
+    "sha256": "9d516a96a045e0a78eae29f191a90e506318242cd41a15bb6256a8208127da4e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_guardados.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_favoritos.png",
+    "sha256": "ccde4d2da301485a4782c91e7d093346910143daf5b2735c3149fdbb46a38535",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_favoritos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_corazon.png",
+    "sha256": "aa054beca6541bbd6627f3c7e398c0673c62b91151a93dc748a67303996636d9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_corazon.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_fijar.png",
+    "sha256": "bb0ad52354f967a663563da9940547fea77ed95cd3d1afc71ef122ea1db890e1",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_fijar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_ajustes.png",
+    "sha256": "ba346aaec6455cd625b6c717e9cfc15af73fdbd5742bcfede615b410b5731800",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_ajustes.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_controles.png",
+    "sha256": "2d51dd1a12b97acb2b3f63430dc76acc61af9ed485f2425c5fcf977e25d5728e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_controles.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_apariencia.png",
+    "sha256": "7a9a458c6003f0b46d8fc08b42c794ddfbd91057a6dbe98850c09c4c84ac0de6",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_apariencia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_pincel.png",
+    "sha256": "445a52ddda8ae11b9639ff3145e57ec7d245f7982e923679244eade659c3dbc6",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_pincel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_imagen.png",
+    "sha256": "7913b559da7e482e251c9361e97757a7de444008a93520e03e3e785ad8f8a17b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_imagen.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_camara.png",
+    "sha256": "1fb1c005ef89a3999d4e76cd8a60dff44916c92f018a5f3cda4a41d7c3d9e362",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_camara.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_video.png",
+    "sha256": "2cfdb3340b78b4bef5d69f2b2613e36a35d0d7021b7f5cc80dde5855d0fff88e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_video.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_musica.png",
+    "sha256": "0b5774eab68b409bad8de7b4f251114942938afe493dd91be809d6c4786be8ef",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_musica.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_documento.png",
+    "sha256": "4e7a1466be1db25d68c516e2c5643fd57b95c849d35a75c1211c34dd413f6be5",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_documento.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_archivo_comprimido.png",
+    "sha256": "73f07a44c341a8b5055fec821c6ccdd83457ee7df6d9d347852971bd8c2bc972",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_archivo_comprimido.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_estadisticas.png",
+    "sha256": "27d8c494d5d91f63616d3c0f85ff4bf07b6ed90331c2da817d4b5ab698e36d45",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_estadisticas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_grafico.png",
+    "sha256": "74c7a22dd3693fe737efd786562e9910563b8e9a5c5b0e93f2bbbc2fc605e254",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_grafico.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_carpeta.png",
+    "sha256": "5721436a3d3c102de4c194707f58de8f5dbd211806612326ab1ab522045b5e7a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_carpeta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_descargar.png",
+    "sha256": "4fae9ba416875ff32c092f9b4d67ab82ec38cb0fd92233486ea65634e5f8f409",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_descargar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_subir.png",
+    "sha256": "7178d03e4393d5b1fca2ac5f462139f0a54234c0e4752415667a1313213aeba9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_subir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_nube_sincronizar.png",
+    "sha256": "f94de43fb53c580cb2b492c7626b98b598a11ad8b7d793f0ec59a244b238d302",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_nube_sincronizar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_agenda_contactos.png",
+    "sha256": "907694117993cbefcaf512a9c44745397642d7f812072e30247eb0f0ef4b4a22",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_agenda_contactos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_contacto_nuevo.png",
+    "sha256": "634d23819abf4fec395851c960ccbf9b435918923ad7f6063e6c315c6706c943",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_contacto_nuevo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_grupos.png",
+    "sha256": "577edbd4408c8e307475842f09baa0c7c2968e454bba493c478978f4bdca110a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_grupos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_grupo_nuevo.png",
+    "sha256": "990fa1b87797f1da416ffd73f83fddbe873a796fe159a2bc22592d8ff2c50165",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_grupo_nuevo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_anuncios.png",
+    "sha256": "a84f9d24312cb8349746a376be1ab279f08992c4a2fd021c1b88ce65e34cb82e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_anuncios.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_transmision.png",
+    "sha256": "3159e3f575112ef2845e1a8e586401e16412bb31a5f754c6bb1f6e0c8ad1fd81",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_transmision.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_altavoz.png",
+    "sha256": "20540ff1fcf376d14af867f6a70c9476f5fd85740db2be730898590b0d7a731e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_altavoz.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_bot.png",
+    "sha256": "58f7bb41ef9fc4cf5ffaab8a06510624a4e09ae1d0f461b9d5efc94c2cdc1a36",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_bot.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_bot_ia.png",
+    "sha256": "b9f6efb71197c1264a6867f8a17a32bb0bca9b988de40ac6a8ef9d2a1c25fd1e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_bot_ia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_destellos_ia.png",
+    "sha256": "037cfa96b3267c2952030db42e62867bf8a8563f268b01ccc0c4d562b6987196",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_destellos_ia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_panel.png",
+    "sha256": "06db0a0350a9e9655c9e6579fc1e0751fd450a228d9391e7284da292beef88ac",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_panel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_capas.png",
+    "sha256": "9ca15a031230498fd71a4005fddcab848097e37ca2a674d393b8ccc91b88f20f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_capas.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_proteccion.png",
+    "sha256": "a06a3d2268a734cf668c885cb3ece42d85292ee8c1fdc9e0848a8c983b414f3a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_proteccion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_candado.png",
+    "sha256": "6bb7a04c5470921ce4db12c4c118c0e47e48a024b726709bdd8f8565ada6282c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_candado.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_clave.png",
+    "sha256": "b5d3e84016c9c31f8cc4006e5667461ade13c68c4c4a1668dfd597e57cba18b8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_clave.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_huella.png",
+    "sha256": "751998c58da29c92cad67394045b7b6d175b0f50f466a8022e35f8aaebf30cd4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_huella.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_escaner.png",
+    "sha256": "897cb915dea922179b4f4c8fbf3f6a47c8555ae8322145cdae798658bfb49134",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_escaner.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_codigo_qr.png",
+    "sha256": "ce5c16f584cabd9dec8a6c18dd8fc6134e74c7ae72d78658e47f47fa75eb57a8",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_codigo_qr.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_enlace.png",
+    "sha256": "232744da859033de7f8fb5dc3c4ed4b1f14b44d755e0af952c67803e1a6ed75f",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_enlace.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_desenlazar.png",
+    "sha256": "75800226d04c50a981aab42472e2de503ddf7ed9e88acd2eb0f7021841906a17",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_desenlazar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_etiqueta.png",
+    "sha256": "457424fbc3b1c5c572f206913571cb06b005446aeaddc166794679e59bee20b0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_etiqueta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_eliminar.png",
+    "sha256": "3474d1cb98ccc09d9054bc3d3bccae8e7453495a8b41dd5e00dbbbf8fc974b15",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_eliminar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_lapiz.png",
+    "sha256": "88857a2f02e5bb384d4d7afaf9e457b27cdaf0ae5038b641d5d1ae072f8baaff",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_lapiz.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_editar.png",
+    "sha256": "4482d74ae6b8fe6bd48da18a669b9e43a00cb85a428ccddf6c2e9fad60d9d802",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_editar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_retroceder.png",
+    "sha256": "3a25886e119c09463007449fa46fe953e6a2f1ec6eccf48776d4fdb567528b7e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_retroceder.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_avanzar.png",
+    "sha256": "0ff4b88e053a6c9935ce99d73eab335fb5dda914663f7b5054f793058b621d1c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_avanzar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_arriba.png",
+    "sha256": "c07e1b8438e475cafbc4ac01edee2f7d1f128929569bb746b5e4cfd9c872370d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_arriba.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_abajo.png",
+    "sha256": "31de40c62aac0bd9f7fe483a62660f7a339a1cdf59a8258e5f9cf931f6d4e61a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_abajo.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_tres_puntos_vertical.png",
+    "sha256": "2a59ec494463580661b2e4320609c79a6981d89ac24228261379621fa675c09a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_tres_puntos_vertical.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_tres_puntos_horizontal.png",
+    "sha256": "4a809176f7ee05098104b8186cbb8e87436afb43f8bb39b1d588fcf886303f45",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_tres_puntos_horizontal.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_filtro.png",
+    "sha256": "f2c488fb1be3ba81f1bf6e75af2fb46232fccb48c71cc70addece98cc1d74ceb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_filtro.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_ordenar.png",
+    "sha256": "551a3df2cf70012cd6fb3376b7369b75f75b4459d6d792177a99090a1f92723c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_ordenar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_lista.png",
+    "sha256": "fd2090c0047e66ff9ca386f6ddb493ba24682acb271e55892413978199bbb1f9",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_lista.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_lista_numerada.png",
+    "sha256": "066d484ede9f502346d1dd137cd4ef5707267fe2d863d6ddc0344f3252095d12",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_lista_numerada.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_cuadricula.png",
+    "sha256": "ed79d20e189fd12de07ea797cd1722695e03382b84291df89d9e46d5430ddabf",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_cuadricula.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_tarjeta.png",
+    "sha256": "d77fcdeac5a71458b395f918a9b35aa6c236f7ccf26835b5e0868b8c653fdc6c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_tarjeta.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_microfono.png",
+    "sha256": "43ff71a1de2ec8440c5ba446e703eb4825c134df02d2e63f1026b3d4c0435c42",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_microfono.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_microfono_desactivado.png",
+    "sha256": "b9c2b351fc8a818e43b72c5824ecc95c0f1b6df5fbace2702d4ec35d3cdabede",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_microfono_desactivado.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_volumen.png",
+    "sha256": "51b0ca97e17b8912aab5682e29185695e21e2952f15e3de08d00f7627f921bbd",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_volumen.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_silencio.png",
+    "sha256": "72569ef1531904f10358aed7959ea707e27c2c0c572750abf423baf2744f7dd2",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_silencio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_audifonos.png",
+    "sha256": "d2b89e7a5fa134de3fd9cec9ce307dd7c0c2bc65fcc6a54b7a1d1dabe1c4b6c2",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_audifonos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_reproducir.png",
+    "sha256": "2199d33952dd35925141e0d4d192ed29aa57f63bb0b0bf4e007d15c7631444b5",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_reproducir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_pausar.png",
+    "sha256": "202b676fb9658966577f0ab35750afd48dc12eddab5b6519e3f177a6735c816d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_pausar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_detener.png",
+    "sha256": "aed21a65ddd90dd8eb6d7fafca2b5660b1a20859dbd9ee9c3e9c293995b08dbf",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_detener.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_repetir.png",
+    "sha256": "18bb20bacb528cecbdc886afdcffdfb7c5a4a0b083a25e6785aa9300fa675d98",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_repetir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_aleatorio.png",
+    "sha256": "9d097b1e67baeb478df1308c907aa8880c30c3b7df914ae5361c613f0633f9df",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_aleatorio.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_temporizador.png",
+    "sha256": "78ca8af817a89543ea9abaa0ec345662f317a4be2a4a286bfecbc9eaefc0eb5d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_temporizador.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_infinito.png",
+    "sha256": "3d19aff6914399a7f75bb3e0b8865c9ad0075b32c41ccd42e25dcb7ca2f78894",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_infinito.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_emoji.png",
+    "sha256": "9c8c3e796ce415e190b9eca40ba1d2e123288019c4d2df3eb620a38400a42176",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_emoji.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_sticker.png",
+    "sha256": "3071bbdabfbb8929b81eed6ea772de5d4a1d40b5ea4cc7d9c604ad1cea6221c1",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_sticker.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_gif.png",
+    "sha256": "dea7a19c1090a8cc4543810840ecb84d7839735d8035f2520d04d061c53b1f5c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_gif.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_adjuntar.png",
+    "sha256": "cfddeb1d987a462511d9453a0e2d69e55255b941f837bc01058158bfa184bf7e",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_adjuntar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_mensaje_texto.png",
+    "sha256": "2b7d371152fce1838523c6e719dc2edc555e0b0b7deb61b9cb7fafcbce865f5a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_mensaje_texto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_ubicacion.png",
+    "sha256": "31c64c2741320e5d4edc43bee36f60b430d366af4d028eecc3c8e2815a5dc777",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_ubicacion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_avion_papel.png",
+    "sha256": "9c63f0f210cc6a3bbd538a68cff93063b50aa254f81d7641278841d9c3654c98",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_avion_papel.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_idioma.png",
+    "sha256": "6e43df302782c5321eb05f42446b4b5c0a91daed74b27b8d97b2a3d07e64cdd7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_idioma.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_mencion.png",
+    "sha256": "f41d788e550b4559d7b685c1e6db0666ee34b3f64ecac1597bc1147c16cc77e4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_mencion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_hashtag.png",
+    "sha256": "6945c6b2286853b9018e8bb333093aa193a2cbeaac389a629f22fa7e23c5237c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_hashtag.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_tipografia.png",
+    "sha256": "577ea982624792612f733581ac59f1978638611f3f7053e902cd6e8780462155",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_tipografia.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_traducir.png",
+    "sha256": "d83bb677e6e6b197c04ce3b4e900f7588f3c7c173499f322e490393a34c779a0",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_traducir.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_llamada_saliente.png",
+    "sha256": "900df58b2e86451bbdd323f8ed30c3bd4cd4d5a7d96133e180c6110d2e7e216d",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_llamada_saliente.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_llamada_entrante.png",
+    "sha256": "85496e3e9f6ce1db87f2f4f5a5512de1dea3c4e092c11f23b6233d50ef2816eb",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_llamada_entrante.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_llamada_perdida.png",
+    "sha256": "c431de36419f7a585f778fea8703f9d881c405d7b8f52bef3118ad31c53cf6c7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_llamada_perdida.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_llamada_agregar.png",
+    "sha256": "fa9f07c3ad9d3c39693f0e510d11e0d0510b7c7f377547e81ea5764e9a1063f7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_llamada_agregar.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_videollamada_contacto.png",
+    "sha256": "060c8429c7e3185f0747bf27a322702616dfe92b651ec9ce5322020411fca904",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_videollamada_contacto.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_compartir_pantalla.png",
+    "sha256": "2c7138e59520c0f855ebda8888218b492f64e11f31aa53a75ced3f3cb539bb94",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_compartir_pantalla.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_transmitir_pantalla.png",
+    "sha256": "2e4fb9f2b9a1ddd98c49aff19d042026d3726815301eee7fde69210c4bed51a4",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_transmitir_pantalla.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_monitor.png",
+    "sha256": "1e9d672fee9f2ce437830717827768c5279e1b5d6b17151097e2e770051036fd",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_monitor.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_portatil.png",
+    "sha256": "e8a304ede1f39d498861f82b12b98e44d440ca0035ffd47a0f82206d76532991",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_portatil.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_telefono.png",
+    "sha256": "8f2e7c73f6369b231d5e366db4733818d1983bf851f53cc177686d9b880d5714",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_telefono.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_dispositivos.png",
+    "sha256": "8635d92daefdd80eebcc16c86b53585c0daf3a1ef06e7f84454dc7676cb2eb5b",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_dispositivos.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_ayuda.png",
+    "sha256": "13a7da589ddc1f90d2cf961f782f2f7eceb83e81095db1f796a50989eb233885",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_ayuda.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_informacion.png",
+    "sha256": "52b070efc2c30a305ed94fd272c2f07f45017bda4f4678c9acea5d03c2855af7",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_LISTO_COPIAR_A_RES/drawable-night-xxxhdpi/fg_ios_informacion.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_plugin.png",
+    "sha256": "b3530ae081209e35dc299f76cd0068e373c9e4a7c9a75bac266075cb17d0c63a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxxhdpi/fg_refb_r08_c09.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_archivo.png",
+    "sha256": "dd53d571f097928461513c2d5525ad1d4d192f25b65330d46c3c28977a3f3687",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxxhdpi/fg_refb_r02_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_sol.png",
+    "sha256": "fff1af07b6624d497acebe45393f4e7787626a1cad7152f0551378de1fd6eca5",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxxhdpi/fg_refb_r06_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_luna.png",
+    "sha256": "81e2ec70f474f7877bf779dbc4419cdc9702323436dcd6d47e9d84a4fa70db71",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxxhdpi/fg_refb_r06_c10.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_regalo.png",
+    "sha256": "5e5a901b3e36b15a2863ef908f2b270624a2bf86ebc11caeaef0c74ea40dea0a",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxxhdpi/fg_refb_r07_c10.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_base_datos.png",
+    "sha256": "b5aa5bcbb6ea4175f38fb8bf9b923a3400fa0e5192256afcf89ef0e317055a5c",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxxhdpi/fg_refb_r08_c06.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_codigo.png",
+    "sha256": "b054ab473ba68fb4132d5441abf045ba20bd67ccf9fbf74c11a0169c747caa88",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxxhdpi/fg_refb_r08_c07.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_cubo.png",
+    "sha256": "73182289afa91f612e889172f49be7f3d6e50506eec51f3cd4ff94c8ebbca283",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxxhdpi/fg_refb_r08_c08.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_actualizar.png",
+    "sha256": "070bc3cfd067ec84971202946fe9560884236c1e2c9b59dcd38eddefeed40407",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxxhdpi/fg_refb_r08_c11.png"
+  },
+  {
+    "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_agregar.png",
+    "sha256": "36cf60f38e2f69ac646ee331e4a1870897b92b611f15c067a73c43464787c300",
+    "zip_path": "FlexyGram_Iconos_Extraidos_Exactos_v2/ANDROID_VARIANTES_ADICIONALES/blancos_referencia_2/drawable-night-xxxhdpi/fg_refb_r04_c11.png"
+  }
+]

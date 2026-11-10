@@ -2,7 +2,7 @@ package app.flexygram.settings.signature;
 
 /** Shared settings-only geometry and theme surface, without preference writes or draw allocations. */
 public final class SettingsCardStyle {
-    public static final int OUTER_RADIUS = 28, INNER_RADIUS = 6, GAP = 4, INSET = 12, ICON = 24;
+    public static final int OUTER_RADIUS = 28, INNER_RADIUS = 6, GAP = 4, INSET = 12, ICON = 36;
     private SettingsCardStyle() {}
     public static int surface(int requested, int page) {
         int r=(requested>>>16)&255,g=(requested>>>8)&255,b=requested&255;

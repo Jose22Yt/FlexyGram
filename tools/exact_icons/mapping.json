@@ -1,0 +1,3341 @@
+{
+  "ai_chat": {
+    "asset": "fg_ios_bot_ia",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "ai_chat_remix": {
+    "asset": "fg_ios_bot_ia",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "ai_chat_solar": {
+    "asset": "fg_ios_bot_ia",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "arrow_more": {
+    "asset": "fg_ios_abajo",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "arrow_more_remix": {
+    "asset": "fg_ios_abajo",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "arrow_more_solar": {
+    "asset": "fg_ios_abajo",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "attach_send": {
+    "asset": "fg_ios_enviar",
+    "width": 54,
+    "height": 54,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "attach_send_remix": {
+    "asset": "fg_ios_enviar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "attach_send_solar": {
+    "asset": "fg_ios_enviar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_access_time_24": {
+    "asset": "fg_ios_reloj",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_access_time_filled_24": {
+    "asset": "fg_ios_reloj",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_add_24": {
+    "asset": "fg_ios_agregar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_alternate_email_12": {
+    "asset": "fg_ios_mencion",
+    "width": 12,
+    "height": 12,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_alternate_email_24": {
+    "asset": "fg_ios_mencion",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_arrow_back_24": {
+    "asset": "fg_ios_retroceder",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_arrow_forward_24": {
+    "asset": "fg_ios_avanzar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_brush_24": {
+    "asset": "fg_ios_pincel",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_bubble_chart_24": {
+    "asset": "fg_ios_estadisticas",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_call_24": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_call_made_18": {
+    "asset": "fg_ios_llamada_saliente",
+    "width": 18,
+    "height": 18,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_call_missed_18": {
+    "asset": "fg_ios_llamada_perdida",
+    "width": 18,
+    "height": 18,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_call_received_18": {
+    "asset": "fg_ios_llamada_entrante",
+    "width": 18,
+    "height": 18,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_camera_alt_16": {
+    "asset": "fg_ios_camara",
+    "width": 16,
+    "height": 16,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_camera_alt_24": {
+    "asset": "fg_ios_camara",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_camera_alt_96": {
+    "asset": "fg_ios_camara",
+    "width": 96,
+    "height": 96,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_cloud_download_24": {
+    "asset": "fg_ios_descargar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_contact_phone_24": {
+    "asset": "fg_ios_contactos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_create_24": {
+    "asset": "fg_ios_lapiz",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_data_usage_24": {
+    "asset": "fg_ios_estadisticas",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_date_range_10": {
+    "asset": "fg_ios_calendario",
+    "width": 10,
+    "height": 10,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_date_range_24": {
+    "asset": "fg_ios_calendario",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_delete_18": {
+    "asset": "fg_ios_eliminar",
+    "width": 18,
+    "height": 18,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_delete_24": {
+    "asset": "fg_ios_eliminar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_delete_forever_24": {
+    "asset": "fg_ios_eliminar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_delete_sweep_24": {
+    "asset": "fg_ios_eliminar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_devices_other_24": {
+    "asset": "fg_ios_dispositivos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_devices_other_96": {
+    "asset": "fg_ios_dispositivos",
+    "width": 96,
+    "height": 96,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_direction_arrow_down_24": {
+    "asset": "fg_ios_abajo",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_edit_12": {
+    "asset": "fg_ios_lapiz",
+    "width": 12,
+    "height": 12,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_edit_24": {
+    "asset": "fg_ios_lapiz",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_emoji_symbols_24": {
+    "asset": "fg_ios_emoji",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_emoticon_24": {
+    "asset": "fg_ios_emoji",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_emoticon_outline_24": {
+    "asset": "fg_ios_emoji",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_extension_24": {
+    "asset": "fg_ios_plugin",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_favorite_20": {
+    "asset": "fg_ios_corazon",
+    "width": 20,
+    "height": 20,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_file_download_24": {
+    "asset": "fg_ios_descargar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_fingerprint_24": {
+    "asset": "fg_ios_huella",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_forum_24": {
+    "asset": "fg_ios_chats_dobles",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_forum_96": {
+    "asset": "fg_ios_chats_dobles",
+    "width": 96,
+    "height": 96,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_group_16": {
+    "asset": "fg_ios_grupos",
+    "width": 16,
+    "height": 16,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_group_24": {
+    "asset": "fg_ios_grupos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_group_56": {
+    "asset": "fg_ios_grupos",
+    "width": 56,
+    "height": 56,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_group_96": {
+    "asset": "fg_ios_grupos",
+    "width": 96,
+    "height": 96,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_group_add_24": {
+    "asset": "fg_ios_grupo_nuevo",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_help_16": {
+    "asset": "fg_ios_ayuda",
+    "width": 16,
+    "height": 16,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_help_24": {
+    "asset": "fg_ios_ayuda",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_help_outline_24": {
+    "asset": "fg_ios_ayuda",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_home_24": {
+    "asset": "fg_ios_inicio",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_image_24": {
+    "asset": "fg_ios_imagen",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_image_96": {
+    "asset": "fg_ios_imagen",
+    "width": 96,
+    "height": 96,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_image_aspect_ratio_24": {
+    "asset": "fg_ios_imagen",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_info_24": {
+    "asset": "fg_ios_informacion",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_insert_drive_file_16": {
+    "asset": "fg_ios_documento",
+    "width": 16,
+    "height": 16,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_insert_drive_file_24": {
+    "asset": "fg_ios_documento",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_insert_drive_file_96": {
+    "asset": "fg_ios_documento",
+    "width": 96,
+    "height": 96,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_keyboard_arrow_down_20": {
+    "asset": "fg_ios_abajo",
+    "width": 20,
+    "height": 20,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_keyboard_arrow_down_24": {
+    "asset": "fg_ios_abajo",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_keyboard_arrow_left_24": {
+    "asset": "fg_ios_retroceder",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_keyboard_arrow_up_24": {
+    "asset": "fg_ios_arriba",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_keyboard_voice_24": {
+    "asset": "fg_ios_microfono",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_link_24": {
+    "asset": "fg_ios_enlace",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_location_on_16": {
+    "asset": "fg_ios_ubicacion",
+    "width": 16,
+    "height": 16,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_location_on_18": {
+    "asset": "fg_ios_ubicacion",
+    "width": 18,
+    "height": 18,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_location_on_20": {
+    "asset": "fg_ios_ubicacion",
+    "width": 20,
+    "height": 20,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_location_on_24": {
+    "asset": "fg_ios_ubicacion",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_location_on_48": {
+    "asset": "fg_ios_ubicacion",
+    "width": 48,
+    "height": 48,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_lock_14": {
+    "asset": "fg_ios_candado",
+    "width": 12,
+    "height": 12,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_lock_24": {
+    "asset": "fg_ios_candado",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_lock_48": {
+    "asset": "fg_ios_candado",
+    "width": 48,
+    "height": 48,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_mic_16": {
+    "asset": "fg_ios_microfono",
+    "width": 16,
+    "height": 16,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_mic_24": {
+    "asset": "fg_ios_microfono",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_mic_96": {
+    "asset": "fg_ios_microfono",
+    "width": 96,
+    "height": 96,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_music_note_24": {
+    "asset": "fg_ios_musica",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_person_16": {
+    "asset": "fg_ios_perfil",
+    "width": 16,
+    "height": 16,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_person_24": {
+    "asset": "fg_ios_perfil",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_person_56": {
+    "asset": "fg_ios_perfil",
+    "width": 56,
+    "height": 56,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "baseline_person_add_24": {
+    "asset": "fg_ios_agregar_contacto",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "bot_file": {
+    "asset": "fg_ios_documento",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "bot_location": {
+    "asset": "fg_ios_ubicacion",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "bot_location_remix": {
+    "asset": "fg_ios_ubicacion",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "bot_location_solar": {
+    "asset": "fg_ios_ubicacion",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "calls_headphones": {
+    "asset": "fg_ios_audifonos",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "calls_menu_headset": {
+    "asset": "fg_ios_audifonos",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "calls_menu_headset_remix": {
+    "asset": "fg_ios_audifonos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "calls_menu_headset_solar": {
+    "asset": "fg_ios_audifonos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "calls_mute_mini": {
+    "asset": "fg_ios_microfono_desactivado",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "calls_mute_remix": {
+    "asset": "fg_ios_microfono_desactivado",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "calls_mute_solar": {
+    "asset": "fg_ios_microfono_desactivado",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "calls_speaker": {
+    "asset": "fg_ios_volumen",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "calls_unmute": {
+    "asset": "fg_ios_microfono",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "calls_video": {
+    "asset": "fg_ios_videollamada",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "camera": {
+    "asset": "fg_ios_camara",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "camera_remix": {
+    "asset": "fg_ios_camara",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "camera_solar": {
+    "asset": "fg_ios_camara",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "chat_calls_video": {
+    "asset": "fg_ios_videollamada",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "chat_calls_voice": {
+    "asset": "fg_ios_llamar",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "chats_archive": {
+    "asset": "fg_ios_archivo",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "chats_archive_remix": {
+    "asset": "fg_ios_archivo",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "chats_archive_solar": {
+    "asset": "fg_ios_archivo",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "chats_pin": {
+    "asset": "fg_ios_fijar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "chats_saved": {
+    "asset": "fg_ios_guardados",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "chats_saved_remix": {
+    "asset": "fg_ios_guardados",
+    "width": 30,
+    "height": 30,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "chats_saved_solar": {
+    "asset": "fg_ios_guardados",
+    "width": 30,
+    "height": 30,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "cloud_sync": {
+    "asset": "fg_ios_nube_sincronizar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "emoji_tabs_faves": {
+    "asset": "fg_ios_favoritos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "emoji_tabs_faves_remix": {
+    "asset": "fg_ios_favoritos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "emoji_tabs_faves_solar": {
+    "asset": "fg_ios_favoritos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_apariencia": {
+    "asset": "fg_ios_apariencia",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_camera": {
+    "asset": "fg_ios_camara",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_canales": {
+    "asset": "fg_ios_anuncios",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_chat": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_chats": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_cloud": {
+    "asset": "fg_ios_nube_sincronizar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_comunidad": {
+    "asset": "fg_ios_idioma",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_download": {
+    "asset": "fg_ios_descargar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_estilo_de_interfaz": {
+    "asset": "fg_ios_controles",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_file": {
+    "asset": "fg_ios_documento",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_folder": {
+    "asset": "fg_ios_carpeta",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_general": {
+    "asset": "fg_ios_panel",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_gesture": {
+    "asset": "fg_ios_controles",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_globe": {
+    "asset": "fg_ios_idioma",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_history": {
+    "asset": "fg_ios_reloj",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_home": {
+    "asset": "fg_ios_apariencia",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_iconos": {
+    "asset": "fg_ios_capas",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_info": {
+    "asset": "fg_ios_idioma",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_layers": {
+    "asset": "fg_ios_capas",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_list": {
+    "asset": "fg_ios_lista",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_otros": {
+    "asset": "fg_ios_descargar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_palette": {
+    "asset": "fg_ios_apariencia",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_plugin": {
+    "asset": "fg_ios_plugin",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_plugins": {
+    "asset": "fg_ios_plugin",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_reset": {
+    "asset": "fg_ios_actualizar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_settings": {
+    "asset": "fg_ios_ajustes",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "fg_settings_trash": {
+    "asset": "fg_ios_eliminar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "files_folder": {
+    "asset": "fg_ios_carpeta",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "files_folder_remix": {
+    "asset": "fg_ios_carpeta",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "files_folder_solar": {
+    "asset": "fg_ios_carpeta",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "files_gallery": {
+    "asset": "fg_ios_imagen",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "files_gallery_remix": {
+    "asset": "fg_ios_imagen",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "files_gallery_solar": {
+    "asset": "fg_ios_imagen",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "filled_link": {
+    "asset": "fg_ios_enlace",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "filled_link_remix": {
+    "asset": "fg_ios_enlace",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "filled_link_solar": {
+    "asset": "fg_ios_enlace",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "filled_profile_call_24": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "filled_profile_message_24": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "filled_profile_settings": {
+    "asset": "fg_ios_ajustes",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "filled_profile_settings_remix": {
+    "asset": "fg_ios_ajustes",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "filled_profile_settings_solar": {
+    "asset": "fg_ios_ajustes",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "filled_profile_video_24": {
+    "asset": "fg_ios_videollamada",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "filter_airplane": {
+    "asset": "fg_ios_avion_papel",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "filter_airplane_remix": {
+    "asset": "fg_ios_avion_papel",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "filter_airplane_solar": {
+    "asset": "fg_ios_avion_papel",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "filter_palette": {
+    "asset": "fg_ios_apariencia",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "filter_palette_remix": {
+    "asset": "fg_ios_apariencia",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "filter_palette_solar": {
+    "asset": "fg_ios_apariencia",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "flexy_composer_clip": {
+    "asset": "fg_ios_adjuntar",
+    "width": 28,
+    "height": 28,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "flexy_composer_folded": {
+    "asset": "fg_ios_sticker",
+    "width": 28,
+    "height": 28,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "flexy_composer_send": {
+    "asset": "fg_ios_enviar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "flexy_composer_smile": {
+    "asset": "fg_ios_sticker",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "flexy_composer_sticker": {
+    "asset": "fg_ios_sticker",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "flexy_composer_video": {
+    "asset": "fg_ios_videollamada",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "flexy_composer_voice": {
+    "asset": "fg_ios_microfono",
+    "width": 28,
+    "height": 28,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "flexy_ios_back": {
+    "asset": "fg_ios_retroceder",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "ic_ab_back": {
+    "asset": "fg_ios_retroceder",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "ic_ab_back_remix": {
+    "asset": "fg_ios_retroceder",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "ic_ab_back_solar": {
+    "asset": "fg_ios_retroceder",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "ic_ab_other": {
+    "asset": "fg_ios_tres_puntos_horizontal",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "ic_ab_search_remix": {
+    "asset": "fg_ios_buscar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "ic_ab_search_solar": {
+    "asset": "fg_ios_buscar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "ic_translate": {
+    "asset": "fg_ios_traducir",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_attach": {
+    "asset": "fg_ios_adjuntar",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_attach_remix": {
+    "asset": "fg_ios_adjuntar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "input_attach_solar": {
+    "asset": "fg_ios_adjuntar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_bot1": {
+    "asset": "fg_ios_bot",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_bot1_remix": {
+    "asset": "fg_ios_bot",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "input_bot1_solar": {
+    "asset": "fg_ios_bot",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_bot2": {
+    "asset": "fg_ios_bot",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_bot2_remix": {
+    "asset": "fg_ios_bot",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "input_bot2_solar": {
+    "asset": "fg_ios_bot",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_message": {
+    "asset": "fg_ios_mensaje_texto",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "input_mic": {
+    "asset": "fg_ios_microfono",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_mic_pressed": {
+    "asset": "fg_ios_microfono",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_mic_pressed_remix": {
+    "asset": "fg_ios_microfono",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "input_mic_pressed_solar": {
+    "asset": "fg_ios_microfono",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_mic_remix": {
+    "asset": "fg_ios_microfono",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "input_mic_solar": {
+    "asset": "fg_ios_microfono",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_smile": {
+    "asset": "fg_ios_sticker",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_smile_remix": {
+    "asset": "fg_ios_sticker",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "input_smile_solar": {
+    "asset": "fg_ios_sticker",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_sticker": {
+    "asset": "fg_ios_sticker",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_video": {
+    "asset": "fg_ios_videollamada",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_video_pressed": {
+    "asset": "fg_ios_videollamada",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_video_pressed_remix": {
+    "asset": "fg_ios_videollamada",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "input_video_pressed_solar": {
+    "asset": "fg_ios_videollamada",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "input_video_remix": {
+    "asset": "fg_ios_videollamada",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "input_video_solar": {
+    "asset": "fg_ios_videollamada",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "menu_calls": {
+    "asset": "fg_ios_llamar",
+    "width": 26,
+    "height": 26,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "menu_chats": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 26,
+    "height": 26,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "menu_date": {
+    "asset": "fg_ios_calendario",
+    "width": 26,
+    "height": 26,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "menu_day_mode_24": {
+    "asset": "fg_ios_sol",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "menu_devices": {
+    "asset": "fg_ios_dispositivos",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "menu_gift": {
+    "asset": "fg_ios_regalo",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "menu_hashtag": {
+    "asset": "fg_ios_hashtag",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "menu_location": {
+    "asset": "fg_ios_ubicacion",
+    "width": 26,
+    "height": 26,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "menu_night_mode_24": {
+    "asset": "fg_ios_luna",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "menu_night_mode_24_remix": {
+    "asset": "fg_ios_luna",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "menu_night_mode_24_solar": {
+    "asset": "fg_ios_luna",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "menu_recent": {
+    "asset": "fg_ios_reloj",
+    "width": 26,
+    "height": 26,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "menu_saved": {
+    "asset": "fg_ios_guardados",
+    "width": 26,
+    "height": 26,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "menu_secret": {
+    "asset": "fg_ios_candado",
+    "width": 26,
+    "height": 26,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "menu_settings": {
+    "asset": "fg_ios_ajustes",
+    "width": 26,
+    "height": 26,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "menu_tag_filter": {
+    "asset": "fg_ios_etiqueta",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "menu_tag_filter_remix": {
+    "asset": "fg_ios_etiqueta",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "menu_tag_filter_solar": {
+    "asset": "fg_ios_etiqueta",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "menu_username_remix": {
+    "asset": "fg_ios_mencion",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "menu_username_solar": {
+    "asset": "fg_ios_mencion",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "menu_videocall": {
+    "asset": "fg_ios_videollamada",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_add": {
+    "asset": "fg_ios_agregar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_add_remix": {
+    "asset": "fg_ios_agregar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_add_solar": {
+    "asset": "fg_ios_agregar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_addbot": {
+    "asset": "fg_ios_bot",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_addbot_remix": {
+    "asset": "fg_ios_bot",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_addbot_solar": {
+    "asset": "fg_ios_bot",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_addcontact": {
+    "asset": "fg_ios_agregar_contacto",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_archive": {
+    "asset": "fg_ios_archivo",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_archive_remix": {
+    "asset": "fg_ios_archivo",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_archive_solar": {
+    "asset": "fg_ios_archivo",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_arrowright": {
+    "asset": "fg_ios_avanzar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_calendar": {
+    "asset": "fg_ios_calendario",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_calendar_remix": {
+    "asset": "fg_ios_calendario",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_calendar_solar": {
+    "asset": "fg_ios_calendario",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_callback": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_calls": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_calls_remix": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_calls_solar": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_camera": {
+    "asset": "fg_ios_camara",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_camera_remix": {
+    "asset": "fg_ios_camara",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_camera_solar": {
+    "asset": "fg_ios_camara",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_channel": {
+    "asset": "fg_ios_anuncios",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_channel_remix": {
+    "asset": "fg_ios_anuncios",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_channel_solar": {
+    "asset": "fg_ios_anuncios",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_clearcache": {
+    "asset": "fg_ios_eliminar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_contact": {
+    "asset": "fg_ios_contactos",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_contact_add": {
+    "asset": "fg_ios_agregar_contacto",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_contact_add_remix": {
+    "asset": "fg_ios_agregar_contacto",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_contact_add_solar": {
+    "asset": "fg_ios_agregar_contacto",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_contacts": {
+    "asset": "fg_ios_contactos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_contacts_remix": {
+    "asset": "fg_ios_contactos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_contacts_solar": {
+    "asset": "fg_ios_contactos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_delete": {
+    "asset": "fg_ios_eliminar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_delete_remix": {
+    "asset": "fg_ios_eliminar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_delete_solar": {
+    "asset": "fg_ios_eliminar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_discuss": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_discuss_remix": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_discuss_solar": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_discussion": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_discussion_remix": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_discussion_solar": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_download": {
+    "asset": "fg_ios_descargar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_download_remix": {
+    "asset": "fg_ios_descargar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_download_solar": {
+    "asset": "fg_ios_descargar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_edit": {
+    "asset": "fg_ios_lapiz",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_edit_remix": {
+    "asset": "fg_ios_lapiz",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_edit_solar": {
+    "asset": "fg_ios_lapiz",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_emoji_smiles": {
+    "asset": "fg_ios_emoji",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_emoji_stickers": {
+    "asset": "fg_ios_sticker",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_fave": {
+    "asset": "fg_ios_favoritos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_fave_remix": {
+    "asset": "fg_ios_favoritos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_fave_solar": {
+    "asset": "fg_ios_favoritos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_folder_remix": {
+    "asset": "fg_ios_carpeta",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_folder_solar": {
+    "asset": "fg_ios_carpeta",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_folders_bots": {
+    "asset": "fg_ios_bot",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_folders_bots_remix": {
+    "asset": "fg_ios_bot",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_folders_bots_solar": {
+    "asset": "fg_ios_bot",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_folders_groups": {
+    "asset": "fg_ios_grupos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_folders_groups_remix": {
+    "asset": "fg_ios_grupos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_folders_groups_solar": {
+    "asset": "fg_ios_grupos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_gallery": {
+    "asset": "fg_ios_imagen",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_gallery_remix": {
+    "asset": "fg_ios_imagen",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_gallery_solar": {
+    "asset": "fg_ios_imagen",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_gif": {
+    "asset": "fg_ios_gif",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_gif_remix": {
+    "asset": "fg_ios_gif",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_gif_solar": {
+    "asset": "fg_ios_gif",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_go_down": {
+    "asset": "fg_ios_abajo",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_go_up": {
+    "asset": "fg_ios_arriba",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_groups": {
+    "asset": "fg_ios_grupos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_groups_remix": {
+    "asset": "fg_ios_grupos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_groups_solar": {
+    "asset": "fg_ios_grupos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_help": {
+    "asset": "fg_ios_ayuda",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_home": {
+    "asset": "fg_ios_inicio",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_home_remix": {
+    "asset": "fg_ios_inicio",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_home_solar": {
+    "asset": "fg_ios_inicio",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_info": {
+    "asset": "fg_ios_informacion",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_info_remix": {
+    "asset": "fg_ios_informacion",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_info_solar": {
+    "asset": "fg_ios_informacion",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_language": {
+    "asset": "fg_ios_idioma",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_language_remix": {
+    "asset": "fg_ios_idioma",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_language_solar": {
+    "asset": "fg_ios_idioma",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_link": {
+    "asset": "fg_ios_enlace",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_list": {
+    "asset": "fg_ios_lista",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_list_remix": {
+    "asset": "fg_ios_lista",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_list_solar": {
+    "asset": "fg_ios_lista",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_location": {
+    "asset": "fg_ios_ubicacion",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_location_remix": {
+    "asset": "fg_ios_ubicacion",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_location_solar": {
+    "asset": "fg_ios_ubicacion",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_media": {
+    "asset": "fg_ios_panel",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_media_remix": {
+    "asset": "fg_ios_panel",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_media_solar": {
+    "asset": "fg_ios_panel",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_mention": {
+    "asset": "fg_ios_mencion",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_message": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_message_remix": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_message_solar": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_mute": {
+    "asset": "fg_ios_notificaciones_silenciadas",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_mute_remix": {
+    "asset": "fg_ios_notificaciones_silenciadas",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_mute_solar": {
+    "asset": "fg_ios_notificaciones_silenciadas",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_notifications": {
+    "asset": "fg_ios_notificaciones",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_notifications_remix": {
+    "asset": "fg_ios_notificaciones",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_notifications_solar": {
+    "asset": "fg_ios_notificaciones",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_openprofile": {
+    "asset": "fg_ios_perfil",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_openprofile_remix": {
+    "asset": "fg_ios_perfil",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_openprofile_solar": {
+    "asset": "fg_ios_perfil",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_payment_card": {
+    "asset": "fg_ios_tarjeta",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_payment_card_remix": {
+    "asset": "fg_ios_tarjeta",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_payment_card_solar": {
+    "asset": "fg_ios_tarjeta",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_photos": {
+    "asset": "fg_ios_imagen",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_photos_remix": {
+    "asset": "fg_ios_imagen",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_photos_solar": {
+    "asset": "fg_ios_imagen",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_pin": {
+    "asset": "fg_ios_fijar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_pin_remix": {
+    "asset": "fg_ios_fijar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_pin_solar": {
+    "asset": "fg_ios_fijar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_plugins": {
+    "asset": "fg_ios_plugin",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_plugins_remix": {
+    "asset": "fg_ios_plugin",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_plugins_solar": {
+    "asset": "fg_ios_plugin",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_qrcode": {
+    "asset": "fg_ios_codigo_qr",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_qrcode_remix": {
+    "asset": "fg_ios_codigo_qr",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_qrcode_solar": {
+    "asset": "fg_ios_codigo_qr",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_reactions": {
+    "asset": "fg_ios_corazon",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_reactions_filled": {
+    "asset": "fg_ios_corazon",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_reactions_filled_remix": {
+    "asset": "fg_ios_corazon",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_reactions_filled_solar": {
+    "asset": "fg_ios_corazon",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_reactions_remix": {
+    "asset": "fg_ios_corazon",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_reactions_solar": {
+    "asset": "fg_ios_corazon",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_recent": {
+    "asset": "fg_ios_reloj",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_recent_remix": {
+    "asset": "fg_ios_reloj",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_recent_solar": {
+    "asset": "fg_ios_reloj",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_reset": {
+    "asset": "fg_ios_actualizar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_reset_remix": {
+    "asset": "fg_ios_actualizar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_reset_solar": {
+    "asset": "fg_ios_actualizar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_saved": {
+    "asset": "fg_ios_guardados",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_saved_remix": {
+    "asset": "fg_ios_guardados",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_saved_solar": {
+    "asset": "fg_ios_guardados",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_search": {
+    "asset": "fg_ios_buscar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_search_remix": {
+    "asset": "fg_ios_buscar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_search_solar": {
+    "asset": "fg_ios_buscar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_secret": {
+    "asset": "fg_ios_candado",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_secret_remix": {
+    "asset": "fg_ios_candado",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_secret_solar": {
+    "asset": "fg_ios_candado",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_send": {
+    "asset": "fg_ios_enviar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_send_remix": {
+    "asset": "fg_ios_enviar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_send_solar": {
+    "asset": "fg_ios_enviar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_settings": {
+    "asset": "fg_ios_ajustes",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_settings_old": {
+    "asset": "fg_ios_ajustes",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_settings_remix": {
+    "asset": "fg_ios_ajustes",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_settings_solar": {
+    "asset": "fg_ios_ajustes",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_stats": {
+    "asset": "fg_ios_estadisticas",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_stats_remix": {
+    "asset": "fg_ios_estadisticas",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_stats_solar": {
+    "asset": "fg_ios_estadisticas",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_sticker": {
+    "asset": "fg_ios_sticker",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_sticker_remix": {
+    "asset": "fg_ios_sticker",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_sticker_solar": {
+    "asset": "fg_ios_sticker",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_theme": {
+    "asset": "fg_ios_apariencia",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_theme_remix": {
+    "asset": "fg_ios_apariencia",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_theme_solar": {
+    "asset": "fg_ios_apariencia",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_translate": {
+    "asset": "fg_ios_traducir",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_translate_remix": {
+    "asset": "fg_ios_traducir",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_translate_solar": {
+    "asset": "fg_ios_traducir",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_unmute": {
+    "asset": "fg_ios_notificaciones",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_user_search": {
+    "asset": "fg_ios_buscar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_user_search_remix": {
+    "asset": "fg_ios_buscar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "msg_user_search_solar": {
+    "asset": "fg_ios_buscar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_usersearch": {
+    "asset": "fg_ios_buscar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "msg_view_file": {
+    "asset": "fg_ios_documento",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "outline_add_account": {
+    "asset": "fg_ios_agregar_contacto",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "outline_add_account_remix": {
+    "asset": "fg_ios_agregar_contacto",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "outline_add_account_solar": {
+    "asset": "fg_ios_agregar_contacto",
+    "width": 23,
+    "height": 23,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "outline_header_qr_24": {
+    "asset": "fg_ios_codigo_qr",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "outline_header_search": {
+    "asset": "fg_ios_buscar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "outline_profile_call_24": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "outline_profile_message_24": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "outline_profile_settings": {
+    "asset": "fg_ios_ajustes",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "outline_profile_video_24": {
+    "asset": "fg_ios_videollamada",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "outline_search_1_24": {
+    "asset": "fg_ios_buscar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "outline_shield_check": {
+    "asset": "fg_ios_proteccion",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "outline_shield_plain_24": {
+    "asset": "fg_ios_proteccion",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "permissions_gallery1": {
+    "asset": "fg_ios_imagen",
+    "width": 44,
+    "height": 44,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "permissions_gallery1_remix": {
+    "asset": "fg_ios_imagen",
+    "width": 44,
+    "height": 44,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "permissions_gallery1_solar": {
+    "asset": "fg_ios_imagen",
+    "width": 44,
+    "height": 44,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "permissions_gallery2": {
+    "asset": "fg_ios_imagen",
+    "width": 44,
+    "height": 44,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "permissions_gallery2_remix": {
+    "asset": "fg_ios_imagen",
+    "width": 44,
+    "height": 44,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "permissions_gallery2_solar": {
+    "asset": "fg_ios_imagen",
+    "width": 44,
+    "height": 44,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "photo_paint_brush": {
+    "asset": "fg_ios_pincel",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "photo_paint_brush_remix": {
+    "asset": "fg_ios_pincel",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "photo_paint_brush_solar": {
+    "asset": "fg_ios_pincel",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "player_new_repeat_off": {
+    "asset": "fg_ios_repetir",
+    "width": 28,
+    "height": 28,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "player_new_repeatall": {
+    "asset": "fg_ios_repetir",
+    "width": 28,
+    "height": 28,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "player_new_shuffle": {
+    "asset": "fg_ios_aleatorio",
+    "width": 28,
+    "height": 28,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "player_new_shuffle_off": {
+    "asset": "fg_ios_aleatorio",
+    "width": 28,
+    "height": 28,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "plugins_filled": {
+    "asset": "fg_ios_plugin",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "plugins_filled_remix": {
+    "asset": "fg_ios_plugin",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "plugins_filled_solar": {
+    "asset": "fg_ios_plugin",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "profile_newmsg": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 26,
+    "height": 26,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "profile_newmsg_filled": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 26,
+    "height": 26,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "profile_newmsg_filled_remix": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 28,
+    "height": 28,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "profile_newmsg_filled_solar": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "profile_phone": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "profile_phone_remix": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "profile_phone_solar": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "profile_qr_scan_24": {
+    "asset": "fg_ios_codigo_qr",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "profile_video": {
+    "asset": "fg_ios_videollamada",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "profile_video_remix": {
+    "asset": "fg_ios_videollamada",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "profile_video_solar": {
+    "asset": "fg_ios_videollamada",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "settings3_chat": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "settings3_document": {
+    "asset": "fg_ios_documento",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "settings3_folder": {
+    "asset": "fg_ios_carpeta",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "settings3_ghost": {
+    "asset": "fg_ios_reloj",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "settings3_hand": {
+    "asset": "fg_ios_controles",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "settings3_info": {
+    "asset": "fg_ios_idioma",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "settings3_plugins": {
+    "asset": "fg_ios_plugin",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "settings3_sliders": {
+    "asset": "fg_ios_ajustes",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "settings3_stack": {
+    "asset": "fg_ios_capas",
+    "width": 32,
+    "height": 32,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "settings_account": {
+    "asset": "fg_ios_perfil",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_ask": {
+    "asset": "fg_ios_ayuda",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_calls": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_channel": {
+    "asset": "fg_ios_anuncios",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_chat": {
+    "asset": "fg_ios_mensaje_tres_puntos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_data": {
+    "asset": "fg_ios_base_datos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_devices": {
+    "asset": "fg_ios_dispositivos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_faq": {
+    "asset": "fg_ios_ayuda",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_folders": {
+    "asset": "fg_ios_carpeta",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_gift": {
+    "asset": "fg_ios_regalo",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_group": {
+    "asset": "fg_ios_grupos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_language": {
+    "asset": "fg_ios_idioma",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_privacy": {
+    "asset": "fg_ios_proteccion",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_sounds": {
+    "asset": "fg_ios_notificaciones",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "settings_stars": {
+    "asset": "fg_ios_favoritos",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "smiles_inputsearch": {
+    "asset": "fg_ios_buscar",
+    "width": 24,
+    "height": 24,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "smiles_inputsearch_remix": {
+    "asset": "fg_ios_buscar",
+    "width": 16,
+    "height": 16,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "smiles_inputsearch_solar": {
+    "asset": "fg_ios_buscar",
+    "width": 16,
+    "height": 16,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "smiles_tab_settings": {
+    "asset": "fg_ios_ajustes",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "smiles_tab_settings_remix": {
+    "asset": "fg_ios_ajustes",
+    "width": 20,
+    "height": 20,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "smiles_tab_settings_solar": {
+    "asset": "fg_ios_ajustes",
+    "width": 20,
+    "height": 20,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "smiles_tab_smiles": {
+    "asset": "fg_ios_emoji",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "smiles_tab_stickers": {
+    "asset": "fg_ios_sticker",
+    "width": 28,
+    "height": 28,
+    "color": 4278190080,
+    "mirrored": false
+  },
+  "tabs_calls_24": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "tabs_calls_active_24": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "tabs_calls_active_remix": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "tabs_calls_active_solar": {
+    "asset": "fg_ios_llamar",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "tabs_chats_24": {
+    "asset": "fg_ios_chats_dobles",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "tabs_chats_active_24": {
+    "asset": "fg_ios_chats_dobles",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "tabs_chats_active_remix": {
+    "asset": "fg_ios_chats_dobles",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "tabs_chats_active_solar": {
+    "asset": "fg_ios_chats_dobles",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "tabs_chats_remix": {
+    "asset": "fg_ios_chats_dobles",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "tabs_chats_solar": {
+    "asset": "fg_ios_chats_dobles",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "tabs_contact_active_24": {
+    "asset": "fg_ios_perfil",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "tabs_contacts_24": {
+    "asset": "fg_ios_perfil",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "tabs_contacts_active_remix": {
+    "asset": "fg_ios_perfil",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  },
+  "tabs_contacts_active_solar": {
+    "asset": "fg_ios_perfil",
+    "width": 24,
+    "height": 24,
+    "color": 4294967295,
+    "mirrored": false
+  }
+}

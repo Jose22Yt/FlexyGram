@@ -73,7 +73,8 @@ public class ChatActivityEnterViewAnimatedIconView extends RLottieImageView {
      */
     private boolean useStaticIcons() {
         try {
-            return app.exteraless.icons.IconPackManager.getInstance().hasReplacements();
+            return app.exteraless.icons.BaseIconPacks.getSelected() == app.exteraless.icons.BaseIconPacks.BASE_DEFAULT
+                    || app.exteraless.icons.IconPackManager.getInstance().hasReplacements();
         } catch (Throwable ignored) {
             return false;
         }
@@ -87,7 +88,7 @@ public class ChatActivityEnterViewAnimatedIconView extends RLottieImageView {
             case KEYBOARD: return R.drawable.input_keyboard;
             case GIF: return R.drawable.msg_gif;
             case MENU: return R.drawable.ic_ab_other;
-            default: return R.drawable.input_smile;
+            default: return R.drawable.msg_sticker;
         }
     }
 

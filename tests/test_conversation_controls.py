@@ -66,6 +66,7 @@ def test_zero_badge_is_retained_and_unchanged_counts_do_not_remeasure(tmp_path):
 
 def test_control_decoder_bypasses_drawable_replacements_and_closes_parser(tmp_path):
     probe(tmp_path,{
+ 'app/flexygram/icons/ExactIcons.java':'package app.flexygram.icons;public class ExactIcons {public static android.graphics.drawable.Drawable create(android.content.res.Resources r,int id,int density,android.content.res.Resources.Theme theme){return null;}}',
  'android/content/res/XmlResourceParser.java':'''package android.content.res;public class XmlResourceParser implements AutoCloseable{public boolean closed;public int id;public void close(){closed=true;}}''',
  'android/util/TypedValue.java':'''package android.util;public class TypedValue{public int density;}''',
  'android/content/res/Resources.java':'''package android.content.res;public class Resources{public static class Theme{}public static class NotFoundException extends RuntimeException{public NotFoundException(String s){super(s);}public NotFoundException(String s,Throwable t){super(s,t);}}public static class Stream extends java.io.ByteArrayInputStream{public boolean closed;Stream(int id){super(new byte[]{(byte)id});}public void close()throws java.io.IOException{closed=true;super.close();}}public Stream stream;public java.io.InputStream openRawResource(int id,android.util.TypedValue value){value.density=320;return stream=new Stream(id);}public XmlResourceParser parser;public XmlResourceParser getXml(int id){parser=new XmlResourceParser();parser.id=id;return parser;}public android.graphics.drawable.Drawable getDrawable(int id){throw new AssertionError("icon replacement path used");}}''',
@@ -79,7 +80,9 @@ def test_control_decoder_bypasses_drawable_replacements_and_closes_parser(tmp_pa
 def test_decoder_types_against_real_android_sdk(tmp_path):
     sdk=Path(os.environ.get('ANDROID_HOME',str(ROOT.parent/'.flexygram/android-sdk')))/'platforms/android-37.0/android.jar'
     if not sdk.is_file()or not shutil.which('javac'):pytest.skip('Android SDK and JDK required')
-    subprocess.run(['javac','-proc:none','-cp',str(sdk),'-d',str(tmp_path),str(JAVA/'app/flexygram/icons/ConversationControlIcons.java')],check=True,capture_output=True,text=True)
+    stub=tmp_path/'ExactIcons.java'
+    stub.write_text('package app.flexygram.icons;public class ExactIcons {public static android.graphics.drawable.Drawable create(android.content.res.Resources r,int id,int d,android.content.res.Resources.Theme t){return null;}}')
+    subprocess.run(['javac','-proc:none','-cp',str(sdk),'-d',str(tmp_path),str(stub),str(JAVA/'app/flexygram/icons/ConversationControlIcons.java')],check=True,capture_output=True,text=True)
 
 
 def test_menu_cards_share_selection_blur_and_imports_preserve_explicit_controls():

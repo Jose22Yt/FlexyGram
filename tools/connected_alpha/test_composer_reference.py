@@ -36,7 +36,7 @@ public class Reference {
    ok(ComposerIcons.resource("STICKER",-1,reference)==R.drawable.flexy_composer_sticker);
    ok(ComposerIcons.resource("GIF",-10,reference)==-10);
    ok(ComposerIcons.resource("MENU",-20,reference)==-20);
-   ok(ComposerIcons.resource("SMILE",-1,reference)==(reference?R.drawable.flexy_composer_folded:R.drawable.flexy_composer_smile));
+   ok(ComposerIcons.resource("SMILE",-1,reference)==R.drawable.flexy_composer_folded);
    for(int level=0;level<3;level++) {
     ok(ComposerStyle.diameter(level)==44-4*level);
     // 28dp vector fits even the smallest surface, with four dp breathing room.

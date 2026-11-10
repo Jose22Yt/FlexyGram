@@ -42,7 +42,7 @@ public class ChatActivityEnterViewStaticIconView extends FrameLayout {
         VIDEO(R.drawable.input_video_pressed),
         STICKER(R.drawable.msg_sticker),
         KEYBOARD(R.drawable.input_keyboard),
-        SMILE(R.drawable.input_smile),
+        SMILE(R.drawable.msg_sticker),
         GIF(R.drawable.msg_gif),
         MENU(R.drawable.ic_ab_other);
 
