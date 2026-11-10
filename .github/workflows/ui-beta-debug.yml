@@ -24,7 +24,7 @@ jobs:
       GRADLE_OPTS: -Dorg.gradle.workers.max=2
       TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
       TELEGRAM_APP_HASH: ${{ secrets.TELEGRAM_APP_HASH }}
-      ALPHA_FIREBASE_JSON_B64: ${{ secrets.ALPHA_FIREBASE_JSON_B64 || secrets.FLEXYGRAM_BETA_FIREBASE_JSON_B64 }}
+      ALPHA_FIREBASE_JSON_B64: ${{ secrets.FLEXYGRAM_BETA_FIREBASE_JSON_B64 || secrets.ALPHA_FIREBASE_JSON_B64 }}
     steps:
       - name: Check out this branch commit
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4

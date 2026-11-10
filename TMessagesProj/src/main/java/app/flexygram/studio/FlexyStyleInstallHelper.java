@@ -105,6 +105,7 @@ public final class FlexyStyleInstallHelper {
         }
         void read() {
             if(canceled)return;waiting=false;if(tag>=0)DownloadController.getInstance(account).removeLoadingFileObserver(this);
+            ApplicationLoader.applicationHandler.removeCallbacks(timeout);
             ApplicationLoader.applicationHandler.postDelayed(timeout,60000);
             try{work=FlexyStudioIO.execute(()->{
                 StudioCodec.Preset result=null;StudioImportPlan comparison=null;String realName=filename;int count=0;String unsupported=null;
