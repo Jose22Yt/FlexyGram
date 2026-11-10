@@ -2256,9 +2256,6 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
             return sendMessage(messages, peer, forwardFromMyName, hideCaption, notify, getConnectionsManager().getCurrentTime() + 12, scheduleRepeatPeriod,
                     replyToTopMsg, video_timestamp, payStars, monoForumPeerId, suggestionParams);
         }
-        if (app.exteraless.privacy.BotAccountRouter.guardSend(currentAccount, peer,
-                () -> sendMessage(messages, peer, forwardFromMyName, hideCaption, notify, scheduleDate, scheduleRepeatPeriod,
-                        replyToTopMsg, video_timestamp, payStars, monoForumPeerId, suggestionParams))) return 0;
         int sendResult = 0;
         long myId = getUserConfig().getClientUserId();
         boolean isChannel = false;
