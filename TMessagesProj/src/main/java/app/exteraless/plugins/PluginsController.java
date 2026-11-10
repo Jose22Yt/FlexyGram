@@ -2078,7 +2078,7 @@ public class PluginsController extends com.exteragram.messenger.plugins.PluginsC
                 }
             }
         }
-        if (target == null || target.onClick == null) {
+        if (target == null || target.onClick == null || org.telegram.ui.Wallet.WalletPluginFreeze.isFrozen()) {
             return;
         }
         PluginsWatchdog wd = getWatchdog();

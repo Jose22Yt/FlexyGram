@@ -194,6 +194,7 @@ import org.telegram.ui.Components.FloatingDebug.FloatingDebugController;
 import org.telegram.ui.Components.FolderBottomSheet;
 import org.telegram.ui.Components.Forum.ForumUtilities;
 import org.telegram.ui.Components.GroupCallPip;
+import org.telegram.ui.Components.InstantCameraView;
 import org.telegram.ui.Components.JoinGroupAlert;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.PasscodeView;
@@ -477,7 +478,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         getWindow().setBackgroundDrawable(new ActivityWindowEmptyBackgroundDrawable());
         getWindow().setFormat(PixelFormat.OPAQUE);
 
-        flagSecureReason = new FlagSecureReason(getWindow(), () -> SharedConfig.passcodeHash.length() > 0 && !SharedConfig.allowScreenCapture);
+        flagSecureReason = new FlagSecureReason(getWindow(), () -> SharedConfig.passcodeHash.length() > 0 && !SharedConfig.allowScreenCapture, true);
         flagSecureReason.attach();
 
         super.onCreate(savedInstanceState);
@@ -8757,6 +8758,17 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             if (baseFragment != null && baseFragment.getLastStoryViewer() != null) {
                 baseFragment.getLastStoryViewer().dispatchKeyEvent(event);
                 return true;
+            }
+        }
+        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP || event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            BaseFragment baseFragment = getLastFragment();
+            if (baseFragment instanceof ChatActivity) {
+                ChatActivity chatActivity = (ChatActivity) baseFragment;
+                InstantCameraView instantCameraView = chatActivity.getInstantCameraView();
+                if (instantCameraView != null && instantCameraView.isCameraReady()) {
+                    instantCameraView.onKeyDown(keyCode, event);
+                    return true;
+                }
             }
         }
         if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP || event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN)) {

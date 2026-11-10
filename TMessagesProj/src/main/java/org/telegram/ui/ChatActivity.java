@@ -2465,6 +2465,25 @@ public class ChatActivity extends BaseFragment implements
         }
 
         @Override
+        public boolean onEditLastMessage() {
+            if (chatMode == MODE_SCHEDULED || editingMessageObject != null) {
+                return false;
+            }
+            for (int i = 0; i < messages.size(); i++) {
+                final MessageObject message = messages.get(i);
+                if (message == null || message.getId() <= 0 || !message.isOutOwner() || message.isSending() || message.isSponsored()) {
+                    continue;
+                }
+                if (!message.canEditMessage(currentChat)) {
+                    return false;
+                }
+                startEditingMessageObject(message);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
         public int getDisableLinkPreviewStatus() {
             return disableLinkPreview ? 2 : 1;
         }
@@ -5815,7 +5834,7 @@ public class ChatActivity extends BaseFragment implements
                 } else if (slidingView != null && e != null && e.getAction() == MotionEvent.ACTION_MOVE && e.getPointerId(0) == startedTrackingPointerId) {
                     int dx = Math.max(AndroidUtilities.dp(-80), Math.min(0, (int) (e.getX() - startedTrackingX)));
                     int dy = Math.abs((int) e.getY() - startedTrackingY);
-                    if (getScrollState() == SCROLL_STATE_IDLE && maybeStartTrackingSlidingView && !startedTrackingSlidingView && dx <= -AndroidUtilities.getPixelsInCM(0.4f, true) && Math.abs(dx) / 3 > dy) {
+                    if (getScrollState() == SCROLL_STATE_IDLE && maybeStartTrackingSlidingView && !startedTrackingSlidingView && dx <= -AndroidUtilities.getPixelsInCM(0.4f, true) && Math.abs(dx) / 3 > dy && !slidingView.canScrollHorizontally(1)) {
                         MotionEvent event = MotionEvent.obtain(0, 0, MotionEvent.ACTION_CANCEL, 0, 0, 0);
                         slidingView.onTouchEvent(event);
                         super.onInterceptTouchEvent(event);
@@ -6941,6 +6960,9 @@ public class ChatActivity extends BaseFragment implements
                 }
                 if (mcell != null) {
                     final MessageObject message = mcell.getMessageObject();
+                    if (message == null) {
+                        return super.drawChild(canvas, child, drawingTime);
+                    }
                     final MessageObject.GroupedMessagePosition position = mcell.getCurrentPosition();
                     final ImageReceiver imageReceiver = mcell.getAvatarImage();
                     if (imageReceiver != null && getSideMenuAlpha() < 1.f) {
@@ -11923,6 +11945,10 @@ public class ChatActivity extends BaseFragment implements
         contentView.addView(instantCameraView, index, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP));
     }
 
+    public InstantCameraView getInstantCameraView() {
+        return instantCameraView instanceof InstantCameraView ? (InstantCameraView) instantCameraView : null;
+    }
+
     private int scrimBlurGeneration;
 
     /** One shared capture, before the popup is visible; discard stale owners. */
@@ -13874,7 +13900,7 @@ public class ChatActivity extends BaseFragment implements
 
     public MessageObject.GroupedMessages getValidGroupedMessage(MessageObject message) {
         MessageObject.GroupedMessages groupedMessages = null;
-        if (message.getGroupId() != 0) {
+        if (message != null && message.getGroupId() != 0) {
             groupedMessages = groupedMessagesMap.get(message.getGroupId());
             if (groupedMessages != null && (groupedMessages.messages.size() <= 1 || groupedMessages.getPosition(message) == null)) {
                 groupedMessages = null;
@@ -17290,7 +17316,7 @@ public class ChatActivity extends BaseFragment implements
             if (view instanceof ChatMessageCell) {
                 ChatMessageCell messageCell = (ChatMessageCell) view;
                 MessageObject messageObject = messageCell.getMessageObject();
-                if (videoPlayerContainer != null && (messageObject.isRoundVideo() || messageObject.isVideo()) && !messageObject.isVoiceTranscriptionOpen() && MediaController.getInstance().isPlayingMessage(messageObject)) {
+                if (videoPlayerContainer != null && messageObject != null && (messageObject.isRoundVideo() || messageObject.isVideo()) && !messageObject.isVoiceTranscriptionOpen() && MediaController.getInstance().isPlayingMessage(messageObject)) {
                     ImageReceiver imageReceiver = messageCell.getPhotoImage();
                     videoPlayerContainer.setTranslationX(imageReceiver.getImageX() + messageCell.getX());
                     float translationY = messageCell.getY() + messageCell.getPaddingTop() + imageReceiver.getImageY() + chatListView.getY() - videoPlayerContainer.getTop();
@@ -17544,7 +17570,7 @@ public class ChatActivity extends BaseFragment implements
             final int visibleBackgroundHeight = getServiceHeight(view);
             boolean hasTopicSeparator = false;
 
-            if (messageCell != null) {
+            if (messageCell != null && messageCell.getMessageObject() != null) {
                 messageObject = messageCell.getMessageObject();
                 if (messageObject.getDialogId() == dialog_id && messageObject.getId() > maxVisibleId) {
                     maxVisibleId = messageObject.getId();
@@ -19397,6 +19423,16 @@ public class ChatActivity extends BaseFragment implements
                         canvas.translate(-imageReceiver.getCenterX(), -imageReceiver.getCenterY());
                     }
                     cell.setTimeAlpha(data.timeAlpha);
+                    if (cell.drawBackgroundInParent()) {
+                        // This overlay bypasses the list parent that normally draws gradient bubbles.
+                        canvas.save();
+                        canvas.translate(0, cell.getPaddingTop());
+                        final float cellAlpha = cell.getAlpha();
+                        cell.setAlpha(1f);
+                        cell.drawBackgroundInternal(canvas, true);
+                        cell.setAlpha(cellAlpha);
+                        canvas.restore();
+                    }
                     cell.draw(canvas);
                     canvas.restore();
                 }
@@ -23214,7 +23250,7 @@ public class ChatActivity extends BaseFragment implements
                 if (reversed || !addDateObjects) {
                     messages.add(obj);
                 } else {
-                    messages.add(messages.size() - 1, obj);
+                    messages.add(Math.max(0, messages.size() - 1), obj);
                 }
             }
 
@@ -27733,7 +27769,7 @@ public class ChatActivity extends BaseFragment implements
                 if (obj.messageOwner instanceof TLRPC.TL_messageEmpty) {
                     continue;
                 }
-                if (!isTopic && threadMessageObject != null && obj.isReply() && !(obj.messageOwner.action instanceof TLRPC.TL_messageActionPinMessage)) {
+                if (!isTopic && threadMessageObject != null && threadMessageObject.messageOwner.replies != null && obj.isReply() && !(obj.messageOwner.action instanceof TLRPC.TL_messageActionPinMessage)) {
                     int mid = obj.getReplyAnyMsgId();
                     if (threadMessageObject.getId() == mid) {
                         threadMessageObject.messageOwner.replies.replies++;
@@ -33533,7 +33569,7 @@ public class ChatActivity extends BaseFragment implements
             final boolean isReactionsAvailableFinal = !suggestEdit && isReactionsAvailable;
 
             int flags = 0;
-            if (isReactionsViewAvailable || showMessageSeen || showSponsorInfo || options.contains(OPTION_REPLY) || options.contains(OPTION_COPY) || options.contains(OPTION_COPY_PHOTO) || options.contains(OPTION_FORWARD) || options.contains(nkbtn_translate) || options.contains(nkbtn_detail)) {
+            if (isReactionsViewAvailable || showMessageSeen || showSponsorInfo || options.contains(OPTION_REPLY) || options.contains(OPTION_COPY) || options.contains(OPTION_COPY_PHOTO) || options.contains(OPTION_FORWARD) || options.contains(nkbtn_translate) || options.contains(nkbtn_detail) || options.contains(app.exteraless.plugins.menus.MenuInjector.MESSAGE_PLUGINS_OPTION)) {
                 flags |= ActionBarPopupWindow.ActionBarPopupWindowLayout.FLAG_USE_SWIPEBACK;
             }
 
@@ -34584,6 +34620,17 @@ public class ChatActivity extends BaseFragment implements
                         int swipeBackIndex = popupLayout.addViewToSwipeBack(forwardPopupWrapper.windowLayout);
                         cell.setOnLongClickListener(view -> {
                             popupLayout.getSwipeBack().openForeground(swipeBackIndex);
+                            return true;
+                        });
+                    }
+                    if (option == app.exteraless.plugins.menus.MenuInjector.MESSAGE_PLUGINS_OPTION) {
+                        int swipeBackIndex = popupLayout.addViewToSwipeBack(app.exteraless.plugins.menus.MenuInjector
+                                .createMessagePluginsMenu(popupLayout.getSwipeBack(), this::closeMenu, getResourceProvider()));
+                        cell.setRightIcon(R.drawable.msg_arrowright);
+                        cell.setOnClickListener(v1 -> popupLayout.getSwipeBack().openForeground(swipeBackIndex));
+                        cell.setOnLongClickListener(v1 -> {
+                            closeMenu();
+                            presentFragment(new app.exteraless.plugins.ui.PluginsActivity());
                             return true;
                         });
                     }
@@ -44370,6 +44417,7 @@ public class ChatActivity extends BaseFragment implements
                 ArrayList<CharSequence> items = new ArrayList<>();
                 final ArrayList<Integer> options = new ArrayList<>();
                 fillMessageMenu(messageObject, icons, items, options);
+                app.exteraless.plugins.menus.MenuInjector.expandMessagePluginsOption(icons, items, options);
                 menu.setupMessageOptions(ChatActivity.this, icons, items, options, ChatActivity.this::processSelectedOption);
                 menu.setOnDismissListener(() -> {
                     selectedObject = null;
@@ -44673,6 +44721,7 @@ public class ChatActivity extends BaseFragment implements
             ArrayList<CharSequence> items = new ArrayList<>();
             final ArrayList<Integer> options = new ArrayList<>();
             fillMessageMenu(messageObject, icons, items, options);
+            app.exteraless.plugins.menus.MenuInjector.expandMessagePluginsOption(icons, items, options);
             menu.setupMessageOptions(ChatActivity.this, icons, items, options, ChatActivity.this::processSelectedOption);
             menu.setOnDismissListener(() -> {
                 selectedObject = null;
