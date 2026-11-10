@@ -128,6 +128,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         } else {
             playButton.setShowRing(true);
         }
+        playButton.setFillCircle(false);playButton.setShowRing(true);playButton.setWaveEnabled(true);
         playButton.setOnClickListener(v -> {
             MediaController mc = MediaController.getInstance();
             MessageObject mo = mc.getPlayingMessageObject();

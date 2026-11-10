@@ -36,6 +36,8 @@ public class RingPlayButton extends View {
     private MessageObject message;
     private boolean playing;
     private boolean showRing = true;
+    private boolean waveEnabled = !org.telegram.messenger.BuildConfig.CONNECTED_ALPHA;
+    public void setWaveEnabled(boolean value) { waveEnabled=value;lastFrame=0;invalidate(); }
     public void setShowRing(boolean value) { showRing = value; invalidate(); }
     private boolean fillCircle;
     private int fillIconColor = 0xffffffff;
@@ -111,12 +113,13 @@ public class RingPlayButton extends View {
         float dt = lastFrame == 0 ? 0.016f : Math.min(0.05f, (now - lastFrame) / 1000f);
         lastFrame = now;
         boolean animating = alt.step(dt);
-        float targetAmp = playing && showRing && !org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !LiteMode.isPowerSaverApplied() ? maxAmplitude : 0f;
+        boolean visible=isShown()&&getWindowVisibility()==VISIBLE;
+        float targetAmp = playing && showRing && waveEnabled && visible && !LiteMode.isPowerSaverApplied() ? maxAmplitude : 0f;
         amplitude += (targetAmp - amplitude) * (1f - (float) Math.pow(0.85, dt / 0.04f));
         if (Math.abs(amplitude - targetAmp) < dpf2(0.03f)) {
             amplitude = targetAmp;
         }
-        if (amplitude > 0f) {
+        if (playing && visible && amplitude > 0f) {
             phase = (phase + 6f * dt) % TAU;
         }
         float cx = getWidth() / 2f;
@@ -158,10 +161,11 @@ public class RingPlayButton extends View {
         drawIcon(canvas, playIcon, 1f - t, 1f - 0.4f * alt.value);
         drawIcon(canvas, pauseIcon, t, 0.6f + 0.4f * alt.value);
         removeCallbacks(waveFrame);
-        if (animating || targetAmp != amplitude) {
+        if (visible && (animating || targetAmp != amplitude)) {
             postInvalidateOnAnimation();
-        } else if (amplitude > 0f) {
-            postDelayed(waveFrame, WAVE_FRAME_MS);
+        } else if (visible && amplitude > 0f && playing) {
+            if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) postInvalidateOnAnimation();
+            else postDelayed(waveFrame, WAVE_FRAME_MS);
         } else {
             lastFrame = 0;
         }

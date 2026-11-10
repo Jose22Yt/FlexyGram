@@ -36284,6 +36284,12 @@ public class ChatActivity extends BaseFragment implements
         if (selectedObject == null || getParentActivity() == null) {
             return;
         }
+        if (option == app.exteraless.player.MusicQueueActions.NEXT || option == app.exteraless.player.MusicQueueActions.LAST) {
+            MessageObject item = selectedObject;
+            closeMenu();
+            app.exteraless.player.MusicQueueActions.enqueue(getParentActivity(), item, option == app.exteraless.player.MusicQueueActions.NEXT);
+            return;
+        }
         // exteraless plugins: id пунктов плагинов живут в своём диапазоне (MenuInjector).
         if (option == oebtn_ask_ai) {
             MessageObject target = selectedObject;
@@ -51846,6 +51852,14 @@ public class ChatActivity extends BaseFragment implements
             items.add(getString(R.string.FlexyFilesExplore));
             options.add(app.flexygram.files.FlexyFiles.MENU);
             icons.add(R.drawable.msg_folders_archive);
+        }
+        if (app.exteraless.player.MusicQueueActions.eligible(message)) {
+            items.add(getString(R.string.FlexyQueueNext));
+            options.add(app.exteraless.player.MusicQueueActions.NEXT);
+            icons.add(R.drawable.player_new_order);
+            items.add(getString(R.string.FlexyQueueLast));
+            options.add(app.exteraless.player.MusicQueueActions.LAST);
+            icons.add(R.drawable.msg_add);
         }
         // exteraless plugins: пункты плагинов в конце контекстного меню сообщения.
         app.exteraless.plugins.menus.MenuInjector.fillMessageMenu(this, message, currentChat, currentUser, currentEncryptedChat, dialog_id, currentAccount, icons, items, options);

@@ -1780,7 +1780,10 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         cancelVideoConvert(null);
     }
 
+    private boolean editedMusicQueue;
+
     private void clearPlaylist() {
+        editedMusicQueue = false;
         currentSavedMusicList = null;
         playlist.clear();
         playlistMap.clear();
@@ -1967,7 +1970,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             }
         } else if (id == NotificationCenter.musicDidLoad) {
             long did = (Long) args[0];
-            if (playingMessageObject != null && playingMessageObject.isMusic() && playingMessageObject.getDialogId() == did && !playingMessageObject.scheduled) {
+            if (!editedMusicQueue && playingMessageObject != null && playingMessageObject.isMusic() && playingMessageObject.getDialogId() == did && !playingMessageObject.scheduled) {
                 ArrayList<MessageObject> arrayListBegin = (ArrayList<MessageObject>) args[1];
                 ArrayList<MessageObject> arrayListEnd = (ArrayList<MessageObject>) args[2];
                 playlist.addAll(0, arrayListBegin);
@@ -1990,7 +1993,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             }
         } else if (id == NotificationCenter.mediaDidLoad) {
             int guid = (Integer) args[3];
-            if (guid == playlistClassGuid && playingMessageObject != null) {
+            if (!editedMusicQueue && guid == playlistClassGuid && playingMessageObject != null) {
                 long did = (Long) args[0];
                 int type = (Integer) args[4];
 
@@ -2828,6 +2831,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
     }
 
     public void loadMoreMusic() {
+        if (editedMusicQueue) return;
         if (currentSavedMusicList != null) {
             currentSavedMusicList.load();
             return;
@@ -2942,7 +2946,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
 
     public boolean setPlaylist(ArrayList<MessageObject> messageObjects, MessageObject current, long mergeDialogId, boolean loadMusic, PlaylistGlobalSearchParams params) {
         if (playingMessageObject == current) {
-            int newIdx = playlist.indexOf(current);
+            int newIdx = (SharedConfig.shuffleMusic ? shuffledPlaylist : playlist).indexOf(current);
             if (newIdx >= 0) {
                 currentPlaylistNum = newIdx;
             }
@@ -2992,6 +2996,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
     }
 
     private void sortPlaylist() {
+        if (editedMusicQueue) return;
         Collections.sort(playlist, (o1, o2) -> {
             int mid1 = o1.getId();
             int mid2 = o2.getId();
@@ -3020,6 +3025,14 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
     }
 
     public boolean findMessageInPlaylistAndPlay(MessageObject messageObject) {
+        if (editedMusicQueue) {
+            ArrayList<MessageObject> active = SharedConfig.shuffleMusic ? shuffledPlaylist : playlist;
+            int index = app.exteraless.player.MusicQueueOrder.indexOf(active, messageObject);
+            if (index < 0) return false;
+            currentPlaylistNum = index;
+            playMusicAgain = true;
+            return playMessage(active.get(index));
+        }
         int index = playlist.indexOf(messageObject);
         if (index == -1) {
             return playMessage(messageObject);
@@ -3731,6 +3744,8 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         if (messageObject == null) {
             return false;
         }
+        if (editedMusicQueue && messageObject.isMusic()
+                && app.exteraless.player.MusicQueueOrder.indexOf(playlist,messageObject)<0) clearPlaylist();
         isSilent = silent;
         checkVolumeBarUI();
         if ((audioPlayer != null || videoPlayer != null) && isSamePlayingMessage(messageObject)) {
@@ -4562,6 +4577,76 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
     /** Read-only order for the music UI; selecting an item still goes through native playback actions. */
     public java.util.List<MessageObject> getMusicPlaybackOrder() {
         return java.util.Collections.unmodifiableList(SharedConfig.shuffleMusic ? shuffledPlaylist : playlist);
+    }
+
+    public ArrayList<MessageObject> getMusicQueueSnapshot() {
+        ArrayList<MessageObject> result = app.exteraless.player.MusicQueueOrder.audible(getMusicPlaybackOrder(), SharedConfig.playOrderReversed);
+        if (result.isEmpty() && playingMessageObject != null && playingMessageObject.isMusic()) result.add(playingMessageObject);
+        return result;
+    }
+
+    public boolean enqueueMusic(MessageObject item, boolean next) {
+        if (item == null || !item.isMusic() || item.scheduled || item.isVoiceOnce() || item.isRoundOnce()) return false;
+        if (playingMessageObject == null) {
+            ArrayList<MessageObject> initial = new ArrayList<>(); initial.add(item);
+            boolean started = setPlaylist(initial, item, 0, false, null);
+            if (started) applyMusicQueue(getMusicQueueSnapshot());
+            return started;
+        }
+        if (!playingMessageObject.isMusic()) return false;
+        ArrayList<MessageObject> order = getMusicQueueSnapshot();
+        if (!app.exteraless.player.MusicQueueOrder.enqueue(order, playingMessageObject, item, next)) return false;
+        return applyMusicQueue(order);
+    }
+
+    public boolean removeMusicFromQueue(MessageObject item) {
+        ArrayList<MessageObject> order = getMusicQueueSnapshot();
+        if (!app.exteraless.player.MusicQueueOrder.remove(order, playingMessageObject, item)) return false;
+        return applyMusicQueue(order);
+    }
+
+    public boolean moveMusicInQueue(MessageObject item, MessageObject target) {
+        ArrayList<MessageObject> order = getMusicQueueSnapshot();
+        if (!app.exteraless.player.MusicQueueOrder.move(order, playingMessageObject, item, target)) return false;
+        return applyMusicQueue(order);
+    }
+
+    public boolean reorderMusicQueue(ArrayList<MessageObject> order, ArrayList<MessageObject> expected) {
+        if (order == null || expected == null) return false;
+        ArrayList<MessageObject> actual = getMusicQueueSnapshot();
+        if (actual.size() != expected.size() || order.size() != expected.size()) return false;
+        java.util.IdentityHashMap<MessageObject, Boolean> members = new java.util.IdentityHashMap<>();
+        for (int i = 0; i < actual.size(); i++) {
+            if (actual.get(i) != expected.get(i)) return false;
+            members.put(expected.get(i), Boolean.TRUE);
+        }
+        for (MessageObject item : order) if (members.remove(item) == null) return false;
+        if (actual.equals(order)) return true;
+        return members.isEmpty() && applyMusicQueue(order);
+    }
+
+    private boolean applyMusicQueue(ArrayList<MessageObject> order) {
+        MessageObject playing = playingMessageObject;
+        if (playing == null || !playing.isMusic()) return false;
+        for (MessageObject item : order) if (item.currentAccount != playing.currentAccount) return false;
+        ArrayList<MessageObject> nativeOrder = app.exteraless.player.MusicQueueOrder.audible(order, SharedConfig.playOrderReversed);
+        int current = app.exteraless.player.MusicQueueOrder.indexOf(nativeOrder, playing);
+        if (current < 0) return false;
+        // Detach the local session from profile/global-search loaders; never edit their saved lists.
+        editedMusicQueue = true;
+        currentSavedMusicList = null;
+        savedMusicPlaylistState = null;
+        playlistGlobalSearchParams = null;
+        playlistClassGuid = 0;
+        loadingPlaylist = false;
+        playlistEndReached[0] = playlistEndReached[1] = true;
+        playlist.clear(); playlist.addAll(nativeOrder);
+        shuffledPlaylist.clear(); shuffledPlaylist.addAll(nativeOrder);
+        playlistMap.clear();
+        currentPlaylistNum = current;
+        forceLoopCurrentPlaylist = false;
+        NotificationCenter.getInstance(playing.currentAccount).postNotificationName(NotificationCenter.moreMusicDidLoad, 0);
+        return true;
     }
 
     public ArrayList<MessageObject> getPlaylist() {

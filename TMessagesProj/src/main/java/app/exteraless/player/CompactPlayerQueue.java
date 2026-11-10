@@ -53,6 +53,7 @@ final class CompactPlayerQueue extends LinearLayout {
             title=new TextView(context);title.setTextSize(14);title.setSingleLine(true);title.setEllipsize(TextUtils.TruncateAt.END);
             artist=new TextView(context);artist.setTextSize(12);artist.setSingleLine(true);artist.setEllipsize(TextUtils.TruncateAt.END);
             labels.addView(title);labels.addView(artist);addView(labels,LayoutHelper.createLinear(0,-2,1f,12,0,8,0));
+            setOnLongClickListener(v->MusicQueueActions.showRowMenu(getContext(),(android.view.ViewGroup)getParent(),this,message));
             setOnClickListener(v->{if(message==null)return;MediaController mc=MediaController.getInstance();if(mc.isPlayingMessage(message)){if(mc.isMessagePaused())mc.playMessage(message);else mc.pauseMessage(message);}else mc.findMessageInPlaylistAndPlay(message);});
         }
         void bind(MessageObject value,MessageObject playing,PlayerColors colors){

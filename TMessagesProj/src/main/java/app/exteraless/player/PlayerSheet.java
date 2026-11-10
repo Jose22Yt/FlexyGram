@@ -295,7 +295,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         headerCenter.setGravity(Gravity.CENTER_HORIZONTAL);
         headerLabel = new TextView(context);
         headerLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        headerLabel.setLetterSpacing(0.08f);
+        headerLabel.setLetterSpacing(BuildConfig.CONNECTED_ALPHA ? .02f : .08f);
         headerLabel.setAllCaps(!BuildConfig.CONNECTED_ALPHA);
         headerLabel.setSingleLine(true);
         headerLabel.setEllipsize(TextUtils.TruncateAt.END);
@@ -510,12 +510,13 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (BuildConfig.CONNECTED_ALPHA) { collapseButton.setRotation(90); header.bringToFront(); }
 
         if(BuildConfig.CONNECTED_ALPHA){
-            titleRow.setOrientation(LinearLayout.VERTICAL);titleRow.setGravity(Gravity.CENTER_HORIZONTAL);
-            LinearLayout.LayoutParams titlesParams=(LinearLayout.LayoutParams)titles.getLayoutParams();titlesParams.width=-1;titlesParams.weight=0;
+            titleRow.setOrientation(LinearLayout.HORIZONTAL);titleRow.setGravity(Gravity.CENTER_VERTICAL);
+            LinearLayout.LayoutParams titlesParams=(LinearLayout.LayoutParams)titles.getLayoutParams();titlesParams.width=0;titlesParams.weight=1;
+            View titleBalance=new View(context);titleRow.addView(titleBalance,0,LayoutHelper.createLinear(48,48));
             titleView.setGravity(Gravity.CENTER);artistView.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams likeParams=(LinearLayout.LayoutParams)likeButton.getLayoutParams();likeParams.leftMargin=0;likeParams.topMargin=dp(4);
+            LinearLayout.LayoutParams likeParams=(LinearLayout.LayoutParams)likeButton.getLayoutParams();likeParams.leftMargin=0;likeParams.topMargin=0;
             root.removeView(signatureScroll);signatureScroll=null;
-            orbit=new OrbitPlayerLayout(context,cover,headerLabel,headerTitle,collapseButton,moreButton,titleRow,timeRow,controls,group,compactQueue,lyricsPanel,this::togglePlay,()->MediaController.getInstance().playNextMessage());
+            orbit=new OrbitPlayerLayout(context,cover,headerLabel,headerTitle,collapseButton,moreButton,titleRow,timeRow,controls,group,compactQueue,lyricsPanel,this::togglePlay,()->MediaController.getInstance().playNextMessage(),()->new PlayerQueueSheet(getContext(),colors,resourcesProvider,true).show());
             orbit.setInsets(getStatusBarHeight(),getBottomInset());root.addView(orbit,new FrameLayout.LayoutParams(-1,-1));
             orbit.getArtwork().setDelegate(seekDelegate);cover.setOnTouchListener(null);
             lyricsView.setPositionProvider(this::positionMs);
@@ -1520,6 +1521,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         boolean noForwards = PlayerActions.noForwards(mo);
         Theme.ResourcesProvider rp = colors.provider(resourcesProvider);
         ItemOptions o = ItemOptions.makeOptions(container, rp, anchor, true);
+        MusicQueueActions.add(o,getContext(),mo);
         if (!noForwards) {
             ItemOptions sub = o.makeSwipeback();
             sub.add(R.drawable.ic_ab_back, getString(R.string.Back), o::closeSwipeback);

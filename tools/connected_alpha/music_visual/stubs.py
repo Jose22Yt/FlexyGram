@@ -7,7 +7,7 @@ import shutil
 
 PRODUCTION = ('MusicBlurSurface','MusicProgressView','MusicSleepTimer','SignatureMusicStyle','SignatureMusicPresentation','SignatureMusicBubble',
               'SignatureMusicHost','ControlsRow','MorphButton','PlayerIcon','Spring',
-              'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage','SignatureCoverFade','SignatureMusicActions','CompactPlayerQueue','OrbitMotion','OrbitArtwork','OrbitPlayerLayout')
+              'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage','SignatureCoverFade','SignatureMusicActions','CompactPlayerQueue','OrbitMotion','OrbitArtwork','LuminousProgressRing','OrbitPlayerLayout')
 
 def write_stubs(source, root):
     def put(path, text):
@@ -20,7 +20,7 @@ def write_stubs(source, root):
     put('app/exteraless/player/MusicGlassRenderer.java','package app.exteraless.player;class MusicGlassRenderer{MusicGlassRenderer(android.view.View v,float r){throw new AssertionError("GPU glass bridge is not software rendering");}void draw(android.graphics.Canvas c,android.graphics.Bitmap b,android.graphics.Rect r,int x,int y){throw new AssertionError();}void clear(){}}')
     code='\n'.join((player/(n+'.java')).read_text() for n in PRODUCTION)
     names=sorted(set(re.findall(r'R.string.(\w+)',code)))
-    put('org/telegram/messenger/R.java','package org.telegram.messenger; public class R {public static class string {'+''.join(f'public static final int {n}={i+1};' for i,n in enumerate(names))+'}}')
+    put('org/telegram/messenger/R.java','package org.telegram.messenger; public class R {public static class string {'+''.join(f'public static final int {n}={i+1};' for i,n in enumerate(names))+'}public static class drawable{public static final int msg_search=android.R.drawable.ic_menu_search;}}')
     keys=sorted(set(re.findall(r'Theme.(key_\w+)',code)))
     put('org/telegram/ui/ActionBar/Theme.java','''package org.telegram.ui.ActionBar;
 import android.graphics.drawable.*; public class Theme {
@@ -110,6 +110,7 @@ public class PlayerArt {public static String key(MessageObject m){return "fixtur
 public static ImageLocation fullLocation(MessageObject m){return null;}public static ImageLocation thumbLocation(MessageObject m){return null;}
 public static boolean isPlaying(MessageObject m){return true;}public interface Callback {void seed(int s);}public static void requestSeed(MessageObject m,Bitmap b,int f,Callback c){throw new AssertionError("unexpected extraction");}}
 ''')
+    put('app/exteraless/player/MusicQueueActions.java','package app.exteraless.player;public class MusicQueueActions {public static boolean showRowMenu(android.content.Context c,android.view.ViewGroup g,android.view.View v,org.telegram.messenger.MessageObject m){return true;}}')
     put('app/exteraless/player/Md3Player.java','''package app.exteraless.player; public class Md3Player {public static boolean miniEnabled(){return true;}public static void open(org.telegram.ui.ActionBar.BaseFragment f,PlayerMiniView v){}}''')
     put('tw/nekomimi/nekogram/helpers/MonetHelper.java','package tw.nekomimi.nekogram.helpers; public class MonetHelper {public static Integer getColorOrNull(String s){return null;}}')
     # Legacy Material utilities are not reached by Connected Alpha. Fail if palette extraction runs.

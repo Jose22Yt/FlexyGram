@@ -31,6 +31,8 @@ public final class OrbitPlayerLayout extends FrameLayout {
     private final MusicBlurSurface[] surfaces = new MusicBlurSurface[3];
     private final View[] surfaceViews;
     private final TextView sourceLabel, sourceTitle, compactSong;
+    private final TextView queueSearch;
+    private final GradientDrawable searchBackground = new GradientDrawable();
     private final ImageView compactPlay, compactNext;
     private PlayerIcon playIcon=PlayerIcon.fill(PlayerIcon.PAUSE,20),nextIcon=PlayerIcon.fill(PlayerIcon.NEXT,20);
     private boolean lyrics;
@@ -41,11 +43,18 @@ public final class OrbitPlayerLayout extends FrameLayout {
 
     public OrbitPlayerLayout(Context context,CoverImage cover,TextView sourceLabel,TextView sourceTitle,
             View back,View more,View titleRow,View times,ControlsRow controls,View group,View queue,
-            View lyricsPanel,Runnable toggle,Runnable next) {
+            View lyricsPanel,Runnable toggle,Runnable next,Runnable openSearch) {
         super(context);setClipChildren(false);this.sourceLabel=sourceLabel;this.sourceTitle=sourceTitle;
         this.lyricsPanel=lyricsPanel;this.titleRow=titleRow;this.controls=controls;this.group=group;this.queue=queue;
         scroll=new ScrollView(context);scroll.setFillViewport(true);scroll.setClipToPadding(false);scroll.setVerticalScrollBarEnabled(false);
         content=new LinearLayout(context);content.setOrientation(LinearLayout.VERTICAL);scroll.addView(content,new ScrollView.LayoutParams(-1,-2));addView(scroll,new LayoutParams(-1,-1));
+        queueSearch=new TextView(context);queueSearch.setTextSize(16);queueSearch.setGravity(Gravity.CENTER_VERTICAL);
+        queueSearch.setSingleLine(true);queueSearch.setEllipsize(TextUtils.TruncateAt.END);
+        queueSearch.setText(LocaleController.getString(R.string.FlexyQueueSearch));queueSearch.setContentDescription(queueSearch.getText());
+        queueSearch.setPadding(dp(18),0,dp(18),0);queueSearch.setCompoundDrawablePadding(dp(12));
+        queueSearch.setBackground(searchBackground);queueSearch.setOnClickListener(v->openSearch.run());queueSearch.setFocusable(true);
+        LinearLayout.LayoutParams searchParams=new LinearLayout.LayoutParams(-1,dp(48));searchParams.bottomMargin=dp(20);
+        content.addView(queueSearch,searchParams);
         artworkSlot=new View(context);content.addView(artworkSlot,new LinearLayout.LayoutParams(-1,dp(280)));
         move(times,content,new LinearLayout.LayoutParams(-1,-2));
         move(titleRow,content,new LinearLayout.LayoutParams(-1,-2));
@@ -93,12 +102,17 @@ public final class OrbitPlayerLayout extends FrameLayout {
         }
         requestLayout();
     }
-    public void setColors(PlayerColors value){colors=value;setBackgroundColor(value.surface);artwork.setColors(value);for(MusicBlurSurface s:surfaces)s.setColors(value);compactSong.setTextColor(value.onSurfaceVariant);playIcon.setColor(value.primary);nextIcon.setColor(value.onSurface);for(int i=0;i<lyricsControls.getChildCount();i++)((PlayerIcon)((ImageView)lyricsControls.getChildAt(i)).getDrawable()).setColor(value.primary);header.invalidate();}
+    public void setColors(PlayerColors value){colors=value;
+        searchBackground.setColor(value.surfaceHigh);searchBackground.setCornerRadius(dp(24));queueSearch.setTextColor(value.onSurfaceVariant);
+        android.graphics.drawable.Drawable searchIcon=getResources().getDrawable(R.drawable.msg_search).mutate();
+        searchIcon.setColorFilter(new android.graphics.PorterDuffColorFilter(value.onSurfaceVariant,android.graphics.PorterDuff.Mode.SRC_IN));
+        searchIcon.setBounds(0,0,dp(22),dp(22));queueSearch.setCompoundDrawablesRelative(searchIcon,null,null,null);
+setBackgroundColor(value.surface);artwork.setColors(value);for(MusicBlurSurface s:surfaces)s.setColors(value);compactSong.setTextColor(value.onSurfaceVariant);playIcon.setColor(value.primary);nextIcon.setColor(value.onSurface);for(int i=0;i<lyricsControls.getChildCount();i++)((PlayerIcon)((ImageView)lyricsControls.getChildAt(i)).getDrawable()).setColor(value.primary);header.invalidate();}
     @Override protected void onAttachedToWindow(){super.onAttachedToWindow();for(MusicBlurSurface s:surfaces)s.attach();}
     @Override protected void onDetachedFromWindow(){for(MusicBlurSurface s:surfaces)s.detach();super.onDetachedFromWindow();}
     @Override protected void onMeasure(int ws,int hs){
         int width=MeasureSpec.getSize(ws),height=MeasureSpec.getSize(hs);
-        diameter=Math.max(dp(120),Math.min(dp(300),width-dp(64)));
+        diameter=Math.max(dp(120),Math.min(dp(280),width-dp(72)));
         int headerHeight=Math.max(dp(56),Math.round(dp(30)+sourceTitle.getTextSize()*1.4f));if(width<dp(320)||getResources().getConfiguration().fontScale>1.6f)headerHeight+=dp(52);
         header.measure(MeasureSpec.makeMeasureSpec(width,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(headerHeight,MeasureSpec.EXACTLY));
         content.setPadding(dp(24),topInset+headerHeight+dp(16),dp(24),bottomInset+dp(28));

@@ -10,6 +10,12 @@ import android.graphics.RectF;
 import android.graphics.drawable.GradientDrawable;
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import org.telegram.ui.Components.ItemOptions;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -55,10 +61,29 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
     private final PlayerIcon chipIcon = PlayerIcon.stroke(PlayerIcon.SHUFFLE, 18);
     private final Adapter adapter = new Adapter();
     private boolean touchInList;
+    private final EditText search;
+    private final GradientDrawable searchBackground = new GradientDrawable();
+    private final boolean focusSearch;
+    private final ArrayList<MessageObject> allItems = new ArrayList<>(), visibleItems = new ArrayList<>();
+    private final ArrayList<String> searchIndex = new ArrayList<>();
+    private ArrayList<MessageObject> dragOriginal;
+    private boolean dismissed;
+    private ItemTouchHelper touchHelper;
+    private final Runnable searchTask = () -> applySearch(true);
+
+    public PlayerQueueSheet(Context context, PlayerColors colors, Theme.ResourcesProvider resourcesProvider, boolean focusSearch) {
+        this(context, colors, resourcesProvider, focusSearch, "");
+    }
+
 
     public PlayerQueueSheet(Context context, PlayerColors colors, Theme.ResourcesProvider resourcesProvider) {
-        super(context, false, resourcesProvider);
+        this(context, colors, resourcesProvider, false, "");
+    }
+
+    private PlayerQueueSheet(Context context, PlayerColors colors, Theme.ResourcesProvider resourcesProvider, boolean focusSearch, String query) {
+        super(context, true, resourcesProvider);
         this.colors = colors;
+        this.focusSearch = focusSearch;
         occupyNavigationBar = true;
         drawNavigationBar = false;
         setApplyTopPadding(false);
@@ -109,7 +134,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         root.addView(handle, LayoutHelper.createFrame(32, 4, Gravity.CENTER_HORIZONTAL | Gravity.TOP, 0, 18, 0, 0));
 
         header = new LinearLayout(context);
-        header.setOrientation(context.getResources().getConfiguration().fontScale > 1.5f ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
+        header.setOrientation(LinearLayout.VERTICAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
         header.setPadding(dp(24), 0, dp(24), 0);
         LinearLayout titles = new LinearLayout(context);
@@ -126,9 +151,9 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         subtitle.setSingleLine(true);
         subtitle.setEllipsize(TextUtils.TruncateAt.END);
         titles.addView(subtitle, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
-        header.addView(titles, context.getResources().getConfiguration().fontScale > 1.5f
-                ? LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT)
-                : LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
+        LinearLayout headingRow = new LinearLayout(context);
+        headingRow.setGravity(Gravity.CENTER_VERTICAL);
+        headingRow.addView(titles, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
         chip = new TextView(context);
         chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         chip.setTypeface(AndroidUtilities.bold());
@@ -141,10 +166,32 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         chip.setOnClickListener(v -> {
             MediaController.getInstance().setPlaybackOrderType(SharedConfig.shuffleMusic ? 0 : 2);
             updateChip();
-            adapter.notifyDataSetChanged();
+            refreshQueue();
             PlayerSheet.onModesChanged();
         });
-        header.addView(chip, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 40, 12, 0, 0, 0));
+        headingRow.addView(chip, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 40, 12, 0, 0, 0));
+        header.addView(headingRow, LayoutHelper.createLinear(-1, -2));
+        search = new EditText(context);
+        search.setSingleLine(true);search.setTextSize(16);search.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        search.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+        search.setHint(getString(R.string.FlexyQueueSearch));search.setContentDescription(getString(R.string.FlexyQueueSearch));
+        search.setTextColor(colors.onSurface);search.setHintTextColor(colors.onSurfaceVariant);
+        searchBackground.setColor(colors.surfaceHigh);searchBackground.setCornerRadius(dp(24));
+        search.setBackground(searchBackground);search.setPadding(dp(16),0,dp(16),0);
+        search.setText(query);
+        search.setOnEditorActionListener((view,action,event)->{
+            if(action==EditorInfo.IME_ACTION_SEARCH){AndroidUtilities.cancelRunOnUIThread(searchTask);applySearch(true);AndroidUtilities.hideKeyboard(search);return true;}return false;
+        });
+        header.addView(search, LayoutHelper.createLinear(-1, 48, 0, 8, 0, 0));
+        TextView hint = new TextView(context);hint.setTextSize(12);hint.setTextColor(colors.onSurfaceVariant);
+        hint.setText(getString(R.string.FlexyQueueHint));header.addView(hint, LayoutHelper.createLinear(-1,-2,0,2,0,8));
+        search.addTextChangedListener(new TextWatcher() {
+            public void beforeTextChanged(CharSequence text,int start,int count,int after) { }
+            public void onTextChanged(CharSequence text,int start,int before,int count) {
+                AndroidUtilities.cancelRunOnUIThread(searchTask);AndroidUtilities.runOnUIThread(searchTask,120);
+            }
+            public void afterTextChanged(Editable text) { }
+        });
         root.addView(header, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 72, Gravity.TOP, 0, 34, 0, 0));
 
         list = new RecyclerListView(context) {
@@ -172,12 +219,46 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         });
         root.addView(list, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP, 0, 34 + 72 + 8, 0, 0));
 
+        touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+            @Override public boolean isLongPressDragEnabled(){return false;}
+            @Override public int getMovementFlags(RecyclerView recycler, RecyclerView.ViewHolder holder) {
+                int position=holder.getBindingAdapterPosition();
+                return search.length()!=0 || position<0 || position>=visibleItems.size()
+                        || MusicQueueOrder.same(visibleItems.get(position),MediaController.getInstance().getPlayingMessageObject())
+                        ? 0 : super.getMovementFlags(recycler,holder);
+            }
+            @Override public void onSelectedChanged(RecyclerView.ViewHolder holder,int state) {
+                if(state==ItemTouchHelper.ACTION_STATE_DRAG){dragOriginal=new ArrayList<>(visibleItems);search.setEnabled(false);container.requestDisallowInterceptTouchEvent(true);}
+                super.onSelectedChanged(holder,state);
+            }
+            @Override public boolean onMove(RecyclerView recycler,RecyclerView.ViewHolder from,RecyclerView.ViewHolder to) {
+                int a=from.getBindingAdapterPosition(),b=to.getBindingAdapterPosition();
+                if(a<0||b<0||a>=visibleItems.size()||b>=visibleItems.size()
+                        ||MusicQueueOrder.same(visibleItems.get(b),MediaController.getInstance().getPlayingMessageObject()))return false;
+                visibleItems.add(b,visibleItems.remove(a));adapter.notifyItemMoved(a,b);return true;
+            }
+            @Override public void clearView(RecyclerView recycler,RecyclerView.ViewHolder holder) {
+                super.clearView(recycler,holder);
+                ArrayList<MessageObject> expected=dragOriginal;search.setEnabled(true);container.requestDisallowInterceptTouchEvent(false);
+                if(!dismissed&&expected!=null){
+                    boolean ok;
+                    try {ok=expected.equals(visibleItems)||MediaController.getInstance().reorderMusicQueue(new ArrayList<>(visibleItems),expected);}
+                    finally {dragOriginal=null;}
+                    if(!ok)android.widget.Toast.makeText(getContext(),getString(R.string.FlexyQueueEditFailed),android.widget.Toast.LENGTH_SHORT).show();
+                    refreshQueue();
+                }else dragOriginal=null;
+            }
+            @Override public void onSwiped(RecyclerView.ViewHolder holder,int direction) { }
+        });
+        touchHelper.attachToRecyclerView(list);
+        list.setOnItemLongClickListener((view,position)->{if(position<0||position>=visibleItems.size())return false;showTrackMenu(view,visibleItems.get(position));return true;});
         updateChip();
-        updateSubtitle();
+        refreshQueue();
         int index = indexOfPlaying();
         if (index > 0) {
             layoutManager.scrollToPositionWithOffset(index, dp(72));
         }
+        if(!focusSearch){root.setFocusableInTouchMode(true);root.requestFocus();}
     }
 
     @Override
@@ -188,6 +269,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
     @Override
     public void show() {
         super.show();
+        if(focusSearch)search.post(()->{if(!dismissed){search.requestFocus();AndroidUtilities.showKeyboard(search);}});
         NotificationCenter nc = NotificationCenter.getInstance(account);
         nc.addObserver(this, NotificationCenter.messagePlayingDidStart);
         NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewTheme);
@@ -200,6 +282,9 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
 
     @Override
     public void dismiss() {
+        dismissed=true;
+        AndroidUtilities.cancelRunOnUIThread(searchTask);AndroidUtilities.hideKeyboard(search);
+        if(touchHelper!=null)touchHelper.attachToRecyclerView(null);
         super.dismiss();
         NotificationCenter nc = NotificationCenter.getInstance(account);
         nc.removeObserver(this, NotificationCenter.messagePlayingDidStart);
@@ -213,7 +298,9 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
         if (id == NotificationCenter.didSetNewTheme && org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
-            colors = PlayerColors.fromSeed(0, PlayerColors.isDark(resourcesProvider));
+            colors = PlayerColors.fromSignatureTheme(PlayerColors.isDark(resourcesProvider),resourcesProvider);
+            search.setTextColor(colors.onSurface);search.setHintTextColor(colors.onSurfaceVariant);
+            searchBackground.setColor(colors.surfaceHigh);
             sheetBg.setColor(colors.surfaceLow);
             title.setTextColor(colors.onSurface);
             subtitle.setTextColor(colors.onSurfaceVariant);
@@ -229,10 +316,10 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
             }
         }
         if (id == NotificationCenter.moreMusicDidLoad || id == NotificationCenter.musicDidLoad) {
-            adapter.notifyDataSetChanged();
-            updateSubtitle();
+            if(dragOriginal==null)refreshQueue();
             return;
         }
+        if (id==NotificationCenter.messagePlayingDidStart && dragOriginal==null)refreshQueue();
         for (int i = 0; i < list.getChildCount(); i++) {
             View child = list.getChildAt(i);
             if (child instanceof Row) {
@@ -256,44 +343,40 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         subtitle.setText(LocaleController.formatPluralString("OEPlayerTracks", count));
     }
 
-    private static boolean direct() {
-        return MediaController.getInstance().currentSavedMusicList != null ? !SharedConfig.playOrderReversed : SharedConfig.playOrderReversed;
+    private void refreshQueue() {
+        if(dismissed||dragOriginal!=null)return;
+        allItems.clear();allItems.addAll(MediaController.getInstance().getMusicQueueSnapshot());searchIndex.clear();
+        for(MessageObject item:allItems)searchIndex.add(MusicQueueOrder.normalize(item.getMusicTitle()+"\n"+item.getMusicAuthor()+"\n"+item.getFileName()));
+        applySearch(false);
     }
-
-    private static MessageObject itemAt(int position) {
-        ArrayList<MessageObject> playlist = MediaController.getInstance().getPlaylist();
-        if (position < 0 || position >= playlist.size()) {
-            return null;
-        }
-        return direct() ? playlist.get(position) : playlist.get(playlist.size() - 1 - position);
+    private void applySearch(boolean userSearch) {
+        if(dismissed||dragOriginal!=null)return;
+        String[] tokens=MusicQueueOrder.normalize(search.getText().toString()).split("\\s+");
+        visibleItems.clear();
+        for(int i=0;i<allItems.size();i++)if(MusicQueueOrder.matches(searchIndex.get(i),tokens))visibleItems.add(allItems.get(i));
+        adapter.notifyDataSetChanged();
+        subtitle.setText(visibleItems.isEmpty()?getString(R.string.FlexyQueueEmpty):LocaleController.formatPluralString("OEPlayerTracks",visibleItems.size()));
+        if(userSearch)list.scrollToPosition(0);
     }
-
-    private static MessageObject currentItem() {
-        MediaController mc = MediaController.getInstance();
-        MessageObject playing = mc.getPlayingMessageObject();
-        if (playing == null) {
-            return null;
-        }
-        ArrayList<MessageObject> playlist = mc.getPlaylist();
-        for (int i = 0; i < playlist.size(); i++) {
-            if (playlist.get(i) == playing) {
-                return playing;
+    private MessageObject itemAt(int position) {return position>=0&&position<visibleItems.size()?visibleItems.get(position):null;}
+    private MessageObject currentItem() {return MediaController.getInstance().getPlayingMessageObject();}
+    private void showTrackMenu(View anchor,MessageObject item) {
+        if(MusicQueueOrder.same(item,currentItem()))return;
+        ItemOptions options=ItemOptions.makeOptions(container,colors.provider(resourcesProvider),anchor,true);
+        MusicQueueActions.add(options,getContext(),item);
+        if(!MusicQueueOrder.same(item,currentItem())){
+            options.add(R.drawable.msg_delete,getString(R.string.FlexyQueueRemove),()->MediaController.getInstance().removeMusicFromQueue(item));
+            int position=MusicQueueOrder.indexOf(allItems,item);
+            if(search.length()==0&&position>0&&!MusicQueueOrder.same(allItems.get(position-1),currentItem())) {
+                MessageObject previous=allItems.get(position-1);
+                options.add(R.drawable.player_new_order,getString(R.string.FlexyQueueUp),()->MediaController.getInstance().moveMusicInQueue(item,previous));
+            }
+            if(search.length()==0&&position>=0&&position+1<allItems.size()&&!MusicQueueOrder.same(allItems.get(position+1),currentItem())) {
+                MessageObject next=allItems.get(position+1);
+                options.add(R.drawable.player_new_order,getString(R.string.FlexyQueueDown),()->MediaController.getInstance().moveMusicInQueue(item,next));
             }
         }
-        for (int i = 0; i < playlist.size(); i++) {
-            MessageObject mo = playlist.get(i);
-            if (mo.getDialogId() == playing.getDialogId() && mo.getId() == playing.getId()) {
-                return mo;
-            }
-        }
-        String key = PlayerArt.key(playing);
-        for (int i = 0; i < playlist.size(); i++) {
-            MessageObject mo = playlist.get(i);
-            if (key.equals(PlayerArt.key(mo))) {
-                return mo;
-            }
-        }
-        return null;
+        options.show();
     }
 
     private int indexOfPlaying() {
@@ -346,7 +429,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
 
         @Override
         public int getItemCount() {
-            return MediaController.getInstance().getPlaylist().size();
+            return visibleItems.size();
         }
     }
 
@@ -382,14 +465,24 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
             artist.setSingleLine(true);
             artist.setEllipsize(TextUtils.TruncateAt.END);
             texts.addView(artist, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
-            addView(texts, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.CENTER_VERTICAL, 66, 0, 52, 0));
+            addView(texts, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.CENTER_VERTICAL, 66, 0, 88, 0));
             duration = new TextView(context);
             duration.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
             duration.setFontFeatureSettings("tnum");
             duration.setTextColor(colors.onSurfaceVariant);
-            addView(duration, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.RIGHT | Gravity.CENTER_VERTICAL));
+            addView(duration, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.RIGHT | Gravity.CENTER_VERTICAL,0,0,38,0));
+            android.widget.ImageView handle=new android.widget.ImageView(context);handle.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+            PlayerIcon grip=PlayerIcon.stroke(PlayerIcon.QUEUE,20);grip.setColor(colors.onSurfaceVariant);handle.setImageDrawable(grip);
+            handle.setContentDescription(getString(R.string.FlexyQueueReorder));
+            addView(handle,LayoutHelper.createFrame(36,48,Gravity.RIGHT|Gravity.CENTER_VERTICAL));
+            handle.setOnClickListener(v->{if(message!=null)showTrackMenu(handle,message);});
+            handle.setOnTouchListener((v,event)->{
+                if(event.getActionMasked()==MotionEvent.ACTION_DOWN&&search.length()==0&&!MusicQueueOrder.same(message,currentItem())){
+                    RecyclerView.ViewHolder holder=list.findContainingViewHolder(this);if(holder!=null){touchHelper.startDrag(holder);return true;}
+                }return false;
+            });
             equalizer = new Equalizer(context);
-            addView(equalizer, LayoutHelper.createFrame(22, 20, Gravity.RIGHT | Gravity.CENTER_VERTICAL));
+            addView(equalizer, LayoutHelper.createFrame(22,20,Gravity.RIGHT | Gravity.CENTER_VERTICAL,0,0,38,0));
         }
 
         void bind(MessageObject mo) {
@@ -406,7 +499,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         }
 
         void updateState() {
-            boolean current = message != null && message == currentItem();
+            boolean current = MusicQueueOrder.same(message, currentItem());
             bg.setColor(current ? colors.secondaryContainer : 0);
             bg.setStroke(current ? dp(1) : 0, colors.outlineVariant);
             title.setTextColor(current ? colors.onSecondaryContainer : colors.onSurface);

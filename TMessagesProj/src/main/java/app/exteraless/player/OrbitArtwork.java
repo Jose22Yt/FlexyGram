@@ -2,7 +2,6 @@ package app.exteraless.player;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -13,8 +12,8 @@ import org.telegram.messenger.AndroidUtilities;
 /** One real artwork view and a seekable ring. No duplicate bitmap or rotating-artwork timer. */
 public final class OrbitArtwork extends FrameLayout {
     private final CoverImage cover;
-    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path circle = new Path();
+    private final LuminousProgressRing luminousRing = new LuminousProgressRing();
     private float progress, ringAlpha = 1;
     private int accent, track;
     private boolean dragging;
@@ -24,26 +23,20 @@ public final class OrbitArtwork extends FrameLayout {
         setFocusable(true);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
     }
     public void setDelegate(WavySeekBar.Delegate value) { delegate=value; }
-    public void setProgress(float value) { if(!dragging){progress=unit(value);invalidate();} }
+    public void setProgress(float value) { if(!dragging && progress!=unit(value)){progress=unit(value);if(ringAlpha>0)invalidate();} }
     public float getProgress() { return progress; }
     public void setRingAlpha(float value) { if(ringAlpha!=value){ringAlpha=value;invalidate();} }
-    public void setColors(PlayerColors colors) { accent=colors.primary;track=colors.outlineVariant;invalidate(); }
-    private static float unit(float value) { return Math.max(0,Math.min(1,value)); }
+    public void setColors(PlayerColors colors) { accent=colors.primary;track=colors.outlineVariant;luminousRing.setColors(accent,track);invalidate(); }
+    private static float unit(float value) { return Float.isFinite(value)?Math.max(0,Math.min(1,value)):0; }
     @Override protected void onSizeChanged(int w,int h,int ow,int oh) {
-        super.onSizeChanged(w,h,ow,oh);circle.rewind();circle.addCircle(w*.5f,h*.5f,Math.max(0,Math.min(w,h)*.5f-AndroidUtilities.dp(8)),Path.Direction.CW);
+        super.onSizeChanged(w,h,ow,oh);circle.rewind();circle.addCircle(w*.5f,h*.5f,Math.max(0,Math.min(w,h)*.5f-AndroidUtilities.dp(14)),Path.Direction.CW);
     }
     @Override protected void onLayout(boolean changed,int l,int t,int r,int b) {
-        int inset=AndroidUtilities.dp(8);cover.layout(inset,inset,r-l-inset,b-t-inset);cover.setRadius(Math.max(1,(r-l-inset*2)/2));
+        int inset=AndroidUtilities.dp(14);cover.layout(inset,inset,r-l-inset,b-t-inset);cover.setRadius(Math.max(1,(r-l-inset*2)/2));
     }
     @Override protected void dispatchDraw(Canvas canvas) {
         int save=canvas.save();canvas.clipPath(circle);super.dispatchDraw(canvas);canvas.restoreToCount(save);
-        float inset=AndroidUtilities.dp(3),radius=getWidth()*.5f-inset;
-        paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(AndroidUtilities.dp(3));paint.setStrokeCap(Paint.Cap.ROUND);
-        paint.setColor(track);paint.setAlpha(Math.round(ringAlpha*255));canvas.drawArc(inset,inset,getWidth()-inset,getHeight()-inset,-90,360,false,paint);
-        paint.setColor(accent);paint.setAlpha(Math.round(ringAlpha*255));canvas.drawArc(inset,inset,getWidth()-inset,getHeight()-inset,-90,progress*360,false,paint);
-        paint.setStyle(Paint.Style.FILL);double angle=Math.toRadians(progress*360-90);
-        canvas.drawCircle(getWidth()*.5f+(float)Math.cos(angle)*radius,getHeight()*.5f+(float)Math.sin(angle)*radius,AndroidUtilities.dp(5),paint);
-        paint.setAlpha(255);
+        luminousRing.draw(canvas,getWidth(),getHeight(),progress,ringAlpha);
     }
     private void updateFromTouch(MotionEvent event) {
         float value=(float)((Math.atan2(event.getY()-getHeight()*.5f,event.getX()-getWidth()*.5f)+Math.PI*.5)/(Math.PI*2));

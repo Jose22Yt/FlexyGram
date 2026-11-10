@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.0.0-beta.37 — preparación, build 1326
+
+- Cola temporal: reproducir a continuación, añadir al final, quitar pendientes y reordenar mediante asa o acciones accesibles. Conserva canción, posición, aleatorio y repetición; no modifica listas guardadas.
+- Buscador por título, artista y archivo, accesible desde el reproductor ampliado y dentro de la cola.
+- Portada circular con arco luminoso y punta degradada del color de acento del tema; degradados reutilizados, sin blur ni reloj adicional.
+- Cabecera, tamaños y alineación de título/favorito ajustados a la referencia aprobada.
+- Contorno ondulado del botón del reproductor minimizado activo solo durante reproducción visible. El ampliado conserva su círculo sin ondas.
+- Regresiones de cola, concurrencia al arrastrar, búsqueda, recursos y presupuesto de dibujo; sin generar APK.
+
 ## 1.0.0-beta.36 — preparación, build 1325
 
 - Apertura desde la lista de chats: precarga asíncrona de usuarios, grupos y chats secretos ausentes en caché; las respuestas de navegación obsoletas se descartan.

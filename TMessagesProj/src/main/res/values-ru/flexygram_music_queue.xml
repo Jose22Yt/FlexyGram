@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyQueueSearch">Поиск по очереди</string>
+    <string name="FlexyQueueNext">Воспроизвести следующим</string>
+    <string name="FlexyQueueLast">Добавить в конец очереди</string>
+    <string name="FlexyQueueRemove">Убрать из очереди</string>
+    <string name="FlexyQueueHint">Удерживайте для изменения порядка; ищите по названию</string>
+    <string name="FlexyQueueEmpty">Нет подходящих песен</string>
+    <string name="FlexyQueueAdded">Добавлено в очередь</string>
+    <string name="FlexyQueueEditFailed">Не удалось изменить очередь</string>
+    <string name="FlexyQueueUp">Выше</string>
+    <string name="FlexyQueueDown">Ниже</string>
+    <string name="FlexyQueueReorder">Изменить порядок</string>
+</resources>

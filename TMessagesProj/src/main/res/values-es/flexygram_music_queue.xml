@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyQueueSearch">Buscar en la cola</string>
+    <string name="FlexyQueueNext">Reproducir a continuación</string>
+    <string name="FlexyQueueLast">Añadir al final de la cola</string>
+    <string name="FlexyQueueRemove">Quitar de la cola</string>
+    <string name="FlexyQueueHint">Mantén pulsado para reordenar; busca para encontrar una canción</string>
+    <string name="FlexyQueueEmpty">No hay canciones que coincidan</string>
+    <string name="FlexyQueueAdded">Añadido a la cola</string>
+    <string name="FlexyQueueEditFailed">No se pudo editar esta cola</string>
+    <string name="FlexyQueueUp">Subir</string>
+    <string name="FlexyQueueDown">Bajar</string>
+    <string name="FlexyQueueReorder">Reordenar cola</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyQueueSearch">Search in queue</string>
+    <string name="FlexyQueueNext">Play next</string>
+    <string name="FlexyQueueLast">Add to end of queue</string>
+    <string name="FlexyQueueRemove">Remove from queue</string>
+    <string name="FlexyQueueHint">Drag to reorder; search to find a track</string>
+    <string name="FlexyQueueEmpty">No matching songs</string>
+    <string name="FlexyQueueAdded">Added to queue</string>
+    <string name="FlexyQueueEditFailed">Could not edit this queue</string>
+    <string name="FlexyQueueUp">Move up</string>
+    <string name="FlexyQueueDown">Move down</string>
+    <string name="FlexyQueueReorder">Reorder queue</string>
+</resources>
