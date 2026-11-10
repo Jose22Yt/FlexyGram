@@ -3257,6 +3257,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     @Override
     public void onFragmentDestroy() {
+        chatOpenGeneration++;
         LiteMode.removeOnPowerSaverAppliedListener(nativeGlassPowerListener);
         super.onFragmentDestroy();
         if (observersGroup != null) {
@@ -7689,8 +7690,20 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
+    private long chatOpenGeneration;
+
     @Override
     public boolean presentFragment(BaseFragment fragment) {
+        final long generation = ++chatOpenGeneration;
+        if (fragment instanceof ChatActivity) {
+            final int account = fragment.getCurrentAccount();
+            if (app.flexygram.performance.ChatPeerPreloader.prepare(account, fragment.getArguments(), found -> {
+                if (generation != chatOpenGeneration || isFinished || isPaused()
+                        || getParentActivity() == null || currentAccount != account) return;
+                if (found) presentFragment(fragment);
+                else Toast.makeText(getParentActivity(), getString(R.string.ErrorOccurred), Toast.LENGTH_SHORT).show();
+            })) return true;
+        }
         boolean b = super.presentFragment(fragment);
         if (b) {
             if (viewPages != null) {
@@ -7711,6 +7724,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     @Override
     public void onPause() {
+        chatOpenGeneration++;
         super.onPause();
         if (storiesBulletin != null) {
             storiesBulletin.hide();

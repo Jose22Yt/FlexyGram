@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.lang.ref.WeakReference;
 
 /**
  * Tracks position changes of multiple Views relative to a specified ancestor ViewGroup.
@@ -48,6 +49,7 @@ public final class ViewPositionWatcher implements
     }
 
     private final WeakHashMap<View, List<Tracked>> tracked = new WeakHashMap<>();
+    private final WeakHashMap<View, ViewOnPreDraw> multiwindowObservers = new WeakHashMap<>();
     private final RectF tmpRect = new RectF(); // reused for all calculations
     private static final int[] tmpCords = new int[2];
 
@@ -83,18 +85,22 @@ public final class ViewPositionWatcher implements
 
         ensureListening();
 
-        if (multiwindow) {
-            new ViewOnPreDraw(view, this);
+        if (multiwindow && !multiwindowObservers.containsKey(view)) {
+            multiwindowObservers.put(view, new ViewOnPreDraw(view, anchorView, this));
         }
     }
 
     /** Unsubscribe a specific view. */
     public void unsubscribe(@NonNull View view) {
         tracked.remove(view);
+        ViewOnPreDraw observer = multiwindowObservers.remove(view);
+        if (observer != null) observer.destroy();
     }
 
     /** Clear all subscriptions. */
     public void clear() {
+        for (ViewOnPreDraw observer : multiwindowObservers.values()) observer.destroy();
+        multiwindowObservers.clear();
         tracked.clear();
     }
 
@@ -102,7 +108,7 @@ public final class ViewPositionWatcher implements
     public void shutdown() {
         detachIfListening();
         anchorView.removeOnAttachStateChangeListener(this);
-        tracked.clear();
+        clear();
     }
 
     // ─────────────── ViewTreeObserver lifecycle ───────────────
@@ -260,16 +266,19 @@ public final class ViewPositionWatcher implements
 
     private static class ViewOnPreDraw {
 
-        private final View view;
+        private final WeakReference<View> viewReference;
+        private final WeakReference<View> anchorReference;
         private final ViewTreeObserver.OnPreDrawListener listener;
 
         private ViewTreeObserver viewTreeObserver;
 
         public ViewOnPreDraw(
                 @NonNull View view,
+                @NonNull View anchor,
                 @NonNull ViewTreeObserver.OnPreDrawListener listener
         ) {
-            this.view = view;
+            this.viewReference = new WeakReference<>(view);
+            this.anchorReference = new WeakReference<>(anchor);
             this.listener = listener;
 
             view.addOnAttachStateChangeListener(attachStateChangeListener);
@@ -293,7 +302,14 @@ public final class ViewPositionWatcher implements
                 };
 
         private void attach() {
+            View view = viewReference.get();
+            if (view == null) return;
             ViewTreeObserver observer = view.getViewTreeObserver();
+            View anchor = anchorReference.get();
+            if (anchor != null && observer == anchor.getViewTreeObserver()) {
+                detach();
+                return;
+            }
             if (viewTreeObserver == observer) {
                 return;
             }
@@ -319,7 +335,8 @@ public final class ViewPositionWatcher implements
 
         public void destroy() {
             detach();
-            view.removeOnAttachStateChangeListener(attachStateChangeListener);
+            View view = viewReference.get();
+            if (view != null) view.removeOnAttachStateChangeListener(attachStateChangeListener);
         }
     }
 }

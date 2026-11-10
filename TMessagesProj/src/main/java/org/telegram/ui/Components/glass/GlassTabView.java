@@ -8,6 +8,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Region;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
@@ -134,6 +136,27 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
     }
 
     private final RectF tmpRectF = new RectF();
+    private final Path counterCutout = new Path();
+    private final RectF counterCutoutBounds = new RectF();
+    private float counterCutoutRadius = -1;
+
+    /** Cut the badge gap out of child content directly, avoiding a full-tab offscreen layer. */
+    private void clipCounterGap(Canvas canvas, float viewWidth, float factor) {
+        final float cx = viewWidth / 2f + dpf2(11);
+        final float cy = MainTabsUiHelper.getMainTabCounterCenterY(mainTabMaterial3, getHeight());
+        final float halfWidth = (Math.max(dpf2(16), counter.getCurrentWidth() + dp(8)) / 2f + dpf2(1.33f)) * factor;
+        final float halfHeight = (dpf2(8) + dpf2(1.33f)) * factor;
+        final float radius = dpf2(9.333f) * factor;
+        tmpRectF.set(cx - halfWidth, cy - halfHeight, cx + halfWidth, cy + halfHeight);
+        if (!tmpRectF.equals(counterCutoutBounds) || radius != counterCutoutRadius) {
+            counterCutoutBounds.set(tmpRectF);
+            counterCutoutRadius = radius;
+            counterCutout.rewind();
+            counterCutout.addRoundRect(tmpRectF, radius, radius, Path.Direction.CW);
+        }
+        if (android.os.Build.VERSION.SDK_INT >= 26) canvas.clipOutPath(counterCutout);
+        else canvas.clipPath(counterCutout, Region.Op.DIFFERENCE);
+    }
 
     private boolean hasGestureSelectedOverride;
     private float gestureSelectedOverride;
@@ -198,12 +221,14 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
         }
 
         final float hasCounter = (usePremiumCounter ? 1f : isHasCounterAnimator.getFloatValue()) * attachScale;
-        final boolean saveLayer = hasCounter > 0;
-        if (saveLayer) {
-            canvas.saveLayer(0, 0, viewWidth, getHeight(), null);
+        final boolean clipCounter = hasCounter > 0;
+        if (clipCounter) {
+            canvas.save();
+            clipCounterGap(canvas, viewWidth, hasCounter);
         }
 
         super.dispatchDraw(canvas);
+        if (clipCounter) canvas.restore();
 
         if (hasCounter > 0) {
             canvas.save();
@@ -213,7 +238,6 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
             final float cy = MainTabsUiHelper.getMainTabCounterCenterY(mainTabMaterial3, getHeight());
             final float height = dpf2(16);
             final float width = Math.max(height, counter.getCurrentWidth() + dp(8));
-            final float rOuter = dpf2(9.333f);
             final float rInner = dpf2(8f);
             tmpRectF.set(
                     cx - width / 2f - gap,
@@ -223,7 +247,6 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
             );
 
             canvas.scale(hasCounter, hasCounter, cx, cy);
-            canvas.drawRoundRect(tmpRectF, rOuter, rOuter, Theme.PAINT_CLEAR);
             tmpRectF.inset(gap, gap);
 
             if (usePremiumCounter) {
@@ -246,9 +269,6 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
             canvas.restore();
         }
 
-        if (saveLayer) {
-            canvas.restore();
-        }
     }
 
     private Drawable premiumStarDrawable;

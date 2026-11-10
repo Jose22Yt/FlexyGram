@@ -13,6 +13,24 @@ public interface IBlur3Hash {
     default void add(View v) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             add(v.getUniqueDrawingId());
+            // A view ID identifies the owner, not its current pixels or composition.
+            // Keep scrolling/transitions live and never reuse dirty child content.
+            if (v.isDirty() || v.isLayoutRequested()) unsupported();
+            addF(v.getX());
+            addF(v.getY());
+            addF(v.getAlpha());
+            addF(v.getScaleX());
+            addF(v.getScaleY());
+            addF(v.getRotation());
+            addF(v.getRotationX());
+            addF(v.getRotationY());
+            addF(v.getPivotX());
+            addF(v.getPivotY());
+            add(v.getWidth());
+            add(v.getHeight());
+            add(v.getScrollX());
+            add(v.getScrollY());
+            add(v.getVisibility());
         } else {
             unsupported();
         }

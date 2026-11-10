@@ -671,8 +671,9 @@ public class MessageDrawable extends Drawable {
                         app.flexygram.bubbles.BubbleConfig.transparency()) / 255f);
                 if (flexyGlassSource == null || !flexyGlassSource.draw(canvas, path, fillAlpha, isSelected)) {
                     // Offscreen renderers without a chat root use the native solid service color.
-                    flexyFillPaint.reset();
-                    flexyFillPaint.setAntiAlias(true);
+                    // Only the previous gradient can differ; keep the instance paint's
+                    // native antialias/style instead of resetting it for every bubble.
+                    flexyFillPaint.setShader(null);
                     flexyFillPaint.setColor(color);
                     flexyFillPaint.setAlpha(Math.round(Color.alpha(color) * fillAlpha / 255f));
                     canvas.drawPath(path, flexyFillPaint);

@@ -1,5 +1,15 @@
 # Cambios
 
+## 1.0.0-beta.36 — preparación, build 1325
+
+- Apertura desde la lista de chats: precarga asíncrona de usuarios, grupos y chats secretos ausentes en caché; las respuestas de navegación obsoletas se descartan.
+- Contadores de navegación inferior: recorte directo del hueco del contador, con geometría reutilizada, sin capa intermedia por contador.
+- Blur: límites de captura correctos para coordenadas negativas y bordes alineados; invalidación por posición, tamaño, transformaciones y contenido pendiente de dibujo.
+- Glass: fuente del programa compartida e inmutable; shaders y uniformes independientes por superficie. Se evita registrar fondos que una superficie opaca no muestra.
+- Seguimiento de posiciones en otras ventanas: un observador por vista, liberado al desuscribirse o destruir el propietario.
+- Burbujas adaptativas: conservación del Paint de relleno y limpieza explícita de su shader, sin reinicializarlo en cada dibujo.
+- Pruebas de regresión y auditoría en `docs/performance/beta36-audit.md`. Sin APK generada ni mediciones físicas de FPS/jank en esta revisión.
+
 ## Sin publicar — preparación 1.0.0-beta.1
 
 - Certificado público Beta registrado por indicación del propietario; huella fijada, generación de sustitutos deshabilitada y firma Alpha intacta.

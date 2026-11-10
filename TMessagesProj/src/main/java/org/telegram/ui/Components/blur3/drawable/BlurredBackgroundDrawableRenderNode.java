@@ -145,26 +145,30 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
         final float sR = boundProps.boundsWithPadding.right + offsetX;
         final float sB = boundProps.boundsWithPadding.bottom + offsetY;
 
-        c = renderNodeFill.beginRecording();
-        c.save();
-        c.translate(-sL, -sT);
-        if (liquidGlassEffect != null && Build.VERSION.SDK_INT >= 33) {
-            final int thickness = Math.max(Math.min(
-                boundProps.liquidThickness <= 0 ? dp(11) : boundProps.liquidThickness,
-                Math.min(boundProps.boundsWithPadding.width(), boundProps.boundsWithPadding.height()) / 5), 1);
+        // An opaque surface never samples the backdrop. Keep the previous fill node
+        // available; a later transparent color change invalidates and records it again.
+        if (Color.alpha(backgroundColor) != 255) {
+            c = renderNodeFill.beginRecording();
+            c.save();
+            c.translate(-sL, -sT);
+            if (liquidGlassEffect != null && Build.VERSION.SDK_INT >= 33) {
+                final int thickness = Math.max(Math.min(
+                    boundProps.liquidThickness <= 0 ? dp(11) : boundProps.liquidThickness,
+                    Math.min(boundProps.boundsWithPadding.width(), boundProps.boundsWithPadding.height()) / 5), 1);
 
-            liquidGlassEffect.update(
-                0, 0, boundProps.boundsWithPadding.width(), boundProps.boundsWithPadding.height(),
-                boundProps.shaderRadii[0], boundProps.shaderRadii[2], boundProps.shaderRadii[4], boundProps.shaderRadii[6],
-                thickness,
-                boundProps.liquidIntensity,
-                boundProps.liquidIndex,
-                backgroundColor
-            );
+                liquidGlassEffect.update(
+                    0, 0, boundProps.boundsWithPadding.width(), boundProps.boundsWithPadding.height(),
+                    boundProps.shaderRadii[0], boundProps.shaderRadii[2], boundProps.shaderRadii[4], boundProps.shaderRadii[6],
+                    thickness,
+                    boundProps.liquidIntensity,
+                    boundProps.liquidIndex,
+                    backgroundColor
+                );
+            }
+            source.draw(c, sL, sT, sR, sB);
+            c.restore();
+            renderNodeFill.endRecording();
         }
-        source.draw(c, sL, sT, sR, sB);
-        c.restore();
-        renderNodeFill.endRecording();
 
 
         c = renderNode.beginRecording();

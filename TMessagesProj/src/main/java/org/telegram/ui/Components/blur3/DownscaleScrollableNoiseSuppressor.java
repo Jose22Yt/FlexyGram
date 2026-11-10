@@ -362,13 +362,18 @@ public class DownscaleScrollableNoiseSuppressor {
     private final Blur3HashImpl builder = new Blur3HashImpl();
 
     public boolean invalidateResultRenderNodes(IBlur3Capture capture, int width, int height) {
-        int updatedCount = 0;
+        if (width <= 0 || height <= 0) return false;
         for (int a = 0; a < rectRenderNodesCount; a++) {
             final SourcePart sourcePart = rectRenderNodes.get(a);
             final Rect position = sourcePart.position;
             tmpRectF.set(position);
 
             builder.start();
+            // Capture coordinates are part of the content, even when the same rows remain visible.
+            builder.add(position.left);
+            builder.add(position.top);
+            builder.add(position.right);
+            builder.add(position.bottom);
             capture.captureCalculateHash(builder, tmpRectF);
             final long hash = builder.get();
 
@@ -376,23 +381,21 @@ public class DownscaleScrollableNoiseSuppressor {
                 continue;
             }
 
-            sourcePart.lastHash = hash;
-
             Canvas c = beginRecordingRect(a);
             c.save();
-            c.translate(-position.left, -position.top);
+            try {
+                c.translate(-position.left, -position.top);
+                capture.capture(c, tmpRectF);
+            } finally {
+                c.restore();
+                endRecordingRect();
+            }
+            sourcePart.lastHash = hash;
 
-            capture.capture(c, tmpRectF);
-            c.restore();
-            endRecordingRect();
-
-            updatedCount++;
         }
 
-        if (updatedCount > 0) {
-            return invalidateResultRenderNodes(width, height);
-        }
-        return false;
+        // Resizes and removal of the last region must rebuild the composite too.
+        return invalidateResultRenderNodes(width, height);
     }
 
     private class SourcePart {
@@ -443,11 +446,11 @@ public class DownscaleScrollableNoiseSuppressor {
     }
 
     private static int roundDown(float value, int N) {
-        return Math.round(value - value % N);
+        return (int) (Math.floor(value / N) * N);
     }
 
     public static int roundUp(float value, int N) {
-        return Math.round(value + (N - value % N));
+        return (int) (Math.ceil(value / N) * N);
     }
 
 
@@ -459,27 +462,26 @@ public class DownscaleScrollableNoiseSuppressor {
     }
 
     public void setupRenderNodes(GlassPositionsArray positions) {
-        rectRenderNodesCount = positions.size();
-
-        while (rectRenderNodesCount > rectRenderNodes.size()) {
-            rectRenderNodes.add(new SourcePart());
-        }
-
-        for (int a = 0; a < rectRenderNodesCount; a++) {
-            rectRenderNodes.get(a).setPosition(positions.get(a));
+        rectRenderNodesCount = 0;
+        for (int a = 0; a < positions.size(); a++) {
+            addCapturePosition(positions.get(a));
         }
     }
 
     public void setupRenderNodes(List<RectF> positions, int count) {
-        rectRenderNodesCount = count;
+        rectRenderNodesCount = 0;
+        for (int a = 0; a < count; a++) {
+            addCapturePosition(positions.get(a));
+        }
+    }
 
-        while (rectRenderNodesCount > rectRenderNodes.size()) {
+    private void addCapturePosition(RectF position) {
+        // Clamping to the chat viewport can collapse a hidden surface completely.
+        if (position.isEmpty()) return;
+        if (rectRenderNodesCount == rectRenderNodes.size()) {
             rectRenderNodes.add(new SourcePart());
         }
-
-        for (int a = 0; a < rectRenderNodesCount; a++) {
-            rectRenderNodes.get(a).setPosition(positions.get(a));
-        }
+        rectRenderNodes.get(rectRenderNodesCount++).setPosition(position);
     }
 
     private int recordingIndex;

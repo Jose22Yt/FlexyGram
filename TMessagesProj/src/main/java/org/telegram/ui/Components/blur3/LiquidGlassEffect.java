@@ -13,14 +13,18 @@ import org.telegram.messenger.R;
 @RequiresApi(api = 33)
 public class LiquidGlassEffect {
 
+    /** Immutable packaged program; each surface still owns its mutable shader/uniforms. */
+    private static final class ShaderSource {
+        static final String CODE = AndroidUtilities.readRes(R.raw.liquid_glass_shader);
+    }
+
     private final RenderNode node;
     private final RuntimeShader shader;
     private RenderEffect effect;
 
     public LiquidGlassEffect(RenderNode node) {
         this.node = node;
-        final String code = AndroidUtilities.readRes(R.raw.liquid_glass_shader);
-        shader = new RuntimeShader(code);
+        shader = new RuntimeShader(ShaderSource.CODE);
         node.setRenderEffect(effect = RenderEffect.createRuntimeShaderEffect(shader, "img"));
     }
 
