@@ -19,7 +19,7 @@ Un cliente de mensajería para Android con personalidad propia, controles de apa
 ---
 
 > [!IMPORTANT]
-> **Versión Oficial Activa:** FlexyGram `v1.0.0-beta.39` (Build `1328`)
+> **Versión Oficial Activa:** FlexyGram `v1.0.0-beta.40` (Build `1329`)
 > **Rama Oficial de Desarrollo:** [`codex/flexygram-beta-glass`](https://github.com/Jose22Yt/FlexyGram/tree/codex/flexygram-beta-glass)  
 > Para desarrolladores y agentes de IA (Codex, ChatGPT, Claude), consulta la guía obligatoria de desarrollo en [AGENTS.md](AGENTS.md).
 

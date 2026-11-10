@@ -487,7 +487,8 @@ public class ChatInputViewsContainer extends FrameLayout {
     private final Paint flexySurface = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint flexyPearl = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    /** Retained shapes share one captured blur source; each owns its bounds and border. */
+    /** Match the header: one native material pass per island, including tint and contour.
+     * An extra composer wash would flatten the native blur/refraction, especially on dark themes. */
     private void drawFlexyNativeGlassIslands(Canvas canvas, float offsetX, float offsetY,
             float radius, boolean attach) {
         final boolean voice = flexyComposer.getFlexyVoiceBounds(flexyVoice);
@@ -495,41 +496,24 @@ public class ChatInputViewsContainer extends FrameLayout {
         final boolean send = flexyComposer.getFlexySendBounds(flexySend);
         if (send) flexySend.offset(offsetX, offsetY);
         drawCompactGlass(canvas, 0, flexyPill, radius);
-        drawFlexyComposerTint(canvas, flexyPill, radius);
+
         if (attach) {
             drawCompactGlass(canvas, 1, flexyAttach, radius);
-            drawFlexyComposerTint(canvas, flexyAttach, radius);
+
         }
         if (voice) {
             drawCompactGlass(canvas, 2, flexyVoice, radius);
-            drawFlexyComposerTint(canvas, flexyVoice, radius);
+
         }
         if (send) {
             drawCompactGlass(canvas, 3, flexySend, radius);
-            drawFlexyComposerTint(canvas, flexySend, radius);
+
         }
         flexySendDrawn = send;
         flexyVoiceDrawn = voice;
         flexyNativeGlassDrawn = true;
         // Invalidate the legacy mask cache after a native ON/OFF switch.
         flexyLastPill.setEmpty();
-    }
-
-    /** Keep the input's surface readable when selection changes the sampled messages.
-     * Native blur and the outer contour remain owned by the existing drawable;
-     * this inset tint needs no capture, bitmap, animation or per-frame allocation.
-     */
-    private void drawFlexyComposerTint(Canvas canvas, RectF bounds, float radius) {
-        int tint = app.flexygram.composer.ComposerStyle.nativeGlassTint(
-                flexyComposer.getThemedColor(Theme.key_chat_messagePanelBackground));
-        int alpha = Color.alpha(tint) * blurredBackgroundDrawable.getAlpha() / 255;
-        if (alpha == 0 || bounds.isEmpty()) return;
-        flexySurface.setColor(ColorUtils.setAlphaComponent(tint, alpha));
-        tmpRectF.set(bounds);
-        float inset = Math.min(AndroidUtilities.density, radius * .1f);
-        tmpRectF.inset(inset, inset);
-        float innerRadius = Math.max(0f, radius - inset);
-        canvas.drawRoundRect(tmpRectF, innerRadius, innerRadius, flexySurface);
     }
 
     private void drawFlexyCompactBackground(Canvas canvas) {

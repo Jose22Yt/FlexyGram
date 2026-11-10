@@ -19,7 +19,7 @@ def write(source,root):
         path='app/flexygram/home/'+name+'.java';put(path,(java/path).read_text())
     put('org/telegram/messenger/SharedConfig.java','package org.telegram.messenger;public class SharedConfig{public static boolean blur=true;public static boolean chatBlurEnabled(){return blur;}}')
     s=(java/'org/telegram/ui/Components/chat/ChatInputViewsContainer.java').read_text()
-    methods='\n'.join(method(s,a) for a in ['private void drawFlexyComposerTint(', 'private void drawFlexyNativeGlassIslands('])
+    methods='\n'.join(method(s,a) for a in ['private void drawFlexyNativeGlassIslands('])
     put('SurfaceProbe.java','''import android.graphics.*;
 public class SurfaceProbe {
  static class AndroidUtilities{static float density=1;}
@@ -32,10 +32,17 @@ public class SurfaceProbe {
  static class Background{int alpha=255;int getAlpha(){return alpha;}}
  final Composer flexyComposer=new Composer();final Background blurredBackgroundDrawable=new Background();
  final Paint flexySurface=new Paint(3);final RectF tmpRectF=new RectF(),flexyPill=new RectF(52,2,230,42),flexyAttach=new RectF(2,2,42,42),flexyVoice=new RectF(),flexySend=new RectF(),flexyLastPill=new RectF();
- boolean flexySendDrawn,flexyVoiceDrawn;int sourceDraws;boolean emptySource=true;
- void drawCompactGlass(Canvas c,int i,RectF b,float r){sourceDraws++;if(!emptySource){Paint p=new Paint();p.setColor(0xffdddddd);c.drawRoundRect(b,r,r,p);}}
+ boolean flexySendDrawn,flexyVoiceDrawn,flexyNativeGlassDrawn;int sourceDraws;boolean emptySource=true;
+ // Explicit native-material double: tint is inside the native drawable/shader,
+ // including an unavailable image. It is not a second compositor wash.
+ void drawCompactGlass(Canvas c,int i,RectF b,float r){sourceDraws++;drawNativeMaterial(c,b,r);}
+ void drawNativeMaterial(Canvas c,RectF b,float r){
+  if(blurredBackgroundDrawable.alpha==0)return;
+  Paint p=new Paint();if(!emptySource){p.setColor(0xffdddddd);p.setAlpha(blurredBackgroundDrawable.alpha);c.drawRoundRect(b,r,r,p);}
+  p.setColor(flexyComposer.color);p.setAlpha(216*blurredBackgroundDrawable.alpha/255);c.drawRoundRect(b,r,r,p);
+ }
  METHODS
- public void draw(Canvas c){drawFlexyNativeGlassIslands(c,0,0,20,true);}
+ public void draw(Canvas c){drawFlexyNativeGlassIslands(c,0,0,20,true);flexyComposer.setFlexyNativeGlassBackdropDrawn(flexyNativeGlassDrawn);}
 }'''.replace('METHODS',methods))
 if __name__=='__main__':
     if '--output-dir' not in sys.argv:sys.argv+=['--output-dir',str(HERE.parents[2]/'build/connected-alpha-composer-surface')]

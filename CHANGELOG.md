@@ -1,5 +1,11 @@
 # Cambios
 
+## 1.0.0-beta.40 — preparación, build 1329
+
+- Composer compacto: una única pasada del material nativo por cápsula/botón, igual que la cabecera. Se retira el tinte secundario que aplanaba visualmente el blur y la refracción de Liquid Glass.
+- Se conservan la política global de efectos/ahorro, los colores propios del tema, las geometrías, los estados de grabación/envío y el fondo sólido al desactivar efectos.
+- Regresión de composición única, opacidad animada, botones visibles, caché de radios y transición de políticas; fixture gráfico actualizado para representar el tinte que ya aplica el drawable nativo.
+
 ## 1.0.0-beta.39 — preparación, build 1328
 
 - Navegación: precarga asíncrona de peers desde ActionBarLayout (presentación y restauración de pila), panel lateral y chats incrustados; se descartan respuestas obsoletas al navegar, pausar, cerrar o cambiar de cuenta.
