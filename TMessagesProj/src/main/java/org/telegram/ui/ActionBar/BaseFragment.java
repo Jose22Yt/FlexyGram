@@ -221,7 +221,7 @@ public abstract class BaseFragment {
         org.telegram.ui.Wallet.WalletPluginFreeze.enterIfWallet(this);
         arguments = args;
         classGuid = ConnectionsManager.generateClassGuid();
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG_TOOLS) {
             LeakDetector.getInstance().add(this);
         }
 

@@ -126,9 +126,7 @@ public class PluginsController extends com.exteragram.messenger.plugins.PluginsC
         initialized = true;
         appContext = context.getApplicationContext();
         preferences = appContext.getSharedPreferences(PluginsConstants.PREFS_NAME, Context.MODE_PRIVATE);
-        PluginGrantStore.get();
         watchdog = new PluginsWatchdog(preferences);
-        getPluginsDir().mkdirs();
 
         if (!isEngineEnabled()) {
             return;
@@ -141,7 +139,6 @@ public class PluginsController extends com.exteragram.messenger.plugins.PluginsC
         watchdog.start();
         PythonPluginsEngine.getInstance().ensureStarted(appContext, ok -> {
             if (ok) {
-                PluginGrantStore.warmUp();
                 rescanAndLoadEnabled();
                 executeOnAppEvent(PluginsConstants.EVENT_APP_START);
             }

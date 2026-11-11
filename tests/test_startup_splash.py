@@ -126,6 +126,7 @@ def test_actual_service_dispatch_keeps_background_entry_immediate_and_ui_work_af
     end = source.index('\n        } finally {', start)
     dispatch = source[start:end]
     run_java(tmp_path, {
+        'app/exteraless/glyph/GlyphController.java':'package app.exteraless.glyph;public class GlyphController{public static GlyphController getInstance(){return new GlyphController();}public void init(){}}',
         'android/os/Looper.java': '''package android.os; public class Looper {
  static final Looper main=new Looper();public static boolean ui=true;
  public static Looper myLooper(){return ui?main:new Looper();}public static Looper getMainLooper(){return main;}}''',

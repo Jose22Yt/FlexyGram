@@ -1,5 +1,16 @@
 # Cambios
 
+## 1.0.0-beta.46 — preparación, build 1335
+
+- Arranque: la creación de la carpeta de plugins y la migración/verificación de permisos pasan al executor del motor, antes de ejecutar Python. Con el motor apagado no se fuerza ese trabajo durante el inicio.
+- Se agrupan las solicitudes de inicio del intérprete que estaban esperando en su executor; conservan sus callbacks sin repetir la preparación/importación después del primer resultado.
+- Las preferencias de confirmaciones de bots web se abren cuando se usan; el cierre de sesión también limpia sus registros si el proceso no las había abierto todavía.
+- Los seis TextPaint de tamaños de emoji se reutilizan sin perder actualizaciones de fuente/densidad, evitando recrearlos en cada inicialización de recursos.
+- LeakDetector, sus registros, el detector ANR y la política VM de diagnóstico quedan bajo el indicador explícito `debugTools`; la beta normal evita sus exploraciones y GC forzados.
+- Glyph: el enlace de servicio se pospone al callback tras la primera oportunidad de dibujar la interfaz; las entradas sin interfaz conservan el enlace inmediato.
+- Trazas de carga nativa, idioma, configuración y recursos iniciales para medir el arranque en dispositivo. No se oculta el problema con una pantalla vacía o un temporizador.
+- Sin APK compilada; permanece la pantalla principal por defecto de beta 45.
+
 ## 1.0.0-beta.45 — preparación, build 1334
 
 - Se elimina el estilo de pantalla principal «Telegram iOS» y su selector. Queda únicamente la pantalla principal por defecto.

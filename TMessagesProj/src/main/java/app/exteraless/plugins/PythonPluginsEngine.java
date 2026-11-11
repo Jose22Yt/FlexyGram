@@ -14,6 +14,7 @@ import org.telegram.ui.Components.UItem;
 
 import app.exteraless.plugins.models.CustomSetting;
 
+import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -119,7 +120,13 @@ public class PythonPluginsEngine extends com.exteragram.messenger.plugins.Python
             return;
         }
         executor.execute(() -> {
+            // Another request may have completed while this one waited on the serial executor.
+            if (started || startFailed) {
+                if (callback != null) callback.onStarted(started);
+                return;
+            }
             try {
+                prepareRuntimeStorage(appContext);
                 if (!Python.isStarted()) {
                     long t0 = System.currentTimeMillis();
                     Python.start(new AndroidPlatform(appContext));
@@ -145,6 +152,15 @@ public class PythonPluginsEngine extends com.exteragram.messenger.plugins.Python
                 callback.onStarted(started);
             }
         });
+    }
+
+    /** Filesystem/grant migration belongs to the engine worker, before any Python code executes. */
+    private void prepareRuntimeStorage(Context context) {
+        File directory = new File(context.getFilesDir(), "plugins");
+        if (!directory.isDirectory() && !directory.mkdirs() && !directory.isDirectory()) {
+            throw new IllegalStateException("Cannot prepare plugin directory");
+        }
+        PluginGrantStore.warmUp();
     }
 
     /**

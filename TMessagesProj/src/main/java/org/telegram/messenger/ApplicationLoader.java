@@ -252,11 +252,12 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         applicationInited = true;
         NativeLoader.initNativeLibs(ApplicationLoader.applicationContext);
 
+        android.os.Trace.beginSection("Flexy.startup.locale");
         try {
             LocaleController.getInstance(); //TODO improve
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        } finally { android.os.Trace.endSection(); }
 
         try {
             connectivityManager = (ConnectivityManager) ApplicationLoader.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -299,32 +300,36 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
             e.printStackTrace();
         }
 
-        SharedConfig.loadConfig();
-        NekoConfig.init();
-        NaConfig.init();
-        OpenExteraConfig.init();
-        app.exteraless.icons.IconPacksConfig.init();
-        if (BuildConfig.CONNECTED_ALPHA) app.flexygram.studio.FlexyStudioStore.recoverIfNeeded();
-        app.exteraless.pillstack.PillStackConfig.init();
-        app.exteraless.appearance.AppearanceConfig.init();
-        app.exteraless.chats.ChatsConfig.init();
-        app.exteraless.general.GeneralConfig.init();
-        app.exteraless.utils.UtilsConfig.init();
-        app.exteraless.glyph.GlyphConfig.init();
-        app.exteraless.glyph.GlyphController.getInstance().init();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            // Суффикс набора Monet запекается в ThemeInfo.assetName при первой загрузке
-            // класса Theme. Если она случилась до загрузки конфигов (процесс поднялся
-            // ради ресивера/провайдера), палитра молча откатывалась бы на набор по
-            // умолчанию — патчим assetName после инициализации конфигов.
-            org.telegram.ui.ActionBar.Theme.reloadMonetThemes();
-        }
-        app.exteraless.plugins.PluginsController.getInstance().init(applicationContext);
-        if (BuildConfig.DEBUG_TOOLS) {
-            app.exteraless.debug.EnergyProfiler.resumeIfEnabled(applicationContext);
-        }
-        SharedPrefsHelper.init(applicationContext);
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.CONNECTED_ALPHA && AndroidUtil.shouldEnableCrashlytics());
+        android.os.Trace.beginSection("Flexy.startup.configs");
+        try {
+            SharedConfig.loadConfig();
+            NekoConfig.init();
+            NaConfig.init();
+            OpenExteraConfig.init();
+            app.exteraless.icons.IconPacksConfig.init();
+            if (BuildConfig.CONNECTED_ALPHA) app.flexygram.studio.FlexyStudioStore.recoverIfNeeded();
+            app.exteraless.pillstack.PillStackConfig.init();
+            app.exteraless.appearance.AppearanceConfig.init();
+            app.exteraless.chats.ChatsConfig.init();
+            app.exteraless.general.GeneralConfig.init();
+            app.exteraless.utils.UtilsConfig.init();
+            app.exteraless.glyph.GlyphConfig.init();
+            if (!prepareDialogs || android.os.Looper.myLooper() != android.os.Looper.getMainLooper()) {
+                app.exteraless.glyph.GlyphController.getInstance().init();
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                // Суффикс набора Monet запекается в ThemeInfo.assetName при первой загрузке
+                // класса Theme. Если она случилась до загрузки конфигов (процесс поднялся
+                // ради ресивера/провайдера), палитра молча откатывалась бы на набор по
+                // умолчанию — патчим assetName после инициализации конфигов.
+                org.telegram.ui.ActionBar.Theme.reloadMonetThemes();
+            }
+            app.exteraless.plugins.PluginsController.getInstance().init(applicationContext);
+            if (BuildConfig.DEBUG_TOOLS) {
+                app.exteraless.debug.EnergyProfiler.resumeIfEnabled(applicationContext);
+            }
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.CONNECTED_ALPHA && AndroidUtil.shouldEnableCrashlytics());
+        } finally { android.os.Trace.endSection(); }
         // Account zero must load first: it owns the persisted selectedAccount preference.
         UserConfig.getInstance(0).loadConfig();
         final int startupAccount = UserConfig.selectedAccount;
@@ -353,7 +358,10 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         if (prepareDialogs && android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
             // Keep native service ownership on main, but let the first UI traversal complete first.
             android.view.Choreographer.getInstance().postFrameCallback(frameTimeNanos ->
-                    applicationHandler.post(() -> initializeAccountServices(true)));
+                    applicationHandler.post(() -> {
+                        app.exteraless.glyph.GlyphController.getInstance().init();
+                        initializeAccountServices(true);
+                    }));
         } else {
             // Push/service entry points still initialize without waiting for an Activity or frame.
             initializeAccountServices();
@@ -525,7 +533,9 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
             applicationContext = getApplicationContext();
         }
 
-        NativeLoader.initNativeLibs(ApplicationLoader.applicationContext);
+        android.os.Trace.beginSection("Flexy.startup.native_load");
+        try { NativeLoader.initNativeLibs(ApplicationLoader.applicationContext); }
+        finally { android.os.Trace.endSection(); }
 
         try {
             ConnectionsManager.native_setJava(false);
@@ -542,7 +552,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                 }
             }
         };
-        if (BuildVars.DEBUG_VERSION) {
+        if (BuildConfig.DEBUG_TOOLS) {
             new ANRDetector(FileLog::dumpANR);
         }
 

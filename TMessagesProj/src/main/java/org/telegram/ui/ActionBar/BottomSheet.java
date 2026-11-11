@@ -1233,7 +1233,7 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
         super(context, R.style.TransparentDialog);
         org.telegram.ui.Wallet.WalletPluginFreeze.enterIfWallet(this);
         this.resourcesProvider = resourcesProvider;
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG_TOOLS) {
             LeakDetector.getInstance().add(this);
         }
 

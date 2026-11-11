@@ -433,13 +433,13 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     protected void onCreate(Bundle savedInstanceState) {
         isActive = true;
         activeInstanceCount++;
-        if (BuildVars.DEBUG_VERSION) {
+        if (BuildConfig.DEBUG_TOOLS) {
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder(StrictMode.getVmPolicy())
                 .detectLeakedClosableObjects()
                 .penaltyLog()
                 .build());
         }
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG_TOOLS) {
             LeakDetector.getInstance().start();
         }
 
@@ -486,8 +486,11 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         if (Build.VERSION.SDK_INT >= 24) {
             AndroidUtilities.isInMultiwindow = isInMultiWindowMode();
         }
-        Theme.createCommonChatResources();
-        Theme.createDialogsResources(this);
+        android.os.Trace.beginSection("Flexy.startup.launch_resources");
+        try {
+            Theme.createCommonChatResources();
+            Theme.createDialogsResources(this);
+        } finally { android.os.Trace.endSection(); }
         if (SharedConfig.passcodeHash.length() != 0 && SharedConfig.appLocked) {
             SharedConfig.lastPauseTime = (int) (SystemClock.elapsedRealtime() / 1000);
         }

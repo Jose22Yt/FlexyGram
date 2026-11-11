@@ -8164,6 +8164,8 @@ public class Theme {
         }
     }
 
+    private static final float[] CHAT_EMOJI_SIZE_PERCENTS = {.68f, .46f, .34f, .28f, .22f, .19f};
+
     public static void createCommonMessageResources() {
         synchronized (sync) {
             if (chat_msgTextPaint == null) {
@@ -8198,10 +8200,9 @@ public class Theme {
                 chat_ephemeralPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
             }
 
-            final float[] emojiSizePercents = new float[] {.68f, .46f, .34f, .28f, .22f, .19f};
             for (int i = 0; i < chat_msgTextPaintEmoji.length; ++i) {
-                chat_msgTextPaintEmoji[i] = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-                chat_msgTextPaintEmoji[i].setTextSize(dp(emojiSizePercents[i] * 120f));
+                if (chat_msgTextPaintEmoji[i] == null) chat_msgTextPaintEmoji[i] = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+                chat_msgTextPaintEmoji[i].setTextSize(dp(CHAT_EMOJI_SIZE_PERCENTS[i] * 120f));
             }
             chat_msgTextPaintOneEmoji.setTextSize(dp(28 + 18));
             chat_msgTextPaintTwoEmoji.setTextSize(dp(24 + 14));
