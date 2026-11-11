@@ -40,6 +40,53 @@ public class BackDrawable extends Drawable {
     private boolean rotated = true;
     private int arrowRotation;
 
+    // Native source glyphs are loaded once; transitions keep FlexyGram's own clock.
+    private Drawable originalBack;
+    private Drawable originalClose;
+    private int originalAlpha = 255;
+    private int originalTint;
+    private boolean originalTintSet;
+    private ColorFilter originalFilter;
+
+    private boolean prepareOriginals() {
+        if (!app.flexygram.icons.ExactIcons.isEnabled()) return false;
+        if (originalBack == null) {
+            originalBack = app.flexygram.icons.ExactIcons.direct(app.flexygram.icons.IosOriginalAssets.BACK);
+            originalClose = app.flexygram.icons.ExactIcons.direct(app.flexygram.icons.IosOriginalAssets.CLOSE);
+            if (originalBack != null) originalBack.setColorFilter(originalFilter);
+            if (originalClose != null) originalClose.setColorFilter(originalFilter);
+            originalTintSet = false;
+        }
+        return originalBack != null && originalClose != null;
+    }
+
+    private boolean drawOriginals(Canvas canvas, int tint) {
+        if (!prepareOriginals()) return false;
+        if (!originalTintSet || originalTint != tint) {
+            originalBack.setTint(tint); originalClose.setTint(tint);
+            originalTint = tint; originalTintSet = true;
+        }
+        int width = getBounds().width(), height = getBounds().height();
+        if (width <= 0) width = getIntrinsicWidth();
+        if (height <= 0) height = getIntrinsicHeight();
+        originalBack.setBounds(0, 0, width, height);
+        originalClose.setBounds(0, 0, width, height);
+        canvas.save();
+        canvas.translate(getBounds().left, getBounds().top);
+        if (arrowRotation != 0) canvas.rotate(arrowRotation, width / 2f, height / 2f);
+        float close = alwaysClose ? 1f : Utilities.clamp(currentRotation, 1f, 0f);
+        if (close < 1f) {
+            originalBack.setAlpha(Math.round(originalAlpha * (1f - close)));
+            originalBack.draw(canvas);
+        }
+        if (close > 0f) {
+            originalClose.setAlpha(Math.round(originalAlpha * close));
+            originalClose.draw(canvas);
+        }
+        canvas.restore();
+        return true;
+    }
+
     private boolean iosStyle = false;
     private android.graphics.Path iosPath;
     private float lastDensity = -1;
@@ -134,7 +181,9 @@ public class BackDrawable extends Drawable {
             invalidateSelf();
         }
 
-        paint.setColor(ColorUtils.blendARGB(color, rotatedColor, currentRotation));
+        int tint = ColorUtils.blendARGB(color, rotatedColor, currentRotation);
+        if (drawOriginals(canvas, tint)) return;
+        paint.setColor(tint);
 
         canvas.save();
         canvas.translate(getIntrinsicWidth() / 2f, getIntrinsicHeight() / 2f);
@@ -190,11 +239,15 @@ public class BackDrawable extends Drawable {
 
     @Override
     public void setAlpha(int alpha) {
+        originalAlpha = Math.max(0, Math.min(255, alpha));
         paint.setAlpha(alpha);
     }
 
     @Override
     public void setColorFilter(ColorFilter cf) {
+        originalFilter = cf;
+        if (originalBack != null) originalBack.setColorFilter(cf);
+        if (originalClose != null) originalClose.setColorFilter(cf);
         paint.setColorFilter(cf);
     }
 
@@ -205,11 +258,11 @@ public class BackDrawable extends Drawable {
 
     @Override
     public int getIntrinsicWidth() {
-        return AndroidUtilities.dp(24);
+        return prepareOriginals() ? originalBack.getIntrinsicWidth() : AndroidUtilities.dp(24);
     }
 
     @Override
     public int getIntrinsicHeight() {
-        return AndroidUtilities.dp(24);
+        return prepareOriginals() ? originalBack.getIntrinsicHeight() : AndroidUtilities.dp(24);
     }
 }

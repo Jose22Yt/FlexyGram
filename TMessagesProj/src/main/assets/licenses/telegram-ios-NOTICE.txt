@@ -1,0 +1,8 @@
+Original Telegram-iOS interface artwork
+Source: https://github.com/TelegramMessenger/Telegram-iOS
+Revision: 24638bc69bd083981b178dd1e7f921eebbf7fc46
+Upstream instructions/notices: https://github.com/TelegramMessenger/Telegram-iOS/blob/24638bc69bd083981b178dd1e7f921eebbf7fc46/README.md
+Original sources and hashes: tools/ios_originals/manifest.json in the FlexyGram source repository.
+The original artwork and its authorship remain with their respective authors.
+The source revision has no root LICENSE file. This conversion does not assign it a new license.
+FlexyGram is an unofficial Android client and retains its own name and application logo.

@@ -108,8 +108,9 @@ def test_native_icon_pack_is_identity_and_cupertino_remains_selectable(tmp_path)
         'org/telegram/messenger/LocaleController.java': 'package org.telegram.messenger;public class LocaleController{public static String getString(int id){return "Default";}}',
         'android/util/SparseIntArray.java': '''package android.util;public class SparseIntArray{java.util.Map<Integer,Integer> m=new java.util.HashMap<>();public SparseIntArray(int capacity){}public void put(int k,int v){m.put(k,v);}public int get(int k,int d){return m.getOrDefault(k,d);}}''',
         'xyz/nextalone/nagram/NaConfig.java': '''package xyz.nextalone.nagram;public class NaConfig{public static final NaConfig INSTANCE=new NaConfig();public final Item item=new Item();public Item getIconReplacements(){return item;}public static class Item{int value;public int Int(){return value;}public void setConfigInt(int v){value=v;}}}''',
-        'android/content/res/Resources.java': 'package android.content.res;public class Resources{}',
+        'android/content/res/Resources.java': 'package android.content.res;public class Resources{public static class Theme{}}',
         'android/graphics/drawable/Drawable.java': 'package android.graphics.drawable;public class Drawable{}',
+        'app/flexygram/icons/ExactIcons.java': 'package app.flexygram.icons;public class ExactIcons{public static android.graphics.drawable.Drawable create(android.content.res.Resources r,int id,int d,android.content.res.Resources.Theme t){return id==1?new android.graphics.drawable.Drawable():null;}}',
         'app/flexygram/icons/CupertinoIconMap.java': 'package app.flexygram.icons;public class CupertinoIconMap{public static int spec(int id){return id==1?1:0;}public static int color(int id){return 0;}}',
         'app/flexygram/icons/CupertinoGlyphDrawable.java': 'package app.flexygram.icons;public class CupertinoGlyphDrawable extends android.graphics.drawable.Drawable{public CupertinoGlyphDrawable(android.content.res.Resources r,int s,int c){}}',
         'Probe.java': '''import app.exteraless.icons.BaseIconPacks;import app.flexygram.icons.CupertinoIcons;

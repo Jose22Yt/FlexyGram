@@ -343,6 +343,43 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
     private int lastIconAnimationRaw;
     private long lastBotIconId;
 
+    /** Original glyph endpoints; tab selection retains the existing FlexyGram timing. */
+    private static int originalTabAsset(TabAnimation animation) {
+        switch (animation) {
+            case CONTACTS: return app.flexygram.icons.IosOriginalAssets.TAB_CONTACTS;
+            case CALLS: return app.flexygram.icons.IosOriginalAssets.TAB_CALLS;
+            case CHATS: return app.flexygram.icons.IosOriginalAssets.TAB_CHATS;
+            case SETTINGS: return app.flexygram.icons.IosOriginalAssets.TAB_SETTINGS;
+            case FEED: return app.flexygram.icons.IosOriginalAssets.TAB_FEED;
+            case NAV_GROUPS: return app.flexygram.icons.IosOriginalAssets.TAB_NAV_GROUPS;
+            case NAV_CHANNELS: return app.flexygram.icons.IosOriginalAssets.TAB_NAV_CHANNELS;
+            case NAV_SAVED: return app.flexygram.icons.IosOriginalAssets.TAB_NAV_SAVED;
+            case NAV_PROFILE: return app.flexygram.icons.IosOriginalAssets.TAB_NAV_PROFILE;
+            case NAV_MORE: return app.flexygram.icons.IosOriginalAssets.TAB_NAV_MORE;
+            case NAV_SEARCH: return app.flexygram.icons.IosOriginalAssets.TAB_NAV_SEARCH;
+            case NAV_MUSIC: return app.flexygram.icons.IosOriginalAssets.TAB_NAV_MUSIC;
+            case CHECKLIST: return app.flexygram.icons.IosOriginalAssets.TAB_CHECKLIST;
+            case COLORS: return app.flexygram.icons.IosOriginalAssets.TAB_COLORS;
+            case FILES: return app.flexygram.icons.IosOriginalAssets.TAB_FILES;
+            case GALLERY: return app.flexygram.icons.IosOriginalAssets.TAB_GALLERY;
+            case GIFT: return app.flexygram.icons.IosOriginalAssets.TAB_GIFT;
+            case LOCATION: return app.flexygram.icons.IosOriginalAssets.TAB_LOCATION;
+            case STICKER: return app.flexygram.icons.IosOriginalAssets.TAB_STICKER;
+            case EMOJI: return app.flexygram.icons.IosOriginalAssets.TAB_EMOJI;
+            case MUSIC: return app.flexygram.icons.IosOriginalAssets.TAB_MUSIC;
+            case POLL: return app.flexygram.icons.IosOriginalAssets.TAB_POLL;
+            case SYMBOLS: return app.flexygram.icons.IosOriginalAssets.TAB_SYMBOLS;
+            case REPLIES: return app.flexygram.icons.IosOriginalAssets.TAB_REPLIES;
+            case WALLET: return app.flexygram.icons.IosOriginalAssets.TAB_WALLET;
+            case LINK: return app.flexygram.icons.IosOriginalAssets.TAB_LINK;
+            case ARTICLE: return app.flexygram.icons.IosOriginalAssets.TAB_ARTICLE;
+            case GRAM: return app.flexygram.icons.IosOriginalAssets.TAB_GRAM;
+            case BOOSTS: return app.flexygram.icons.IosOriginalAssets.TAB_BOOSTS;
+            case MONETIZATION: return app.flexygram.icons.IosOriginalAssets.TAB_MONETIZATION;
+            default: return 0; // App-exclusive tabs have no invented iOS counterpart.
+        }
+    }
+
     private void checkPlayAnimation(boolean animated) {
         final boolean isSelected = isSelectedAnimator.getValue();
 
@@ -374,6 +411,22 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
 
         if (tabAnimation == null) {
             return;
+        }
+
+        if (app.flexygram.icons.ExactIcons.isEnabled()) {
+            int asset = originalTabAsset(tabAnimation);
+            if (asset != 0) {
+                if (lastIconAnimationRaw != asset) {
+                    Drawable original = app.flexygram.icons.ExactIcons.direct(asset);
+                    if (original != null) {
+                        lastIconAnimationRaw = asset;
+                        imageView.clearAnimationDrawable();
+                        imageView.setImageDrawable(original);
+                    }
+                }
+                updateColors();
+                return;
+            }
         }
 
         if ((tabAnimation.iconToFilled == 0 || ChatActivityEnterViewStaticIconView.isStaticIconsEnabled())

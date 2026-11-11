@@ -64,7 +64,7 @@ public class ChatActivityEnterViewStaticIconView extends FrameLayout {
         referenceIcons = reference;
         for (ImageView view : buttonViews) {
             FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) view.getLayoutParams();
-            int size = compact ? Math.min(nativeIconSize, org.telegram.messenger.AndroidUtilities.dp(28)) : nativeIconSize;
+            int size = compact && !app.flexygram.icons.ExactIcons.isEnabled() ? Math.min(nativeIconSize, org.telegram.messenger.AndroidUtilities.dp(28)) : nativeIconSize;
             if (lp.width != size || lp.height != size) {
                 lp.width = lp.height = size;
                 view.setLayoutParams(lp);
@@ -73,7 +73,7 @@ public class ChatActivityEnterViewStaticIconView extends FrameLayout {
         if (currentState != null) setState(currentState, false);
     }
     private int iconResource(State state) {
-        return compactIcons ? app.flexygram.composer.ComposerIcons.resource(state.name(), state.resource, referenceIcons) : state.resource;
+        return compactIcons || app.flexygram.icons.ExactIcons.isEnabled() ? app.flexygram.composer.ComposerIcons.resource(state.name(), state.resource, referenceIcons) : state.resource;
     }
 
 

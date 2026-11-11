@@ -1,0 +1,3 @@
+# Preserve byte-identical vendored originals, including upstream whitespace.
+tools/ios_originals/UPSTREAM-README.md -whitespace
+tools/ios_originals/upstream/** -whitespace

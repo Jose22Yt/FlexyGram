@@ -1,38 +1,34 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 package app.flexygram.icons;
 
+import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import app.exteraless.icons.BaseIconPacks;
+import org.telegram.messenger.ApplicationLoader;
 
-/** Default artwork from the user's archive. Resources owns decoding and bitmap reuse. */
+/** Original Telegram-iOS artwork. Native Resources caches vectors/decoded raster pixels. */
 public final class ExactIcons {
     private ExactIcons() {}
+    public static boolean isEnabled() { int selected=BaseIconPacks.getSelected(); return selected==BaseIconPacks.BASE_DEFAULT||selected==BaseIconPacks.BASE_CUPERTINO; }
 
-    public static Drawable create(Resources resources, int id, int density, Resources.Theme theme) {
-        ExactIconMap.Entry entry = ExactIconMap.get(id);
-        if (entry == null || BaseIconPacks.getSelected() != BaseIconPacks.BASE_DEFAULT) return null;
-        // Asset IDs are deliberately outside the alias map: this lookup cannot recurse.
-        // Android's density/configuration-aware resource cache shares the decoded pixels.
-        Drawable source = resources.getDrawableForDensity(entry.asset, density, theme);
-        if (!(source instanceof BitmapDrawable)) return null;
-        return new Icon(resources, ((BitmapDrawable) source).getBitmap(), entry,
-                density == 0 ? resources.getDisplayMetrics().densityDpi : density);
+    public static Drawable create(Resources resources,int id,int density,Resources.Theme theme) {
+        ExactIconMap.Entry entry=ExactIconMap.get(id);
+        if(entry==null||!isEnabled())return null;
+        // Source IDs are excluded from the alias map, so this lookup terminates.
+        Drawable icon=original(resources,entry.asset,density,theme);
+        icon.setTint(entry.color);icon.setAutoMirrored(entry.mirrored);
+        return icon;
     }
-
-    /** Independent tint/bounds per view, shared immutable pixels and original UI dimensions. */
-    private static final class Icon extends BitmapDrawable {
-        private final int width, height;
-        Icon(Resources resources, Bitmap bitmap, ExactIconMap.Entry entry, int density) {
-            super(resources, bitmap);
-            width = Math.round(entry.width * density / 160f);
-            height = Math.round(entry.height * density / 160f);
-            setFilterBitmap(true);
-            setTint(entry.color);
-            setAutoMirrored(entry.mirrored);
-        }
-        @Override public int getIntrinsicWidth() { return width; }
-        @Override public int getIntrinsicHeight() { return height; }
+    private static Drawable original(Resources resources,int asset,int density,Resources.Theme theme) {
+        return new OriginalIconDrawable(resources.getDrawableForDensity(asset,density,theme).mutate());
+    }
+    /** For controls which previously painted approximate paths instead of loading an Android ID. */
+    public static Drawable direct(int asset) {
+        Context context=ApplicationLoader.applicationContext;
+        if(context==null||!isEnabled())return null;
+        Drawable icon=original(context.getResources(),asset,0,context.getTheme());
+        icon.setTint(0xff000000);
+        return icon;
     }
 }

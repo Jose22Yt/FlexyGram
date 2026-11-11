@@ -1,0 +1,53 @@
+// Generated original source IDs, used by direct-drawing controls too.
+package app.flexygram.icons;
+import org.telegram.messenger.R;
+public final class IosOriginalAssets {
+ private IosOriginalAssets() {}
+ public static final int CHEVRON_DOWN=R.drawable.fg_ios_original_navigation_titleexpand;
+ public static final int MORE=R.drawable.fg_ios_original_chat_list_navigationmore;
+ public static final int HEART=R.drawable.fg_ios_original_chat_context_menu_reactions;
+ public static final int SHUFFLE=R.drawable.fg_ios_original_globalmusicplayer_orderrandom;
+ public static final int REPEAT=R.drawable.fg_ios_original_globalmusicplayer_repeat;
+ public static final int PREV=R.drawable.fg_ios_original_globalmusicplayer_previous;
+ public static final int NEXT=R.drawable.fg_ios_original_globalmusicplayer_next;
+ public static final int PLAY=R.drawable.fg_ios_original_globalmusicplayer_play;
+ public static final int PAUSE=R.drawable.fg_ios_original_globalmusicplayer_pause;
+ public static final int TIMER=R.drawable.fg_ios_original_chat_context_menu_timer;
+ public static final int SPEED=R.drawable.fg_ios_original_chat_context_menu_speed;
+ public static final int LYRICS=R.drawable.fg_ios_original_chat_context_menu_formattext;
+ public static final int QUEUE=R.drawable.fg_ios_original_chat_context_menu_list;
+ public static final int NOTE=R.drawable.fg_ios_original_chat_context_menu_addmusic;
+ public static final int CLOSE=R.drawable.fg_ios_original_navigation_close;
+ public static final int TAB_CONTACTS=R.drawable.fg_ios_original_chat_list_tabs_iconcontacts;
+ public static final int TAB_CALLS=R.drawable.fg_ios_original_chat_list_tabs_iconcalls;
+ public static final int TAB_CHATS=R.drawable.fg_ios_original_chat_list_tabs_iconchats;
+ public static final int TAB_SETTINGS=R.drawable.fg_ios_original_chat_list_tabs_iconsettings;
+ public static final int TAB_FEED=R.drawable.fg_ios_original_chat_context_menu_stories;
+ public static final int TAB_NAV_GROUPS=R.drawable.fg_ios_original_chat_context_menu_groups;
+ public static final int TAB_NAV_CHANNELS=R.drawable.fg_ios_original_chat_context_menu_channels;
+ public static final int TAB_NAV_SAVED=R.drawable.fg_ios_original_chat_context_menu_save;
+ public static final int TAB_NAV_PROFILE=R.drawable.fg_ios_original_chat_context_menu_user;
+ public static final int TAB_NAV_MORE=R.drawable.fg_ios_original_chat_list_navigationmore;
+ public static final int TAB_NAV_SEARCH=R.drawable.fg_ios_original_navigation_search;
+ public static final int TAB_NAV_MUSIC=R.drawable.fg_ios_original_chat_context_menu_addmusic;
+ public static final int TAB_CHECKLIST=R.drawable.fg_ios_original_chat_context_menu_formatchecklist;
+ public static final int TAB_COLORS=R.drawable.fg_ios_original_chat_context_menu_palette;
+ public static final int TAB_FILES=R.drawable.fg_ios_original_chat_context_menu_file;
+ public static final int TAB_GALLERY=R.drawable.fg_ios_original_chat_context_menu_image;
+ public static final int TAB_GIFT=R.drawable.fg_ios_original_chat_context_menu_gift;
+ public static final int TAB_LOCATION=R.drawable.fg_ios_original_location_sendlocationicon;
+ public static final int TAB_STICKER=R.drawable.fg_ios_original_chat_context_menu_sticker;
+ public static final int TAB_EMOJI=R.drawable.fg_ios_original_chat_context_menu_smile;
+ public static final int TAB_MUSIC=R.drawable.fg_ios_original_chat_context_menu_addmusic;
+ public static final int TAB_POLL=R.drawable.fg_ios_original_chat_list_pollbadgeicon;
+ public static final int TAB_SYMBOLS=R.drawable.fg_ios_original_chat_context_menu_formattext;
+ public static final int TAB_REPLIES=R.drawable.fg_ios_original_chat_context_menu_replies;
+ public static final int TAB_WALLET=R.drawable.fg_ios_original_item_list_icons_balance;
+ public static final int TAB_LINK=R.drawable.fg_ios_original_chat_context_menu_link;
+ public static final int TAB_ARTICLE=R.drawable.fg_ios_original_chat_context_menu_file;
+ public static final int TAB_GRAM=R.drawable.fg_ios_original_item_list_icons_gram;
+ public static final int TAB_BOOSTS=R.drawable.fg_ios_original_chat_context_menu_boost;
+ public static final int TAB_MONETIZATION=R.drawable.fg_ios_original_item_list_icons_earnings;
+ public static final int[] PREVIEW={0,R.drawable.fg_ios_original_chat_context_menu_file,R.drawable.fg_ios_original_item_list_icons_microphone,R.drawable.fg_ios_original_chat_context_menu_addmusic,R.drawable.fg_ios_original_chat_context_menu_link,R.drawable.fg_ios_original_chat_context_menu_calendar,R.drawable.fg_ios_original_chat_context_menu_image,R.drawable.fg_ios_original_item_list_icons_video,R.drawable.fg_ios_original_location_sendlocationicon,R.drawable.fg_ios_original_chat_context_menu_user,R.drawable.fg_ios_original_chat_context_menu_file,R.drawable.fg_ios_original_chat_context_menu_file,R.drawable.fg_ios_original_chat_context_menu_file,R.drawable.fg_ios_original_chat_input_media_entityinputgifsicon,R.drawable.fg_ios_original_chat_context_menu_sticker,R.drawable.fg_ios_original_chat_list_pollbadgeicon,R.drawable.fg_ios_original_chat_context_menu_pin,R.drawable.fg_ios_original_chat_context_menu_edit,R.drawable.fg_ios_original_chat_context_menu_channels,R.drawable.fg_ios_original_item_list_icons_admin,R.drawable.fg_ios_original_stories_livechatcrown,R.drawable.fg_ios_original_chat_context_menu_delete,R.drawable.fg_ios_original_chat_context_menu_adduser,R.drawable.fg_ios_original_chat_context_menu_logout,R.drawable.fg_ios_original_chat_context_menu_file,R.drawable.fg_ios_original_chat_context_menu_file,R.drawable.fg_ios_original_chat_context_menu_file,R.drawable.fg_ios_original_chat_context_menu_file};
+ public static final int BACK=R.drawable.fg_ios_original_navigation_back;
+}

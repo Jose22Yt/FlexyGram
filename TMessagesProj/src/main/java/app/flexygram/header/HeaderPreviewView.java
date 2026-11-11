@@ -182,7 +182,7 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         int icon=AndroidUtilities.dp(24),x=Math.round(g.back.centerX()),y=Math.round(g.back.centerY());back.setBounds(x-icon/2,y-icon/2,x+icon/2,y+icon/2);
         int transform=canvas.save();if(g.rtl)canvas.scale(-1,1,g.back.centerX(),g.back.centerY());back.draw(canvas);canvas.restoreToCount(transform);
         x=Math.round(g.call.centerX());y=Math.round(g.call.centerY());fusion.phone.setBounds(x-icon/2,y-icon/2,x+icon/2,y+icon/2);fusion.phone.draw(canvas);
-        x=Math.round(g.more.centerX());y=Math.round(g.more.centerY());fusion.more.setBounds(x-icon/2,y-icon/2,x+icon/2,y+icon/2);transform=canvas.save();canvas.rotate(90,x,y);fusion.more.draw(canvas);canvas.restoreToCount(transform);
+        x=Math.round(g.more.centerX());y=Math.round(g.more.centerY());fusion.more.setBounds(x-icon/2,y-icon/2,x+icon/2,y+icon/2);transform=canvas.save();if(!app.flexygram.icons.ExactIcons.isEnabled())canvas.rotate(90,x,y);fusion.more.draw(canvas);canvas.restoreToCount(transform);
         fusion.surface.drawCenterBorder(canvas,g,edge,d);canvas.restoreToCount(outer);
     }
 

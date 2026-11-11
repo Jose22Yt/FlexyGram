@@ -25,4 +25,4 @@ def test_active_header_does_not_hide_controls_before_measure():
     controls = method(source, 'private void prepareFusionControls()')
     assert 'loadBitmap(getContext(),R.drawable.ic_ab_other)' in controls
     assert 'loadBitmap(getContext(),R.drawable.msg_callback)' in controls
-    assert 'signatureMore.setRotation(90)' in controls
+    assert 'signatureMore.setRotation(app.flexygram.icons.ExactIcons.isEnabled()?0:90)' in controls

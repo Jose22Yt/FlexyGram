@@ -14,6 +14,12 @@ def write_stubs(source, root):
         dest=source/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(text)
     for annotation in ('NonNull','Nullable'):
         put('androidx/annotation/'+annotation+'.java', 'package androidx.annotation; public @interface '+annotation+' {}')
+    # This fixture measures the pre-existing layout/fallback glyphs. Official source
+    # resources, sizes, tint isolation and direct controls have their own icon tests.
+    put('app/flexygram/icons/ExactIcons.java','package app.flexygram.icons;public class ExactIcons{public static android.graphics.drawable.Drawable direct(int id){return null;}}')
+    assets=(root/'TMessagesProj/src/main/java/app/flexygram/icons/IosOriginalAssets.java').read_text()
+    constants=re.findall(r'public static final int (\w+)=',assets)
+    put('app/flexygram/icons/IosOriginalAssets.java','package app.flexygram.icons;public class IosOriginalAssets{'+''.join(f'public static final int {n}={i+1};'for i,n in enumerate(constants))+'}')
     player=root/'TMessagesProj/src/main/java/app/exteraless/player'
     for name in PRODUCTION:
         put('app/exteraless/player/'+name+'.java',(player/(name+'.java')).read_text())

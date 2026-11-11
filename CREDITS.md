@@ -49,3 +49,9 @@ Este índice no sustituye los archivos `LICENSE`, `COPYING`, `NOTICE` ni los enc
 El repositorio mantiene [GNU GPL versión 3](LICENSE). Los avisos específicos de los archivos y componentes de terceros siguen siendo aplicables, incluidos los encabezados GPL v2 o posterior que existan en el código de origen.
 
 La autoría de las contribuciones permanece en el historial Git. Los nuevos componentes deben registrar fuente, revisión y licencia, además de incluir los avisos que correspondan en la distribución.
+
+## Iconos originales de Telegram para iOS (beta 41)
+
+Dibujos importados de [TelegramMessenger/Telegram-iOS](https://github.com/TelegramMessenger/Telegram-iOS/tree/24638bc69bd083981b178dd1e7f921eebbf7fc46), revisión `24638bc69bd083981b178dd1e7f921eebbf7fc46`. Se conservan archivos fuente y metadatos originales con SHA-256 y Git blob, junto al [README original](tools/ios_originals/UPSTREAM-README.md). La conversión a recursos Android conserva las geometrías o rasteriza el archivo original; no procede de Flutter Cupertino, SF Symbols recreados ni generación de imágenes.
+
+El [informe de importación](docs/icons/beta41-original-ios.md) detalla formatos, tamaños, roles y excepciones. Estos recursos no cambian el nombre ni el logotipo de FlexyGram. La revisión original no incluye un archivo LICENSE en la raíz; se mantiene su README y no se atribuye a Telegram una licencia nueva a través de esta conversión.

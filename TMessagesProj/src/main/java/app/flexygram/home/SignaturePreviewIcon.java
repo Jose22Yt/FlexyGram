@@ -117,6 +117,34 @@ public final class SignaturePreviewIcon extends ReplacementSpan {
         sharedIconPaint.setStrokeJoin(Paint.Join.ROUND);
     }
 
+    private static final android.graphics.drawable.Drawable[] originalIcons = new android.graphics.drawable.Drawable[28];
+    private static final int[] originalColors = new int[28];
+    private static final boolean[] originalTintSet = new boolean[28];
+    private static float originalDensity = -1;
+
+    private static boolean drawOriginal(Canvas canvas, int kind, float x, float y, float size, Paint ink) {
+        if (!app.flexygram.icons.ExactIcons.isEnabled()) return false;
+        if (originalDensity != AndroidUtilities.density) {
+            java.util.Arrays.fill(originalIcons, null);
+            java.util.Arrays.fill(originalTintSet, false);
+            originalDensity = AndroidUtilities.density;
+        }
+        android.graphics.drawable.Drawable icon = originalIcons[kind];
+        if (icon == null) {
+            icon = app.flexygram.icons.ExactIcons.direct(app.flexygram.icons.IosOriginalAssets.PREVIEW[kind]);
+            if (icon == null) return false;
+            originalIcons[kind] = icon;
+        }
+        if (!originalTintSet[kind] || originalColors[kind] != ink.getColor()) {
+            icon.setTint(ink.getColor()); originalColors[kind] = ink.getColor(); originalTintSet[kind] = true;
+        }
+        icon.setAlpha(ink.getAlpha());
+        int side = Math.round(size);
+        icon.setBounds(0, 0, side, side);
+        canvas.save(); canvas.translate(x, y); icon.draw(canvas); canvas.restore();
+        return true;
+    }
+
     private final int kind;
     public SignaturePreviewIcon(int kind) { this.kind = kind >= 1 && kind < ICONS.length ? kind : 1; }
     @Override public int getSize(Paint paint, CharSequence text, int start, int end, Paint.FontMetricsInt fm) { return AndroidUtilities.dp(16); }
@@ -126,6 +154,7 @@ public final class SignaturePreviewIcon extends ReplacementSpan {
     }
     public static void draw(Canvas c, int iconKind, float x, float y, float size, Paint p) {
         int index = iconKind >= 1 && iconKind < ICONS.length && ICONS[iconKind] != null ? iconKind : 1;
+        if (drawOriginal(c, index, x, y, size, p)) return;
         float factor = size / 12f;
         sharedIconPaint.setColor(p.getColor());
         sharedIconPaint.setAlpha(p.getAlpha());

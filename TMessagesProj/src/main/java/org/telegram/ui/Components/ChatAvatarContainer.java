@@ -891,7 +891,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         signaturePhotoMask = new app.flexygram.header.fusion.SignatureFusionAvatarMask();
         signaturePhotoClip = new android.graphics.Path();
         signatureMore = new android.widget.ImageView(getContext()); signatureMore.setImageDrawable(app.flexygram.icons.ConversationControlIcons.loadBitmap(getContext(),R.drawable.ic_ab_other));
-        signatureMore.setRotation(90); signatureMore.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+        signatureMore.setRotation(app.flexygram.icons.ExactIcons.isEnabled()?0:90); signatureMore.setScaleType(android.widget.ImageView.ScaleType.CENTER);
         signatureMore.setContentDescription(getString(R.string.AccDescrMoreOptions));
         signatureMore.setOnClickListener(v -> onSignatureOptionsClick());
         signatureCall = new android.widget.ImageView(getContext()); signatureCall.setImageDrawable(app.flexygram.icons.ConversationControlIcons.loadBitmap(getContext(),R.drawable.msg_callback));

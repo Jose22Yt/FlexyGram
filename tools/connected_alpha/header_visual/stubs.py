@@ -13,7 +13,7 @@ def write_stubs(source,root):
  spec=importlib.util.spec_from_file_location('header_music_services',root/'tools/connected_alpha/music_visual/stubs.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);m.write_stubs(source,root)
  def put(path,text):p=source/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
  # This geometry fixture deliberately excludes default-pack selection (covered by loader JVM tests).
- put('app/flexygram/icons/ExactIcons.java','package app.flexygram.icons;public class ExactIcons {public static android.graphics.drawable.Drawable create(android.content.res.Resources r,int id,int d,android.content.res.Resources.Theme t){return null;}}')
+ put('app/flexygram/icons/ExactIcons.java','package app.flexygram.icons;public class ExactIcons {public static boolean isEnabled(){return false;}public static android.graphics.drawable.Drawable create(android.content.res.Resources r,int id,int d,android.content.res.Resources.Theme t){return null;}}')
  put('app/flexygram/icons/ConversationControlIcons.java',(root/'TMessagesProj/src/main/java/app/flexygram/icons/ConversationControlIcons.java').read_text())
  folder=root/'TMessagesProj/src/main/java/app/flexygram/header'
  for name in ['HeaderConfig','HeaderGeometry','HeaderSurface','SignatureChatHeader','HeaderPreviewView']:put('app/flexygram/header/'+name+'.java',(folder/(name+'.java')).read_text())

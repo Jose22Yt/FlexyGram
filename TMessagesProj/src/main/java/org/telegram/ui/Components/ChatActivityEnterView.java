@@ -3591,7 +3591,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         cameraOutline.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_glass_defaultIcon), PorterDuff.Mode.MULTIPLY));
 
         if (ChatActivityEnterViewStaticIconView.isStaticIconsEnabled()) {
-            audioVideoSendButton = new ChatActivityEnterViewStaticIconView(context, this, 24) {
+            audioVideoSendButton = new ChatActivityEnterViewStaticIconView(context, this, app.flexygram.icons.ExactIcons.isEnabled() ? 30 : 24) {
                 private final Rect tmpRectF = new Rect();
                 @Override
                 public void draw(@NonNull Canvas canvas) {

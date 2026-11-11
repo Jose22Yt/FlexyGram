@@ -8,13 +8,18 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import app.flexygram.bubbles.interaction.BubbleActionPanelView.Action;
 
-/** Original rounded outline glyphs, drawn from cached paths without frame allocations. */
+/** Official iOS glyphs; legacy optional-pack geometry is retained as a fallback. */
 public final class BubbleMenuIcon extends Drawable {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path path = new Path();
     private final Action action;
+    private final Drawable original;
     public BubbleMenuIcon(Action action, int color) {
-        this.action = action; paint.setColor(color); paint.setStyle(Paint.Style.STROKE);
+        this.action = action;
+        original = app.flexygram.icons.ExactIcons.direct(originalAsset(action));
+        if (original != null) original.setTint(color);
+        paint.setColor(color); paint.setStyle(Paint.Style.STROKE);
+        if (original != null) return;
         paint.setStrokeWidth(1.75f); paint.setStrokeCap(Paint.Cap.ROUND); paint.setStrokeJoin(Paint.Join.ROUND);
         switch (action) {
             case REPLY: case FORWARD:
@@ -46,7 +51,24 @@ public final class BubbleMenuIcon extends Drawable {
                 path.moveTo(8,12.5f);path.lineTo(16,12.5f);break;
         }
     }
+    private static int originalAsset(Action action) {
+        switch (action) {
+            case REPLY: return org.telegram.messenger.R.drawable.fg_ios_original_chat_context_menu_reply;
+            case FORWARD: return org.telegram.messenger.R.drawable.fg_ios_original_chat_context_menu_forward;
+            case COPY: return org.telegram.messenger.R.drawable.fg_ios_original_chat_context_menu_copy;
+            case STICKER: return org.telegram.messenger.R.drawable.fg_ios_original_chat_context_menu_sticker;
+            case PIN: return org.telegram.messenger.R.drawable.fg_ios_original_chat_context_menu_pin;
+            case DELETE: return org.telegram.messenger.R.drawable.fg_ios_original_chat_context_menu_delete;
+            case EDIT: return org.telegram.messenger.R.drawable.fg_ios_original_chat_context_menu_edit;
+            case SELECT: return org.telegram.messenger.R.drawable.fg_ios_original_chat_context_menu_select;
+            case SAVE: return org.telegram.messenger.R.drawable.fg_ios_original_chat_context_menu_download;
+            case SHARE: return org.telegram.messenger.R.drawable.fg_ios_original_chat_context_menu_share;
+            case LINK: return org.telegram.messenger.R.drawable.fg_ios_original_chat_context_menu_link;
+            default: return app.flexygram.icons.IosOriginalAssets.MORE;
+        }
+    }
     @Override public void draw(Canvas canvas) {
+        if (original != null) { original.setBounds(getBounds()); original.draw(canvas); return; }
         int save = canvas.save();canvas.translate(getBounds().left,getBounds().top);canvas.scale(getBounds().width()/24f,getBounds().height()/24f);
         if(action==Action.FORWARD){canvas.translate(24,0);canvas.scale(-1,1);}
         canvas.drawPath(path,paint);
@@ -56,7 +78,7 @@ public final class BubbleMenuIcon extends Drawable {
         if(action==Action.MORE){canvas.drawCircle(5,12,.85f,paint);canvas.drawCircle(12,12,.85f,paint);canvas.drawCircle(19,12,.85f,paint);}
         canvas.restoreToCount(save);
     }
-    @Override public void setAlpha(int alpha){paint.setAlpha(alpha);invalidateSelf();}
-    @Override public void setColorFilter(ColorFilter filter){paint.setColorFilter(filter);invalidateSelf();}
+    @Override public void setAlpha(int alpha){paint.setAlpha(alpha);if(original!=null)original.setAlpha(alpha);invalidateSelf();}
+    @Override public void setColorFilter(ColorFilter filter){paint.setColorFilter(filter);if(original!=null)original.setColorFilter(filter);invalidateSelf();}
     @Override public int getOpacity(){return PixelFormat.TRANSLUCENT;}
 }

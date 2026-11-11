@@ -83,7 +83,7 @@ public final class BaseIconPacks {
         if (type == BASE_REMIX) {
             return "Remix Icon";
         }
-        return type == BASE_CUPERTINO ? "Cupertino Icons" : org.telegram.messenger.LocaleController.getString(R.string.Default);
+        return type == BASE_CUPERTINO ? "Telegram iOS" : org.telegram.messenger.LocaleController.getString(R.string.Default);
     }
 
     /** Автор набора ({@code BaseIconPacks.java:1192}). */
@@ -94,7 +94,7 @@ public final class BaseIconPacks {
         if (type == BASE_REMIX) {
             return "Remix-Design";
         }
-        return type == BASE_CUPERTINO ? "Vladimir Kharlampidi · MIT" : "FlexyGram";
+        return type == BASE_CUPERTINO ? "Telegram" : "Telegram iOS · FlexyGram";
     }
 
     /** Карта выбранного набора или null, если подмены нет. */

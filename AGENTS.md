@@ -9,7 +9,7 @@
 
 - **Nombre de la Aplicación:** FlexyGram
 - **Package Name (ID de Android):** `com.flexygram.messenger`
-- **Versión Activa Oficial:** Definida dinámicamente en `gradle.properties` (`BETA_VERSION_NAME` y `BETA_VERSION_CODE`, actualmente `1.0.0-beta.40` / Build `1329`)
+- **Versión Activa Oficial:** Definida dinámicamente en `gradle.properties` (`BETA_VERSION_NAME` y `BETA_VERSION_CODE`, actualmente `1.0.0-beta.41` / Build `1330`)
 - **Rama Oficial de Desarrollo:** `codex/flexygram-beta-glass`
 - **Repositorio Oficial:** `https://github.com/Jose22Yt/FlexyGram`
 - **Huella Digital del Certificado Oficial (SHA-256):**

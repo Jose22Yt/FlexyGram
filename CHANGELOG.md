@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.0.0-beta.41 — preparación, build 1330
+
+- Se sustituyen las hojas anteriores por 235 recursos originales de Telegram-iOS, revisión `24638bc69bd083981b178dd1e7f921eebbf7fc46`, con 1.566 asociaciones semánticas y trazabilidad de cada archivo.
+- Navegación, conversaciones, ajustes, menús, llamadas, edición y reproductor utilizan originales donde existe una asociación verificada. La opción Cupertino anterior usa la misma importación oficial.
+- Dimensiones originales en puntos trasladadas a dp, densidades de Android y proporciones conservadas; sin estirar símbolos en botones grandes. Sticker de esquina doblada y teclado mantienen estados distintos.
+- Pestañas, menús de burbujas, controles musicales, flecha de navegación y vistas previas dejan de dibujar aproximaciones para los roles importados. Se conservan las áreas táctiles y los tiempos de FlexyGram.
+- Recursos nativos con caché y estado independiente por control: 952.054 bytes de dibujos empaquetados, frente a 1.300.230 bytes de las hojas previas. Sin PDF, conversión ni reproducción Lottie nueva durante el dibujo.
+- Alcance y excepciones documentados: no se certifica un port completo de iOS 27. 483 asociaciones del catálogo antiguo quedan con su recurso existente al no haberse establecido un equivalente exacto. Sin compilar APK.
+
 ## 1.0.0-beta.40 — preparación, build 1329
 
 - Composer compacto: una única pasada del material nativo por cápsula/botón, igual que la cabecera. Se retira el tinte secundario que aplanaba visualmente el blur y la refracción de Liquid Glass.

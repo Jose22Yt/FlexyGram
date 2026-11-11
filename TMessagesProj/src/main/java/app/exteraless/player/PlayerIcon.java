@@ -42,16 +42,38 @@ public class PlayerIcon extends Drawable {
     private final Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final int size;
     private boolean fillStroke;
+    private final Drawable original;
 
     public PlayerIcon(String stroke, String fill, int sizeDp) {
-        strokePath = stroke == null ? null : path(stroke);
-        fillPath = fill == null ? null : path(fill);
+        int asset=originalAsset(stroke!=null?stroke:fill);
+        original=asset==0?null:app.flexygram.icons.ExactIcons.direct(asset);
+        strokePath = original!=null||stroke==null?null:path(stroke);
+        fillPath = original!=null||fill==null?null:path(fill);
         size = AndroidUtilities.dp(sizeDp);
         strokePaint.setStyle(Paint.Style.STROKE);
         strokePaint.setStrokeCap(Paint.Cap.ROUND);
         strokePaint.setStrokeJoin(Paint.Join.ROUND);
         strokePaint.setStrokeWidth(2f);
         fillPaint.setStyle(Paint.Style.FILL);
+    }
+
+    private static int originalAsset(String path) {
+        if(CHEVRON_DOWN.equals(path))return app.flexygram.icons.IosOriginalAssets.CHEVRON_DOWN;
+        if(MORE.equals(path))return app.flexygram.icons.IosOriginalAssets.MORE;
+        if(HEART.equals(path))return app.flexygram.icons.IosOriginalAssets.HEART;
+        if(SHUFFLE.equals(path))return app.flexygram.icons.IosOriginalAssets.SHUFFLE;
+        if(REPEAT.equals(path))return app.flexygram.icons.IosOriginalAssets.REPEAT;
+        if(PREV.equals(path))return app.flexygram.icons.IosOriginalAssets.PREV;
+        if(NEXT.equals(path))return app.flexygram.icons.IosOriginalAssets.NEXT;
+        if(PLAY.equals(path))return app.flexygram.icons.IosOriginalAssets.PLAY;
+        if(PAUSE.equals(path))return app.flexygram.icons.IosOriginalAssets.PAUSE;
+        if(TIMER.equals(path))return app.flexygram.icons.IosOriginalAssets.TIMER;
+        if(SPEED.equals(path))return app.flexygram.icons.IosOriginalAssets.SPEED;
+        if(LYRICS.equals(path))return app.flexygram.icons.IosOriginalAssets.LYRICS;
+        if(QUEUE.equals(path))return app.flexygram.icons.IosOriginalAssets.QUEUE;
+        if(NOTE.equals(path))return app.flexygram.icons.IosOriginalAssets.NOTE;
+        if(CLOSE.equals(path))return app.flexygram.icons.IosOriginalAssets.CLOSE;
+        return 0;
     }
 
     public static PlayerIcon stroke(String d, int sizeDp) {
@@ -86,6 +108,7 @@ public class PlayerIcon extends Drawable {
         if (strokePaint.getColor() != color || fillPaint.getColor() != color) {
             strokePaint.setColor(color);
             fillPaint.setColor(color);
+            if(original!=null)original.setTint(color);
             invalidateSelf();
         }
     }
@@ -99,6 +122,7 @@ public class PlayerIcon extends Drawable {
 
     @Override
     public void draw(@NonNull Canvas canvas) {
+        if(original!=null){original.setBounds(getBounds());original.draw(canvas);return;}
         Rect b = getBounds();
         canvas.save();
         canvas.translate(b.centerX() - size / 2f, b.centerY() - size / 2f);
@@ -121,6 +145,7 @@ public class PlayerIcon extends Drawable {
         int a = Math.max(0, Math.min(255, alpha));
         strokePaint.setAlpha(a);
         fillPaint.setAlpha(a);
+        if(original!=null)original.setAlpha(a);
         invalidateSelf();
     }
 
@@ -128,6 +153,7 @@ public class PlayerIcon extends Drawable {
     public void setColorFilter(@Nullable ColorFilter colorFilter) {
         strokePaint.setColorFilter(colorFilter);
         fillPaint.setColorFilter(colorFilter);
+        if(original!=null)original.setColorFilter(colorFilter);
     }
 
     @Override
@@ -137,11 +163,11 @@ public class PlayerIcon extends Drawable {
 
     @Override
     public int getIntrinsicWidth() {
-        return size;
+        return original!=null?original.getIntrinsicWidth():size;
     }
 
     @Override
     public int getIntrinsicHeight() {
-        return size;
+        return original!=null?original.getIntrinsicHeight():size;
     }
 }
