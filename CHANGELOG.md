@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.0.0-beta.50 — build 1339
+
+- Se retiran completamente la isla de notificaciones y Camera Pop: vistas, animaciones, índices, temporizadores, ajustes, recursos y enlaces de ciclo de vida.
+- Se restaura el flujo normal de notificaciones de Telegram/Android, sin filtros de isla ni desvío de avisos. Los antiguos valores Solo isla ya no afectan al funcionamiento.
+- Apertura de chats: las solicitudes simultáneas del mismo interlocutor comparten una lectura de almacenamiento y conservan sus callbacks.
+- Los resultados tardíos se descartan si la cuenta cerró sesión, cambió de propietario o se recreó su controlador. Los datos recientes de la caché tienen prioridad sobre una instantánea más antigua de disco.
+- Los callbacks y observadores temporales de precarga se liberan al cerrar sesión, incluso si la cola antigua se detuvo. Se permite reintentar una carga fallida sin dejar una solicitud bloqueada.
+- Se conservan iconos, reproductor, pantalla principal por defecto y optimizaciones anteriores. Compilación oficial solicitada sin supervisión posterior.
+
 ## 1.0.0-beta.49 — preparación, build 1338
 
 - Camera Pop evoluciona a una isla de notificaciones compacta, anclada al recorte real de cámara y con contadores agregados de chats/mensajes.

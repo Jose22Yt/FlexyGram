@@ -3,14 +3,16 @@ from test_composer_layout import method
 from test_render_work_reuse import JAVA, probe
 
 
-def test_cold_chat_open_reads_off_ui_and_keeps_accounts_and_peer_types_separate(tmp_path):
-    files = {
+def peer_preload_hosts():
+    return {
         'android/os/Bundle.java': '''package android.os;public class Bundle {
  public long chat,user;public int enc;public long getLong(String k,long d){return k.equals("chat_id")?chat:user;}
  public int getInt(String k,int d){return enc;}}''',
         'org/telegram/tgnet/TLRPC.java': '''package org.telegram.tgnet;public class TLRPC {
  public static class Chat {public long id;}public static class User {public long id;}
  public static class EncryptedChat {public int id;public long user_id;}}''',
+        'org/telegram/messenger/NotificationCenter.java': '''package org.telegram.messenger;import java.util.*;public class NotificationCenter{public static final int appDidLogout=1;public interface NotificationCenterDelegate{void didReceivedNotification(int event,int account,Object...args);}static final NotificationCenter[]all={new NotificationCenter(0),new NotificationCenter(1)};final int account;NotificationCenter(int a){account=a;}public final Set<NotificationCenterDelegate>observers=new HashSet<>();public static NotificationCenter getInstance(int a){return all[a];}public void addObserver(NotificationCenterDelegate d,int e){observers.add(d);}public void removeObserver(NotificationCenterDelegate d,int e){observers.remove(d);}public void logout(){for(var d:new ArrayList<>(observers))d.didReceivedNotification(appDidLogout,account);}}''',
+        'org/telegram/messenger/UserConfig.java': '''package org.telegram.messenger;public class UserConfig{public long owner=1000;public boolean active=true;static final UserConfig[]all={new UserConfig(),new UserConfig()};public static UserConfig getInstance(int a){return all[a];}public long getClientUserId(){return owner;}public boolean isClientActivated(){return active;}}''',
         'org/telegram/messenger/AndroidUtilities.java': '''package org.telegram.messenger;public class AndroidUtilities {
  public static Runnable ui;public static void runOnUIThread(Runnable r){ui=r;}}''',
         'org/telegram/messenger/FileLog.java': 'package org.telegram.messenger;public class FileLog {public static void e(Exception e){}}',
@@ -54,6 +56,10 @@ public class Probe {
  }
 }'''
     }
+
+
+def test_cold_chat_open_reads_off_ui_and_keeps_accounts_and_peer_types_separate(tmp_path):
+    files=peer_preload_hosts()
     probe(tmp_path, files, [JAVA/'app/flexygram/performance/ChatPeerPreloader.java'])
     dialogs = (JAVA/'org/telegram/ui/DialogsActivity.java').read_text()
     opening = method(dialogs, 'public boolean presentFragment(BaseFragment fragment)')

@@ -1,5 +1,7 @@
 # Beta 48 — avisos reales e independencia de notificaciones del sistema
 
+> Histórico: esta función se retiró completamente en beta 50. No describe la versión actual.
+
 ## Problemas corregidos
 
 En beta 47 Camera Pop dependía de un puente dentro de NotificationsController,

@@ -1,5 +1,7 @@
 # Beta 47 — FlexyBubble Camera Pop
 
+> Histórico: esta función se retiró completamente en beta 50. No describe la versión actual.
+
 Implementación interna opcional, apagada inicialmente. Parte de beta 46, conservando
 el inicio optimizado, las animaciones anteriores y la pantalla principal por defecto.
 

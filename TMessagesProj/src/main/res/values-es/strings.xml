@@ -1318,34 +1318,4 @@
     <string name="Understood">👍 Entendido</string>
     <string name="FlexyFolderThemeAccent">Usar acento del tema en carpeta activa</string>
 
-    <!-- FlexyBubble Camera Pop: internal, opt-in message reminders. -->
-    <string name="CameraPopTitle">Isla de notificaciones</string>
-    <string name="CameraPopEnabled">Activar isla de notificaciones</string>
-    <string name="CameraPopSelected">Chats y contactos seleccionados</string>
-    <string name="CameraPopImmediate">Avisos inmediatos</string>
-    <string name="CameraPopReminders">Recordatorios de mensajes sin leer</string>
-    <string name="CameraPopInterval">Intervalo de recordatorio</string>
-    <string name="CameraPopDuration">Tiempo visible de la isla</string>
-    <string name="CameraPopNames">Mostrar nombres y fotos de perfil</string>
-    <string name="CameraPopRespectMuted">Respetar chats silenciados</string>
-    <string name="CameraPopQuiet">Horario de silencio</string>
-    <string name="CameraPopQuietStart">Inicio del silencio</string>
-    <string name="CameraPopQuietEnd">Fin del silencio</string>
-    <string name="CameraPopDemo">Demostración con datos ficticios</string>
-    <string name="CameraPopDemoName">Demostración de Camera Pop</string>
-    <string name="CameraPopDemoMessage">Tienes 2 mensajes sin leer. Es una demostración.</string>
-    <string name="CameraPopPrivateName">Mensajes pendientes</string>
-    <string name="CameraPopUnread_one">%d mensaje sin leer</string>
-    <string name="CameraPopUnread_other">%d mensajes sin leer</string>
-    <string name="CameraPopInfo">Toca la isla para desplegar los chats pendientes y toca un chat para abrirlo. Puede incluir todos los chats o solo los elegidos. La permanencia mantiene la isla mientras haya mensajes sin leer. La lista desplegada pausa el ocultado automático. Con FlexyGram visible, los avisos de mensajes usan la isla; en segundo plano vuelven a Android. Solo isla desactiva los avisos Android de mensajes también en segundo plano: fuera de FlexyGram no habrá avisos visibles de mensajes. Llamadas, reproducción y otros avisos esenciales conservan sus controles normales. Se mantienen privacidad, silenciamientos explícitos y horario de silencio.</string>
-    <string name="CameraPopAllChats">Todos los chats</string>
-    <string name="CameraPopOnlyIsland">Solo isla</string>
-    <string name="CameraPopPermanent">Mientras haya mensajes pendientes</string>
-    <string name="CameraPopCustomDuration">Duración personalizada</string>
-    <string name="CameraPopDurationRange">Elige entre 1 y 300 segundos.</string>
-    <string name="CameraPopCollapse">Recoger lista de chats</string>
-    <string name="CameraPopExpand">Toca para ver los chats pendientes</string>
-    <string name="CameraPopChats_one">%d chat</string>
-    <string name="CameraPopChats_other">%d chats</string>
-    <string name="CameraPopOnlyIslandInfo">También oculta los avisos Android de mensajes fuera de FlexyGram.</string>
 </resources>

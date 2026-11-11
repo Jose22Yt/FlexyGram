@@ -18,7 +18,6 @@ final class Settings3LinksSection extends SignatureMatteSettingsActivity {
     @Override protected void onItemClick(View view,int p,float x,float y){
         BaseFragment f;
         switch(ids[p]){
-            case "camera_pop":f=new app.flexygram.camerapop.CameraPopSettingsActivity();break;
             case "composer_style":f=new ConversationStyleSettingsActivity(false);break;
             case "header_style":f=new ConversationStyleSettingsActivity(true);break;
             case "bubble_style":f=new app.flexygram.bubbles.BubbleSettingsActivity();break;

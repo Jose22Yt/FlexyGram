@@ -47,7 +47,6 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
     private void build(){
         switch(category){
             case "chat":
-                links(new String[]{"camera_pop"},new int[]{R.string.CameraPopTitle},new int[]{R.drawable.fg_settings_chats});
                 links(new String[]{"composer_style","header_style","bubble_style","context"},new int[]{R.string.FlexyInterfaceLower,R.string.FlexyInterfaceUpper,R.string.FlexyBubblesTitle,R.string.FlexyMenuTitle},new int[]{R.drawable.fg_settings_chats,R.drawable.fg_settings_estilo_de_interfaz,R.drawable.fg_settings_chats,R.drawable.fg_settings_chats});
                 add(new app.flexygram.effects.GlareSettingsSection());
                 add(new app.flexygram.memberlens.MemberLensSettingsSection());

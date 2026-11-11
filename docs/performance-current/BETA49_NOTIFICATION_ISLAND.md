@@ -1,5 +1,7 @@
 # Beta 49 — isla de notificaciones interna
 
+> Histórico: esta función se retiró completamente en beta 50. No describe la versión actual.
+
 ## Comportamiento
 
 Ajustes de FlexyGram → Conversaciones → Isla de notificaciones. El interruptor

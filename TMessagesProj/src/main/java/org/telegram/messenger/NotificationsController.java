@@ -3430,18 +3430,16 @@ public class NotificationsController extends BaseController implements Notificat
     }
 
     public void hideNotifications() {
-        notificationsQueue.postRunnable(this::hideNotificationSurfaces);
-    }
-
-    private void hideNotificationSurfaces() {
-        notificationManager.cancel(notificationId);
-        lastWearNotifiedMessageId.clear();
-        for (int a = 0; a < wearNotificationsIds.size(); a++) {
-            notificationManager.cancel(wearNotificationsIds.valueAt(a));
-        }
-        wearNotificationsIds.clear();
-        NotificationsHelper.clearPostedSignatures(currentAccount);
-        NotificationsHelper.saveWearNotificationIds(currentAccount, wearNotificationsIds);
+        notificationsQueue.postRunnable(() -> {
+            notificationManager.cancel(notificationId);
+            lastWearNotifiedMessageId.clear();
+            for (int a = 0; a < wearNotificationsIds.size(); a++) {
+                notificationManager.cancel(wearNotificationsIds.valueAt(a));
+            }
+            wearNotificationsIds.clear();
+            NotificationsHelper.clearPostedSignatures(currentAccount);
+            NotificationsHelper.saveWearNotificationIds(currentAccount, wearNotificationsIds);
+        });
     }
 
     private void dismissNotification() {
@@ -4495,42 +4493,10 @@ public class NotificationsController extends BaseController implements Notificat
         }
     }
 
-    /** Filter only presentation; retain native unread/dedup state for background restoration. */
-    private ArrayList<MessageObject> islandVisibleMessages() {
-        if (!app.flexygram.camerapop.CameraPopRuntime.filtersAndroid(currentAccount)) return pushMessages;
-        ArrayList<MessageObject> visible = null;
-        for (int i = 0; i < pushMessages.size(); i++) {
-            MessageObject message = pushMessages.get(i);
-            if (app.flexygram.camerapop.CameraPopRuntime.routesToIsland(currentAccount, message)) {
-                if (visible == null) visible = new ArrayList<>(pushMessages.subList(0, i));
-            } else if (visible != null) visible.add(message);
-        }
-        return visible == null ? pushMessages : visible;
-    }
-
     private void showOrUpdateNotification(boolean notifyAboutLast) {
         if (!getUserConfig().isClientActivated() || pushMessages.isEmpty() && storyPushMessages.isEmpty() || PasscodeHelper.isAccountHidden(currentAccount) || !SharedConfig.showNotificationsForAllAccounts && currentAccount != UserConfig.selectedAccount) {
             dismissNotification();
             return;
-        }
-        ArrayList<MessageObject> pushMessages = islandVisibleMessages();
-        if (pushMessages.isEmpty() && storyPushMessages.isEmpty()) {
-            // Do not call dismissNotification(): it erases the native pending queue.
-            hideNotificationSurfaces();
-            return;
-        }
-        LongSparseArray<Integer> pushDialogs = this.pushDialogs;
-        int total_unread_count = this.total_unread_count;
-        if (pushMessages != this.pushMessages) {
-            pushDialogs = new LongSparseArray<>();total_unread_count = 0;
-            for (MessageObject message : pushMessages) {
-                long dialog = message.getDialogId();
-                if (pushDialogs.indexOfKey(dialog) < 0) {
-                    Integer count = this.pushDialogs.get(dialog);
-                    int unread = count == null ? 1 : count;
-                    pushDialogs.put(dialog, unread);total_unread_count += unread;
-                }
-            }
         }
         try {
             getConnectionsManager().resumeNetworkMaybe();
@@ -5121,7 +5087,6 @@ public class NotificationsController extends BaseController implements Notificat
 
     @SuppressLint("InlinedApi")
     private void showExtraNotifications(NotificationCompat.Builder notificationBuilder, String summary, long lastDialogId, long lastTopicId, String chatName, long[] vibrationPattern, int ledColor, Uri sound, int importance, boolean isDefault, boolean isInApp, boolean isSilent, int chatType) {
-        ArrayList<MessageObject> pushMessages = islandVisibleMessages();
         FileLog.d("showExtraNotifications pushMessages.size()=" + pushMessages.size());
         if (Build.VERSION.SDK_INT >= 26) {
             notificationBuilder.setChannelId(validateChannelId(lastDialogId, lastTopicId, chatName, vibrationPattern, ledColor, sound, importance, isDefault, isInApp, isSilent, chatType));
