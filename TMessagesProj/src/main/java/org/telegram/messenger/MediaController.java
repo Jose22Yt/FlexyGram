@@ -1583,8 +1583,8 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                 NotificationCenter.getInstance(a).addObserver(MediaController.this, NotificationCenter.musicDidLoad);
                 NotificationCenter.getInstance(a).addObserver(MediaController.this, NotificationCenter.mediaDidLoad);
                 NotificationCenter.getInstance(a).addObserver(MediaController.this, NotificationCenter.musicListLoaded);
-                NotificationCenter.getGlobalInstance().addObserver(MediaController.this, NotificationCenter.playerDidStartPlaying);
             }
+            NotificationCenter.getGlobalInstance().addObserver(MediaController.this, NotificationCenter.playerDidStartPlaying);
         });
 
         mediaProjections = new String[]{
@@ -1597,6 +1597,12 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                 MediaStore.Images.ImageColumns.HEIGHT
         };
 
+        // MediaStore registration uses binder. It is independent of first-frame/player UI setup.
+        // Screenshot/media-security observers in startMediaObserver remain on their existing path.
+        Utilities.globalQueue.postRunnable(this::registerGalleryObservers);
+    }
+
+    private void registerGalleryObservers() {
         ContentResolver contentResolver = ApplicationLoader.applicationContext.getContentResolver();
         try {
             contentResolver.registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, true, new GalleryObserverExternal());

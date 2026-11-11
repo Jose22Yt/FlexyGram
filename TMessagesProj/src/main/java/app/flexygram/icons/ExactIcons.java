@@ -13,11 +13,13 @@ public final class ExactIcons {
     public static boolean isEnabled() { int selected=BaseIconPacks.getSelected(); return selected==BaseIconPacks.BASE_DEFAULT||selected==BaseIconPacks.BASE_CUPERTINO; }
 
     public static Drawable create(Resources resources,int id,int density,Resources.Theme theme) {
-        ExactIconMap.Entry entry=ExactIconMap.get(id);
-        if(entry==null||!isEnabled())return null;
+        if(id<=0)return null;
+        long record=ExactIconMap.find(id);
+        // Unrelated resources must not force preference/config initialization during startup.
+        if(record==0||!isEnabled())return null;
         // Source IDs are excluded from the alias map, so this lookup terminates.
-        Drawable icon=original(resources,entry.asset,density,theme);
-        icon.setTint(entry.color);icon.setAutoMirrored(entry.mirrored);
+        Drawable icon=original(resources,ExactIconMap.asset(record),density,theme);
+        icon.setTint(ExactIconMap.color(record));icon.setAutoMirrored(ExactIconMap.mirrored(record));
         return icon;
     }
     private static Drawable original(Resources resources,int asset,int density,Resources.Theme theme) {

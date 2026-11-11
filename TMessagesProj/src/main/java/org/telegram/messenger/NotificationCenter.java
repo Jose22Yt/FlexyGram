@@ -533,9 +533,11 @@ public class NotificationCenter {
                 onAnimationFinish(expiredIndices.get(i));
             }
         }
-        if (minTime != Long.MAX_VALUE) {
+        if (minTime != Long.MAX_VALUE && checkForExpiredNotifications == null && allowedNotifications.size() > 0) {
             long time = EXPIRE_NOTIFICATIONS_TIME - (currentTime - minTime);
-            AndroidUtilities.runOnUIThread(() -> checkForExpiredNotifications = this::checkForExpiredNotifications, Math.max(17, time));
+            // Schedule the checker itself. A lambda assigning it never expires the remaining leases.
+            // A notification callback may already have registered the next checker while draining.
+            AndroidUtilities.runOnUIThread(checkForExpiredNotifications = this::checkForExpiredNotifications, Math.max(17, time));
         }
     }
 

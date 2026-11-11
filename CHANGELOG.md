@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.0.0-beta.42 — preparación, build 1331
+
+- Arranque UI: cero y la cuenta seleccionada preparan sus controladores antes del contenido; las demás sesiones activas se distribuyen por la cola de frames existente. Entradas de servicio y cierres de sesión durante la espera mantienen un camino explícito.
+- Galería: los cuatro registros binder de MediaStore pasan a la cola de trabajo; la suscripción global del reproductor deja de repetirse por cuenta.
+- Proxy: se cancela el ping periódico al estar desactivado o no haber servidor seleccionado; reanudación por cambios nativos de configuración.
+- Iconos: tabla primitiva compacta, sin crear 1.566 objetos de metadatos al cargar; originales, tamaños, tintes y asociaciones conservados.
+- Notificaciones: se corrige la reprogramación del comprobador de retenciones de animación, con cancelación y reentrancia sin callbacks duplicados.
+- Regresiones de orden, sesiones, worker, proxy y expiración; medición de asignación inicial del mapa en JVM. Sin APK de esta revisión.
+
 ## 1.0.0-beta.41 — preparación, build 1330
 
 - Se sustituyen las hojas anteriores por 235 recursos originales de Telegram-iOS, revisión `24638bc69bd083981b178dd1e7f921eebbf7fc46`, con 1.566 asociaciones semánticas y trazabilidad de cada archivo.

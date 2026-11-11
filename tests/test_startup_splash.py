@@ -161,6 +161,7 @@ def test_account_services_are_spread_across_frames_and_headless_stays_immediate(
  static List<String> calls=new ArrayList<>();static class Handler{List<Runnable> queue=new ArrayList<>();void post(Runnable r){queue.add(r);}void run(){var copy=new ArrayList<>(queue);queue.clear();for(var r:copy)r.run();}}
  static Handler applicationHandler=new Handler();
  static class UserConfig{static final int MAX_ACCOUNT_COUNT=4;int account;static UserConfig getInstance(int a){var v=new UserConfig();v.account=a;return v;}boolean isClientActivated(){return account==1||account==3;}}
+ static void initializeDeferredStartupAccount(int account){} // No deferred core sessions in this legacy service-order fixture.
  static class MediaController{static void getInstance(){calls.add("media");}}
  static class ContactsController{int account;static ContactsController getInstance(int a){var v=new ContactsController();v.account=a;return v;}void checkAppAccount(){calls.add("contacts"+account);}}
  static class DownloadController{static void getInstance(int a){calls.add("downloads"+a);}}

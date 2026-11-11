@@ -9,7 +9,7 @@ def fixtures():
     fields=''.join(f'public static int {n}={len(names)-i+100};'for i,n in enumerate(names))
     return {
 'org/telegram/messenger/R.java':'package org.telegram.messenger;public class R{public static class drawable{'+fields+'}}',
-'app/exteraless/icons/BaseIconPacks.java':'package app.exteraless.icons;public class BaseIconPacks{public static int BASE_DEFAULT=0,BASE_CUPERTINO=3,selected;public static int getSelected(){return selected;}}',
+'app/exteraless/icons/BaseIconPacks.java':'package app.exteraless.icons;public class BaseIconPacks{public static int BASE_DEFAULT=0,BASE_CUPERTINO=3,selected,reads;public static int getSelected(){reads++;return selected;}}',
 'org/telegram/messenger/ApplicationLoader.java':'package org.telegram.messenger;public class ApplicationLoader{public static android.content.Context applicationContext=new android.content.Context();}',
 'android/content/Context.java':'package android.content;public class Context{public android.content.res.Resources getResources(){return new android.content.res.Resources();}public android.content.res.Resources.Theme getTheme(){return null;}}',
 'android/content/res/ColorStateList.java':'package android.content.res;public class ColorStateList{}',

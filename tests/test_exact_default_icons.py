@@ -140,7 +140,9 @@ public class Probe {
   Drawable rectangle=ExactIcons.create(r,R.drawable.input_attach,0,null);check(rectangle.getIntrinsicWidth()==60&&rectangle.getIntrinsicHeight()==40);
   rectangle.setBounds(0,0,30,30);rectangle.draw(c);check(c.last.getBounds().width()==30&&c.last.getBounds().height()==20&&c.last.getBounds().top==5);
   rectangle.setBounds(0,0,120,120);rectangle.draw(c);check(c.last.getBounds().width()==60&&c.last.getBounds().height()==40);
+  int reads=BaseIconPacks.reads;
   check(ExactIcons.create(r,0,0,null)==null&&ExactIcons.create(r,-1,0,null)==null&&ExactIcons.create(r,R.drawable.fg_ios_original_animation_input_anim_keytosticker_json,0,null)==null);
+  check(BaseIconPacks.reads==reads); // Source/unrelated IDs never touch configuration.
   BaseIconPacks.selected=3;check(ExactIcons.create(r,R.drawable.input_smile,0,null)!=null);
   for(int type=1;type<=2;type++){BaseIconPacks.selected=type;check(ExactIcons.create(r,R.drawable.input_smile,0,null)==null&&ExactIcons.direct(R.drawable.input_smile)==null);}
  }

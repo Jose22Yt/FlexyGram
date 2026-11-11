@@ -1,0 +1,109 @@
+{
+  "baseline_commit": "c68627aba75861f4a9d3fac611f810406845344d",
+  "scope": "Isolated host JVM metadata lookup with non-final synthetic R IDs, not Android startup, frame timing or device memory.",
+  "java": "openjdk version \"21.0.13\" 2026-10-20",
+  "baseline": {
+    "samples": [
+      {
+        "init_alloc_bytes": 295264,
+        "init_nanos": 12462791,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 10064893
+      },
+      {
+        "init_alloc_bytes": 295264,
+        "init_nanos": 11857770,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 11904861
+      },
+      {
+        "init_alloc_bytes": 295264,
+        "init_nanos": 12970785,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 9572513
+      },
+      {
+        "init_alloc_bytes": 295264,
+        "init_nanos": 11875567,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 9501365
+      },
+      {
+        "init_alloc_bytes": 295264,
+        "init_nanos": 12694329,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 10776164
+      },
+      {
+        "init_alloc_bytes": 295264,
+        "init_nanos": 12081927,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 10590363
+      },
+      {
+        "init_alloc_bytes": 295264,
+        "init_nanos": 12756733,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 9851943
+      }
+    ],
+    "median": {
+      "init_alloc_bytes": 295264,
+      "init_nanos": 12462791,
+      "million_lookup_alloc_bytes": 0,
+      "million_lookup_nanos": 10064893
+    }
+  },
+  "current": {
+    "samples": [
+      {
+        "init_alloc_bytes": 245336,
+        "init_nanos": 11992654,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 11369926
+      },
+      {
+        "init_alloc_bytes": 245336,
+        "init_nanos": 11937560,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 13294181
+      },
+      {
+        "init_alloc_bytes": 245336,
+        "init_nanos": 12176931,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 21086936
+      },
+      {
+        "init_alloc_bytes": 245336,
+        "init_nanos": 10819909,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 14595259
+      },
+      {
+        "init_alloc_bytes": 245336,
+        "init_nanos": 12760668,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 13427171
+      },
+      {
+        "init_alloc_bytes": 245336,
+        "init_nanos": 10539938,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 11930701
+      },
+      {
+        "init_alloc_bytes": 245336,
+        "init_nanos": 12168899,
+        "million_lookup_alloc_bytes": 0,
+        "million_lookup_nanos": 11546013
+      }
+    ],
+    "median": {
+      "init_alloc_bytes": 245336,
+      "init_nanos": 11992654,
+      "million_lookup_alloc_bytes": 0,
+      "million_lookup_nanos": 13294181
+    }
+  }
+}

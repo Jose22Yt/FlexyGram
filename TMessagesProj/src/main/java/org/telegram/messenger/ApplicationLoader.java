@@ -86,6 +86,13 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
 
     private static ConnectivityManager connectivityManager;
     private static volatile boolean applicationInited = false;
+    // UI-owned flags; the count also lets a background entry request immediate draining.
+    private static final boolean[] deferredStartupAccounts = new boolean[UserConfig.MAX_ACCOUNT_COUNT];
+    private static volatile int deferredStartupAccountCount;
+    private static final class PendingStartupAccounts {
+        static final app.flexygram.performance.CoalescedTask DRAIN = new app.flexygram.performance.CoalescedTask(
+                AndroidUtilities::runOnUIThread, ApplicationLoader::initializePendingStartupAccounts);
+    }
     private static volatile  ConnectivityManager.NetworkCallback networkCallback;
     private static volatile long lastNetworkCheckTypeTime;
     private static volatile int lastKnownNetworkType = -1;
@@ -236,6 +243,8 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         if (applicationContext == null) return;
         if (applicationInited) {
             if (prepareDialogs) prepareSelectedDialogs();
+            else if (deferredStartupAccountCount != 0)
+                PendingStartupAccounts.DRAIN.request();
             return;
         }
         android.os.Trace.beginSection("Flexy.startup.post_init");
@@ -319,28 +328,22 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         // Account zero must load first: it owns the persisted selectedAccount preference.
         UserConfig.getInstance(0).loadConfig();
         final int startupAccount = UserConfig.selectedAccount;
+        final boolean uiStartup = prepareDialogs && android.os.Looper.myLooper() == android.os.Looper.getMainLooper();
         for (int position = 0; position < UserConfig.MAX_ACCOUNT_COUNT; position++) {
             final int a = app.flexygram.performance.StartupAccounts.accountAt(position, startupAccount, UserConfig.MAX_ACCOUNT_COUNT);
             // Account zero was loaded above to resolve selectedAccount; do not read it twice.
             if (a != 0) UserConfig.getInstance(a).loadConfig();
             if (!app.flexygram.performance.StartupAccounts.needsControllers(a, startupAccount,
                     UserConfig.getInstance(a).isClientActivated())) continue;
-            MessagesController.getInstance(a);
-            if (a == 0) {
-                SharedConfig.pushStringStatus = "__FIREBASE_GENERATING_SINCE_" + ConnectionsManager.getInstance(a).getCurrentTime() + "__";
+            if (uiStartup && a != 0 && a != startupAccount) {
+                deferredStartupAccounts[a] = true;
+                deferredStartupAccountCount++;
             } else {
-                ConnectionsManager.getInstance(a);
-            }
-            TLRPC.User user = UserConfig.getInstance(a).getCurrentUser();
-            if (user != null) {
-                MessagesController.getInstance(a).putUser(user, true);
-                // Enqueue the selected account's native SQLite read before ancillary accounts/services.
-                // Native loading/reset guards, notifications, validation and network sync stay intact.
-                if (prepareDialogs && a == startupAccount) prepareSelectedDialogs();
-                SendMessagesHelper.getInstance(a).checkUnsentMessages();
+                initializeStartupAccount(a, prepareDialogs && a == startupAccount);
             }
         }
 
+        app.exteraless.proxy.ProxyPingController.init();
         PushListenerController.reconcilePushRegistration();
 
         // init fcm
@@ -360,7 +363,41 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         }
     }
 
-    /** All sessions/configs are loaded above; inactive slots retain native lazy getInstance(). */
+    /** Selected/zero accounts initialize before content; other active sessions get a later frame. */
+    private static void initializeStartupAccount(int a, boolean prepareDialogs) {
+        android.os.Trace.beginSection("Flexy.startup.account_core");
+        try {
+            MessagesController.getInstance(a);
+            if (a == 0) {
+                SharedConfig.pushStringStatus = "__FIREBASE_GENERATING_SINCE_" + ConnectionsManager.getInstance(a).getCurrentTime() + "__";
+            } else {
+                ConnectionsManager.getInstance(a);
+            }
+            TLRPC.User user = UserConfig.getInstance(a).getCurrentUser();
+            if (user != null) {
+                MessagesController.getInstance(a).putUser(user, true);
+                // Enqueue the selected account's native SQLite read before ancillary accounts/services.
+                // Native loading/reset guards, notifications, validation and network sync stay intact.
+                if (prepareDialogs) prepareSelectedDialogs();
+                SendMessagesHelper.getInstance(a).checkUnsentMessages();
+            }
+        } finally { android.os.Trace.endSection(); }
+    }
+
+    private static void initializeDeferredStartupAccount(int account) {
+        if (!deferredStartupAccounts[account]) return;
+        deferredStartupAccounts[account] = false;
+        deferredStartupAccountCount--;
+        // The user may log out between the first content frame and this account's turn.
+        if (UserConfig.getInstance(account).isClientActivated()) initializeStartupAccount(account, false);
+    }
+
+    private static void initializePendingStartupAccounts() {
+        for (int account = 0; account < UserConfig.MAX_ACCOUNT_COUNT; account++)
+            initializeDeferredStartupAccount(account);
+    }
+
+    /** All configurations are ready; controller startup is completed per slot, leaving empty slots lazy. */
     private static void initializeAccountServices() { initializeAccountServices(false); }
 
     private static void initializeAccountServices(boolean incremental) {
@@ -379,6 +416,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     }
 
     private static void initializeAccountSlot(int account) {
+        initializeDeferredStartupAccount(account);
         if (account == 0 || UserConfig.getInstance(account).isClientActivated()) ContactsController.getInstance(account).checkAppAccount();
         if (UserConfig.getInstance(account).isClientActivated()) DownloadController.getInstance(account);
     }
@@ -386,7 +424,10 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     /** UI launch: leave a render opportunity between account batches, without fixed sleeps. */
     private static void scheduleAccountServices(int start) {
         int next = start;
-        while (next < UserConfig.MAX_ACCOUNT_COUNT && next != 0 && !UserConfig.getInstance(next).isClientActivated()) next++;
+        while (next < UserConfig.MAX_ACCOUNT_COUNT && next != 0 && !UserConfig.getInstance(next).isClientActivated()) {
+            initializeDeferredStartupAccount(next);
+            next++;
+        }
         final int account = next;
         android.view.Choreographer.getInstance().postFrameCallback(frameTimeNanos -> applicationHandler.post(() -> {
             if (account >= UserConfig.MAX_ACCOUNT_COUNT) {
@@ -524,7 +565,6 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         // Reconciliation checks every alias via binder; it is not a prerequisite for opening chats.
         Utilities.globalQueue.postRunnable(LauncherIconController::tryFixLauncherIconIfNeeded);
         ProxyRotationController.init();
-        app.exteraless.proxy.ProxyPingController.init();
         app.exteraless.links.LinkCleaner.preloadIfEnabled();
         app.exteraless.appearance.M3CircularProgress.prewarm();
 
