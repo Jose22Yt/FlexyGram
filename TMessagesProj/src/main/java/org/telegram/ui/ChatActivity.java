@@ -11955,7 +11955,7 @@ public class ChatActivity extends BaseFragment implements
     private void captureMessageMenuBlur(int blurGeneration, boolean async) {
         ScrimOptions.makeGlobalBlurBitmaps((bitmapBg, bitmapOptions) -> {
             if (bitmapBg == null || bitmapOptions == null || blurGeneration != scrimBlurGeneration
-                    || async && (!selectedBubbleMotion.hasOwner() || selectedBubbleMotion.isClosing()) || fragmentView == null
+                    || async && (scrimPopupWindow == null || selectedBubbleMotion.isClosing()) || fragmentView == null
                     || !fragmentView.isAttachedToWindow() || scrimView == null) {
                 if (bitmapBg != null) bitmapBg.recycle();
                 if (bitmapOptions != null) bitmapOptions.recycle();
@@ -35326,8 +35326,9 @@ public class ChatActivity extends BaseFragment implements
                 if (compactContext) {
                     prepareSignatureMenuScrim(v);
                     popupLayout.setAlpha(0f);
-                    popupLayout.setScaleX(.94f);popupLayout.setScaleY(.94f);
-                    popupLayout.setTranslationY(dp(8));
+                    popupLayout.setScaleX(app.flexygram.bubbles.interaction.SelectedBubbleMotion.PANEL_START_SCALE);
+                    popupLayout.setScaleY(app.flexygram.bubbles.interaction.SelectedBubbleMotion.PANEL_START_SCALE);
+                    popupLayout.setTranslationY(dp(10));
                     popupLayout.setPivotY(0f);
                     popupLayout.setPivotX(signatureSelectedMessage.isOutOwner() ? popupLayout.getMeasuredWidth() : 0f);
                     if (finalReactionsLayout != null) {
@@ -35362,6 +35363,8 @@ public class ChatActivity extends BaseFragment implements
                        handoff?tapped.signatureTapScaleY():1f,
                        handoff?tapped.signatureTapVelocityX():0f,
                        handoff?tapped.signatureTapVelocityY():0f);
+                    // The capture can complete inline before enter() establishes its owner.
+                    if (scrimBlurBitmap != null) selectedBubbleMotion.backdropReady();
                     // Ownership changes at actual show time, never while language detection waits.
                     if (handoff) tapped.finishSignatureTap();
                     signaturePreviewViewport.getViewTreeObserver().addOnPreDrawListener(new android.view.ViewTreeObserver.OnPreDrawListener() {

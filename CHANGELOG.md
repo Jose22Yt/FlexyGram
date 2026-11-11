@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.0.0-beta.43 — preparación, build 1332
+
+- Menú de mensajes/fotos: expansión anclada y elevación ligera de la selección, con un mismo reloj para tarjeta, burbuja y reacciones, siguiendo el patrón visual del video de referencia.
+- Integración analítica local del resorte para estas interacciones: recorrido consistente con el tiempo real entre frames y sin un primer salto fijo. Se conserva el integrador existente de los demás consumidores.
+- El desenfoque empieza a fundirse cuando la captura está disponible; se admite la entrega inmediata antes de crear el propietario y se descartan generaciones/cierres obsoletos.
+- Retorno interrumpible conservando posición y velocidad; límites de fotos altas, cancelación de gestos y scroll estático conservados.
+- Pruebas de frecuencias, frames irregulares, blur tardío y entrega síncrona; sin APK de esta revisión.
+
 ## 1.0.0-beta.42 — preparación, build 1331
 
 - Arranque UI: cero y la cuenta seleccionada preparan sus controladores antes del contenido; las demás sesiones activas se distribuyen por la cola de frames existente. Entradas de servicio y cierres de sesión durante la espera mantienen un camino explícito.

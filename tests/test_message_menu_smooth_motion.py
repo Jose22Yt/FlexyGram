@@ -19,10 +19,10 @@ public class Probe{
  public static void main(String[]args){
   for(int hz:new int[]{30,60,90,120}){
    var motion=new SelectedBubbleMotion();int[] draws={0},done={0};long t=1000000000L;android.os.SystemClock.now=1000;
-   motion.enter(()->draws[0]++);check(motion.panelScale()>=.94f&&motion.panelOffset()<=8);
+   motion.enter(()->draws[0]++);check(motion.panelScale()==SelectedBubbleMotion.PANEL_START_SCALE&&motion.panelOffset()<=10);
    float previous=motion.panelScale();int frames=0;
    while(motion.isRunning()&&frames++<hz){int before=draws[0];t+=1000000000L/hz;Choreographer.getInstance().frame(t);
-    check(draws[0]-before==1);check(Math.abs(motion.panelScale()-previous)<.045f);
+    check(draws[0]-before==1);check(Math.abs(motion.panelScale()-previous)<8.5f/hz);
     check(motion.progress()>=0&&motion.progress()<=1);previous=motion.panelScale();
    }
    check(!motion.isRunning()&&motion.panelScale()==1f&&frames<=hz/2);

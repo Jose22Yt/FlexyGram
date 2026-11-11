@@ -11,7 +11,7 @@ public final class BubbleTapMotion implements Runnable {
     private final Spring x = new Spring(1f, 900f, .78f, .0002f);
     private final Spring y = new Spring(1f, 900f, .78f, .0002f);
     private boolean pressed, running;
-    private long last, started;
+    private long last;
     public BubbleTapMotion(View owner) { this.owner = owner; }
     public float scale() { return (x.value + y.value) * .5f; }
     public float scaleX() { return x.value; }
@@ -22,11 +22,11 @@ public final class BubbleTapMotion implements Runnable {
 
     public void press(float compression, float rebound, long duration) {
         // Old arguments are retained for binary/source compatibility only. Physics is fixed.
-        pressed = true; started = SystemClock.uptimeMillis();
+        pressed = true;
         x.target = .978f;
         y.target = .965f;
         // Integrate the first sub-frame on DOWN; no abrupt scale assignment.
-        x.step(1f / 240f); y.step(1f / 240f);
+        x.stepExact(1f / 240f); y.stepExact(1f / 240f);
         invalidate();
         schedule();
     }
@@ -39,7 +39,7 @@ public final class BubbleTapMotion implements Runnable {
     }
     public void release() {
         if (!pressed) return;
-        pressed = false; started = SystemClock.uptimeMillis();
+        pressed = false;
         x.target = y.target = 1f;
         schedule(); // Keeps both current positions and velocities.
     }
@@ -51,11 +51,8 @@ public final class BubbleTapMotion implements Runnable {
     @Override public void run() {
         if (!running) return;
         long now = SystemClock.uptimeMillis();
-        float dt = Math.max(0f, Math.min(.064f, (now-last)/1000f)); last = now;
-        boolean movingX, movingY;
-        if (now-started >= 250) {
-            x.snap(x.target); y.snap(y.target); movingX=movingY=false;
-        } else { movingX=x.step(dt); movingY=y.step(dt); }
+        float dt = Math.max(0f, (now-last)/1000f); last = now;
+        boolean movingX = x.stepExact(dt), movingY = y.stepExact(dt);
         invalidate();
         running = movingX || movingY;
         if (running) owner.postOnAnimation(this);

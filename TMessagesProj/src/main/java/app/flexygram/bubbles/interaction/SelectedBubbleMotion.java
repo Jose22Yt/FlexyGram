@@ -9,19 +9,20 @@ import app.exteraless.player.Spring;
  * Closing retargets existing springs: it never restarts a timed interpolation.
  */
 public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
-    private final Spring x = new Spring(1f, 900f, .78f, .0002f);
-    private final Spring y = new Spring(1f, 900f, .78f, .0002f);
-    private final Spring backdrop = new Spring(0f, 900f, 1f, .003f);
+    private final Spring x = new Spring(1f, 640f, .82f, .0002f);
+    private final Spring y = new Spring(1f, 640f, .82f, .0002f);
+    private final Spring backdrop = new Spring(0f, 1600f, 1f, .003f);
     private boolean backdropAvailable;
-    public float backdropProgress() { return Math.max(0f, Math.min(1f, backdropAvailable ? backdrop.value : Math.max(backdrop.value, phase.value * 0.85f))); }
+    public float backdropProgress() { return backdropAvailable ? Math.max(0f, Math.min(1f, backdrop.value)) : 0f; }
     public void backdropReady() {
         if (invalidate == null || closing) return;
+        if (backdropAvailable) return;
         backdropAvailable = true;backdrop.target = 1f;
         if (!BubbleInteractionSettings.motionEnabled()) { backdrop.snap(1f);invalidate.run();return; }
         schedule();
     }
-    private final Spring phase = new Spring(1f, 1100f, .78f, .0015f);
-    private static final long ENTER_LIMIT_MS = 360, CLOSE_LIMIT_MS = 220;
+    private final Spring phase = new Spring(1f, 640f, .82f, .0012f);
+    private static final long ENTER_LIMIT_MS = 420, CLOSE_LIMIT_MS = 260;
     private Runnable invalidate, completion;
     private boolean running, closing;
     private long lastFrame, started;
@@ -38,8 +39,11 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
         if (p <= 1f) return distance * p;
         return distance + maxOvershoot * (float)Math.tanh(distance * (p - 1f) / maxOvershoot);
     }
-    public float panelScale() { return Math.max(.85f, Math.min(1.04f, .94f + .06f * phase.value)); }
-    public float panelOffset() { return 8f * Math.max(-0.2f, 1f - phase.value); }
+    public static final float PANEL_START_SCALE = .32f;
+    public static final float OPEN_MESSAGE_SCALE = 1.012f;
+    public float panelScale() { return Math.max(PANEL_START_SCALE, Math.min(1.025f,
+            PANEL_START_SCALE + (1f - PANEL_START_SCALE) * phase.value)); }
+    public float panelOffset() { return 10f * Math.max(-.15f, 1f - phase.value); }
     public float scale() { return (x.value + y.value) * .5f; }
     public float scaleX() { return x.value; }
     public float scaleY() { return y.value; }
@@ -53,11 +57,12 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     public void enter(Runnable redraw, float sx, float sy, float vx, float vy) {
         reset();
         invalidate = redraw; closing = false;
-        x.setState(sx, vx); y.setState(sy, vy); x.target = y.target = 1f;
+        x.setState(sx, vx); y.setState(sy, vy); x.target = y.target = OPEN_MESSAGE_SCALE;
         phase.snap(0f); phase.target = 1f;
-        backdrop.snap(0f); backdrop.target = 1f;
+        // A late bitmap starts its own fade from zero, rather than appearing at a completed phase.
+        backdrop.snap(0f); backdrop.target = 0f;
         if (!BubbleInteractionSettings.motionEnabled()) {
-            x.snap(1f); y.snap(1f); phase.snap(1f); backdrop.snap(1f); redraw.run(); return;
+            x.snap(OPEN_MESSAGE_SCALE); y.snap(OPEN_MESSAGE_SCALE); phase.snap(1f); redraw.run(); return;
         }
         redraw.run(); schedule();
     }
@@ -73,22 +78,24 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
         schedule();
     }
     private void schedule() {
-        if (running) return;
+        if (running || invalidate == null) return;
         running = true;
-        lastFrame = 0; // Establish the time base from Choreographer itself.
         started = android.os.SystemClock.uptimeMillis();
+        lastFrame = started * 1_000_000L;
         Choreographer.getInstance().postFrameCallback(this);
     }
     @Override public void doFrame(long frameTimeNanos) {
         if (!running) return;
         long frameGeneration = generation;
-        float dt = lastFrame == 0 ? 1f/120f : Math.max(0f, Math.min(.064f, (frameTimeNanos-lastFrame)/1_000_000_000f));
-        lastFrame = frameTimeNanos;
-        boolean mx=x.step(dt), my=y.step(dt), mp=phase.step(dt), mb=backdrop.step(dt);
+        // Input can arrive during the same vsync whose frame timestamp precedes the gesture.
+        long timestamp = Math.max(lastFrame, frameTimeNanos);
+        float dt = (timestamp-lastFrame)/1_000_000_000f;
+        lastFrame = timestamp;
+        boolean mx=x.stepExact(dt), my=y.stepExact(dt), mp=phase.stepExact(dt), mb=backdrop.stepExact(dt);
         if ((!mx && !my && !mp && !mb) || closing && phase.value <= 0f
                 || android.os.SystemClock.uptimeMillis()-started >= (closing ? CLOSE_LIMIT_MS : ENTER_LIMIT_MS) && (closing || !mb)) {
             running = false;
-            x.snap(1f); y.snap(1f); phase.snap(closing ? 0f : 1f);backdrop.snap(!closing && backdropAvailable ? 1f : 0f);
+            x.snap(closing ? 1f : OPEN_MESSAGE_SCALE); y.snap(closing ? 1f : OPEN_MESSAGE_SCALE); phase.snap(closing ? 0f : 1f);backdrop.snap(!closing && backdropAvailable ? 1f : 0f);
             if (closing) finish(); else if (invalidate != null) invalidate.run();
         } else {
             if (invalidate != null) invalidate.run();

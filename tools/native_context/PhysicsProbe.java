@@ -32,14 +32,14 @@ public class PhysicsProbe {
   for(int hz:new int[]{60,90,120,144}){
    SelectedBubbleMotion m=new SelectedBubbleMotion();
    m.enter(()->{},.978f,.965f,0f,0f);
-   require(m.panelScale()>=.94f&&m.panelScale()<.95f,"Card must use a subtle anchored reveal");
+   require(m.panelScale()==SelectedBubbleMotion.PANEL_START_SCALE,"Card must start its anchored expansion before the first frame");
    float peak=0f;double peakTime=0;int settledFrame=0;
    for(int i=1;i<=hz;i++){
     frame(1d/hz);
     float p=m.geometryProgress();
     if(p>peak){peak=p;peakTime=i/(double)hz;}
     require(m.progress()>=0&&m.progress()<=1,"Opacity/reveal escaped bounds");
-    require(m.panelScale()>.60f&&m.panelScale()<1.05f,"Card rebound too large");
+    require(m.panelScale()>=SelectedBubbleMotion.PANEL_START_SCALE&&m.panelScale()<1.025f,"Card rebound too large");
     require(Math.abs(m.spatialOffset(-1000f,4f))<=1004.001f,"Tall preview crossed reaction gap");
     require(m.spatialOffset(0f,4f)==0f,"Stationary preview moved");
     if(!m.isRunning()&&settledFrame==0)settledFrame=i;
@@ -91,7 +91,7 @@ public class PhysicsProbe {
    fast.close(()->completed[0]++);
    int frames=0;
    while(fast.hasOwner()&&frames<hz){frame(1d/hz);frames++;}
-   require(frames<=Math.ceil(.180*hz)+1,"Bubble close exceeded its local 180ms bound");
+   require(frames<=Math.ceil(.260*hz)+1,"Bubble close exceeded its local 260ms bound");
    require(completed[0]==1&&!fast.isRunning(),"Close cleanup did not run exactly once");
    fast.enter(()->{});frame(1d/hz);fast.close(()->completed[0]++);
    fast.finishImmediately();
