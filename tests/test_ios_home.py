@@ -82,3 +82,25 @@ def test_home_views_against_android_sdk_types():
     if not sdk.is_file() or not core.is_file() or not shutil.which('javac'):
         pytest.skip('Android API37, AndroidX Core and javac required')
     subprocess.run([sys.executable,str(ROOT/'tools/ios_home/check_types.py')],check=True,cwd=ROOT,capture_output=True,text=True)
+
+
+def test_empty_edit_mode_cannot_dispatch_a_dialog_action(tmp_path):
+    source=(JAVA/'org/telegram/ui/DialogsActivity.java').read_text()
+    actual=method(source,'private void performSelectedDialogsAction(ArrayList<Long> selectedDialogs, int action, boolean alert, boolean longPress, HashSet<Long> dialogsIdsToRevoke)')
+    # Execute the real entry guard with a host whose account/controller is not ready.
+    guard=actual[:actual.index('        MessagesController.DialogFilter filter;')]
+    probe(tmp_path,{'Probe.java':'''import java.util.*;public class Probe{
+ int accesses;Object getParentActivity(){accesses++;return new Object();}
+ GUARD accesses+=100;}
+ public static void main(String[]a){Probe p=new Probe();p.performSelectedDialogsAction(new ArrayList<>(),1,true,false,null);
+ if(p.accesses!=0)throw new AssertionError("empty selection reached native services");
+ ArrayList<Long> ids=new ArrayList<>();ids.add(12L);p.performSelectedDialogsAction(ids,1,true,false,null);
+ if(p.accesses!=101)throw new AssertionError("valid selection discarded");}
+ }'''.replace('GUARD',guard)})
+    counters=method(source,'private void updateCounters(boolean hide)')
+    assert 'muteItem.setEnabled(count>0)' in counters
+    assert 'if (count==0 || canDeleteCount != count' in counters
+    assert 'if (count==0 || cantBlockCount != 0)' in counters
+    assert 'if (count>0 && forumCount == 0' in counters
+    # Select All remains in the enabled overflow; the close control is never disabled.
+    assert 'setEnabled' not in method(source,'private void createActionMode(String tag)')

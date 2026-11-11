@@ -9700,6 +9700,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     private void performSelectedDialogsAction(ArrayList<Long> selectedDialogs, int action, boolean alert, boolean longPress, HashSet<Long> dialogsIdsToRevoke) {
+        if(selectedDialogs.isEmpty())return;
         if (getParentActivity() == null) {
             return;
         }
@@ -10311,6 +10312,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             return;
         }
         int count = selectedDialogs.size();
+        if(muteItem!=null){muteItem.setEnabled(count>0);muteItem.setAlpha(count>0?1f:.4f);}
         long selfUserId = getUserConfig().getClientUserId();
         SharedPreferences preferences = getNotificationsSettings();
         for (int a = 0; a < count; a++) {
@@ -10410,14 +10412,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         }
         if (deleteItem != null) {
-            if (canDeleteCount != count || communitiesCount > 0) {
+            if (count==0 || canDeleteCount != count || communitiesCount > 0) {
                 deleteItem.setVisibility(View.GONE);
             } else {
                 deleteItem.setVisibility(View.VISIBLE);
             }
         }
         if (clearItem != null) {
-            if (canClearCacheCount != 0 && canClearCacheCount != count || canClearHistoryCount != 0 && canClearHistoryCount != count || communitiesCount > 0) {
+            if (count==0 || canClearCacheCount != 0 && canClearCacheCount != count || canClearHistoryCount != 0 && canClearHistoryCount != count || communitiesCount > 0) {
                 clearItem.setVisibility(View.GONE);
             } else {
                 clearItem.setVisibility(View.VISIBLE);
@@ -10459,7 +10461,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         }
         if (pinItem != null && pin2Item != null) {
-            if ((canPinCount + canUnpinCount != count) || (communityId != 0)) {
+            if (count==0 || (canPinCount + canUnpinCount != count) || (communityId != 0)) {
                 pinItem.setVisibility(View.GONE);
                 pin2Item.setVisibility(View.GONE);
             } else {
@@ -10473,14 +10475,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         }
         if (blockItem != null) {
-            if (cantBlockCount != 0) {
+            if (count==0 || cantBlockCount != 0) {
                 blockItem.setVisibility(View.GONE);
             } else {
                 blockItem.setVisibility(View.VISIBLE);
             }
         }
         if (removeFromFolderItem != null) {
-            boolean cantRemoveFromFolder = filterTabsView == null || filterTabsView.getVisibility() != View.VISIBLE || filterTabsView.currentTabIsDefault();
+            boolean cantRemoveFromFolder = count==0 || filterTabsView == null || filterTabsView.getVisibility() != View.VISIBLE || filterTabsView.currentTabIsDefault();
             if (!cantRemoveFromFolder) {
                 try {
                     final int dialogsCount = getDialogsArray(currentAccount, viewPages[0].dialogsAdapter.getDialogsType(), folderId, dialogsListFrozen).size();
@@ -10495,7 +10497,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         }
         if (addToFolderItem != null) {
-            if (folderId == 1 || filterTabsView != null && getFilterTabsVisibilityFactor(false) > 0.5f && filterTabsView.currentTabIsDefault() && !FiltersListBottomSheet.getCanAddDialogFilters(this, selectedDialogs).isEmpty()) {
+            if (count>0 && (folderId == 1 || filterTabsView != null && getFilterTabsVisibilityFactor(false) > 0.5f && filterTabsView.currentTabIsDefault() && !FiltersListBottomSheet.getCanAddDialogFilters(this, selectedDialogs).isEmpty())) {
                 addToFolderItem.setVisibility(View.VISIBLE);
             } else {
                 addToFolderItem.setVisibility(View.GONE);
@@ -10515,7 +10517,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 readItem.setTextAndIcon(LocaleController.getString(R.string.MarkAsRead), R.drawable.msg_markread);
                 readItem.setVisibility(View.VISIBLE);
             } else {
-                if (forumCount == 0 && communitiesCount == 0) {
+                if (count>0 && forumCount == 0 && communitiesCount == 0) {
                     readItem.setTextAndIcon(LocaleController.getString(R.string.MarkAsUnread), R.drawable.msg_markunread);
                     readItem.setVisibility(View.VISIBLE);
                 } else {

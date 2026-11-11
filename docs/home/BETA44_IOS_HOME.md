@@ -38,8 +38,8 @@ Los controles visuales de 44 dp disponen de una delegación táctil de al menos 
 
 ## Verificación y límites
 
-- Suite local: **385 correctas, 39 omitidas**; las omisiones indican herramientas/corpus ausentes, no éxitos.
-- Pruebas JVM de migración `1 → 0`, selección explícita de `2`, snapshot sin lecturas de preferencias durante 20.000 consultas, restauración de preferencias de navegación y orden de chats fijados con Guardados visible.
+- Suite local: **386 correctas, 39 omitidas**; las omisiones indican herramientas/corpus ausentes, no éxitos.
+- Pruebas JVM de migración `1 → 0`, selección explícita de `2`, entrada segura en selección vacía, snapshot sin lecturas de preferencias durante 20.000 consultas, restauración de preferencias de navegación y orden de chats fijados con Guardados visible.
 - Verificación reproducible de todas las fuentes y salidas de iconos; comprobación de sintaxis Java y recursos.
 - Nuevas vistas/selector comprobados con tipos reales de Android API 35 y AndroidX Core de forma aislada; no equivale a la compilación completa. CI utiliza Android API 37 y ejecuta la suite, las comprobaciones nativas existentes y el ensamblado ARM64.
 
