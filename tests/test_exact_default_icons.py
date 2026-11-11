@@ -144,7 +144,7 @@ public class Probe {
   check(ExactIcons.create(r,0,0,null)==null&&ExactIcons.create(r,-1,0,null)==null&&ExactIcons.create(r,R.drawable.fg_ios_original_animation_input_anim_keytosticker_json,0,null)==null);
   check(BaseIconPacks.reads==reads); // Source/unrelated IDs never touch configuration.
   BaseIconPacks.selected=3;check(ExactIcons.create(r,R.drawable.input_smile,0,null)!=null);
-  for(int type=1;type<=2;type++){BaseIconPacks.selected=type;check(ExactIcons.create(r,R.drawable.input_smile,0,null)==null&&ExactIcons.direct(R.drawable.input_smile)==null);}
+  for(int type=1;type<=2;type++){BaseIconPacks.selected=type;check(ExactIcons.create(r,R.drawable.input_smile,0,null)==null&&ExactIcons.direct(R.drawable.input_smile)==null);check(ExactIcons.original(R.drawable.input_smile)!=null);}
  }
 }"""
     actual=[JAVA/'app/flexygram/icons'/n for n in ['ExactIcons.java','ExactIconMap.java','OriginalIconDrawable.java']]

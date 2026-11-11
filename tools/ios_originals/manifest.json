@@ -514,6 +514,51 @@
       ]
     },
     {
+      "key": "Chat List/ComposeIcon",
+      "asset": "fg_ios_original_chat_list_composeicon",
+      "width_dp": 30.0,
+      "height_dp": 30.0,
+      "kind": "original-pdf-raster",
+      "frame": null,
+      "template": true,
+      "sources": [
+        {
+          "path": "tools/ios_originals/upstream/submodules/TelegramUI/Images.xcassets/Chat List/ComposeIcon.imageset/Contents.json",
+          "upstream_path": "submodules/TelegramUI/Images.xcassets/Chat List/ComposeIcon.imageset/Contents.json",
+          "sha256": "14b9108d1bfda4d7c93ffb5bcf327c7b65259edbc145d496329daeefe0605eb5",
+          "git_blob": "c52813013e4262d39b229c0271d122b3ce46849b"
+        },
+        {
+          "path": "tools/ios_originals/upstream/submodules/TelegramUI/Images.xcassets/Chat List/ComposeIcon.imageset/ic_create.pdf",
+          "upstream_path": "submodules/TelegramUI/Images.xcassets/Chat List/ComposeIcon.imageset/ic_create.pdf",
+          "sha256": "fabd630f038c82eb36dfb048c07d93bc88e612cbe36b3044b521d930edb23307",
+          "git_blob": "ca0a3da950075090ab7e0e8610f06fc1eb28320b"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "TMessagesProj/src/main/res/drawable-mdpi/fg_ios_original_chat_list_composeicon.png",
+          "sha256": "604a30074d062bb4be9e0b2a286791deee05c07658c418eec3f86dd7be9172ab"
+        },
+        {
+          "path": "TMessagesProj/src/main/res/drawable-hdpi/fg_ios_original_chat_list_composeicon.png",
+          "sha256": "3243940e1fbc30cce37f3d1668362b5979260bd4eca272860d0fb9fa701f4c85"
+        },
+        {
+          "path": "TMessagesProj/src/main/res/drawable-xhdpi/fg_ios_original_chat_list_composeicon.png",
+          "sha256": "ebfe2bb690816c79f1584a709ae308ffd1d16bf66c7cb8b822b192b6b4da557f"
+        },
+        {
+          "path": "TMessagesProj/src/main/res/drawable-xxhdpi/fg_ios_original_chat_list_composeicon.png",
+          "sha256": "df681206e717b5237a469bcba579ab12af4173c45c890919f9456fef30f88283"
+        },
+        {
+          "path": "TMessagesProj/src/main/res/drawable-xxxhdpi/fg_ios_original_chat_list_composeicon.png",
+          "sha256": "59544ed64953ac20652de3205d39cd753b7e6267065b25044f3a9fe68fb7f65c"
+        }
+      ]
+    },
+    {
       "key": "Chat List/NavigationMore",
       "asset": "fg_ios_original_chat_list_navigationmore",
       "width_dp": 30.0,

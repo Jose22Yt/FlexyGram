@@ -1,0 +1,5 @@
+<resources>
+    <string name="FlexyHomeStyle">Home screen style</string>
+    <string name="FlexyHomeIos">Telegram iOS</string>
+    <string name="FlexyHomeChatDividers">Chat divider lines</string>
+</resources>

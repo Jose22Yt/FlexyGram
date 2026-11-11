@@ -19,9 +19,9 @@ Un cliente de mensajería para Android con personalidad propia, controles de apa
 ---
 
 > [!IMPORTANT]
-> **Versión Oficial Activa:** FlexyGram `v1.0.0-beta.43` (Build `1332`)
+> **Versión Oficial Activa:** FlexyGram `v1.0.0-beta.44` (Build `1333`)
 > **Rama Oficial de Desarrollo:** [`codex/flexygram-beta-glass`](https://github.com/Jose22Yt/FlexyGram/tree/codex/flexygram-beta-glass)  
-> Revisión actual: [movimiento de mensajes, beta 43](docs/bubbles/BETA43_MESSAGE_MOTION.md). Cambios pendientes de compilación.
+> Revisión actual: [pantalla principal Telegram iOS, beta 44](docs/home/BETA44_IOS_HOME.md). Compilación oficial mediante GitHub Actions.
 > Para desarrolladores y agentes de IA (Codex, ChatGPT, Claude), consulta la guía obligatoria de desarrollo en [AGENTS.md](AGENTS.md).
 
 ## Tu espacio, tu estilo

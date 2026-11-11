@@ -1610,7 +1610,6 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
     }
 
     private void updateItemList() {
-        if(parentFragment!=null&&parentFragment.isEssentialsHome())parentFragment.invalidateHomeDialogs();
         if (communityId != 0) {
             updateItemListForCommunity();
             return;

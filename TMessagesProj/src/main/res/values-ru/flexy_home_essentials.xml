@@ -1,9 +1,0 @@
-<resources>
-    <string name="FlexyHomeStyle">Стиль главного экрана</string>
-    <string name="FlexyHomeEssentials">Основной дизайн</string>
-    <string name="FlexyHomeFavorites">Избранное</string>
-    <string name="FlexyHomeFavoritesEmpty">Избранное пусто</string>
-    <string name="FlexyHomeFavoritesHint">Удерживайте «Избранное», чтобы выбрать чаты, группы, каналы или ботов.</string>
-    <string name="FlexyHomeChatDividers">Разделители чатов</string>
-    <string name="FlexyHomeSaved">Избранное</string>
-</resources>

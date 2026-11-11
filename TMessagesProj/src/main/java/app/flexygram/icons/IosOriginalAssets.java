@@ -3,6 +3,7 @@ package app.flexygram.icons;
 import org.telegram.messenger.R;
 public final class IosOriginalAssets {
  private IosOriginalAssets() {}
+ public static final int HOME_COMPOSE=R.drawable.fg_ios_original_chat_list_composeicon;
  public static final int CHEVRON_DOWN=R.drawable.fg_ios_original_navigation_titleexpand;
  public static final int MORE=R.drawable.fg_ios_original_chat_list_navigationmore;
  public static final int HEART=R.drawable.fg_ios_original_chat_context_menu_reactions;

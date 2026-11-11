@@ -67,6 +67,20 @@ public class DockProbe {
    }
   }
   check(LiquidNavigationMath.dockWidth(412,3,4,72,.93f,true)<LiquidNavigationMath.dockWidth(412,4,4,72,.93f,true));
+  // The iPhone presentation is a non-destructive overlay on saved navigation preferences.
+  LiquidNavigationConfig.setDensity(0);LiquidNavigationConfig.setShowTitles(false);
+  LiquidNavigationConfig.setFloatingDock(false);LiquidNavigationConfig.setOrder(new int[]{4,2});
+  LiquidNavigationConfig.setEnabled(false);
+  app.flexygram.home.HomeStyleConfig.setStyle(2);
+  check(LiquidNavigationConfig.isEnabled()&&LiquidNavigationConfig.isVisible()&&LiquidNavigationConfig.labels());
+  check(LiquidNavigationConfig.heightDp()==64&&LiquidNavigationConfig.iconDp()==28&&LiquidNavigationConfig.isFloatingDock());
+  check(Arrays.equals(LiquidNavigationConfig.order(),new int[]{1,3,0,2}));
+  check(!LiquidNavigationConfig.separateSearch());
+  check(Arrays.equals(LiquidNavigationConfig.shown(2),new int[]{1,9}));
+  app.flexygram.home.HomeStyleConfig.setStyle(0);
+  check(!LiquidNavigationConfig.isEnabled()&&!LiquidNavigationConfig.isFloatingDock()&&!LiquidNavigationConfig.labels());
+  check(LiquidNavigationConfig.heightDp()==48&&LiquidNavigationConfig.separateSearch());
+  check(Arrays.equals(LiquidNavigationConfig.order(),new int[]{4,2}));
   int[] ids=LiquidNavigationDestinations.sanitize(new int[]{4,4,-1,2,99});
   check(Arrays.equals(ids,new int[]{4,2}));check(!LiquidNavigationDestinations.contains(ids,0));
   check(Arrays.equals(LiquidNavigationDestinations.fit(new int[]{4,2,1},2),new int[]{4,9}));
@@ -80,6 +94,7 @@ public class DockProbe {
         file.parent.mkdir(parents=True, exist_ok=True)
         file.write_text(content)
         files.append(file)
+    files += [JAVA / 'app/flexygram/home/HomeStyleConfig.java']
     files += [JAVA / f'app/flexygram/navigation/{name}.java'
               for name in ['LiquidNavigationConfig', 'LiquidNavigationDestinations', 'LiquidNavigationMath']]
     subprocess.run(['java', '-m', 'jdk.compiler/com.sun.tools.javac.Main', '-d', str(tmp_path),

@@ -413,11 +413,12 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
             return;
         }
 
-        if (app.flexygram.icons.ExactIcons.isEnabled()) {
+        if (app.flexygram.icons.ExactIcons.isEnabled() || app.flexygram.home.HomeStyleConfig.isIos()) {
             int asset = originalTabAsset(tabAnimation);
             if (asset != 0) {
                 if (lastIconAnimationRaw != asset) {
-                    Drawable original = app.flexygram.icons.ExactIcons.direct(asset);
+                    Drawable original = app.flexygram.home.HomeStyleConfig.isIos()
+                            ? app.flexygram.icons.ExactIcons.original(asset):app.flexygram.icons.ExactIcons.direct(asset);
                     if (original != null) {
                         lastIconAnimationRaw = asset;
                         imageView.clearAnimationDrawable();

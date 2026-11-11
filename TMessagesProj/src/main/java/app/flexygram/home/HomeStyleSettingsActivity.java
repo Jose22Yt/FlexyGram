@@ -26,7 +26,7 @@ public final class HomeStyleSettingsActivity extends SignatureMatteSettingsActiv
                 ((org.telegram.ui.Cells.TextCheckCell)holder.itemView).setTextAndCheck(LocaleController.getString(R.string.FlexyHomeChatDividers),chatDividersEnabled(),false);
                 return;
             }
-            ((TextSettingsCell)holder.itemView).setTextAndValue(getActionBarTitle(),LocaleController.getString(HomeStyleConfig.style()==HomeStyleConfig.ESSENTIALS?R.string.FlexyHomeEssentials:R.string.Default),false);
+            ((TextSettingsCell)holder.itemView).setTextAndValue(getActionBarTitle(),LocaleController.getString(HomeStyleConfig.isIos()?R.string.FlexyHomeIos:R.string.Default),false);
         }
         @Override public boolean isEnabled(RecyclerView.ViewHolder holder){return true;}
     };}
@@ -43,9 +43,10 @@ public final class HomeStyleSettingsActivity extends SignatureMatteSettingsActiv
         }
         if(position!=styleRow)return;
         showDialog(new AlertDialog.Builder(getParentActivity(),resourcesProvider).setTitle(getActionBarTitle())
-            .setItems(new CharSequence[]{LocaleController.getString(R.string.Default),LocaleController.getString(R.string.FlexyHomeEssentials)},(dialog,which)->{
-                if(HomeStyleConfig.style()==which)return;
-                HomeStyleConfig.setStyle(which);listAdapter.notifyItemChanged(styleRow);
+            .setItems(new CharSequence[]{LocaleController.getString(R.string.Default),LocaleController.getString(R.string.FlexyHomeIos)},(dialog,which)->{
+                int style=HomeStyleConfig.optionStyle(which);
+                if(HomeStyleConfig.style()==style)return;
+                HomeStyleConfig.setStyle(style);listAdapter.notifyItemChanged(styleRow);
                 if(getParentLayout()!=null)getParentLayout().rebuildFragments(0);
             }).create());
     }

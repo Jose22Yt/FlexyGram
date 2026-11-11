@@ -27,8 +27,12 @@ public final class ExactIcons {
     }
     /** For controls which previously painted approximate paths instead of loading an Android ID. */
     public static Drawable direct(int asset) {
+        return isEnabled()?original(asset):null;
+    }
+    /** A complete iPhone home presentation owns its glyphs without changing the user's global pack. */
+    public static Drawable original(int asset) {
         Context context=ApplicationLoader.applicationContext;
-        if(context==null||!isEnabled())return null;
+        if(context==null)return null;
         Drawable icon=original(context.getResources(),asset,0,context.getTheme());
         icon.setTint(0xff000000);
         return icon;

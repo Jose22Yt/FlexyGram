@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.0.0-beta.44 — build 1333
+
+- Pantalla principal: selector «Por defecto» / «Telegram iOS». Se retira «Diseño esencial»; su valor antiguo migra a «Por defecto».
+- Cabecera con Editar, Chats centrado, composición con el icono oficial y búsqueda nativa recogible. Se conservan historias, carpetas, gestos y menús; Guardados permanece en la lista.
+- Filas con avatares de 60 dp, márgenes del cliente de iPhone y textos de 17/16 sp; barra inferior flotante con Contactos, Llamadas, Chats y Ajustes. Cambiar de estilo restaura la configuración de navegación guardada.
+- Material sobre el motor compartido de blur/glass y color opaco alternativo. Sin renderizadores de iOS, bitmaps adicionales por frame ni animadores permanentes.
+- Fuente oficial fijada a `24638bc69bd083981b178dd1e7f921eebbf7fc46`; el material de UIKit se adapta a Android, sin afirmar identidad de píxeles o certificación de la versión de iOS.
+- Incluye las mejoras de arranque y movimiento de mensajes de beta 42/43, aún no compiladas en esas revisiones.
+
 ## 1.0.0-beta.43 — preparación, build 1332
 
 - Menú de mensajes/fotos: expansión anclada y elevación ligera de la selección, con un mismo reloj para tarjeta, burbuja y reacciones, siguiendo el patrón visual del video de referencia.

@@ -119,6 +119,7 @@ EXTRA = {
 'Item List/Icons/Hand':'fg_settings_gesture fg_settings_estilo_de_interfaz settings3_hand',
 }
 PLAYER = {
+'HOME_COMPOSE':'Chat List/ComposeIcon',
 'CHEVRON_DOWN':'Navigation/TitleExpand','MORE':'Chat List/NavigationMore',
 'HEART':'Chat/Context Menu/Reactions','SHUFFLE':'GlobalMusicPlayer/OrderRandom',
 'REPEAT':'GlobalMusicPlayer/Repeat','PREV':'GlobalMusicPlayer/Previous','NEXT':'GlobalMusicPlayer/Next',

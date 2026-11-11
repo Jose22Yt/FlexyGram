@@ -82,12 +82,12 @@ def test_settings_reuses_existing_divider_and_plain_chat_rows():
     assert 'if (homeDivider) Theme.dividerPaint.setColor(dividerColor)' in rows
     native=(JAVA/'org/telegram/ui/DialogsActivity.java').read_text()
     assert 'Math.max(-getIdleSearchFieldHeight(), totalOffset - searchOffset)' in native
-    assert 'getDialogFilters().indexOf(favorite)' in native
-    chrome=(JAVA/'app/flexygram/home/EssentialsSearchHeader.java').read_text()
-    assert 'actions.addView(search' in chrome and 'actions.addView(menu' in chrome
-    assert 'setText("FlexyGram")' in chrome and 'setText(LocaleController.getString(R.string.Search))' not in chrome
+    chrome=(JAVA/'app/flexygram/home/IosHomeHeader.java').read_text()
+    assert 'R.string.Edit' in chrome and 'IosOriginalAssets.HOME_COMPOSE' in chrome
+    search=(JAVA/'app/flexygram/home/IosHomeSearch.java').read_text()
+    assert 'R.string.Search' in search
     # The root shares the native search/action-mode progress; no second animator or per-frame hierarchy rebuild.
-    animation=native[native.index('if(essentialsSearchHeader!=null){'):native.index('            super.dispatchDraw(canvas);',native.index('if(essentialsSearchHeader!=null){'))]
+    animation=native[native.index('if(iosHomeHeader!=null){'):native.index('            super.dispatchDraw(canvas);',native.index('if(iosHomeHeader!=null){'))]
     assert all(token not in animation for token in ['requestLayout','addView','removeView','new ','measureText'])
 
 
@@ -124,29 +124,29 @@ def test_positional_resource_fixes_preserve_real_formatter_output(tmp_path):
  }}'''.replace('BEFORE','new String[]{'+','.join(json.dumps(v) for v in before)+'}').replace('AFTER','new String[]{'+','.join(json.dumps(v) for v in after)+'}')})
 
 
-def test_dragging_pinned_chats_updates_controller_with_saved_hidden(tmp_path):
+def test_dragging_pinned_chats_preserves_the_visible_saved_row(tmp_path):
     native=(JAVA/'org/telegram/ui/Adapters/DialogsAdapter.java').read_text()
     move=method(native,'public void moveDialogs(RecyclerListView recyclerView, int fromPosition, int toPosition)')
-    probe(tmp_path,{'Probe.java':'''import java.util.*;import app.flexygram.home.HomeDialogProjection;
+    probe(tmp_path,{'Probe.java':'''import java.util.*;
 class RecyclerListView{}class TLRPC{static class Dialog{long id;int pinnedNum;Dialog(long id,int n){this.id=id;pinnedNum=n;}}}
 class MessagesController{static MessagesController instance=new MessagesController();static MessagesController getInstance(int a){return instance;}static class DialogFilter{Map<Long,Integer> pinnedDialogs=new HashMap<>();}DialogFilter[]selectedDialogFilter={new DialogFilter(),new DialogFilter()};}
 public class Probe{
- static class Parent{ArrayList<TLRPC.Dialog> source=new ArrayList<>();HomeDialogProjection<TLRPC.Dialog> cache=new HomeDialogProjection<>(d->d.id);
- ArrayList<TLRPC.Dialog> getDialogsArray(int a,int type,int folder,boolean frozen){return cache.without(source,1);}
+ static class Parent{ArrayList<TLRPC.Dialog> source=new ArrayList<>();
+ ArrayList<TLRPC.Dialog> getDialogsArray(int a,int type,int folder,boolean frozen){return source;}
  ArrayList<TLRPC.Dialog> getControllerDialogsArray(int a,int type,int folder,boolean frozen){return source;}}
  Parent parentFragment=new Parent();int currentAccount,dialogsType,folderId;int fixPosition(int p){return p;}
- void updateList(Object o){parentFragment.cache.invalidate();}
+ void updateList(Object o){}
  MOVE
  public static void main(String[]args){for(int type:new int[]{0,7,8}){
  Probe p=new Probe();p.dialogsType=type;TLRPC.Dialog first=new TLRPC.Dialog(10,3),saved=new TLRPC.Dialog(1,2),last=new TLRPC.Dialog(20,1);
  p.parentFragment.source.addAll(Arrays.asList(first,saved,last));
  if(type!=0){var pins=MessagesController.instance.selectedDialogFilter[type==8?1:0].pinnedDialogs;pins.put(10L,3);pins.put(1L,2);pins.put(20L,1);}
- p.moveDialogs(new RecyclerListView(),0,1);
+ p.moveDialogs(new RecyclerListView(),0,2);
  if(!p.parentFragment.source.equals(Arrays.asList(last,saved,first)))throw new AssertionError("controller order unchanged");
  var visible=p.parentFragment.getDialogsArray(0,type,0,false);
- if(visible.size()!=2||visible.get(0)!=last||visible.get(1)!=first)throw new AssertionError("drag reversed after refresh");
- if(saved.pinnedNum!=2)throw new AssertionError("hidden saved changed");
+ if(visible.size()!=3||visible.get(0)!=last||visible.get(1)!=saved||visible.get(2)!=first)throw new AssertionError("drag reversed after refresh");
+ if(saved.pinnedNum!=2)throw new AssertionError("saved changed");
  if(type==0&&(first.pinnedNum!=1||last.pinnedNum!=3))throw new AssertionError("pinned numbers not swapped");
- if(type!=0&&MessagesController.instance.selectedDialogFilter[type==8?1:0].pinnedDialogs.get(1L)!=2)throw new AssertionError("hidden folder pin changed");
+ if(type!=0&&MessagesController.instance.selectedDialogFilter[type==8?1:0].pinnedDialogs.get(1L)!=2)throw new AssertionError("saved folder pin changed");
  }}
-}'''.replace('MOVE',move)},[JAVA/'app/flexygram/home/HomeDialogProjection.java'])
+}'''.replace('MOVE',move)})
