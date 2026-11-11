@@ -7375,6 +7375,12 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         //}
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        app.flexygram.camerapop.CameraPopRuntime.windowFocusChanged(this,hasFocus);
+    }
+
     public static Runnable whenResumed;
 
     private void invalidateTabletMode() {

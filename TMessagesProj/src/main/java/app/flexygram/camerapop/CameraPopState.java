@@ -12,10 +12,10 @@ public final class CameraPopState {
     public static final int QUEUE_LIMIT = 3;
     public static final class Pending {
         public final long dialog;
-        public int message;
+        public int message, received;
         public long topic, due;
         Pending(long dialog, int message, long topic, long due) {
-            this.dialog = dialog; this.message = message; this.topic = topic; this.due = due;
+            this.dialog = dialog; this.message = message; this.received = message; this.topic = topic; this.due = due;
         }
     }
     private final Map<Long, Pending> entries = new HashMap<>();
@@ -24,17 +24,27 @@ public final class CameraPopState {
     public boolean incoming(long dialog, int message, long topic, long now, long interval) {
         if (dialog == 0 || message <= 0) return false;
         Pending old = entries.get(dialog);
-        if (old != null && old.message >= message) return false;
+        if (old != null && old.received >= message) return false;
         // New messages do not postpone the first pending reminder indefinitely.
         long due = old != null && old.due > 0 ? old.due : now + interval;
-        entries.put(dialog, new Pending(dialog, message, topic, due));
+        Pending next=new Pending(dialog, old==null?message:Math.max(message,old.message), topic, due);
+        next.received=message;entries.put(dialog,next);
         return true;
+    }
+    /** Restoring native unread state must not consume a live arrival's dedup token. */
+    public boolean seed(long dialog,int message,long now,long interval) {
+        if(dialog==0 || message<=0)return false;
+        Pending old=entries.get(dialog);
+        if(old!=null && old.message>=message)return false;
+        Pending next=new Pending(dialog,message,old==null?0:old.topic,
+                old!=null && old.due>0?old.due:now+interval);
+        next.received=old==null?0:old.received;entries.put(dialog,next);return true;
     }
     public Pending get(long dialog) { return entries.get(dialog); }
     public ArrayList<Pending> pending() { return new ArrayList<>(entries.values()); }
     public void read(long dialog) {
         Pending p = entries.get(dialog);
-        if (p != null) p.due = 0; // Retain the high-water mark across read/re-delivery.
+        if (p != null) {p.due = 0;p.received=Math.max(p.received,p.message);} // Retain dedup after reading.
         queue.remove(dialog);
     }
     public void defer(long dialog, long due) {
@@ -59,7 +69,7 @@ public final class CameraPopState {
     }
     public Set<String> save() {
         Set<String> saved = new HashSet<>();
-        for (Pending p : entries.values()) saved.add(p.dialog + ":" + p.message + ":" + p.topic + ":" + p.due);
+        for (Pending p : entries.values()) saved.add(p.dialog + ":" + p.message + ":" + p.topic + ":" + p.due + ":" + p.received);
         return saved;
     }
     public void restore(Set<String> saved, Set<Long> selected) {
@@ -67,10 +77,13 @@ public final class CameraPopState {
         for (String value : saved) {
             try {
                 String[] fields = value.split(":");
-                if (fields.length != 4) continue;
+                if (fields.length != 4 && fields.length != 5) continue;
                 long dialog = Long.parseLong(fields[0]); int message = Integer.parseInt(fields[1]);
                 long topic = Long.parseLong(fields[2]), due = Long.parseLong(fields[3]);
-                if (selected.contains(dialog) && message > 0 && due >= 0) entries.put(dialog, new Pending(dialog, message, topic, due));
+                int received=fields.length==5?Integer.parseInt(fields[4]):message;
+                if (selected.contains(dialog) && message > 0 && due >= 0 && received>=0 && received<=message) {
+                    Pending p=new Pending(dialog,message,topic,due);p.received=received;entries.put(dialog,p);
+                }
             } catch (NumberFormatException ignored) { /* Discard corrupt persisted records. */ }
         }
     }

@@ -6,9 +6,10 @@ import static org.telegram.messenger.AndroidUtilities.dp;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Path;
+import android.graphics.Paint;
+import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.text.TextUtils;
 import android.view.Choreographer;
@@ -39,7 +40,12 @@ final class CameraPopCapsule extends LinearLayout {
     private Choreographer.FrameCallback frame;
     private Runnable completed;
     private float destinationX, destinationY;
-    private boolean closing;
+    private float terminalX=.01f,terminalY=.01f,surfaceNeck;
+    private boolean closing,hasCutout;
+    private final CameraPopMotion motionValue=new CameraPopMotion();
+    private final Path surfacePath=new Path();
+    private final Paint surfacePaint=new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint borderPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
 
     CameraPopCapsule(FrameLayout root) {
         super(root.getContext());
@@ -48,6 +54,7 @@ final class CameraPopCapsule extends LinearLayout {
         setOrientation(HORIZONTAL); setGravity(Gravity.CENTER_VERTICAL);
         setPadding(dp(14),dp(12),dp(14),dp(12));
         setMinimumHeight(dp(76)); setClickable(true); setFocusable(true);
+        setWillNotDraw(false);borderPaint.setStyle(Paint.Style.STROKE);borderPaint.setStrokeWidth(dp(1));
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
         setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);
         avatar=new BackupImageView(context); avatar.setRoundRadius(dp(23));
@@ -89,13 +96,29 @@ final class CameraPopCapsule extends LinearLayout {
     }
 
     private void updateColors() {
-        GradientDrawable surface=new GradientDrawable();
-        surface.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-        surface.setCornerRadius(dp(28));
-        surface.setStroke(dp(1),Theme.getColor(Theme.key_divider));
-        setBackground(surface);
+        surfacePaint.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+        borderPaint.setColor(Theme.getColor(Theme.key_divider));
         name.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
         detail.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
+        invalidate();
+    }
+
+    @Override protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        float w=getWidth(),h=getHeight(),neck=h*surfaceNeck,cx=w/2f;
+        float radius=Math.min(dp(28),Math.min(w/2f,(h-neck)/2f)),shoulder=Math.min(neck*1.5f,w/2f-radius);
+        surfacePath.rewind();surfacePath.moveTo(cx,0);
+        surfacePath.cubicTo(cx+neck*.55f,0,cx+neck*.8f,neck,cx+shoulder,neck);
+        surfacePath.lineTo(w-radius,neck);surfacePath.quadTo(w,neck,w,neck+radius);
+        surfacePath.lineTo(w,h-radius);surfacePath.quadTo(w,h,w-radius,h);
+        surfacePath.lineTo(radius,h);surfacePath.quadTo(0,h,0,h-radius);
+        surfacePath.lineTo(0,neck+radius);surfacePath.quadTo(0,neck,radius,neck);
+        surfacePath.lineTo(cx-shoulder,neck);
+        surfacePath.cubicTo(cx-neck*.8f,neck,cx-neck*.55f,0,cx,0);surfacePath.close();
+        canvas.drawPath(surfacePath,surfacePaint);canvas.drawPath(surfacePath,borderPaint);
+    }
+    @Override protected void dispatchDraw(Canvas canvas) {
+        int save=canvas.save();canvas.clipPath(surfacePath);super.dispatchDraw(canvas);canvas.restoreToCount(save);
     }
 
     void position() {
@@ -163,6 +186,9 @@ final class CameraPopCapsule extends LinearLayout {
         }
         destinationX=p.originX-(p.x+p.width/2f);
         destinationY=p.originY-(p.y+cardHeight/2f);
+        hasCutout=p.cutout;
+        float terminal=hasCutout?Math.max(1f,Math.min(notch.width(),notch.height())*.60f):1f;
+        terminalX=Math.min(1f,terminal/p.width);terminalY=Math.min(1f,terminal/Math.max(1,cardHeight));
     }
 
     private boolean reducedMotion() {
@@ -175,13 +201,13 @@ final class CameraPopCapsule extends LinearLayout {
         cancelMotion(); closing=exit; completed=completion;
         if(reducedMotion()) { apply(exit?0f:1f);finish();return; }
         final long[] start={0};
-        final long duration=(exit?200L:240L)*1_000_000L;
+        final long duration=(exit?280L:300L)*1_000_000L;
         // Own finite clock: Android's x5/x10 animation duration does not slow the app.
         apply(exit?1f:0f);
         frame=time->{
             if(start[0]==0) start[0]=time;
             float fraction=Math.min(1f,(float)(time-start[0])/duration);
-            float eased=exit?fraction*fraction*fraction:1f-(float)Math.pow(1f-fraction,4);
+            float eased=exit?1f-(float)Math.pow(1f-fraction,2.2):1f-(float)Math.pow(1f-fraction,3);
             apply(exit?1f-eased:eased);
             if(fraction<1f) Choreographer.getInstance().postFrameCallback(frame);
             else {frame=null;finish();}
@@ -189,9 +215,11 @@ final class CameraPopCapsule extends LinearLayout {
         Choreographer.getInstance().postFrameCallback(frame);
     }
     private void apply(float progress) {
-        setScaleX(.035f+.965f*progress);setScaleY(.08f+.92f*progress);
-        setTranslationX(destinationX*(1f-progress));setTranslationY(destinationY*(1f-progress));
-        setAlpha(Math.min(1f,progress*2f));
+        motionValue.update(progress,closing,terminalX,terminalY,destinationX,destinationY,hasCutout);
+        setScaleX(motionValue.scaleX);setScaleY(motionValue.scaleY);
+        setTranslationX(motionValue.x);setTranslationY(motionValue.y);setAlpha(motionValue.alpha);
+        avatar.setAlpha(motionValue.contentAlpha);name.setAlpha(motionValue.contentAlpha);detail.setAlpha(motionValue.contentAlpha);
+        surfaceNeck=motionValue.neck;invalidate();
     }
     private void finish() {Runnable done=completed;completed=null;if(done!=null)done.run();}
     void cancelMotion() {

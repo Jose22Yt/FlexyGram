@@ -1327,7 +1327,7 @@
     <string name="CameraPopInterval">Intervalo de recordatorio</string>
     <string name="CameraPopDuration">Duración de la cápsula</string>
     <string name="CameraPopNames">Mostrar nombres y fotos de perfil</string>
-    <string name="CameraPopRespectMuted">Respetar ajustes de Telegram</string>
+    <string name="CameraPopRespectMuted">Respetar chats silenciados</string>
     <string name="CameraPopQuiet">Horario de silencio</string>
     <string name="CameraPopQuietStart">Inicio del silencio</string>
     <string name="CameraPopQuietEnd">Fin del silencio</string>
@@ -1337,5 +1337,5 @@
     <string name="CameraPopPrivateName">Mensajes pendientes</string>
     <string name="CameraPopUnread_one">%d mensaje sin leer</string>
     <string name="CameraPopUnread_other">%d mensajes sin leer</string>
-    <string name="CameraPopInfo">Solo los chats seleccionados pueden mostrar Camera Pop, dentro de FlexyGram mientras está visible. Al volver se revisan los recordatorios vencidos. No usa permisos de superposición ni servicios en segundo plano. Al desactivar el respeto por los ajustes de Telegram permites expresamente avisos de los chats silenciados seleccionados. Ocultar nombres también oculta las fotos. Si el inicio y el fin del silencio coinciden, se silencia todo el día.</string>
+    <string name="CameraPopInfo">Camera Pop funciona dentro de FlexyGram aunque las notificaciones de Android o las categorías generales de Telegram estén desactivadas. Solo avisa de los chats seleccionados. Con los recordatorios activados, avisa al volver si quedan mensajes sin leer y después según el intervalo elegido. La opción de silencio respeta únicamente silenciamientos explícitos de chats o temas; puedes desactivarla para permitirlos también. El horario de silencio y la privacidad siguen aplicándose. Ocultar nombres también oculta fotos. No usa permisos de superposición ni servicios adicionales. Si el inicio y el fin del silencio coinciden, se silencia todo el día.</string>
 </resources>

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.ArrayList;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.DialogObject;
 import org.telegram.messenger.LocaleController;
@@ -29,7 +30,7 @@ import tw.nekomimi.nekogram.helpers.PasscodeHelper;
 /** UI-thread coordinator. No Activity is retained while paused; no background wakeups. */
 public final class CameraPopRuntime implements NotificationCenter.NotificationCenterDelegate {
     private static final CameraPopRuntime INSTANCE=new CameraPopRuntime();
-    private static final int[] EVENTS={NotificationCenter.messagesRead,NotificationCenter.messagesDeleted,
+    private static final int[] EVENTS={NotificationCenter.didReceiveNewMessages,NotificationCenter.messagesRead,NotificationCenter.messagesDeleted,
             NotificationCenter.dialogsNeedReload,NotificationCenter.dialogsUnreadCounterChanged,
             NotificationCenter.notificationsSettingsUpdated,NotificationCenter.openedChatChanged,NotificationCenter.appDidLogout};
     private static final class AccountState {
@@ -40,6 +41,10 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
     }
     private final Map<Integer,AccountState> accounts=new HashMap<>();
     private final Set<Integer> dirtyAccounts=new HashSet<>();
+    private final Set<Long> entryPending=new HashSet<>();
+    private final Set<Long> livePending=new HashSet<>();
+    private final Map<Long,Integer> liveRetries=new HashMap<>();
+    private int sessionAccount=-1;
     private WeakReference<LaunchActivity> host=new WeakReference<>(null);
     private int observing=-1;
     private CameraPopCapsule capsule;
@@ -59,27 +64,32 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
         return value;
     }
 
-    /** Called only after Telegram's incoming-message dedup/filter, on notificationsQueue. */
-    public static void incoming(int account,MessageObject message,boolean nativeAllowed) {
-        if(!CameraPopConfig.enabled(account) || message.messageOwner==null || message.getId()<=0
+    /** Native message events, independent of the system-notification pipeline. UI thread only. */
+    public static void incoming(int account,MessageObject message) {
+        if(!CameraPopConfig.enabled(account) || message==null || message.messageOwner==null || message.getId()<=0
                 || message.isOutOwner() || message.messageOwner.from_scheduled
                 || message.isReactionPush || message.isStoryReactionPush || message.isOauthPush
-                || (!message.messageOwner.unread && !message.isFcmMessage())
+                || !message.messageOwner.unread || message.isImportedForward()
                 || (message.messageOwner.action!=null && !(message.messageOwner.action instanceof TLRPC.TL_messageActionEmpty))) return;
         // Capture primitives only; never retain MessageObject or private message content.
         long dialog=message.getDialogId(); int id=message.getId();
-        if(!CameraPopConfig.interested(account,dialog,nativeAllowed))return;
+        if(!CameraPopConfig.interested(account,dialog))return;
         long topic=MessageObject.getTopicId(account,message.messageOwner,MessagesController.getInstance(account).isForum(message));
-        AndroidUtilities.runOnUIThread(()->INSTANCE.accept(account,dialog,id,topic,nativeAllowed));
+        INSTANCE.accept(account,dialog,id,topic);
     }
-    private void accept(int id,long dialog,int message,long topic,boolean nativeAllowed) {
+    private void accept(int id,long dialog,int message,long topic) {
         if(!UserConfig.getInstance(id).isClientActivated() || !CameraPopConfig.enabled(id)) return;
         AccountState a=account(id); CameraPopConfig c=a.config;
-        if(!c.enabled || !c.selected.contains(dialog) || (c.respectMuted && !nativeAllowed)) return;
+        if(!c.enabled || !c.selected.contains(dialog)) return;
         if(!a.state.incoming(dialog,message,topic,System.currentTimeMillis(),c.interval())) return;
         saveSoon(id);
-        if(id==observing && c.immediate && allowed(a,dialog)) {
-            if(capsule!=null && visibleDialog==dialog && !demo) {if(unread(dialog)>0)bind(a,dialog);}
+        // Queue even while focus/counters are settling; revalidate when actually showing.
+        if(id==observing && c.immediate) {
+            livePending.add(dialog);
+            liveRetries.put(dialog,3);
+            if(capsule!=null && visibleDialog==dialog && !demo) {
+                if(unread(dialog)>0) {bind(a,dialog);livePending.remove(dialog);liveRetries.remove(dialog);}
+            }
             else {a.state.enqueue(dialog);requestDrain(320);}
         }
         schedule();
@@ -87,6 +97,7 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
 
     public static void resume(LaunchActivity activity) {
         INSTANCE.host=new WeakReference<>(activity);
+        INSTANCE.sessionAccount=-1;INSTANCE.entryPending.clear();
         // Post to the next frame; optional reminders never delay activity initialization.
         AndroidUtilities.cancelRunOnUIThread(INSTANCE.reconcile);
         activity.getWindow().getDecorView().postOnAnimation(INSTANCE.reconcile);
@@ -95,6 +106,10 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
         if(INSTANCE.host.get()==activity) INSTANCE.reconcile();
     }
     public static void conceal() { INSTANCE.hide(); }
+    public static void windowFocusChanged(LaunchActivity activity,boolean focused) {
+        if(INSTANCE.host.get()!=activity)return;
+        if(focused)INSTANCE.reconcile();else INSTANCE.hide();
+    }
     public static void pause(LaunchActivity activity) {
         if(INSTANCE.host.get()!=activity) return;
         activity.getWindow().getDecorView().removeCallbacks(INSTANCE.reconcile);
@@ -103,7 +118,14 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
     public static void configurationChanged(int id) {
         INSTANCE.dirtyAccounts.remove(id);
         if(INSTANCE.dirtyAccounts.isEmpty())AndroidUtilities.cancelRunOnUIThread(INSTANCE.persist);
-        AccountState a=INSTANCE.account(id);long previousInterval=a.config.interval();a.config=new CameraPopConfig(id);
+        AccountState a=INSTANCE.account(id);long previousInterval=a.config.interval();
+        Set<Long> oldSelected=a.config.selected;a.config=new CameraPopConfig(id);
+        if(INSTANCE.observing==id) {
+            INSTANCE.entryPending.retainAll(a.config.selected);
+            INSTANCE.livePending.retainAll(a.config.selected);
+            INSTANCE.liveRetries.keySet().retainAll(a.config.selected);
+            for(long dialog:a.config.selected)if(!oldSelected.contains(dialog))INSTANCE.entryPending.add(dialog);
+        }
         a.state.retain(a.config.selected);a.state.clearQueue();
         if(!a.config.enabled) {a.state.clear();a.config.clearPending();}
         else {
@@ -114,7 +136,7 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
             for(long dialog:a.config.selected) {
                 TLRPC.Dialog value=MessagesController.getInstance(id).dialogs_dict.get(dialog);
                 if(a.state.get(dialog)==null && value!=null && value.unread_count>0)
-                    a.state.incoming(dialog,value.top_message,0,System.currentTimeMillis(),a.config.interval());
+                    a.state.seed(dialog,value.top_message,System.currentTimeMillis(),a.config.interval());
             }
             a.config.save(a.state);
         }
@@ -144,16 +166,14 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
         if(top instanceof ChatActivity && ((ChatActivity)top).getDialogId()==dialog
                 && top.getCurrentAccount()==observing) return false;
         CameraPopState.Pending pending=a.state.get(dialog);
-        if(a.config.respectMuted && MessagesController.getInstance(observing).isDialogMuted(dialog,pending==null?0:pending.topic)) return false;
+        if(a.config.respectMuted && CameraPopConfig.explicitlyMuted(observing,dialog,pending==null?0:pending.topic)) return false;
         Calendar now=Calendar.getInstance();
         return !a.config.quiet || !CameraPopState.quiet(now.get(Calendar.HOUR_OF_DAY)*60+now.get(Calendar.MINUTE),a.config.quietStart,a.config.quietEnd);
     }
     private int unread(long dialog) {
         TLRPC.Dialog value=MessagesController.getInstance(observing).dialogs_dict.get(dialog);
         if(value==null) return -1; // Cache not loaded: postpone, do not invent an unread count.
-        CameraPopState.Pending p=account(observing).state.get(dialog);
-        Integer read=MessagesController.getInstance(observing).dialogs_read_inbox_max.get(dialog);
-        return p!=null && read!=null && read>=p.message ? 0 : value.unread_count;
+        return value.unread_count; // Native dialog counter is authoritative, including forums.
     }
     private void observe(int account) {
         if(observing==account) return;
@@ -175,6 +195,7 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
             globals=false;
         }
         observing=-1;hide();
+        sessionAccount=-1;entryPending.clear();livePending.clear();liveRetries.clear();
         AndroidUtilities.cancelRunOnUIThread(reconcile);
         AndroidUtilities.cancelRunOnUIThread(deadline);
     }
@@ -195,6 +216,7 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
         int id=UserConfig.selectedAccount;
         if(!UserConfig.getInstance(id).isClientActivated() || !CameraPopConfig.enabled(id)) {stop();return;}
         observe(id);AccountState a=account(id);
+        if(sessionAccount!=id) {sessionAccount=id;entryPending.addAll(a.config.selected);}
         boolean dirty=false;
         // Recover pending reminders from the selected native dialogs after process death.
         // This does not turn old unread messages into new-message alerts.
@@ -202,11 +224,20 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
             TLRPC.Dialog value=MessagesController.getInstance(id).dialogs_dict.get(dialog);
             CameraPopState.Pending p=a.state.get(dialog);
             if(value!=null && value.unread_count>0 && (p==null || p.due==0)) {
-                dirty|=a.state.incoming(dialog,value.top_message,0,System.currentTimeMillis(),a.config.interval());
+                dirty|=a.state.seed(dialog,value.top_message,System.currentTimeMillis(),a.config.interval());
+            }
+            if(value!=null && value.unread_count==0 && !waitingForCounter(a,dialog)) {
+                entryPending.remove(dialog);livePending.remove(dialog);liveRetries.remove(dialog);
+            }
+            else if(value!=null && value.unread_count>0 && ((a.config.reminders && entryPending.contains(dialog))
+                    || (a.config.immediate && livePending.contains(dialog))) && allowed(a,dialog)) {
+                if(capsule!=null && visibleDialog==dialog && !demo) {
+                    bind(a,dialog);entryPending.remove(dialog);livePending.remove(dialog);liveRetries.remove(dialog);
+                } else a.state.enqueue(dialog);
             }
         }
         for(CameraPopState.Pending p:a.state.pending()) {
-            if(p.due>0 && unread(p.dialog)==0) {a.state.read(p.dialog);dirty=true;}
+            if(p.due>0 && unread(p.dialog)==0 && !waitingForCounter(a,p.dialog)) {a.state.read(p.dialog);dirty=true;}
         }
         if(dirty)a.config.save(a.state);
         if(capsule!=null && !demo && (!allowed(a,visibleDialog) || unread(visibleDialog)==0)) hide();
@@ -219,7 +250,7 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
             for(CameraPopState.Pending p:a.state.pending()) {
                 if(p.due<=0 || p.due>now) continue;
                 int count=unread(p.dialog);
-                if(count==0) a.state.read(p.dialog);
+                if(count==0 && !waitingForCounter(a,p.dialog)) a.state.read(p.dialog);
                 else {
                     if(count>0 && allowed(a,p.dialog)) a.state.enqueue(p.dialog);
                     a.state.defer(p.dialog,now+a.config.interval());
@@ -243,10 +274,22 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
         if(capsule!=null || observing<0)return;
         AccountState a=account(observing);long dialog;
         while((dialog=a.state.poll())!=0) {
-            if(!allowed(a,dialog) || unread(dialog)<=0)continue;
+            if(!allowed(a,dialog))continue;
+            if(unread(dialog)<=0) {
+                Integer attempts=liveRetries.get(dialog);
+                if(attempts!=null && attempts>0 && waitingForCounter(a,dialog)) {
+                    liveRetries.put(dialog,attempts-1);a.state.enqueue(dialog);requestDrain(120);return;
+                }
+                continue;
+            }
             LaunchActivity activity=host.get();if(activity==null || !createCapsule(activity))return;
             visibleDialog=dialog;demo=false;bind(a,dialog);startCapsule(a.config.durationSeconds);return;
         }
+    }
+    private boolean waitingForCounter(AccountState a,long dialog) {
+        CameraPopState.Pending p=a.state.get(dialog);
+        Integer read=MessagesController.getInstance(observing).dialogs_read_inbox_max.get(dialog);
+        return livePending.contains(dialog) && p!=null && p.received>0 && (read==null || read<p.received);
     }
     private void requestDrain(long delay) {
         // A continuous stream must not keep pushing the first alert into the future.
@@ -276,6 +319,10 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
         capsule.bind(title,LocaleController.formatPluralString("CameraPopUnread",Math.max(1,unread(dialog))),peer);
     }
     private void startCapsule(int seconds) {
+        if(!demo) {
+            entryPending.remove(visibleDialog);livePending.remove(visibleDialog);liveRetries.remove(visibleDialog);
+            AccountState a=account(observing);a.state.defer(visibleDialog,System.currentTimeMillis()+a.config.interval());saveSoon(observing);
+        }
         capsule.enter();
         AndroidUtilities.cancelRunOnUIThread(expire);AndroidUtilities.runOnUIThread(expire,seconds*1000L);
     }
@@ -302,6 +349,13 @@ public final class CameraPopRuntime implements NotificationCenter.NotificationCe
         if(last!=null && MessagesController.getInstance(id).checkCanOpenChat(args,last)) last.presentFragment(new ChatActivity(args));
     }
     @Override public void didReceivedNotification(int event,int account,Object...args) {
+        if(event==NotificationCenter.didReceiveNewMessages) {
+            if(account!=observing || args.length<4 || !Boolean.FALSE.equals(args[2])
+                    || !(args[3] instanceof Integer) || (Integer)args[3]!=ChatActivity.MODE_DEFAULT
+                    || !(args[1] instanceof ArrayList<?>))return;
+            for(Object item:(ArrayList<?>)args[1])if(item instanceof MessageObject)incoming(account,(MessageObject)item);
+            return;
+        }
         if(event==NotificationCenter.appDidLogout) {
             AccountState a=accounts.remove(account);if(a!=null)a.config.clearPending();stop();return;
         }

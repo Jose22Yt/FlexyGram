@@ -11552,7 +11552,7 @@
     <string name="CameraPopInterval">Reminder interval</string>
     <string name="CameraPopDuration">Capsule duration</string>
     <string name="CameraPopNames">Show names and profile photos</string>
-    <string name="CameraPopRespectMuted">Respect Telegram settings</string>
+    <string name="CameraPopRespectMuted">Respect muted chats</string>
     <string name="CameraPopQuiet">Quiet hours</string>
     <string name="CameraPopQuietStart">Quiet hours start</string>
     <string name="CameraPopQuietEnd">Quiet hours end</string>
@@ -11562,5 +11562,5 @@
     <string name="CameraPopPrivateName">Pending messages</string>
     <string name="CameraPopUnread_one">%d unread message</string>
     <string name="CameraPopUnread_other">%d unread messages</string>
-    <string name="CameraPopInfo">Only selected chats can show Camera Pop, inside FlexyGram while it is visible. Overdue reminders are checked when you return. No overlay permission or background service is used. Turning off respect for Telegram settings explicitly allows alerts for selected muted chats. Hiding names also hides profile photos. Equal quiet-hour times silence the whole day.</string>
+    <string name="CameraPopInfo">Camera Pop works inside FlexyGram even when Android notifications or Telegram global notification categories are disabled. Only selected chats can alert. With reminders enabled, unread messages are recalled when you return and then at your chosen interval. The mute option respects explicit chat or topic mutes only; turn it off to allow those too. Quiet hours and privacy still apply. Hiding names also hides profile photos. No overlay permission or additional service is used. Equal quiet-hour times silence the whole day.</string>
 </resources>

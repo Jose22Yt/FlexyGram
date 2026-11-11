@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.0.0-beta.48 — build 1337
+
+- Camera Pop recibe eventos reales de mensajes directamente de NotificationCenter, independientemente del permiso Android y de las categorías globales de notificaciones de Telegram.
+- Separa la recuperación de pendientes de la deduplicación de llegadas para no suprimir avisos inmediatos de personas o canales ya presentes en la caché.
+- Con recordatorios activados, avisa en cada regreso a primer plano si los chats elegidos siguen sin leer, sin esperar al intervalo. Espera carga de caché, foco y contadores nativos.
+- Conserva selección, privacidad y horario de silencio. El control de silenciamientos se limita a chats/temas silenciados expresamente y se explica en ajustes.
+- La absorción termina en el centro real del recorte, con contracción progresiva, silueta vectorial de cuello y superficie opaca hasta entrar en el agujero. Sin desenfoque ni bucles permanentes.
+- Pruebas de regresión para eventos nativos, recuperación frente a llegadas, notificaciones generales apagadas, contadores tardíos, foco y regreso con pendientes. Compilación oficial solicitada sin seguimiento del workflow.
+
 ## 1.0.0-beta.47 — build 1336
 
 - FlexyBubble Camera Pop opcional en Ajustes de FlexyGram → Conversaciones, con selector nativo de chats/contactos/grupos/canales/bots por cuenta.

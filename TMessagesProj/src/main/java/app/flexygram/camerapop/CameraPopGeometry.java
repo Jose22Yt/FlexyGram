@@ -7,8 +7,10 @@ public final class CameraPopGeometry {
     public static final class Placement {
         public final float x, y, originX, originY;
         public final int width;
-        Placement(float x, float y, float originX, float originY, int width) {
+        public final boolean cutout;
+        Placement(float x, float y, float originX, float originY, int width,boolean cutout) {
             this.x=x; this.y=y; this.originX=originX; this.originY=originY; this.width=width;
+            this.cutout=cutout;
         }
     }
     public static Placement place(int width, int height, int safeLeft, int safeTop, int safeRight,
@@ -19,10 +21,10 @@ public final class CameraPopGeometry {
         boolean valid = right > left && bottom > top && left >= 0 && top >= 0
                 && right <= width && bottom <= height && top < height / 2f;
         float originX = valid ? (left+right)/2f : width/2f;
-        float originY = valid ? bottom : safeTop;
+        float originY = valid ? (top+bottom)/2f : safeTop;
         float x = Math.max(minX, Math.min(originX-cardWidth/2f, maxX-cardWidth));
-        float y = Math.max(safeTop, originY) + gap;
+        float y = Math.max(safeTop, valid?bottom:safeTop) + gap;
         y = Math.max(safeTop, Math.min(y, height-safeBottom-cardHeight-margin));
-        return new Placement(x, y, originX, originY, cardWidth);
+        return new Placement(x, y, originX, originY, cardWidth,valid);
     }
 }

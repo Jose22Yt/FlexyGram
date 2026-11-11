@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.UserConfig;
+import org.telegram.messenger.NotificationsSettingsFacade;
+import org.telegram.tgnet.ConnectionsManager;
 
 /** Uses the existing account preferences; no eager app-wide storage or new service. */
 public final class CameraPopConfig {
@@ -39,11 +41,17 @@ public final class CameraPopConfig {
         }
     }
     public static boolean enabled(int account) { return MessagesController.getMainSettings(account).getBoolean(PREFIX+"enabled", false); }
-    public static boolean interested(int account,long dialog,boolean nativeAllowed) {
+    public static boolean interested(int account,long dialog) {
         SharedPreferences prefs=MessagesController.getMainSettings(account);
         return prefs.getBoolean(PREFIX+"enabled",false)
-                && (nativeAllowed || !prefs.getBoolean(PREFIX+"respect_muted",true))
                 && prefs.getStringSet(PREFIX+"selected",java.util.Collections.emptySet()).contains(Long.toString(dialog));
+    }
+    /** Explicit chat/topic mutes only. Global categories and Android POST_NOTIFICATIONS are independent. */
+    public static boolean explicitlyMuted(int account,long dialog,long topic) {
+        NotificationsSettingsFacade settings=new NotificationsSettingsFacade(account);
+        int type=settings.getProperty(NotificationsSettingsFacade.PROPERTY_NOTIFY,dialog,topic,-1);
+        return type==2 || (type==3 && settings.getProperty(NotificationsSettingsFacade.PROPERTY_NOTIFY_UNTIL,
+                dialog,topic,0)>=ConnectionsManager.getInstance(account).getCurrentTime());
     }
     public long interval() { return intervalMinutes * 60_000L; }
     public void set(String key, boolean value) { prefs.edit().putBoolean(PREFIX+key,value).apply(); }

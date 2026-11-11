@@ -19,9 +19,9 @@ Un cliente de mensajería para Android con personalidad propia, controles de apa
 ---
 
 > [!IMPORTANT]
-> **Versión Oficial Activa:** FlexyGram `v1.0.0-beta.47` (Build `1336`)
+> **Versión Oficial Activa:** FlexyGram `v1.0.0-beta.48` (Build `1337`)
 > **Rama Oficial de Desarrollo:** [`codex/flexygram-beta-glass`](https://github.com/Jose22Yt/FlexyGram/tree/codex/flexygram-beta-glass)  
-> Revisión actual: [FlexyBubble Camera Pop, beta 47](docs/performance-current/BETA47_CAMERA_POP.md). Conserva el arranque optimizado de beta 46 y la pantalla principal por defecto de beta 45. Compilación mediante el workflow oficial; resultado pendiente de verificación.
+> Revisión actual: [corrección de avisos Camera Pop, beta 48](docs/performance-current/BETA48_CAMERA_POP.md). Conserva el arranque optimizado de beta 46 y la pantalla principal por defecto de beta 45. Compilación mediante el workflow oficial; resultado pendiente de verificación.
 > Para desarrolladores y agentes de IA (Codex, ChatGPT, Claude), consulta la guía obligatoria de desarrollo en [AGENTS.md](AGENTS.md).
 
 ## Tu espacio, tu estilo
