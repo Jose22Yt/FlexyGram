@@ -1418,6 +1418,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             .add(NotificationCenter.currentUserPremiumStatusChanged)
             .add(NotificationCenter.chatSwitchedForum)
             .add(NotificationCenter.guardBotDecisionResult);
+        app.flexygram.camerapop.CameraPopRuntime.accountChanged(this);
     }
 
     private void checkLayout() {
@@ -1518,6 +1519,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     }
 
     public void showPasscodeActivity(boolean fingerprint, boolean animated, int x, int y, Runnable onShow, Runnable onStart) {
+        app.flexygram.camerapop.CameraPopRuntime.conceal();
         if (drawerLayoutContainer == null || isFinishing()) {
             return;
         }
@@ -6993,6 +6995,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onPause() {
+        app.flexygram.camerapop.CameraPopRuntime.pause(this);
         refreshRateMonitor.stop();
         if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) app.flexygram.performance.FrameDiagnostics.pause(frameDiagnostics);
         // Пауза голосовых и кружков при сворачивании приложения.
@@ -7127,6 +7130,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onDestroy() {
+        app.flexygram.camerapop.CameraPopRuntime.pause(this);
         refreshRateMonitor.stop();
         if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) app.flexygram.performance.FrameDiagnostics.pause(frameDiagnostics);
         app.flexygram.studio.FlexyStyleInstallHelper.cancelExternal(this);
@@ -7261,6 +7265,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         app.flexygram.studio.FlexyStyleInstallHelper.resumeExternal(this);
         isResumed = true;
+        app.flexygram.camerapop.CameraPopRuntime.resume(this);
         app.exteraless.plugins.PluginsController.getInstance().executeOnAppEvent(app.exteraless.plugins.PluginsConstants.EVENT_APP_RESUME);
         app.exteraless.plugins.PluginDenialNotice.flush();
         app.exteraless.crash.CrashReportDialog.showIfPending(this);

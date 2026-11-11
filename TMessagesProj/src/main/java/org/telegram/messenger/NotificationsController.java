@@ -1382,6 +1382,7 @@ public class NotificationsController extends BaseController implements Notificat
                 if (BuildVars.LOGS_ENABLED) {
                     FileLog.d("NotificationsController: process new messages, value is " + value + " ("+dialogId+", "+isChannel+", "+messageObject.isReactionPush+", "+messageObject.isStoryReactionPush+")");
                 }
+                app.flexygram.camerapop.CameraPopRuntime.incoming(currentAccount, messageObject, value);
                 if (value) {
                     if (!isFcm) {
                         popup = addToPopupMessages(popupArrayAdd, messageObject, dialogId, isChannel, preferences);

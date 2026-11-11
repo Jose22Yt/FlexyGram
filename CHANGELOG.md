@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.0.0-beta.47 — build 1336
+
+- FlexyBubble Camera Pop opcional en Ajustes de FlexyGram → Conversaciones, con selector nativo de chats/contactos/grupos/canales/bots por cuenta.
+- Avisos de mensajes entrantes reales y recordatorios de pendientes, agrupación limitada, deduplicación, privacidad, silenciamientos, horario de silencio y demostración ficticia.
+- Anclaje al recorte mediante APIs Android, alternativa con detector existente de Telegram y posición superior segura cuando no hay geometría válida.
+- Entrada y absorción finitas hacia el recorte, sin blur ni redibujado permanente; pulsar cancela la animación y solicita abrir el chat inmediatamente.
+- Temporizador solo con la app visible, revalidación al volver y limpieza en pausa/desactivación. No crea servicios ni permisos de superposición ni altera las notificaciones normales.
+- Conserva las mejoras de arranque de beta 46 y la pantalla principal por defecto. Verificación JVM/API Android y guía manual en `docs/performance-current/BETA47_CAMERA_POP.md`; mediciones físicas pendientes.
+
 ## 1.0.0-beta.46 — preparación, build 1335
 
 - Arranque: la creación de la carpeta de plugins y la migración/verificación de permisos pasan al executor del motor, antes de ejecutar Python. Con el motor apagado no se fuerza ese trabajo durante el inicio.

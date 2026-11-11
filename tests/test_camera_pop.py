@@ -1,0 +1,248 @@
+"""Execute Camera Pop policy/geometry and coordinator with deterministic native hosts.
+These are JVM correctness tests, not Android graphics or physical-device FPS tests.
+"""
+from pathlib import Path
+import re
+import xml.etree.ElementTree as ET
+from test_render_work_reuse import JAVA, ROOT, probe
+
+POP = JAVA/'app/flexygram/camerapop'
+
+
+def test_cutout_geometry_center_side_landscape_and_safe_fallback(tmp_path):
+    probe(tmp_path, {'Probe.java': '''import app.flexygram.camerapop.CameraPopGeometry;
+public class Probe {
+ static void check(boolean ok){if(!ok)throw new AssertionError();}
+ public static void main(String[]a){
+ var c=CameraPopGeometry.place(1080,2400,0,90,0,70,900,240,30,12,510,10,570,70);
+ check(c.originX==540&&c.originY==70&&c.x==90&&c.y==102&&c.width==900);
+ var l=CameraPopGeometry.place(1080,2400,0,90,0,70,900,240,30,12,40,10,100,70);
+ check(l.originX==70&&l.x==30&&l.y==102);
+ var r=CameraPopGeometry.place(1080,2400,0,90,0,70,900,240,30,12,980,10,1040,70);
+ check(r.originX==1010&&r.x==150);
+ var land=CameraPopGeometry.place(2400,1080,90,0,0,50,900,200,30,12,10,40,70,100);
+ check(land.x>=120&&land.y>=112&&land.x+land.width<=2370);
+ var fallback=CameraPopGeometry.place(1080,2400,0,90,0,70,900,240,30,12,-20,0,10,60);
+ check(fallback.originX==540&&fallback.originY==90);
+ var small=CameraPopGeometry.place(360,400,20,60,20,50,500,150,12,6,0,0,0,0);
+ check(small.width==296&&small.x>=32&&small.x+small.width<=328&&small.y+150<=338);
+ for(int width:new int[]{320,720,1080,2400})for(int safe:new int[]{0,20,40}){
+ var p=CameraPopGeometry.place(width,2800,safe,80,safe,100,1000,300,12,6,0,0,0,0);
+ check(p.width>0&&p.x>=safe+12&&p.x+p.width<=width-safe-12&&p.y>=80);
+ }
+ }}'''}, [POP/'CameraPopGeometry.java'])
+
+
+def test_state_dedup_read_persistence_queue_and_quiet_hours(tmp_path):
+    probe(tmp_path, {'Probe.java': '''import java.util.*;import app.flexygram.camerapop.CameraPopState;
+public class Probe{
+ static void check(boolean ok){if(!ok)throw new AssertionError();}
+ public static void main(String[]a){
+ CameraPopState s=new CameraPopState();
+ check(s.incoming(-10,7,3,1000,300000));check(!s.incoming(-10,7,3,2000,300000));
+ check(s.incoming(-11,7,0,1000,300000));check(s.incoming(-10,8,3,2000,300000));
+ check(s.get(-10).due==301000); // A noisy chat never postpones its first deadline.
+ s.enqueue(-10);s.enqueue(-10);check(s.poll()==-10&&s.poll()==0);
+ s.enqueue(1);s.enqueue(2);s.enqueue(3);s.enqueue(4);check(s.poll()==2&&s.poll()==3&&s.poll()==4&&s.poll()==0);
+ s.enqueue(-10);s.read(-10);check(s.get(-10).due==0&&s.poll()==0&&!s.incoming(-10,8,3,4000,300000));
+ CameraPopState restored=new CameraPopState();Set<String>saved=s.save();saved.add("bad");saved.add("1:bad:0:0");
+ restored.restore(saved,new HashSet<>(Arrays.asList(-10L,-11L)));
+ check(restored.get(-10).due==0&&!restored.incoming(-10,8,3,5000,300000));
+ check(restored.nextDue()==301000);restored.retain(Collections.singleton(-10L));check(restored.get(-11)==null);
+ check(restored.incoming(-10,9,3,5000,300000)&&restored.get(-10).due==305000);
+ check(CameraPopState.quiet(23*60,22*60,8*60));check(CameraPopState.quiet(7*60,22*60,8*60));
+ check(!CameraPopState.quiet(8*60,22*60,8*60));check(!CameraPopState.quiet(12*60,22*60,8*60));
+ check(CameraPopState.quiet(600,600,600));check(CameraPopState.quiet(600,540,720));
+ check(!CameraPopState.quiet(720,540,720));
+ CameraPopState otherAccount=new CameraPopState();check(otherAccount.incoming(-10,9,0,0,1));
+ restored.clear();check(restored.nextDue()==Long.MAX_VALUE&&restored.save().isEmpty());
+ }}'''}, [POP/'CameraPopState.java'])
+
+
+def runtime_hosts():
+    """Explicit doubles for native UI/lifecycle; the production coordinator/config execute."""
+    files={
+'android/content/SharedPreferences.java':'''package android.content;import java.util.*;public class SharedPreferences {
+ public int writes;final Map<String,Object>data=new HashMap<>();public boolean getBoolean(String k,boolean d){return (Boolean)data.getOrDefault(k,d);}
+ public int getInt(String k,int d){return (Integer)data.getOrDefault(k,d);}public long getLong(String k,long d){return (Long)data.getOrDefault(k,d);}
+ @SuppressWarnings("unchecked")public Set<String>getStringSet(String k,Set<String>d){return new HashSet<>((Set<String>)data.getOrDefault(k,d));}
+ public Editor edit(){return new Editor();}public class Editor{public Editor putBoolean(String k,boolean v){data.put(k,v);return this;}public Editor putInt(String k,int v){data.put(k,v);return this;}public Editor putLong(String k,long v){data.put(k,v);return this;}public Editor putStringSet(String k,Set<String>v){data.put(k,new HashSet<>(v));return this;}public Editor remove(String k){data.remove(k);return this;}public void apply(){writes++;}}}''',
+'android/os/Bundle.java':'package android.os;public class Bundle extends java.util.HashMap<String,Object>{public void putLong(String k,long v){put(k,v);}}',
+'android/os/Build.java':'package android.os;public class Build{public static class VERSION{public static int SDK_INT=35;}}',
+'android/view/Gravity.java':'package android.view;public class Gravity{public static final int TOP=48,LEFT=3;}',
+'android/view/View.java':'package android.view;public class View{public interface OnClickListener{void onClick(View v);}public void postOnAnimation(Runnable r){r.run();}public void removeCallbacks(Runnable r){org.telegram.messenger.AndroidUtilities.cancelRunOnUIThread(r);}}',
+'android/widget/FrameLayout.java':'package android.widget;public class FrameLayout extends android.view.View{public void addView(android.view.View v,LayoutParams p){}public static class LayoutParams{public static int WRAP_CONTENT=-2;public LayoutParams(int w,int h,int g){}}}',
+'org/telegram/tgnet/TLRPC.java':'''package org.telegram.tgnet;public class TLRPC{
+ public static class Dialog{public int unread_count,top_message;}
+ public static class User{public String name="Peer";}public static class Chat{public String title="Group";}
+ public static class TL_messageActionEmpty{}
+ public static class Message{public boolean unread=true,from_scheduled;public Object action;}
+}''',
+'org/telegram/messenger/UserConfig.java':'''package org.telegram.messenger;public class UserConfig{public static int selectedAccount;public long owner=100;public boolean active=true;static final UserConfig[]all={new UserConfig(),new UserConfig()};public static UserConfig getInstance(int a){return all[a];}public boolean isClientActivated(){return active;}public long getClientUserId(){return owner;}}''',
+'org/telegram/messenger/SharedConfig.java':'package org.telegram.messenger;public class SharedConfig{public static boolean appLocked,isWaitingForPasscodeEnter;}',
+'org/telegram/messenger/AndroidUtilities.java':'''package org.telegram.messenger;import java.util.*;public class AndroidUtilities{
+ public static final Map<Runnable,Long>jobs=new LinkedHashMap<>();public static int posts;
+ public static void runOnUIThread(Runnable r){posts++;r.run();}public static void runOnUIThread(Runnable r,long d){jobs.put(r,d);}
+ public static void cancelRunOnUIThread(Runnable r){jobs.remove(r);}public static int dp(int n){return n;}public static boolean needShowPasscode(){return false;}
+ public static void shortJobs(){for(int round=0;round<20;round++){var ready=new ArrayList<Runnable>();for(var e:jobs.entrySet())if(e.getValue()<=500)ready.add(e.getKey());if(ready.isEmpty())return;for(var r:ready){jobs.remove(r);r.run();}}throw new AssertionError("callback loop");}
+}''',
+'org/telegram/messenger/MessageObject.java':'''package org.telegram.messenger;public class MessageObject{public org.telegram.tgnet.TLRPC.Message messageOwner=new org.telegram.tgnet.TLRPC.Message();public long dialog;public int id;public boolean out,isReactionPush,isStoryReactionPush,isOauthPush;public int getId(){return id;}public long getDialogId(){return dialog;}public boolean isOutOwner(){return out;}public boolean isFcmMessage(){return false;}public static long getTopicId(int a,Object m,boolean f){return 0;}}''',
+'org/telegram/messenger/MessagesController.java':'''package org.telegram.messenger;import java.util.*;import android.content.SharedPreferences;import org.telegram.tgnet.TLRPC;
+ public class MessagesController{static final MessagesController[]all={new MessagesController(),new MessagesController()};public final Map<Long,TLRPC.Dialog>dialogs_dict=new HashMap<>();public final Map<Long,Integer>dialogs_read_inbox_max=new HashMap<>();public final Set<Long>muted=new HashSet<>();final SharedPreferences prefs=new SharedPreferences();public static MessagesController getInstance(int a){return all[a];}public static SharedPreferences getMainSettings(int a){return all[a].prefs;}public boolean isForum(MessageObject m){return false;}public boolean isDialogMuted(long d,long t){return muted.contains(d);}public TLRPC.User getUser(long d){return new TLRPC.User();}public TLRPC.Chat getChat(long d){return new TLRPC.Chat();}public boolean checkCanOpenChat(android.os.Bundle b,org.telegram.ui.ActionBar.BaseFragment f){return true;}}''',
+'org/telegram/messenger/NotificationCenter.java':'''package org.telegram.messenger;import java.util.*;public class NotificationCenter{
+ public static final int messagesRead=1,messagesDeleted=2,dialogsNeedReload=3,dialogsUnreadCounterChanged=4,notificationsSettingsUpdated=5,appDidLogout=6,didSetPasscode=7,passcodeDismissed=8,openedChatChanged=9;
+ public interface NotificationCenterDelegate{void didReceivedNotification(int e,int a,Object...args);}
+ static final NotificationCenter[]all={new NotificationCenter(0),new NotificationCenter(1),new NotificationCenter(-1)};final int account;NotificationCenter(int a){account=a;}
+ public final Map<Integer,Set<NotificationCenterDelegate>>listeners=new HashMap<>();public static NotificationCenter getInstance(int a){return all[a];}public static NotificationCenter getGlobalInstance(){return all[2];}
+ public void addObserver(NotificationCenterDelegate d,int e){listeners.computeIfAbsent(e,k->new HashSet<>()).add(d);}public void removeObserver(NotificationCenterDelegate d,int e){listeners.getOrDefault(e,Collections.emptySet()).remove(d);}
+ public void post(int e){for(var d:new ArrayList<>(listeners.getOrDefault(e,Collections.emptySet())))d.didReceivedNotification(e,account);}
+}''',
+'org/telegram/messenger/DialogObject.java':'package org.telegram.messenger;public class DialogObject{public static boolean isUserDialog(long d){return d>0;}public static boolean isChatDialog(long d){return d<0;}}',
+'org/telegram/messenger/LocaleController.java':'package org.telegram.messenger;public class LocaleController{public static String getString(int r){return r==R.string.CameraPopPrivateName?"PRIVATE":"DEMO";}public static String formatPluralString(String s,int n){return n+" unread";}}',
+'org/telegram/messenger/R.java':'package org.telegram.messenger;public class R{public static class string{public static int CameraPopDemoName=1,CameraPopDemoMessage=2,CameraPopPrivateName=3;}}',
+'org/telegram/messenger/UserObject.java':'package org.telegram.messenger;public class UserObject{public static String getUserName(org.telegram.tgnet.TLRPC.User u){return u.name;}}',
+'org/telegram/ui/ActionBar/BaseFragment.java':'package org.telegram.ui.ActionBar;public class BaseFragment{public static int opened;public int getCurrentAccount(){return org.telegram.messenger.UserConfig.selectedAccount;}public boolean presentFragment(BaseFragment f){opened++;org.telegram.ui.LaunchActivity.last=f;return true;}}',
+'org/telegram/ui/ChatActivity.java':'package org.telegram.ui;public class ChatActivity extends org.telegram.ui.ActionBar.BaseFragment{public final android.os.Bundle args;public ChatActivity(android.os.Bundle b){args=b;}public long getDialogId(){return args.containsKey("user_id")?(long)args.get("user_id"):-(long)args.get("chat_id");}}',
+'org/telegram/ui/LaunchActivity.java':'''package org.telegram.ui;public class LaunchActivity{public static org.telegram.ui.ActionBar.BaseFragment last=new org.telegram.ui.ActionBar.BaseFragment();public final android.widget.FrameLayout root=new android.widget.FrameLayout();public boolean focus=true;public boolean isFinishing(){return false;}public boolean isDestroyed(){return false;}public boolean hasWindowFocus(){return focus;}public boolean isInPictureInPictureMode(){return false;}public Window getWindow(){return new Window();}public class Window{public android.view.View getDecorView(){return root;}}public static org.telegram.ui.ActionBar.BaseFragment getLastFragmentIncludeMainTabs(){return last;}}''',
+ 'tw/nekomimi/nekogram/helpers/PasscodeHelper.java':'package tw.nekomimi.nekogram.helpers;public class PasscodeHelper{public static boolean isAccountHidden(int a){return false;}}',
+'app/flexygram/camerapop/CameraPopCapsule.java':'''package app.flexygram.camerapop;public class CameraPopCapsule extends android.view.View{public static int creates,releases,enters,exits;public static CameraPopCapsule last;public Object peer;public String title;public android.view.View.OnClickListener click;public Runnable closing;public CameraPopCapsule(android.widget.FrameLayout r){creates++;last=this;}public void bind(String t,String d,Object p){title=t;peer=p;}public void setAlpha(float a){}public void setOnClickListener(android.view.View.OnClickListener c){click=c;}public void enter(){enters++;}public void exit(Runnable r){exits++;closing=r;}public void release(){releases++;closing=null;click=null;} }'''
+    }
+    return files
+
+
+def test_coordinator_selection_privacy_read_mute_lifecycle_and_navigation(tmp_path):
+    files=runtime_hosts()
+    files['Probe.java']='''import java.util.*;import app.flexygram.camerapop.*;import org.telegram.messenger.*;import org.telegram.ui.*;import org.telegram.tgnet.TLRPC;
+public class Probe{
+ static void check(boolean ok){if(!ok)throw new AssertionError();}
+ static void unread(int a,long d,int count,int mid){TLRPC.Dialog v=new TLRPC.Dialog();v.unread_count=count;v.top_message=mid;MessagesController.getInstance(a).dialogs_dict.put(d,v);}
+ static void incoming(int a,long d,int mid,boolean normal){MessageObject m=new MessageObject();m.id=mid;m.dialog=d;CameraPopRuntime.incoming(a,m,normal);AndroidUtilities.shortJobs();}
+ public static void main(String[]args){
+ LaunchActivity host=new LaunchActivity();CameraPopRuntime.resume(host);check(CameraPopCapsule.creates==0);
+ CameraPopConfig config=new CameraPopConfig(0);config.set("enabled",true);config.set("quiet",false);config.select(new HashSet<>(Arrays.asList(10L,-20L)));
+ CameraPopRuntime.configurationChanged(0);unread(0,10,2,7);incoming(0,10,7,true);check(CameraPopCapsule.creates==1&&CameraPopCapsule.last.peer!=null);
+ incoming(0,10,7,true);check(CameraPopCapsule.creates==1);int posts=AndroidUtilities.posts;incoming(0,99,1,true);check(AndroidUtilities.posts==posts); // unselected never dispatched to UI
+ config.set("names",false);CameraPopRuntime.configurationChanged(0);incoming(0,10,8,true);check(CameraPopCapsule.last.peer==null&&CameraPopCapsule.last.title.equals("PRIVATE"));
+ CameraPopCapsule shown=CameraPopCapsule.last;shown.exit(()->{});shown.click.onClick(shown);check(org.telegram.ui.ActionBar.BaseFragment.opened==1&&shown.closing==null); // no animation wait
+ LaunchActivity.last=new org.telegram.ui.ActionBar.BaseFragment();unread(0,10,3,9);incoming(0,10,9,true);
+ MessagesController.getInstance(0).dialogs_read_inbox_max.put(10L,9);unread(0,10,0,9);NotificationCenter.getInstance(0).post(NotificationCenter.messagesRead);AndroidUtilities.shortJobs();check(shown.releases>=1);
+ int creates=CameraPopCapsule.creates;incoming(0,10,9,true);check(CameraPopCapsule.creates==creates);
+ MessagesController.getInstance(0).muted.add(-20L);unread(0,-20,1,7);incoming(0,-20,7,false);check(CameraPopCapsule.creates==creates);
+ config.set("respect_muted",false);CameraPopRuntime.configurationChanged(0);incoming(0,-20,8,false);check(CameraPopCapsule.creates==creates+1);
+ CameraPopRuntime.pause(host);check(AndroidUtilities.jobs.isEmpty());check(NotificationCenter.getInstance(0).listeners.values().stream().allMatch(Set::isEmpty));
+ creates=CameraPopCapsule.creates;unread(0,-20,2,9);incoming(0,-20,9,false);check(CameraPopCapsule.creates==creates&&AndroidUtilities.jobs.isEmpty());
+ CameraPopRuntime.resume(host);SharedConfig.appLocked=true;CameraPopRuntime.conceal();incoming(0,-20,10,false);check(CameraPopCapsule.creates==creates);SharedConfig.appLocked=false;
+ config.set("enabled",false);CameraPopRuntime.configurationChanged(0);check(AndroidUtilities.jobs.isEmpty());
+ CameraPopState saved=new CameraPopState();new CameraPopConfig(0).load(saved);check(saved.save().isEmpty());
+ CameraPopRuntime.demonstrate();check(CameraPopCapsule.last.peer==null);CameraPopRuntime.pause(host);check(AndroidUtilities.jobs.isEmpty());
+ UserConfig.getInstance(0).owner=200;CameraPopConfig nextOwner=new CameraPopConfig(0);check(!nextOwner.enabled&&nextOwner.selected.isEmpty());
+ }}'''
+    probe(tmp_path, files, [POP/name for name in ['CameraPopState.java','CameraPopConfig.java','CameraPopRuntime.java']])
+
+
+def test_integration_keeps_native_dedup_and_notification_repeat():
+    source=(JAVA/'org/telegram/messenger/NotificationsController.java').read_text()
+    start=source.index('public void processNewMessages(')
+    bridge=source.index('CameraPopRuntime.incoming(', start)
+    assert source.index('if (oldMessageObject != null)',start)<bridge
+    assert source.index('dialogId == openedDialogId',start)<bridge
+    assert bridge<source.index('if (value) {',bridge)
+    repeat=source[source.index('protected void scheduleNotificationRepeat()'):source.index('protected void scheduleNotificationRepeat()')+1300] if 'protected void scheduleNotificationRepeat()' in source else source[source.index('void scheduleNotificationRepeat()'):source.index('void scheduleNotificationRepeat()')+1300]
+    assert 'CameraPop' not in repeat
+    launch=(JAVA/'org/telegram/ui/LaunchActivity.java').read_text()
+    assert 'CameraPopRuntime.resume(this)' in launch and launch.count('CameraPopRuntime.pause(this)')==2
+    assert 'CameraPopRuntime.conceal()' in launch
+    view=(POP/'CameraPopCapsule.java').read_text()
+    assert 'getBoundingRects()' in view and 'getCutoutPath()' in view
+    assert 'removeFrameCallback(frame)' in view and 'root.removeView(this)' in view
+    assert 'RenderEffect' not in view and 'blurBitmap' not in view
+    assert 'ValueAnimator.areAnimatorsEnabled()' in view
+    runtime=(POP/'CameraPopRuntime.java').read_text()
+    assert runtime.index('int id=observing;hide();')<runtime.index('last.presentFragment(')
+    assert 'SYSTEM_ALERT_WINDOW' not in ''.join(p.read_text() for p in POP.glob('*.java'))
+
+
+def test_camera_pop_resources_complete_in_english_and_spanish():
+    used=set(re.findall(r'R.string.(CameraPop\w+)', ''.join(p.read_text() for p in POP.glob('*.java'))))
+    for locale in ['values','values-es']:
+        doc=ET.parse(ROOT/f'TMessagesProj/src/main/res/{locale}/strings.xml')
+        names=[e.get('name') for e in doc.getroot()]
+        assert used<=set(names)
+        assert {'CameraPopUnread_one','CameraPopUnread_other'}<=set(names)
+        assert len(names)==len(set(names))
+
+
+def test_finite_motion_cancels_frames_and_does_not_wait_before_reversal(tmp_path):
+    from test_composer_layout import method
+    source=(POP/'CameraPopCapsule.java').read_text()
+    methods='\n'.join(method(source,mark) for mark in [
+        'private void motion(', 'private void apply(', 'private void finish()', 'void cancelMotion()'])
+    probe(tmp_path, {'Probe.java':'''import java.util.*;
+class Choreographer{
+ interface FrameCallback{void doFrame(long time);}static final Choreographer clock=new Choreographer();
+ final ArrayList<FrameCallback>frames=new ArrayList<>();static Choreographer getInstance(){return clock;}
+ void postFrameCallback(FrameCallback c){if(frames.contains(c))throw new AssertionError("duplicate frame");frames.add(c);}
+ void removeFrameCallback(FrameCallback c){frames.remove(c);}
+ void step(long time){var ready=new ArrayList<>(frames);frames.clear();for(var c:ready)c.doFrame(time);}
+}
+public class Probe{
+ Choreographer.FrameCallback frame;Runnable completed;boolean closing,reduced;float destinationX=40,destinationY=-100,x,y,sx,sy,alpha;
+ boolean reducedMotion(){return reduced;}void setScaleX(float v){sx=v;}void setScaleY(float v){sy=v;}void setTranslationX(float v){x=v;}void setTranslationY(float v){y=v;}void setAlpha(float v){alpha=v;}
+ METHODS
+ static void check(boolean ok){if(!ok)throw new AssertionError();}
+ public static void main(String[]a){Probe p=new Probe();var c=Choreographer.getInstance();
+ p.motion(false,null);check(p.alpha==0&&p.x==40&&p.y==-100);
+ for(int i=0;i<20;i++)c.step(1_000_000L+i*16_000_000L);
+ check(c.frames.isEmpty()&&p.frame==null&&p.sx==1&&p.sy==1&&p.x==0&&p.y==0&&p.alpha==1);
+ int[]done={0};p.motion(true,()->done[0]++);c.step(400_000_000L);c.step(480_000_000L);check(p.alpha>0);
+ p.cancelMotion();check(c.frames.isEmpty()&&done[0]==0&&p.completed==null);
+ p.motion(false,null);for(int i=0;i<20;i++)c.step(600_000_000L+i*16_000_000L);
+ p.motion(true,()->done[0]++);for(int i=0;i<20;i++)c.step(1_000_000_000L+i*16_000_000L);
+ check(done[0]==1&&p.alpha==0&&c.frames.isEmpty());
+ p.reduced=true;p.motion(false,null);check(p.alpha==1&&c.frames.isEmpty());p.motion(true,()->done[0]++);check(p.alpha==0&&done[0]==2&&c.frames.isEmpty());
+ }}'''.replace('METHODS',methods)})
+
+
+def test_reminders_revalidate_native_reads_quiet_hours_and_account_switch(tmp_path):
+    files=runtime_hosts()
+    files['Probe.java']='''import java.util.*;import java.lang.reflect.*;import app.flexygram.camerapop.*;import org.telegram.messenger.*;import org.telegram.ui.*;import org.telegram.tgnet.TLRPC;
+public class Probe{
+ static void check(boolean v){if(!v)throw new AssertionError();}
+ static CameraPopState state(int account)throws Exception{
+ Field f=CameraPopRuntime.class.getDeclaredField("INSTANCE");f.setAccessible(true);Object runtime=f.get(null);
+ Method m=CameraPopRuntime.class.getDeclaredMethod("account",int.class);m.setAccessible(true);Object a=m.invoke(runtime,account);
+ Field s=a.getClass().getDeclaredField("state");s.setAccessible(true);return (CameraPopState)s.get(a);
+ }
+ static void arrival(int a,int message){MessageObject m=new MessageObject();m.id=message;m.dialog=10;CameraPopRuntime.incoming(a,m,true);AndroidUtilities.shortJobs();}
+ static void refresh(){NotificationCenter.getInstance(UserConfig.selectedAccount).post(NotificationCenter.dialogsNeedReload);AndroidUtilities.shortJobs();}
+ public static void main(String[]args)throws Exception{
+ for(int a=0;a<2;a++){CameraPopConfig c=new CameraPopConfig(a);c.set("enabled",true);c.set("immediate",false);c.set("quiet",false);c.select(Collections.singleton(10L));TLRPC.Dialog d=new TLRPC.Dialog();d.unread_count=2;d.top_message=7;MessagesController.getInstance(a).dialogs_dict.put(10L,d);CameraPopRuntime.configurationChanged(a);}
+ LaunchActivity host=new LaunchActivity();CameraPopRuntime.resume(host);arrival(0,8);check(CameraPopCapsule.creates==0);
+ state(0).defer(10,1);refresh();check(CameraPopCapsule.creates==1&&state(0).get(10).due>System.currentTimeMillis());
+ CameraPopRuntime.pause(host);check(AndroidUtilities.jobs.isEmpty());
+ new CameraPopConfig(0).set("quiet",true);new CameraPopConfig(0).set("quiet_start",0);new CameraPopConfig(0).set("quiet_end",0);CameraPopRuntime.configurationChanged(0);
+ CameraPopRuntime.resume(host);state(0).defer(10,1);int count=CameraPopCapsule.creates;refresh();check(CameraPopCapsule.creates==count);
+ new CameraPopConfig(0).set("quiet",false);CameraPopRuntime.configurationChanged(0);MessagesController.getInstance(0).dialogs_dict.get(10L).unread_count=0;
+ state(0).defer(10,1);refresh();check(state(0).get(10).due==0&&CameraPopCapsule.creates==count);
+ UserConfig.selectedAccount=1;CameraPopRuntime.accountChanged(host);state(1).defer(10,1);refresh();check(CameraPopCapsule.creates==count+1);
+ CameraPopRuntime.pause(host);LaunchActivity recreated=new LaunchActivity();CameraPopRuntime.resume(recreated);check(CameraPopCapsule.creates==count+1); // no duplicate on recreation
+ NotificationCenter.getInstance(1).post(NotificationCenter.appDidLogout);check(AndroidUtilities.jobs.isEmpty());
+ CameraPopState saved=new CameraPopState();new CameraPopConfig(1).load(saved);check(saved.save().isEmpty());CameraPopRuntime.pause(recreated);
+ }}'''
+    probe(tmp_path,files,[POP/name for name in ['CameraPopState.java','CameraPopConfig.java','CameraPopRuntime.java']])
+
+
+def test_foreground_burst_batches_preference_writes_and_pause_flushes(tmp_path):
+    files=runtime_hosts()
+    files['Probe.java']='''import java.util.*;import app.flexygram.camerapop.*;import org.telegram.messenger.*;import org.telegram.ui.*;import org.telegram.tgnet.TLRPC;
+public class Probe{
+ public static void main(String[]args){CameraPopConfig c=new CameraPopConfig(0);c.set("enabled",true);c.set("immediate",false);c.set("reminders",false);c.set("quiet",false);c.select(Collections.singleton(10L));CameraPopRuntime.configurationChanged(0);
+ TLRPC.Dialog d=new TLRPC.Dialog();d.unread_count=100;d.top_message=100;MessagesController.getInstance(0).dialogs_dict.put(10L,d);
+ LaunchActivity host=new LaunchActivity();CameraPopRuntime.resume(host);int before=c.prefs.writes;
+ for(int i=101;i<=200;i++){MessageObject m=new MessageObject();m.id=i;m.dialog=10;CameraPopRuntime.incoming(0,m,true);}
+ if(c.prefs.writes!=before)throw new AssertionError("one preference write per message");
+ CameraPopRuntime.pause(host);if(c.prefs.writes!=before+1||!AndroidUtilities.jobs.isEmpty())throw new AssertionError("pause did not flush/cancel");
+ CameraPopState restored=new CameraPopState();new CameraPopConfig(0).load(restored);
+ if(restored.get(10).message!=200)throw new AssertionError("latest pending state lost on pause");
+ }}'''
+    probe(tmp_path,files,[POP/name for name in ['CameraPopState.java','CameraPopConfig.java','CameraPopRuntime.java']])
