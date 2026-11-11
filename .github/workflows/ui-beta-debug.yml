@@ -170,6 +170,7 @@ jobs:
             --init-script "$RUNNER_TEMP/flexy-native-pools.gradle" \
             -PflexyPerformanceBuild=true :TMessagesProj:assembleDebug 2>&1 | tee build/reports/ui-beta/assemble.log
       - name: Verify APK signature and native ABI
+        id: verify_apk
         shell: bash
         run: |
           set -euo pipefail
@@ -228,8 +229,18 @@ jobs:
               echo '```'
             fi
           } >> "$GITHUB_STEP_SUMMARY"
+      # A diagnostics upload outage must not prevent delivery of the verified APK.
+      - name: Save debug APK
+        if: ${{ !cancelled() && steps.verify_apk.outcome == 'success' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: flexygram-ui-beta-debug-arm64-${{ github.sha }}
+          path: TMessagesProj/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 7
       - name: Save build reports
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: flexygram-ui-beta-reports-${{ github.sha }}
@@ -237,11 +248,4 @@ jobs:
             build/reports/ui-beta/
             build/reports/problems/
           if-no-files-found: warn
-          retention-days: 7
-      - name: Save debug APK
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: flexygram-ui-beta-debug-arm64-${{ github.sha }}
-          path: TMessagesProj/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
           retention-days: 7

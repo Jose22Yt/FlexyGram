@@ -95,3 +95,19 @@ No se ha afirmado impacto cero. La función es interna; no aparece sobre otras a
 recibe permisos adicionales, y no sustituye el transporte push ni las notificaciones
 normales. La compilación se inicia con el push final y no se inspecciona por indicación
 expresa del propietario.
+
+
+## Corrección de entrega del artefacto
+
+La ejecución `43092239511` del commit `b5b723786` terminó las pruebas, el ensamblado
+real de la APK y la verificación de firma/ABI correctamente. Falló después al crear
+el artefacto de informes: el servicio devolvió HTML en lugar de JSON tras cinco
+intentos. Al estar antes de la entrega de la APK, ese fallo dejó omitida su subida.
+
+El workflow ahora sube primero la APK y exige que la verificación haya terminado
+correctamente. La subida de informes se ejecuta después como paso no bloqueante.
+Un fallo de compilación, verificación o entrega de la APK sigue siendo un fallo;
+no se ha ocultado el resultado principal ni se han alterado firmas o credenciales.
+Una prueba de regresión valida esas condiciones y el orden de entrega. La nueva
+compilación se inicia mediante push sin seguimiento posterior, por indicación del
+propietario. Esta corrección no modifica el código de la app ni su versión beta 48.
