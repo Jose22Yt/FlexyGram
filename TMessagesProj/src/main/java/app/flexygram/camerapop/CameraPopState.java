@@ -68,11 +68,19 @@ public final class CameraPopState {
         return next;
     }
     public Set<String> save() {
+        int read=0;for(Pending p:entries.values())if(p.due==0)read++;
+        if(read>512) {
+            java.util.Iterator<Pending> it=entries.values().iterator();
+            while(it.hasNext() && read>512)if(it.next().due==0){it.remove();read--;}
+        }
         Set<String> saved = new HashSet<>();
         for (Pending p : entries.values()) saved.add(p.dialog + ":" + p.message + ":" + p.topic + ":" + p.due + ":" + p.received);
         return saved;
     }
     public void restore(Set<String> saved, Set<Long> selected) {
+        restore(saved,selected,false);
+    }
+    public void restore(Set<String> saved, Set<Long> selected,boolean all) {
         clear();
         for (String value : saved) {
             try {
@@ -81,7 +89,7 @@ public final class CameraPopState {
                 long dialog = Long.parseLong(fields[0]); int message = Integer.parseInt(fields[1]);
                 long topic = Long.parseLong(fields[2]), due = Long.parseLong(fields[3]);
                 int received=fields.length==5?Integer.parseInt(fields[4]):message;
-                if (selected.contains(dialog) && message > 0 && due >= 0 && received>=0 && received<=message) {
+                if ((all || selected.contains(dialog)) && message > 0 && due >= 0 && received>=0 && received<=message) {
                     Pending p=new Pending(dialog,message,topic,due);p.received=received;entries.put(dialog,p);
                 }
             } catch (NumberFormatException ignored) { /* Discard corrupt persisted records. */ }

@@ -2,234 +2,205 @@
 package app.flexygram.camerapop;
 
 import static org.telegram.messenger.AndroidUtilities.dp;
-
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Path;
-import android.graphics.Paint;
 import android.graphics.Canvas;
-import android.graphics.Rect;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.os.Build;
 import android.text.TextUtils;
 import android.view.Choreographer;
-import android.view.DisplayCutout;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowInsets;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
-import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.ImageLocation;
-import org.telegram.messenger.NotchInfoUtils;
-import org.telegram.messenger.SharedConfig;
+import android.widget.ImageView;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.LongConsumer;
+import org.telegram.messenger.*;
 import org.telegram.tgnet.TLRPC;
-import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.Components.BackupImageView;
 
-/** Only the capsule is attached to decor: no full-screen touch-consuming overlay. */
-final class CameraPopCapsule extends LinearLayout {
-    private final BackupImageView avatar;
-    private final TextView name, detail;
-    private final FrameLayout root;
+/** Compact island + recycled chat list. No fullscreen overlay, blur or idle frame loop. */
+final class CameraPopCapsule extends FrameLayout {
+    private final FrameLayout root,compact;
+    private final LinearLayout panel;
+    private final TextView left,right,heading;
+    private final ListView list;
+    private final Rows adapter=new Rows();
+    private final Paint surface=new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Path clip=new Path();
+    private final RectF bounds=new RectF();
+    private final CameraPopSpring presence=new CameraPopSpring(),expansion=new CameraPopSpring();
     private final View.OnLayoutChangeListener layoutListener;
-    private final int[] location = new int[2];
     private final Runnable reposition=this::position;
     private Choreographer.FrameCallback frame;
-    private Runnable completed;
-    private float destinationX, destinationY;
-    private float terminalX=.01f,terminalY=.01f,surfaceNeck;
-    private boolean closing,hasCutout;
-    private final CameraPopMotion motionValue=new CameraPopMotion();
-    private final Path surfacePath=new Path();
-    private final Paint surfacePaint=new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint borderPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Runnable completed,expandedChanged;
+    private LongConsumer rowClick;
+    private List<CameraPopInbox.Row> rows=new ArrayList<>();
+    private int account,compactHeight,fullHeight,compactWidth;
+    private float anchorX,anchorY,compactLeft,terminal=.01f,hitRadius;
+    private boolean names,expanded,cutout,exiting;
+    private long previousFrame,started;
 
     CameraPopCapsule(FrameLayout root) {
-        super(root.getContext());
-        this.root=root;
-        Context context=getContext();
-        setOrientation(HORIZONTAL); setGravity(Gravity.CENTER_VERTICAL);
-        setPadding(dp(14),dp(12),dp(14),dp(12));
-        setMinimumHeight(dp(76)); setClickable(true); setFocusable(true);
-        setWillNotDraw(false);borderPaint.setStyle(Paint.Style.STROKE);borderPaint.setStrokeWidth(dp(1));
+        super(root.getContext());this.root=root;Context c=getContext();
+        setWillNotDraw(false);setClickable(true);setFocusable(true);
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
         setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);
-        avatar=new BackupImageView(context); avatar.setRoundRadius(dp(23));
-        addView(avatar,new LinearLayout.LayoutParams(dp(46),dp(46)));
-        LinearLayout text=new LinearLayout(context); text.setOrientation(VERTICAL);
-        LinearLayout.LayoutParams textParams=new LinearLayout.LayoutParams(0,LayoutParams.WRAP_CONTENT,1f);
-        textParams.setMarginStart(dp(12)); addView(text,textParams);
-        name=new TextView(context); name.setTextSize(15); name.setTypeface(AndroidUtilities.bold());
-        name.setSingleLine(true); name.setEllipsize(TextUtils.TruncateAt.END);
-        detail=new TextView(context); detail.setTextSize(13); detail.setMaxLines(2);
-        detail.setEllipsize(TextUtils.TruncateAt.END);
-        text.addView(name,new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT));
-        text.addView(detail,new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT));
-        layoutListener=(v,l,t,r,b,ol,ot,or,ob)->{
-            if(frame!=null && (r-l!=or-ol || b-t!=ob-ot)) {
-                boolean exiting=closing;Runnable done=completed;cancelMotion();
-                position();apply(exiting?0f:1f);if(done!=null)done.run();
-            } else if(frame==null && !closing) position();
-        };
+        surface.setColor(Color.rgb(18,18,20));
+        compact=new FrameLayout(c);left=label(c,12);right=label(c,13);
+        left.setGravity(Gravity.CENTER);right.setGravity(Gravity.CENTER);
+        compact.addView(left);compact.addView(right);addView(compact);
+        compact.setOnClickListener(v->toggleExpanded());
+        panel=new LinearLayout(c);panel.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout toolbar=new LinearLayout(c);toolbar.setGravity(Gravity.CENTER_VERTICAL);
+        toolbar.setMinimumHeight(dp(48));
+        toolbar.setPadding(dp(16),0,dp(8),0);heading=label(c,14);
+        toolbar.addView(heading,new LinearLayout.LayoutParams(0,LayoutParams.WRAP_CONTENT,1));heading.setGravity(Gravity.CENTER_VERTICAL);
+        ImageView close=new ImageView(c);close.setImageResource(R.drawable.fg_ios_original_chat_context_menu_collapse);
+        close.setColorFilter(Color.WHITE);close.setScaleType(ImageView.ScaleType.CENTER);
+        close.setContentDescription(LocaleController.getString(R.string.CameraPopCollapse));
+        toolbar.addView(close,new LinearLayout.LayoutParams(dp(48),dp(48)));close.setOnClickListener(v->toggleExpanded());
+        panel.addView(toolbar);
+        list=new ListView(c);list.setDivider(null);list.setCacheColorHint(Color.TRANSPARENT);list.setAdapter(adapter);
+        list.setOnItemClickListener((parent,v,p,id)->{if(p<rows.size() && rowClick!=null)rowClick.accept(rows.get(p).dialog);});
+        panel.addView(list,new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,0,1));
+        addView(panel);panel.setVisibility(GONE);
+        layoutListener=(v,l,t,r,b,ol,ot,or,ob)->{if(r-l!=or-ol || b-t!=ob-ot)position();};
         root.addOnLayoutChangeListener(layoutListener);
         setOnApplyWindowInsetsListener((v,insets)->{removeCallbacks(reposition);post(reposition);return insets;});
-        updateColors();
     }
-
-    void bind(String title, String description, Object peer) {
-        updateColors(); name.setText(title); detail.setText(description);
-        setContentDescription(title+". "+description);
-        AvatarDrawable placeholder=new AvatarDrawable();
-        if (peer instanceof TLRPC.User) {
-            TLRPC.User user=(TLRPC.User)peer; placeholder.setInfo(user);
-            avatar.setImage(ImageLocation.getForUser(user,ImageLocation.TYPE_SMALL),"46_46",placeholder,user);
-        } else if (peer instanceof TLRPC.Chat) {
-            TLRPC.Chat chat=(TLRPC.Chat)peer; placeholder.setInfo(chat);
-            avatar.setImage(ImageLocation.getForChat(chat,ImageLocation.TYPE_SMALL),"46_46",placeholder,chat);
-        } else {
-            // Clearing an earlier peer request is essential when privacy is enabled.
-            placeholder.setInfo(0,"F","G"); avatar.setImageDrawable(placeholder);
-        }
+    private TextView label(Context c,int size) {
+        TextView t=new TextView(c);t.setTextColor(Color.WHITE);t.setTextSize(size);
+        t.setTypeface(AndroidUtilities.bold());t.setSingleLine(true);t.setEllipsize(TextUtils.TruncateAt.END);return t;
     }
-
-    private void updateColors() {
-        surfacePaint.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-        borderPaint.setColor(Theme.getColor(Theme.key_divider));
-        name.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-        detail.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
-        invalidate();
+    void bindRows(int account,boolean names,List<CameraPopInbox.Row> rows,LongConsumer onRow,Runnable onExpansion) {
+        boolean resize=Math.min(5,this.rows.size())!=Math.min(5,rows.size()) || getWidth()==0;
+        this.account=account;this.names=names;this.rows=rows;rowClick=onRow;expandedChanged=onExpansion;
+        long total=0;for(CameraPopInbox.Row row:rows)total+=row.unread;
+        String chats=LocaleController.formatPluralString("CameraPopChats",rows.size());
+        String messages=LocaleController.formatPluralString("CameraPopUnread",(int)Math.min(Integer.MAX_VALUE,total));
+        left.setText(Integer.toString(rows.size()));right.setText(Long.toString(total));
+        heading.setText(chats+" · "+messages);setContentDescription(chats+". "+messages+". "+LocaleController.getString(R.string.CameraPopExpand));
+        compact.setContentDescription(getContentDescription());
+        if(panel.getVisibility()==VISIBLE)adapter.notifyDataSetChanged();
+        if(resize)position();
     }
-
-    @Override protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        float w=getWidth(),h=getHeight(),neck=h*surfaceNeck,cx=w/2f;
-        float radius=Math.min(dp(28),Math.min(w/2f,(h-neck)/2f)),shoulder=Math.min(neck*1.5f,w/2f-radius);
-        surfacePath.rewind();surfacePath.moveTo(cx,0);
-        surfacePath.cubicTo(cx+neck*.55f,0,cx+neck*.8f,neck,cx+shoulder,neck);
-        surfacePath.lineTo(w-radius,neck);surfacePath.quadTo(w,neck,w,neck+radius);
-        surfacePath.lineTo(w,h-radius);surfacePath.quadTo(w,h,w-radius,h);
-        surfacePath.lineTo(radius,h);surfacePath.quadTo(0,h,0,h-radius);
-        surfacePath.lineTo(0,neck+radius);surfacePath.quadTo(0,neck,radius,neck);
-        surfacePath.lineTo(cx-shoulder,neck);
-        surfacePath.cubicTo(cx-neck*.8f,neck,cx-neck*.55f,0,cx,0);surfacePath.close();
-        canvas.drawPath(surfacePath,surfacePaint);canvas.drawPath(surfacePath,borderPaint);
+    boolean isExpanded() {return expanded;}
+    boolean isExiting() {return exiting;}
+    void toggleExpanded() {
+        exiting=false;
+        expanded=!expanded;if(expanded)adapter.notifyDataSetChanged();panel.setVisibility(VISIBLE);
+        animateTo(1f,expanded?1f:0f,null);
+        if(expandedChanged!=null)expandedChanged.run();
     }
-    @Override protected void dispatchDraw(Canvas canvas) {
-        int save=canvas.save();canvas.clipPath(surfacePath);super.dispatchDraw(canvas);canvas.restoreToCount(save);
-    }
-
     void position() {
-        int width=root.getWidth(), height=root.getHeight();
-        if(width<=0 || height<=0) return;
-        int left=0,top=AndroidUtilities.statusBarHeight,right=0,bottom=0;
-        RectF notch=new RectF();
-        WindowInsets insets=root.getRootWindowInsets();
-        if(insets!=null) {
-            if(Build.VERSION.SDK_INT>=30) {
-                android.graphics.Insets safe=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());
-                left=safe.left;top=safe.top;right=safe.right;bottom=safe.bottom;
-            } else {
-                left=insets.getSystemWindowInsetLeft();top=insets.getSystemWindowInsetTop();
-                right=insets.getSystemWindowInsetRight();bottom=insets.getSystemWindowInsetBottom();
-            }
-            if(Build.VERSION.SDK_INT>=28) {
-                DisplayCutout cutout=insets.getDisplayCutout();
-                if(cutout!=null) {
-                    root.getLocationInWindow(location);
-                    // WindowInsets cutout rectangles have already been inset to this window.
-                    for(Rect rect:cutout.getBoundingRects()) {
-                        RectF candidate=new RectF(rect); candidate.offset(-location[0],-location[1]);
-                        if(candidate.top<height/2f && (notch.isEmpty() || candidate.top<notch.top)) notch.set(candidate);
-                    }
-                    if(Build.VERSION.SDK_INT>=31) {
-                        Path path=cutout.getCutoutPath();
-                        if(path!=null) {
-                            // Use the actual contour when available, rather than its padded safe bounds.
-                            // Unlike the bounds above, this path is in display coordinates.
-                            Path local=new Path(path);root.getLocationOnScreen(location);
-                            local.offset(-location[0],-location[1]);
-                            if(!notch.isEmpty()) {
-                                Path region=new Path();region.addRect(notch,Path.Direction.CW);
-                                if(!local.op(region,Path.Op.INTERSECT))local.reset();
-                            }
-                            RectF precise=new RectF();local.computeBounds(precise,true);
-                            if(!precise.isEmpty())notch.set(precise);
-                        }
-                    }
-                }
-            }
+        if(getLayoutParams()==null || root.getWidth()<=0 || root.getHeight()<=0)return;
+        CameraPopCutout.Anchor a=CameraPopCutout.read(root);
+        RectF hole=a.bounds;int width=root.getWidth(),height=root.getHeight();
+        CameraPopGeometry.Island p=CameraPopGeometry.island(width,height,a.left,a.top,a.right,a.bottom,
+                getResources().getDisplayMetrics().density,rows.size(),hole.left,hole.top,hole.right,hole.bottom);
+        cutout=p.cutout;compactHeight=p.compactHeight;compactWidth=p.compactWidth;fullHeight=p.height;
+        int fullWidth=p.width;float x=p.x,y=p.y;anchorX=p.anchorX;anchorY=p.anchorY;compactLeft=p.compactLeft;
+        terminal=cutout?Math.min(.2f,Math.max(1f,Math.min(hole.width(),hole.height())*.35f)/Math.max(fullWidth,fullHeight)):.01f;
+        LayoutParams lp=(LayoutParams)getLayoutParams();
+        if(lp.width!=fullWidth || lp.height!=fullHeight || lp.leftMargin!=Math.round(x) || lp.topMargin!=Math.round(y)) {
+            lp.width=fullWidth;lp.height=fullHeight;lp.leftMargin=Math.round(x);lp.topMargin=Math.round(y);setLayoutParams(lp);
         }
-        if(notch.isEmpty() && width>=height) {
-            // Do not interpret portrait firmware paths in landscape.
-            notch.setEmpty();
-        } else if(notch.isEmpty()) {
-            // Existing Telegram detector: best-effort only; never a dependency.
-            try {
-                NotchInfoUtils.NotchInfo info=NotchInfoUtils.getInfo(getContext());
-                if(info!=null) {
-                    notch.set(info.bounds); root.getLocationOnScreen(location);
-                    notch.offset(-location[0],-location[1]);
-                }
-            } catch(RuntimeException ignored) { /* Some OEMs do not expose this resource. */ }
-        }
-        int available=Math.max(1,Math.min(dp(360),width-left-right-dp(24)));
-        measure(MeasureSpec.makeMeasureSpec(available,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(0,MeasureSpec.UNSPECIFIED));
-        int cardHeight=getMeasuredHeight();
-        CameraPopGeometry.Placement p=CameraPopGeometry.place(width,height,left,top,right,bottom,
-                dp(360),cardHeight,dp(12),dp(6),notch.left,notch.top,notch.right,notch.bottom);
-        FrameLayout.LayoutParams params=(FrameLayout.LayoutParams)getLayoutParams();
-        if(params.width!=p.width || params.leftMargin!=Math.round(p.x) || params.topMargin!=Math.round(p.y)) {
-            params.width=p.width;params.leftMargin=Math.round(p.x);params.topMargin=Math.round(p.y);setLayoutParams(params);
-        }
-        destinationX=p.originX-(p.x+p.width/2f);
-        destinationY=p.originY-(p.y+cardHeight/2f);
-        hasCutout=p.cutout;
-        float terminal=hasCutout?Math.max(1f,Math.min(notch.width(),notch.height())*.60f):1f;
-        terminalX=Math.min(1f,terminal/p.width);terminalY=Math.min(1f,terminal/Math.max(1,cardHeight));
+        LayoutParams cp=new LayoutParams(compactWidth,compactHeight);cp.leftMargin=Math.round(compactLeft);compact.setLayoutParams(cp);
+        int gap=cutout?Math.round(hole.width())+dp(12):dp(16);
+        int middle=Math.round(anchorX-compactLeft);
+        int leftWidth=Math.max(0,middle-gap/2),rightStart=Math.min(compactWidth,middle+gap/2);
+        LayoutParams l=new LayoutParams(leftWidth,compactHeight);left.setLayoutParams(l);left.setVisibility(leftWidth>=dp(24)?VISIBLE:INVISIBLE);
+        LayoutParams r=new LayoutParams(Math.max(0,compactWidth-rightStart),compactHeight);r.leftMargin=rightStart;right.setLayoutParams(r);
+        LayoutParams pp=new LayoutParams(fullWidth,Math.max(0,fullHeight-compactHeight));pp.topMargin=compactHeight;panel.setLayoutParams(pp);
+        setPivotX(anchorX);setPivotY(anchorY);apply();
     }
-
+    @Override protected void onDraw(Canvas c) {
+        super.onDraw(c);float e=expansion.value;
+        bounds.set(compactLeft*(1-e),0,compactLeft+compactWidth+(getWidth()-compactLeft-compactWidth)*e,
+                compactHeight+(fullHeight-compactHeight)*e);
+        clip.rewind();float radius=compactHeight/2f+(dp(26)-compactHeight/2f)*e;hitRadius=radius;
+        clip.addRoundRect(bounds,radius,radius,Path.Direction.CW);c.drawPath(clip,surface);
+    }
+    @Override protected void dispatchDraw(Canvas c) {int save=c.save();c.clipPath(clip);super.dispatchDraw(c);c.restoreToCount(save);}
+    @Override public boolean dispatchTouchEvent(MotionEvent e) {
+        if(e.getActionMasked()==MotionEvent.ACTION_DOWN && !CameraPopGeometry.contains(bounds.left,bounds.top,bounds.right,bounds.bottom,hitRadius,e.getX(),e.getY()))return false;
+        return super.dispatchTouchEvent(e);
+    }
+    void enter() {exiting=false;position();animateTo(1f,expanded?1f:0f,null);}
+    void exit(Runnable done) {exiting=true;animateTo(0f,expansion.value,done);}
     private boolean reducedMotion() {
         return !SharedConfig.animationsEnabled() || AndroidUtilities.isAccessibilityScreenReaderEnabled()
                 || (Build.VERSION.SDK_INT>=26 && !ValueAnimator.areAnimatorsEnabled());
     }
-    void enter() { position(); motion(false,null); }
-    void exit(Runnable completion) { position(); motion(true,completion); }
-    private void motion(boolean exit,Runnable completion) {
-        cancelMotion(); closing=exit; completed=completion;
-        if(reducedMotion()) { apply(exit?0f:1f);finish();return; }
-        final long[] start={0};
-        final long duration=(exit?280L:300L)*1_000_000L;
-        // Own finite clock: Android's x5/x10 animation duration does not slow the app.
-        apply(exit?1f:0f);
+    private void animateTo(float visible,float expand,Runnable done) {
+        completed=done;presence.target(visible);expansion.target(expand);
+        if(reducedMotion()) {cancelFrame();presence.snap(visible);expansion.snap(expand);apply();finish();return;}
+        if(frame!=null){started=0;return;} // Retarget without losing position/velocity.
+        previousFrame=0;started=0;
         frame=time->{
-            if(start[0]==0) start[0]=time;
-            float fraction=Math.min(1f,(float)(time-start[0])/duration);
-            float eased=exit?1f-(float)Math.pow(1f-fraction,2.2):1f-(float)Math.pow(1f-fraction,3);
-            apply(exit?1f-eased:eased);
-            if(fraction<1f) Choreographer.getInstance().postFrameCallback(frame);
-            else {frame=null;finish();}
+            if(started==0)started=time;
+            float dt=previousFrame==0?1f/60f:(time-previousFrame)/1_000_000_000f;previousFrame=time;
+            boolean p=presence.step(dt),e=expansion.step(dt);apply();
+            if((p||e) && time-started<1_200_000_000L)Choreographer.getInstance().postFrameCallback(frame);
+            else {presence.snap(presence.target);expansion.snap(expansion.target);frame=null;apply();finish();}
         };
         Choreographer.getInstance().postFrameCallback(frame);
     }
-    private void apply(float progress) {
-        motionValue.update(progress,closing,terminalX,terminalY,destinationX,destinationY,hasCutout);
-        setScaleX(motionValue.scaleX);setScaleY(motionValue.scaleY);
-        setTranslationX(motionValue.x);setTranslationY(motionValue.y);setAlpha(motionValue.alpha);
-        avatar.setAlpha(motionValue.contentAlpha);name.setAlpha(motionValue.contentAlpha);detail.setAlpha(motionValue.contentAlpha);
-        surfaceNeck=motionValue.neck;invalidate();
+    private void apply() {
+        float p=presence.value;
+        setScaleX(terminal+(1-terminal)*(float)Math.pow(p,1.25));
+        setScaleY(terminal+(1-terminal)*(float)Math.pow(p,.85));
+        setAlpha(cutout?(p==0?0:1):Math.min(1,p*4));
+        panel.setAlpha(expansion.value);compact.setAlpha(Math.min(1,p*3));invalidate();
     }
-    private void finish() {Runnable done=completed;completed=null;if(done!=null)done.run();}
-    void cancelMotion() {
-        if(frame!=null) Choreographer.getInstance().removeFrameCallback(frame);
-        frame=null;completed=null;
-    }
+    private void finish() {if(!expanded)panel.setVisibility(GONE);Runnable done=completed;completed=null;if(done!=null)done.run();}
+    private void cancelFrame() {if(frame!=null)Choreographer.getInstance().removeFrameCallback(frame);frame=null;}
+    void cancelMotion() {cancelFrame();completed=null;}
     void release() {
-        cancelMotion(); removeCallbacks(reposition);
-        root.removeOnLayoutChangeListener(layoutListener);
-        setOnApplyWindowInsetsListener(null);setOnClickListener(null);
-        avatar.setImageDrawable(null);root.removeView(this);
+        cancelMotion();removeCallbacks(reposition);root.removeOnLayoutChangeListener(layoutListener);
+        setOnApplyWindowInsetsListener(null);setOnClickListener(null);rowClick=null;expandedChanged=null;
+        list.setAdapter(null);root.removeView(this);
+    }
+    private final class Rows extends BaseAdapter {
+        @Override public int getCount(){return rows.size();}
+        @Override public Object getItem(int p){return rows.get(p);}
+        @Override public long getItemId(int p){return rows.get(p).dialog;}
+        @Override public boolean hasStableIds(){return true;}
+        @Override public View getView(int p,View convert,ViewGroup parent) {
+            RowView row=convert instanceof RowView?(RowView)convert:new RowView(getContext());
+            CameraPopInbox.Row item=rows.get(p);Object peer=null;String title=LocaleController.getString(R.string.CameraPopPrivateName);
+            if(names && item.dialog!=0) {
+                if(DialogObject.isUserDialog(item.dialog)){TLRPC.User user=MessagesController.getInstance(account).getUser(item.dialog);peer=user;if(user!=null)title=UserObject.getUserName(user);}
+                else {TLRPC.Chat chat=MessagesController.getInstance(account).getChat(-item.dialog);peer=chat;if(chat!=null)title=chat.title;}
+            }
+            row.title.setText(title);row.subtitle.setText(LocaleController.formatPluralString("CameraPopUnread",item.unread));
+            AvatarDrawable placeholder=new AvatarDrawable();
+            if(peer instanceof TLRPC.User){TLRPC.User user=(TLRPC.User)peer;placeholder.setInfo(account,user);row.image.setImage(ImageLocation.getForUser(user,ImageLocation.TYPE_SMALL),"46_46",placeholder,user);}
+            else if(peer instanceof TLRPC.Chat){TLRPC.Chat chat=(TLRPC.Chat)peer;placeholder.setInfo(account,chat);row.image.setImage(ImageLocation.getForChat(chat,ImageLocation.TYPE_SMALL),"46_46",placeholder,chat);}
+            else {placeholder.setInfo(0,"F","G");row.image.setImageDrawable(placeholder);}
+            row.setContentDescription(row.title.getText()+". "+row.subtitle.getText());return row;
+        }
+    }
+    private final class RowView extends LinearLayout {
+        final BackupImageView image;final TextView title,subtitle;
+        RowView(Context c) {
+            super(c);setOrientation(HORIZONTAL);setGravity(Gravity.CENTER_VERTICAL);setPadding(dp(16),dp(8),dp(16),dp(8));
+            setMinimumHeight(dp(64));setLayoutParams(new android.widget.AbsListView.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT));
+            image=new BackupImageView(c);image.setRoundRadius(dp(22));addView(image,new LinearLayout.LayoutParams(dp(44),dp(44)));
+            LinearLayout text=new LinearLayout(c);text.setOrientation(VERTICAL);LinearLayout.LayoutParams tp=new LinearLayout.LayoutParams(0,LayoutParams.WRAP_CONTENT,1);tp.setMarginStart(dp(12));addView(text,tp);
+            title=label(c,15);subtitle=label(c,12);subtitle.setTextColor(0xffbdbdc5);text.addView(title);text.addView(subtitle);
+        }
     }
 }

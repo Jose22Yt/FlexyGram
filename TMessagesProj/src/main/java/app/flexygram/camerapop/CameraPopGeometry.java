@@ -4,27 +4,32 @@ package app.flexygram.camerapop;
 /** Pure window-local geometry, independent of density and a particular phone model. */
 public final class CameraPopGeometry {
     private CameraPopGeometry() {}
-    public static final class Placement {
-        public final float x, y, originX, originY;
-        public final int width;
-        public final boolean cutout;
-        Placement(float x, float y, float originX, float originY, int width,boolean cutout) {
-            this.x=x; this.y=y; this.originX=originX; this.originY=originY; this.width=width;
-            this.cutout=cutout;
-        }
+    public static boolean contains(float left,float top,float right,float bottom,float radius,float x,float y) {
+        if(x<left || x>=right || y<top || y>=bottom)return false;
+        float r=Math.max(0,Math.min(radius,Math.min(right-left,bottom-top)/2));
+        float cx=Math.max(left+r,Math.min(x,right-r)),cy=Math.max(top+r,Math.min(y,bottom-r));
+        float dx=x-cx,dy=y-cy;return dx*dx+dy*dy<=r*r;
     }
-    public static Placement place(int width, int height, int safeLeft, int safeTop, int safeRight,
-            int safeBottom, int desiredWidth, int cardHeight, int margin, int gap,
-            float left, float top, float right, float bottom) {
-        float minX = safeLeft + margin, maxX = width - safeRight - margin;
-        int cardWidth = Math.max(1, Math.min(desiredWidth, Math.round(maxX-minX)));
-        boolean valid = right > left && bottom > top && left >= 0 && top >= 0
-                && right <= width && bottom <= height && top < height / 2f;
-        float originX = valid ? (left+right)/2f : width/2f;
-        float originY = valid ? (top+bottom)/2f : safeTop;
-        float x = Math.max(minX, Math.min(originX-cardWidth/2f, maxX-cardWidth));
-        float y = Math.max(safeTop, valid?bottom:safeTop) + gap;
-        y = Math.max(safeTop, Math.min(y, height-safeBottom-cardHeight-margin));
-        return new Placement(x, y, originX, originY, cardWidth,valid);
+    public static final class Island {
+        public float x,y,anchorX,anchorY,compactLeft;
+        public int width,height,compactWidth,compactHeight;
+        public boolean cutout;
+    }
+    public static Island island(int width,int height,int safeLeft,int safeTop,int safeRight,int safeBottom,
+            float density,int rows,float left,float top,float right,float bottom) {
+        Island p=new Island();float d=Math.max(.1f,density);
+        p.cutout=right>left && bottom>top && left>=0 && right<=width && top>=0 && bottom<height/2f
+                && right-left<=80*d && bottom-top<=64*d;
+        float origin=p.cutout?(left+right)/2f:width/2f;
+        p.compactHeight=Math.round(p.cutout?Math.max(32*d,bottom-top+8*d):36*d);
+        p.width=Math.max(1,Math.min(Math.round(360*d),width-safeLeft-safeRight-Math.round(24*d)));
+        p.compactWidth=Math.min(p.width,Math.round(Math.max(132*d,(p.cutout?right-left:0)+112*d)));
+        p.x=Math.max(safeLeft+12*d,Math.min(origin-p.width/2f,width-safeRight-12*d-p.width));
+        p.y=p.cutout?Math.max(0,(top+bottom)/2f-p.compactHeight/2f):safeTop+6*d;
+        p.anchorX=origin-p.x;p.anchorY=p.cutout?(top+bottom)/2f-p.y:0;
+        p.compactLeft=Math.max(0,Math.min(p.anchorX-p.compactWidth/2f,p.width-p.compactWidth));
+        p.height=Math.max(p.compactHeight,Math.min(height-safeBottom-Math.round(p.y)-Math.round(12*d),
+                p.compactHeight+Math.round(48*d)+Math.round(64*d)*Math.min(5,Math.max(1,rows))));
+        return p;
     }
 }

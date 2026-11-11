@@ -1,5 +1,15 @@
 # Cambios
 
+## 1.0.0-beta.49 — preparación, build 1338
+
+- Camera Pop evoluciona a una isla de notificaciones compacta, anclada al recorte real de cámara y con contadores agregados de chats/mensajes.
+- Tocar la isla despliega una lista nativa con filas recicladas; solo tocar una conversación abre ese chat. Conserva privacidad, lectura sincronizada y silenciamientos configurables.
+- Permite todos los chats de la cuenta o solo los elegidos; permanencia mientras haya pendientes, 1–9 segundos y otros intervalos, o duración personalizada de 1–300 segundos. El panel abierto pausa el ocultado.
+- Movimiento propio con resortes críticamente amortiguados: al invertir o interrumpir el gesto conserva posición y velocidad. Sin blur, sombras pesadas ni callbacks de cuadros en reposo.
+- Los avisos de mensajes se presentan por la isla con la app visible; en segundo plano se restaura la presentación Android sin borrar las colas nativas. Incluye opción explícita Solo isla, con explicación de su alcance.
+- Los avisos esenciales de llamadas/reproducción y notificaciones no representadas por la isla conservan su tratamiento nativo.
+- Recuperación inicial de chats en bloques, fotos solo para filas visibles, metadatos sin contenido de mensajes y tope de marcas de lectura antiguas. Sin APK compilada en esta etapa.
+
 ## 1.0.0-beta.48 — build 1337
 
 - Camera Pop recibe eventos reales de mensajes directamente de NotificationCenter, independientemente del permiso Android y de las categorías globales de notificaciones de Telegram.

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.UserConfig;
+import org.telegram.messenger.DialogObject;
 import org.telegram.messenger.NotificationsSettingsFacade;
 import org.telegram.tgnet.ConnectionsManager;
 
@@ -13,7 +14,7 @@ import org.telegram.tgnet.ConnectionsManager;
 public final class CameraPopConfig {
     private static final String PREFIX = "flexy_camera_pop_";
     public final SharedPreferences prefs;
-    public final boolean enabled, immediate, reminders, names, respectMuted, quiet;
+    public final boolean enabled, immediate, reminders, names, respectMuted, quiet, allChats, onlyIsland;
     public final int intervalMinutes, durationSeconds, quietStart, quietEnd;
     public final Set<Long> selected = new HashSet<>();
     public CameraPopConfig(int account) {
@@ -26,6 +27,8 @@ public final class CameraPopConfig {
             edit.apply();
         }
         enabled = prefs.getBoolean(PREFIX+"enabled", false);
+        allChats=prefs.getBoolean(PREFIX+"all_chats",true);
+        onlyIsland=prefs.getBoolean(PREFIX+"only_island",false);
         immediate = prefs.getBoolean(PREFIX+"immediate", true);
         reminders = prefs.getBoolean(PREFIX+"reminders", true);
         names = prefs.getBoolean(PREFIX+"names", true);
@@ -33,19 +36,26 @@ public final class CameraPopConfig {
         quiet = prefs.getBoolean(PREFIX+"quiet", false);
         int minutes = prefs.getInt(PREFIX+"interval", 15);
         intervalMinutes = minutes == 5 || minutes == 30 ? minutes : 15;
-        durationSeconds = Math.max(2, Math.min(10, prefs.getInt(PREFIX+"duration", 4)));
+        durationSeconds = Math.max(0, Math.min(300, prefs.getInt(PREFIX+"duration", 5)));
         quietStart = Math.floorMod(prefs.getInt(PREFIX+"quiet_start", 22*60), 1440);
         quietEnd = Math.floorMod(prefs.getInt(PREFIX+"quiet_end", 8*60), 1440);
         for (String id : prefs.getStringSet(PREFIX+"selected", java.util.Collections.emptySet())) {
             try { selected.add(Long.parseLong(id)); } catch (NumberFormatException ignored) {}
         }
     }
-    public static boolean enabled(int account) { return MessagesController.getMainSettings(account).getBoolean(PREFIX+"enabled", false); }
+    public static boolean enabled(int account) {
+        SharedPreferences p=MessagesController.getMainSettings(account);
+        long owner=UserConfig.getInstance(account).getClientUserId();
+        return owner!=0 && p.getLong(PREFIX+"owner",0)==owner && p.getBoolean(PREFIX+"enabled",false);
+    }
     public static boolean interested(int account,long dialog) {
         SharedPreferences prefs=MessagesController.getMainSettings(account);
-        return prefs.getBoolean(PREFIX+"enabled",false)
-                && prefs.getStringSet(PREFIX+"selected",java.util.Collections.emptySet()).contains(Long.toString(dialog));
+        return enabled(account) && (DialogObject.isUserDialog(dialog)||DialogObject.isChatDialog(dialog))
+                && (prefs.getBoolean(PREFIX+"all_chats",true)
+                || prefs.getStringSet(PREFIX+"selected",java.util.Collections.emptySet()).contains(Long.toString(dialog)));
     }
+    public boolean matches(long dialog) {return allChats || selected.contains(dialog);}
+    public static boolean onlyIsland(int account) {return MessagesController.getMainSettings(account).getBoolean(PREFIX+"only_island",false);}
     /** Explicit chat/topic mutes only. Global categories and Android POST_NOTIFICATIONS are independent. */
     public static boolean explicitlyMuted(int account,long dialog,long topic) {
         NotificationsSettingsFacade settings=new NotificationsSettingsFacade(account);
@@ -61,7 +71,7 @@ public final class CameraPopConfig {
         for (long id : dialogs) saved.add(Long.toString(id));
         prefs.edit().putStringSet(PREFIX+"selected",saved).apply();
     }
-    public void load(CameraPopState state) { state.restore(prefs.getStringSet(PREFIX+"pending",java.util.Collections.emptySet()),selected); }
+    public void load(CameraPopState state) { state.restore(prefs.getStringSet(PREFIX+"pending",java.util.Collections.emptySet()),selected,allChats); }
     public void save(CameraPopState state) { prefs.edit().putStringSet(PREFIX+"pending",state.save()).apply(); }
     public void clearPending() { prefs.edit().remove(PREFIX+"pending").apply(); }
 }

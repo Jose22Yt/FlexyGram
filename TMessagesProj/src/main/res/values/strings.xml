@@ -11544,13 +11544,13 @@
     <string name="FlexyFolderThemeAccent">Use theme accent for active folder</string>
 
     <!-- FlexyBubble Camera Pop: internal, opt-in message reminders. -->
-    <string name="CameraPopTitle">FlexyBubble Camera Pop</string>
-    <string name="CameraPopEnabled">Enable Camera Pop</string>
+    <string name="CameraPopTitle">Notification island</string>
+    <string name="CameraPopEnabled">Enable notification island</string>
     <string name="CameraPopSelected">Selected chats and contacts</string>
     <string name="CameraPopImmediate">Immediate alerts</string>
     <string name="CameraPopReminders">Unread message reminders</string>
     <string name="CameraPopInterval">Reminder interval</string>
-    <string name="CameraPopDuration">Capsule duration</string>
+    <string name="CameraPopDuration">Island visibility duration</string>
     <string name="CameraPopNames">Show names and profile photos</string>
     <string name="CameraPopRespectMuted">Respect muted chats</string>
     <string name="CameraPopQuiet">Quiet hours</string>
@@ -11562,5 +11562,15 @@
     <string name="CameraPopPrivateName">Pending messages</string>
     <string name="CameraPopUnread_one">%d unread message</string>
     <string name="CameraPopUnread_other">%d unread messages</string>
-    <string name="CameraPopInfo">Camera Pop works inside FlexyGram even when Android notifications or Telegram global notification categories are disabled. Only selected chats can alert. With reminders enabled, unread messages are recalled when you return and then at your chosen interval. The mute option respects explicit chat or topic mutes only; turn it off to allow those too. Quiet hours and privacy still apply. Hiding names also hides profile photos. No overlay permission or additional service is used. Equal quiet-hour times silence the whole day.</string>
+    <string name="CameraPopInfo">Tap the island to expand pending chats; tap a chat to open it. All chats or only selected chats can participate. Zero duration keeps the island visible while messages remain. During an expanded list, automatic hiding pauses. Message alerts use the island while FlexyGram is visible and return to Android in background. Only island disables Android message alerts even in background: no visible message alert will appear outside FlexyGram. Calls, media and other essential system alerts keep their normal controls. Privacy, explicit mutes and quiet hours still apply.</string>
+    <string name="CameraPopAllChats">All chats</string>
+    <string name="CameraPopOnlyIsland">Only island</string>
+    <string name="CameraPopPermanent">While unread messages remain</string>
+    <string name="CameraPopCustomDuration">Custom duration</string>
+    <string name="CameraPopDurationRange">Choose 1 to 300 seconds.</string>
+    <string name="CameraPopCollapse">Collapse chat list</string>
+    <string name="CameraPopExpand">Tap to view pending chats</string>
+    <string name="CameraPopChats_one">%d chat</string>
+    <string name="CameraPopChats_other">%d chats</string>
+    <string name="CameraPopOnlyIslandInfo">Also hides Android message alerts outside FlexyGram.</string>
 </resources>
