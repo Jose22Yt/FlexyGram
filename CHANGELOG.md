@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.0.0-beta.45 — preparación, build 1334
+
+- Se elimina el estilo de pantalla principal «Telegram iOS» y su selector. Queda únicamente la pantalla principal por defecto.
+- Se retiran la cabecera/buscador específicos, los tamaños de filas y textos forzados y las reglas que impedían personalizar la barra inferior.
+- Las preferencias antiguas de estilos esencial/iOS se restablecen a por defecto. Se admite el valor legado en copias de FlexyStudio para poder importarlas sin reactivar el estilo retirado.
+- Se conservan las líneas divisorias, las mini píldoras, los avatares, los iconos originales y las mejoras de rendimiento/animaciones anteriores.
+- Sin compilación de APK por indicación del usuario.
+
 ## 1.0.0-beta.44 — build 1333
 
 - Pantalla principal: selector «Por defecto» / «Telegram iOS». Se retira «Diseño esencial»; su valor antiguo migra a «Por defecto».

@@ -72,8 +72,8 @@ def test_glossy_is_the_only_fresh_install_alias_and_remembered_default(tmp_path)
 
 
 def test_settings_reuses_existing_divider_and_plain_chat_rows():
-    setting=(JAVA/'app/flexygram/home/HomeStyleSettingsActivity.java').read_text()
-    assert setting.index('styleRow=addRow(')<setting.index('dividerRow=addRow(')
+    setting=(JAVA/'app/flexygram/home/HomeListSettingsActivity.java').read_text()
+    assert 'dividerRow=addRow(' in setting and 'styleRow' not in setting
     assert 'getHideDividers().setConfigBool' in setting and 'AppearanceConfig.invalidateDividerStyle()' in setting
     assert 'Theme.applyCommonTheme()' in setting
     rows=(JAVA/'org/telegram/ui/Cells/DialogCell.java').read_text()
@@ -81,14 +81,9 @@ def test_settings_reuses_existing_divider_and_plain_chat_rows():
     assert 'Theme.dividerPaint.setColor(Theme.getDividerColor(resourcesProvider))' in rows
     assert 'if (homeDivider) Theme.dividerPaint.setColor(dividerColor)' in rows
     native=(JAVA/'org/telegram/ui/DialogsActivity.java').read_text()
-    assert 'Math.max(-getIdleSearchFieldHeight(), totalOffset - searchOffset)' in native
-    chrome=(JAVA/'app/flexygram/home/IosHomeHeader.java').read_text()
-    assert 'R.string.Edit' in chrome and 'IosOriginalAssets.HOME_COMPOSE' in chrome
-    search=(JAVA/'app/flexygram/home/IosHomeSearch.java').read_text()
-    assert 'R.string.Search' in search
-    # The root shares the native search/action-mode progress; no second animator or per-frame hierarchy rebuild.
-    animation=native[native.index('if(iosHomeHeader!=null){'):native.index('            super.dispatchDraw(canvas);',native.index('if(iosHomeHeader!=null){'))]
-    assert all(token not in animation for token in ['requestLayout','addView','removeView','new ','measureText'])
+    assert 'filterTabsView.setSignatureHome(isSignatureHome())' in native
+    assert 'IosHomeHeader' not in native and 'iosHomeSearch' not in native
+    assert 'HomeStyleConfig' not in (JAVA/'app/flexygram/navigation/LiquidNavigationConfig.java').read_text()
 
 
 def test_beta_preflight_accepts_current_beta_but_rejects_invalid_source_identity(tmp_path):

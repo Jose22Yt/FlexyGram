@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Actual Home view/selector sources against Android API37; native app services are explicit doubles. No APK."""
+"""Actual Home list control sources against Android API37; native app services are explicit doubles. No APK."""
 import os,re,subprocess,tempfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
@@ -9,7 +9,7 @@ parser=argparse.ArgumentParser();parser.add_argument('--android-jar',type=Path);
 sdk=args.android_jar or Path(os.environ.get('ANDROID_HOME',str(ROOT.parent/'.flexygram/android-sdk')))/'platforms/android-37.0/android.jar'
 core=args.core_jar or Path(os.environ.get('FLEXY_CORE_JAR','/tmp/flexy-performance-libs/core.jar'))
 if not sdk.is_file() or not core.is_file():raise SystemExit('Android API37 and AndroidX Core jar required.')
-names=['HomeStyleConfig','HomeStyleSettingsActivity','IosHomeHeader','IosHomeSearch','IosHomeSurface']
+names=['HomeStyleConfig','HomeListSettingsActivity']
 with tempfile.TemporaryDirectory(prefix='home-essentials-types-') as tmp:
  folder=Path(tmp);src=folder/'src';src.mkdir()
  def put(path,text):
@@ -19,8 +19,6 @@ with tempfile.TemporaryDirectory(prefix='home-essentials-types-') as tmp:
  strings=sorted(set(re.findall(r'R.string.(\w+)',code)));drawables=sorted(set(re.findall(r'R.drawable.(\w+)',code)));keys=sorted(set(re.findall(r'Theme.(key_\w+)',code)))
  put('org/telegram/messenger/R.java','package org.telegram.messenger;public class R{public static class string{'+''.join(f'public static int {n}={i};'for i,n in enumerate(strings))+'}public static class drawable{'+''.join(f'public static int {n}={i};'for i,n in enumerate(drawables))+'}}')
  put('org/telegram/ui/ActionBar/Theme.java','package org.telegram.ui.ActionBar;public class Theme{public interface ResourcesProvider{}public static int getColor(int k,ResourcesProvider p){return 0;}public static void applyCommonTheme(){}'+''.join(f'public static int {n}={i};'for i,n in enumerate(keys))+'}')
- put('app/flexygram/icons/ExactIcons.java','package app.flexygram.icons;public class ExactIcons{public static android.graphics.drawable.Drawable original(int id){return null;}}')
- put('app/flexygram/icons/IosOriginalAssets.java','package app.flexygram.icons;public class IosOriginalAssets{public static int HOME_COMPOSE=1,TAB_NAV_SEARCH=2;}')
  put('org/telegram/messenger/ApplicationLoader.java','package org.telegram.messenger;public class ApplicationLoader{public static android.content.Context applicationContext;}')
  put('org/telegram/messenger/SharedConfig.java','package org.telegram.messenger;public class SharedConfig{public static boolean chatBlurEnabled(){return false;}}')
  put('org/telegram/messenger/AndroidUtilities.java','package org.telegram.messenger;public class AndroidUtilities{public static int dp(float n){return (int)n;}public static android.graphics.Typeface bold(){return null;}}')
@@ -59,4 +57,4 @@ with tempfile.TemporaryDirectory(prefix='home-essentials-types-') as tmp:
  kotlin=core.parent/'kotlin.jar'
  if kotlin.is_file():libs.append(kotlin)
  subprocess.run(['javac','-proc:none','-cp',os.pathsep.join(map(str,libs)),'-d',str(folder/'classes'),*map(str,src.rglob('*.java'))],check=True)
-print('Home views and selector type checked against '+str(sdk)+' and AndroidX Core; app services are doubles. No APK built.')
+print('Home list controls and legacy migration type checked against '+str(sdk)+' and AndroidX Core; app services are doubles. No APK built.')

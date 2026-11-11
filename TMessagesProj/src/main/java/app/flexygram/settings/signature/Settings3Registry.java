@@ -39,7 +39,7 @@ public final class Settings3Registry {
         return "chat";
     }
     public static BaseFragment searchTarget(BaseFragment original,String key){
-        if("dividerStyle".equals(key)||"flexyHomeStyle".equals(key)||original instanceof app.flexygram.home.HomeStyleSettingsActivity)return open("home");
+        if("dividerStyle".equals(key)||original instanceof app.flexygram.home.HomeListSettingsActivity)return open("home");
         if("flexySmartPreviews".equals(key)||original instanceof app.flexygram.home.SmartPreviewsSettingsActivity)return open("home");
         if("flexyfilesEnabled".equals(key)||"flexyfilesHelp".equals(key))return open("flexyfiles");
         String route=null;

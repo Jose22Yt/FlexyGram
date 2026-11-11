@@ -58,7 +58,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
                 extra("nc","messages_extra","media_extra","stickers_extra");extra("ng","media_extra","stickers_extra");extra("nx","media_extra","stickers_extra");
                 add(new app.flexygram.bubbles.deletion.MessageAnimationsActivity(true));break;
             case "home":
-                add(new app.flexygram.home.HomeStyleSettingsActivity());
+                add(new app.flexygram.home.HomeListSettingsActivity());
                 add(new app.flexygram.home.SmartPreviewsSettingsActivity());
                 add(scope(new OpenExteraAppearanceActivity(),"appearance","chat_list|avatars|folders"));
                 add(scope(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_CHATS),"chats","chat_list"));

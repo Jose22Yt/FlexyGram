@@ -107,7 +107,8 @@ final class StudioClientCatalog {
         for(ConfigItem item:PillStackConfig.INSTANCE.getStudioItems())item(item,"navigation");
         for(ConfigItem item:UtilsConfig.INSTANCE.getStudioItems())item(item);
         for(ConfigItem item:app.exteraless.glyph.GlyphConfig.INSTANCE.getStudioItems())item(item,"appearance");
-        integer("flexygram_home","style",0);range("flexygram_home","style",0,1);
+        // Legacy backups may contain layout 1 or 2; reload migrates both to the sole default.
+        integer("flexygram_home","style",0);range("flexygram_home","style",0,2);
         String f="flexygram_bubbles";
         bool(f,"glass",false);bool(f,"border",false);bool(f,"edges",false);integer(f,"transparency",0);integer(f,"signature_border_tenths",11);
         integer(f,"surface_effect",2);bool(f,"small_timestamp",false);

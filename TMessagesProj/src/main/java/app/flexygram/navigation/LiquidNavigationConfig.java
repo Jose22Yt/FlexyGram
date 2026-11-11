@@ -22,9 +22,6 @@ public final class LiquidNavigationConfig {
     public static void removeChangeListener(Runnable listener) { changeListeners.remove(listener); }
     private static void notifyChanged() { for (Runnable listener : changeListeners) listener.run(); }
 
-    private static final int[] IOS_ORDER={LiquidNavigationDestinations.CONTACTS,LiquidNavigationDestinations.CALLS,
-            LiquidNavigationDestinations.CHATS,LiquidNavigationDestinations.SETTINGS};
-    private static boolean iosHome(){return app.flexygram.home.HomeStyleConfig.isIos();}
     private LiquidNavigationConfig() {}
 
     private static SharedPreferences preferences;
@@ -79,13 +76,11 @@ public final class LiquidNavigationConfig {
     }
 
     public static boolean configured() {
-        if(iosHome())return true;
         ensure();
         return enabled;
     }
 
     public static boolean isEnabled() {
-        if(iosHome())return true;
         ensure();
         return enabled;
     }
@@ -98,7 +93,6 @@ public final class LiquidNavigationConfig {
     }
 
     public static boolean showTitles() {
-        if(iosHome())return true;
         ensure();
         return showTitles;
     }
@@ -144,7 +138,6 @@ public final class LiquidNavigationConfig {
     }
 
     public static boolean isFloatingDock() {
-        if(iosHome())return true;
         ensure();
         return floatingDock;
     }
@@ -157,7 +150,6 @@ public final class LiquidNavigationConfig {
     }
 
     public static int[] order() {
-        if(iosHome())return IOS_ORDER;
         ensure();
         if (activeOrder == null) return LiquidNavigationDestinations.defaults();
         return activeOrder;
@@ -175,8 +167,7 @@ public final class LiquidNavigationConfig {
         notifyChanged();
     }
 
-    public static boolean separateSearch() {
-        if(iosHome())return false; ensure(); return separateSearch; }
+    public static boolean separateSearch() { ensure(); return separateSearch; }
     public static void setSeparateSearch(boolean value) {
         ensure(); separateSearch = value;
         prefs().edit().putBoolean("separate_search",value).apply(); notifyChanged();
@@ -189,19 +180,16 @@ public final class LiquidNavigationConfig {
     }
 
     public static boolean hideLabels(int count, int availableDp) {
-        if(iosHome())return false;
         ensure();
         return !showTitles;
     }
 
     public static boolean isVisible() {
-        if(iosHome())return true;
         ensure();
         return enabled && order().length > 0;
     }
 
     public static boolean labels() {
-        if(iosHome())return true;
         ensure();
         return showTitles;
     }
@@ -217,22 +205,18 @@ public final class LiquidNavigationConfig {
         notifyChanged();
     }
     public static int heightDp() {
-        if(iosHome())return 64;
         return new int[]{48, 52, 60}[densityIndex()];
     }
 
     public static int innerMarginDp() {
-        if(iosHome())return 4;
         return 2;
     }
 
     public static int bottomGapDp() {
-        if(iosHome())return 8;
         return isFloatingDock() ? 9 : 0;
     }
 
     public static int sideGapDp() {
-        if(iosHome())return 16;
         return isFloatingDock() ? 10 : 0;
     }
 
@@ -241,17 +225,14 @@ public final class LiquidNavigationConfig {
     }
 
     public static int iconDp() {
-        if(iosHome())return 28;
         return new int[]{21, 22, 23}[densityIndex()];
     }
 
     public static float widthFraction() {
-        if(iosHome())return 1f;
         return new float[]{.86f, .93f, 1f}[densityIndex()];
     }
 
     public static float radiusDp() {
-        if(iosHome())return heightDp()/2f;
         return isFloatingDock() ? heightDp() / 2f - 1 : 0f;
     }
 
@@ -264,7 +245,6 @@ public final class LiquidNavigationConfig {
     }
 
     public static int contentPaddingDp() {
-        if(iosHome())return 4;
         return 3;
     }
 }

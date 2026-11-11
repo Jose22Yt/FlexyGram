@@ -1,5 +1,7 @@
 # Beta 44 — pantalla principal Telegram iOS
 
+**Histórico:** este estilo y su selector se retiran en [beta 45](BETA45_DEFAULT_HOME.md).
+
 Fecha: 11 de noviembre de 2026 (America/Bogota). Versión `1.0.0-beta.44`, build `1333`, paquete `com.flexygram.messenger`.
 
 ## Activación y migración
