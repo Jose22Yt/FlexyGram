@@ -46,3 +46,7 @@ Los controles visuales de 44 dp disponen de una delegación táctil de al menos 
 Esta es una adaptación nativa a Android, **no una copia binaria de UIKit ni una garantía de igualdad exacta de píxeles**. La tipografía sigue el sistema Android y su escala de accesibilidad. Historias, carpetas, selección y búsqueda conservan sus transiciones Android. Los estados especiales de red, insignias premium y comportamientos privados del material de Apple no se certifican como idénticos. El nombre de la opción no certifica que Apple haya distribuido una versión concreta de iOS 27. La fluidez real, la captura de blur y la respuesta del conjunto necesitan validación en dispositivos; no se han medido FPS en un teléfono durante esta revisión.
 
 La APK oficial se genera únicamente mediante `.github/workflows/ui-beta-debug.yml`. La firma del workflow es de depuración; la clave de producción permanece bajo custodia del propietario.
+
+## Preparación del servidor de compilación
+
+Un intento quedó detenido por fallos DNS de `azure.archive.ubuntu.com` en la lista de mirrors de Ubuntu del runner. El flujo oficial usa ahora los mirrors HTTPS de Ubuntu en esa lista, conserva las comprobaciones de firmas/TLS y limita reintentos y tiempos de descarga. La preparación tiene un máximo de diez minutos; el ensamblado nativo conserva el plazo general existente. Este ajuste del servidor no introduce código ni dependencias adicionales en la APK.
