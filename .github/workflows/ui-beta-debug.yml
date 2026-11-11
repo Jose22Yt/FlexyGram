@@ -53,7 +53,11 @@ jobs:
           # The hosted mirror list can retain an unreachable Azure endpoint for every package.
           # Keep signed Ubuntu repositories and HTTPS; no trust checks are bypassed.
           if [ -f /etc/apt/apt-mirrors.txt ]; then
-            printf '%s\n' 'https://archive.ubuntu.com/ubuntu' 'https://security.ubuntu.com/ubuntu' | sudo tee /etc/apt/apt-mirrors.txt > /dev/null
+            printf '%s\n' 'https://archive.ubuntu.com/ubuntu/' | sudo tee /etc/apt/apt-mirrors.txt > /dev/null
+          fi
+          python tools/beta_release/ubuntu_dns.py --hosts-file "$RUNNER_TEMP/flexy-ubuntu-hosts"
+          if [ -s "$RUNNER_TEMP/flexy-ubuntu-hosts" ]; then
+            sudo tee -a /etc/hosts < "$RUNNER_TEMP/flexy-ubuntu-hosts" > /dev/null
           fi
           flexy_apt_options=(-o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 -o APT::Update::Error-Mode=any)
           sudo apt-get "${flexy_apt_options[@]}" update -qq
