@@ -60,4 +60,4 @@ El comparador requiere el commit base en el historial Git. Queda la comprobació
 
 ## Integridad de identidad
 
-Se restauró en `AGENTS.md` la transcripción original de la huella del certificado, alterada al sustituir numéricamente la versión en una revisión anterior. Los incrementos de esta entrega se limitan a los campos de versión. No se han cambiado claves, configuración de firma ni paquete de la aplicación.
+Los incrementos de versión se limitan a los campos declarados en `gradle.properties`. La identidad, el certificado y la configuración de firma se documentan en [SIGNING.md](../SIGNING.md).

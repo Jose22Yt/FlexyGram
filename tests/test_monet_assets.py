@@ -9,7 +9,7 @@ def test_reviewed_resources_are_losslessly_imported_and_all_have_coverage():
     assert len(assets)==85
     assert len({a['drawable'] for a in assets})==85
     res=ROOT/'TMessagesProj/src/main/res'
-    with zipfile.ZipFile(ROOT/'docs/design-reviews/FlexyGram_Duotono_Monet_Bordes_Pulidos.zip') as z:
+    with zipfile.ZipFile(ROOT/'tools/settings_monet/sources/approved-icons.zip') as z:
         for a in assets:
             path=res/'drawable-nodpi'/(a['drawable']+'.png')
             assert path.read_bytes()==z.read('FlexyGram_Duotono_Monet_Bordes_Pulidos/android/res/drawable-nodpi/'+path.name)

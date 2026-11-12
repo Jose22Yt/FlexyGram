@@ -1,41 +1,38 @@
-# Тесты каталога плагинов
+# Pruebas de FlexyGram
 
-Статические проверки поверх корпуса плагинов exteraGram. Джавы и устройства не требуют,
-гоняются обычным CPython.
+La suite cubre políticas de renderizado, interacción, ajustes, recursos, ciclo de vida,
+cuentas y compatibilidad con el motor de plugins. Combina comprobaciones Python con
+pruebas que compilan y ejecutan clases o métodos Java de producción con dobles de sus dependencias.
 
-```
+## Ejecutar
+
+Desde la raíz del repositorio, utiliza Python con `pytest` y las dependencias de las
+pruebas que vayas a ejecutar. Las pruebas JVM requieren un JDK; las comprobaciones de
+imágenes requieren Pillow y NumPy.
+
+```sh
 python3 -m pytest tests/ -q
+python3 -m pytest tests/test_scroll_work_budget.py tests/test_render_work_reuse.py -q
 ```
 
-Полный проход — около пяти минут, почти всё время уходит на разбор `mapping.txt` R8
-и на AST восьмисот плагинов.
+Las utilidades Android y sus dependencias están documentadas en [tools](../tools/README.md).
+Una prueba aislada no genera una APK ni acredita por sí sola el funcionamiento integrado en Android.
 
-## Корпус
+## Entradas opcionales
 
-Корпус в репозиторий не входит (77 МБ). По умолчанию тесты ищут его в
-`/home/coral/openExtera/plugin-corpus`, путь переопределяется переменными окружения:
+Las comprobaciones del catálogo de plugins pueden utilizar un corpus externo. Configura
+`EXTERALESS_PLUGIN_CORPUS` con los archivos `.plugin` y `EXTERALESS_PLUGIN_ARCHIVES`
+con los archivos `.eaf`. El corpus no forma parte del repositorio. Si falta una entrada
+opcional, la prueba correspondiente se omite con su motivo.
 
-| переменная | что содержит |
-|---|---|
-| `EXTERALESS_PLUGIN_CORPUS` | каталог с `*.plugin` — по одному Python-файлу на плагин |
-| `EXTERALESS_PLUGIN_ARCHIVES` | каталог с `*.eaf` — ZIP-архивы многофайловых плагинов |
+Las pruebas R8 utilizan los resultados de `TMessagesProj/build/outputs/mapping/release/`.
+Los resultados ausentes o anteriores a las reglas vigentes no se presentan como una validación actual.
 
-Если каталога нет, тесты скипаются, а не падают.
+## Datos de referencia
 
-Собрать корпус заново: выгрузки каталогов плагинов из Telegram (папки `ChatExport_*`)
-плюс `git clone https://github.com/KangelPlugins/Plugins-Store`, дедупликация по sha256
-содержимого. ZIP-архивы (`.eaf`) кладутся отдельно от исходников — это не Python.
+`tests/baselines/` registra límites de compatibilidad conocidos. Al resolver uno, actualiza
+su referencia y conserva la comprobación que impide regresiones. No utilices datos de
+cuentas reales, sesiones ni conversaciones privadas como fixtures.
 
-## Базовые списки
-
-`tests/baselines/*.json` — известные дыры на момент записи. Тест падает только на том,
-чего в списке нет, иначе на 104 непортированных Java-классах он был бы красным всегда.
-Когда дыру закрывают, запись из списка убирают: тест показывает такие остатки в тексте
-ошибки, но из-за них не падает.
-
-## R8
-
-Проверки шринкинга читают `TMessagesProj/build/outputs/mapping/release/`. Если этих
-артефактов нет или они старше `proguard-rules.pro`, проверки скипаются с указанием
-правила, которого не было в том билде, — зелёный результат на протухшем маппинге ничего
-не значит.
+Los resultados de estas pruebas deben distinguirse de una compilación completa y de
+mediciones de rendimiento en dispositivo.

@@ -1,20 +1,20 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: Proponer una mejora
+about: Sugiere una función o mejora para FlexyGram
 title: ''
 labels: ''
 assignees: ''
-
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## Necesidad
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+Describe qué tarea quieres resolver o qué parte de la experiencia puede mejorar.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+## Propuesta
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+Explica cómo debería funcionar, dónde aparecería y cuál sería el resultado esperado.
+
+## Referencias opcionales
+
+Incluye ejemplos o imágenes que ayuden a entender la propuesta, sin información privada.
+Indica si la mejora debe funcionar con varios temas, tamaños de pantalla o funciones de accesibilidad.

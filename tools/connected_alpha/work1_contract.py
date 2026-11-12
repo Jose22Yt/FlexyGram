@@ -4,7 +4,7 @@ from functools import lru_cache
 import hashlib,json,subprocess
 ROOT=Path(__file__).resolve().parents[2]
 BASE='3db6f7a87d147b84a628af7352299173424ce4f7'
-MANIFEST=ROOT/'tools/work1/review.json'
+MANIFEST=ROOT/'tools/variant_checks/review.json'
 def spec():return json.loads(MANIFEST.read_text())
 def paths():
  from refinement134_contract import paths as refinement_paths

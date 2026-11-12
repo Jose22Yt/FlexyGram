@@ -152,7 +152,7 @@ print('ALL CHECKS PASSED!')
 
 1. **Entorno de Ejecución Local (Termux):** Al ejecutarse dentro del entorno de espacio de usuario de Termux en Linux/Android sin Android SDK emulado completo, las pruebas gráficas de hardware (`tools/connected_alpha/music_visual`, `header_touch`) que requieren la pila oficial de emulación de Android 15/16 y Maven se delegan a la integración continua oficial en GitHub Actions (`.github/workflows/ui-beta-debug.yml`).
 2. **Submódulos Nativos:** Los submódulos en `TMessagesProj/jni/third_party` (FFmpeg, BoringSSL, WebRTC) no fueron modificados ni alterados, manteniendo estabilidad binaria.
-3. **Reproductor Órbita en Desarrollo:** Conforme a las instrucciones, el trabajo pendiente de `docs/design/music/CONTINUE_ORBIT.md` se mantuvo preservado sin mezclas forzadas.
+3. **Reproductor Órbita en Desarrollo:** Conforme a las instrucciones, el trabajo pendiente de `docs/design/music/README.md` se mantuvo preservado sin mezclas forzadas.
 
 ---
 

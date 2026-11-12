@@ -1,14 +1,17 @@
-# Funciones y límites
+# Funciones
 
-Esta rama conserva el código de Alpha 1286. No es un rediseño funcional ni una reconstrucción sobre otro cliente.
+FlexyGram es un cliente Android basado en Telegram y Exteraless, con controles de apariencia
+y herramientas propias. La disponibilidad concreta depende de la versión y del dispositivo.
 
-| Área | Código conservado | Alcance de la afirmación |
-| --- | --- | --- |
-| Mensajería | Telegram, cuentas, conversaciones, reacciones y llamadas | La identidad Beta aún requiere pruebas reales |
-| Signature | Bienvenida, cabeceras, compositor y navegación | Mismos componentes e iconos de la base |
-| Apariencia | Temas, burbujas, contornos, blur y transparencias | Depende de ajustes y capacidades de Android |
-| Herramientas | FlexyStudio, música, opciones heredadas compatibles | No se eliminan funciones por el cambio de identidad |
-| Interacción 1286 | Toque de burbujas, Liquid Navigation 2.0, Fusion y Share Sheet opcional | Candidato PR #130, pendiente de aceptación física |
-| Animaciones | Política y componentes presentes en el SHA base | Sin reinstalar motores antiguos ni cambiar parámetros |
+| Área | Funciones |
+| --- | --- |
+| Mensajería | Cuentas, conversaciones, reacciones, archivos y llamadas sobre los servicios nativos de Telegram. |
+| Conversaciones | Estilos de interfaz superior e inferior, formas de burbuja y personalización de superficies y bordes. |
+| Apariencia | Temas claros y oscuros, acentos dinámicos e iconos adaptados al tema. |
+| Ajustes | Secciones compactas y selectores con vistas previas. |
+| FlexyStudio | Exportación e importación selectiva de la configuración. |
+| Herramientas | Gestión de archivos, opciones de navegación y reproductor de música. |
+| Desplazamiento | Scroll nativo en la lista de chats y las conversaciones, sin transformaciones de filas. |
 
-El diseño busca respuesta fluida; no hay una medición Beta que permita prometer superioridad sobre Exteraless o una tasa de cuadros concreta. Los resultados históricos de pruebas host y renderers se refieren a sus SHA originales y no certifican esta migración. Conservamos esos registros para mantenimiento.
+Las decisiones de caché, renderizado y reanudación se documentan en las guías de rendimiento.
+Las pruebas de escritorio no sustituyen la evaluación de fluidez, consumo y compatibilidad en un teléfono.

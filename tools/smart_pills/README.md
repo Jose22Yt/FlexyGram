@@ -1,8 +1,8 @@
-# FlexyGram Smart Mini Pills v2 — Work 1 handoff
+# Smart Mini Pills v2
 
-This branch **extends** SignatureSmartPreviews; it does not add a parallel chat-list renderer.
+Reference for the Smart Mini Pills integration in SignatureSmartPreviews.
 
-## Already implemented
+## Componentes
 - Pure local filename/MIME classifier for PDF, TXT, ZIP, RAR, 7Z, APK, PNG, JPG, WEBP, GIF, MP3/FLAC, videos, DOCX, XLSX, PPTX and generic files.
 - Service messages: joined, left, pinned; native media: image, video, audio, voice, sticker, poll, contact, location; standalone URL, channel post and edited text when reliably indicated.
 - Existing four theme modes remain: Adaptive / Theme / Matte / Off.
@@ -10,7 +10,7 @@ This branch **extends** SignatureSmartPreviews; it does not add a parallel chat-
 - Guard margin in SignatureSmartPillLayout, one-line content sanitization, spoiler/TTL/restriction checks and fallback to native on narrow rows.
 - EN/ES captions. No file reads, downloads, network requests or per-frame bitmap work.
 
-## Deliberate limitations — Work 1 must verify before acceptance
+## Límites de la integración
 - The renderer prioritizes **one pill per chat row**, with a second **CANAL** pill for verified channel posts when enough width exists. Other combinations (e.g. ADMIN + PDF) require verified participant roles, priority policy and real width testing, not guesses.
 - Never label a sender ADMIN/OWNER from a channel post alone. The role hook in SignatureMiniPillClassifier accepts only locally confirmed rights; integrate it only where a reliable cached participant record exists.
 - A filename ending in .jpg or .png does not prove WALLPAPER intent. Leave it PNG/JPG unless Telegram has explicit wallpaper media metadata.

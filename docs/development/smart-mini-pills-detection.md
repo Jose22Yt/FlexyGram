@@ -17,7 +17,7 @@ Se corrige la clasificación de la lista principal conservando los modos Adaptat
 
 ## Validación
 
-`JAVA_HOME=/workspace/.flexygram/jdk21 PATH=/workspace/.flexygram/jdk21/bin:$PATH python -m pytest tests/ -q -p no:cacheprovider`: **234 aprobadas, 31 omitidas**.
+`python3 -m pytest tests/ -q -p no:cacheprovider` (con JDK 21 en `PATH`): **234 aprobadas, 31 omitidas**.
 
 Las pruebas nuevas ejecutan el clasificador, las etiquetas y la paleta reales con metadatos de Telegram simulados. Cubren documentos embebidos en páginas web, texto ordinario, MIME/extensiones contradictorios, voz/música, notas de vídeo, stickers animados, GIF, metadatos incompletos, roles, eventos, mensajes conservados como eliminados, protecciones de contenido, offsets URL, nombres Unicode, contraste y reutilización de todas las geometrías de iconos.
 

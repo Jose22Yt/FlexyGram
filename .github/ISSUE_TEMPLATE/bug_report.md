@@ -1,35 +1,32 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: Informar de un fallo
+about: Describe un problema reproducible en FlexyGram
 title: ''
 labels: ''
 assignees: ''
-
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Descripción
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+Explica qué ocurre y qué esperabas que ocurriera.
 
-**Logcat**
-Share only the smallest relevant, sanitized log excerpt. Remove tokens, credentials, account data, phone numbers and private messages. Do not upload a full log archive unless you have reviewed every file. See [SECURITY.md](https://github.com/Jose22Yt/FlexyGram/blob/main/SECURITY.md) for private security reports.
+## Cómo reproducirlo
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+1. Abre…
+2. Selecciona…
+3. Observa…
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## Entorno
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. MI6]
- - OS: [e.g. Android8.1]
- - Version [e.g. 5.15.0]
+- Versión y build de FlexyGram:
+- Modelo del dispositivo:
+- Versión de Android:
+- Tema, estilo o ajuste relacionado:
 
-**Additional context**
-Add any other context about the problem here.
+## Evidencia opcional
+
+Incluye una captura o un fragmento mínimo del registro si ayuda a reproducir el fallo.
+Retira mensajes privados, números de teléfono, tokens y datos de cuentas.
+
+Las vulnerabilidades y credenciales expuestas deben comunicarse por el canal privado
+descrito en [SECURITY.md](https://github.com/Jose22Yt/FlexyGram/blob/codex/flexygram-beta-glass/SECURITY.md).

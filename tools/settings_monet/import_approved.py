@@ -3,7 +3,7 @@ from pathlib import Path
 from PIL import Image
 import numpy as np,json,zipfile,io
 ROOT=Path(__file__).resolve().parents[2]
-archive=ROOT/'docs/design-reviews/FlexyGram_Duotono_Monet_Bordes_Pulidos.zip'
+archive=ROOT/'tools/settings_monet/sources/approved-icons.zip'
 res=ROOT/'TMessagesProj/src/main/res';data=[]
 (res/'drawable-nodpi').mkdir(exist_ok=True);(res/'raw').mkdir(exist_ok=True)
 with zipfile.ZipFile(archive) as z:

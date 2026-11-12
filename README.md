@@ -18,12 +18,11 @@ Un cliente de mensajería para Android con personalidad propia, controles de apa
 
 ---
 
-> [!IMPORTANT]
-> **Versión Oficial Activa:** FlexyGram `v1.0.0-beta.54` (Build `1343`)
-> **Rama Oficial de Desarrollo:** [`codex/flexygram-beta-glass`](https://github.com/Jose22Yt/FlexyGram/tree/codex/flexygram-beta-glass)  
-> Revisión actual, sin compilar: [desplazamiento nativo sin efectos](docs/scroll/NATIVE_SCROLL.md). Se retiran el aro 3D y sus ajustes de ambas listas. Se conservan los ajustes compactos y las mejoras de reanudación de beta 54. No se inicia una compilación de APK.
-> En preparación: [selectores compactos de interfaz y burbujas](docs/settings3/COMPACT_STYLE_PICKERS.md), con vista previa común, miniaturas y geometría oficial de Telegram para iPhone. Sin compilar APK.
-> Para desarrolladores y agentes de IA (Codex, ChatGPT, Claude), consulta la guía obligatoria de desarrollo en [AGENTS.md](AGENTS.md).
+## Desarrollo
+
+La rama activa es [`codex/flexygram-beta-glass`](https://github.com/Jose22Yt/FlexyGram/tree/codex/flexygram-beta-glass).
+Las versiones y los identificadores de la aplicación se declaran en [`gradle.properties`](gradle.properties).
+Consulta la [documentación](docs/README.md) para conocer la arquitectura, las funciones y el proceso de compilación.
 
 ## Tu espacio, tu estilo
 
@@ -62,7 +61,7 @@ Opciones para archivos, navegación y uso diario, con ajustes organizados por se
 </tr>
 </table>
 
-Las funciones y su disponibilidad dependen de la rama, la versión y el dispositivo. Toda la línea activa de desarrollo se encuentra en la rama [`codex/flexygram-beta-glass`](https://github.com/Jose22Yt/FlexyGram/tree/codex/flexygram-beta-glass); no desarrolles sobre `main` ni sobre ramas antiguas de pruebas. Los cambios en desarrollo no son una garantía de compatibilidad o rendimiento en todos los teléfonos.
+La disponibilidad de las funciones depende de la versión, los ajustes y las capacidades del dispositivo.
 
 ## Empieza aquí
 
@@ -73,7 +72,7 @@ Las funciones y su disponibilidad dependen de la rama, la versión y el disposit
 
 ## Proyecto y comunidad
 
-FlexyGram está creado y dirigido por [@Lukhou23](https://t.me/Lukhou23), con el repositorio mantenido por [Jose22Yt](https://github.com/Jose22Yt).
+FlexyGram está creado y dirigido por [@Lukhou23](https://t.me/Lukhou23), con el repositorio mantenido por [Jose22Yt](https://github.com/Jose22Yt). El desarrollo cuenta con asistencia de **Codex**.
 
 Las contribuciones se revisan mediante cambios pequeños, pruebas pertinentes y descripciones que permitan reproducir el problema. La autoría y las colaboraciones se conservan en el historial del proyecto.
 

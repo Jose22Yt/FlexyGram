@@ -6,7 +6,7 @@ Navigation rows use 22dp glyphs, 15sp regular labels, a 48dp minimum content hei
 
 ## Approved assets and rendering
 
-`tools/settings_monet/import_approved.py` imports the 85 original PNGs directly from `docs/design-reviews/FlexyGram_Duotono_Monet_Bordes_Pulidos.zip`. Their bytes are unchanged. A second, lossless RGB PNG stores body coverage in red, accent coverage in green and total coverage in blue; only empty margins are removed. No glyph geometry is retraced or resampled during import.
+`tools/settings_monet/import_approved.py` imports the 85 original PNGs directly from `tools/settings_monet/sources/approved-icons.zip`. Their bytes are unchanged. A second, lossless RGB PNG stores body coverage in red, accent coverage in green and total coverage in blue; only empty margins are removed. No glyph geometry is retraced or resampled during import.
 
 `DuotoneSettingsIcon` combines the two coverage channels once per palette. Body is white in dark mode and black in light mode; accent comes from the active header/accent token. Numerical composition retains the original total alpha rather than compositing two overlapping translucent masks. Parent monochrome icon filters cannot collapse the duotone. Native image alpha/disabled state remains supported.
 

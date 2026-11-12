@@ -32,7 +32,7 @@ El blur y la congelación de fondos ya tienen trabajo asíncrono/cancelación; n
 
 Suite final sobre el árbol completo: **280 aprobadas, 33 omitidas y 9 subtests aprobados** (219,53 s). Comando: `python -m pytest tests/ tools/connected_alpha/test_flexystudio.py tools/connected_alpha/test_composer_reference.py -q`, con JDK 21. Las omisiones corresponden a condiciones opcionales del entorno; no se cuentan como cobertura ejecutada.
 
-`git diff --check` limpio. Parche acumulado: `/workspace/artifacts/flexygram-wide-performance.patch`, comprobado contra el árbol con `git apply --reverse --check` sin aplicarlo de nuevo. Incluye los cambios previos de lista/ajustes y las cinco áreas nuevas; no debe reaplicarse sobre este árbol ya modificado.
+`git diff --check` limpio. Las modificaciones forman parte del historial del repositorio; no requieren aplicar parches locales adicionales.
 
 Pruebas nuevas: `tests/test_preview_frame_work.py` y `tests/test_file_editor_decode_worker.py`. Se añaden a las regresiones previas de lista/ajustes. Las pruebas verifican lógica y recuentos; los dobles de Canvas no equivalen a píxeles Android.
 

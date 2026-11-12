@@ -5,7 +5,7 @@ El resto de este documento conserva la descripción histórica.
 
 # Cristal universal
 
-Estado de compilación más reciente: [Compilación de la beta](FlexyGram-beta-compilacion.md). Las notas de validación de este documento describen las etapas anteriores.
+Estado de compilación más reciente: [Compilación de la beta](BUILDING.md). Las notas de validación de este documento describen las etapas anteriores.
 
 
 Implementación opcional basada en las dos referencias visuales: superficies translúcidas, tinte suave y bordes de luz. No se afirma reproducción idéntica a las capturas; no se ha ejecutado ni comparado la app en un dispositivo.

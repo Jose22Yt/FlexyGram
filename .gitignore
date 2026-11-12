@@ -59,3 +59,26 @@ htmlcov/
 **/shared_prefs/
 /private/
 /reports/private/
+
+# Local development and test output
+.ruff_cache/
+.mypy_cache/
+.tox/
+.nox/
+.venv/
+venv/
+coverage.xml
+*.py,cover
+*.log
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+*.swp
+*.swo
+*~
+/Desktop.ini
+/Thumbs.db
+/reports/local/
+/docs/design-reviews/

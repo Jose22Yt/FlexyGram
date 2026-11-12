@@ -2,6 +2,8 @@
 
 FlexyGram es un proyecto creado y dirigido por [@Lukhou23](https://t.me/Lukhou23), con el repositorio mantenido por [Jose22Yt](https://github.com/Jose22Yt). Estos roles corresponden al proyecto FlexyGram y no sustituyen la autoría de sus componentes.
 
+**Asistencia de desarrollo:** Codex, como herramienta de apoyo en implementación, revisión y pruebas bajo la dirección del responsable de FlexyGram.
+
 ## Código y proyectos de origen
 
 | Proyecto | Aportación / procedencia |

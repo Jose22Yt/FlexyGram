@@ -1,6 +1,6 @@
 # Ajustes visuales de FlexyGram
 
-Estado de compilación más reciente: [Compilación de la beta](FlexyGram-beta-compilacion.md). Las notas de validación de este documento describen las etapas anteriores.
+Estado de compilación más reciente: [Compilación de la beta](BUILDING.md). Las notas de validación de este documento describen las etapas anteriores.
 
 
 Cambios preparados sobre el checkout de `main`. No se compiló APK ni se ejecutó Gradle.
