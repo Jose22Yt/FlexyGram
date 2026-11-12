@@ -148,3 +148,33 @@ public class Probe{
   p.releaseAvatarParticles();check(a.imageReceiver.detaches==1&&b.imageReceiver.detaches==1&&c.imageReceiver.detaches==1);
  }
 }'''.replace('METHODS',methods)},[R/'ReactionMotion.java'])
+
+
+def test_overlay_draw_updates_owner_field_without_capturing_a_mutable_constructor_argument(tmp_path):
+    import re
+    source=OVERLAY.read_text()
+    constructor=re.search(r'public ReactionsEffectOverlay\([^\n]+\) \{',source).group(0)
+    constructor=constructor.replace('ReactionsEffectOverlay','Probe')
+    assignment=re.search(r'this\.cell\s*=\s*\w+;',source).group(0)
+    draw=method(source,'protected void dispatchDraw(Canvas canvas)')
+    # Compile the real constructor declaration and both owner updates inside an
+    # anonymous class. Moving just the draw body to a flat probe hid the CI error.
+    updates=re.findall(r'(?:if\(!isStories\))?cell\s*=\s*drawingCell;',draw)
+    assert len(updates)==2
+    probe(tmp_path, {'Probe.java': '''
+class Context{}class BaseFragment{}class ReactionsContainerLayout{}class View{}
+class ReactionsLayoutInBubble{static class VisibleReaction{}}
+public class Probe{
+ View cell,next;Runnable draw;
+ CONSTRUCTOR
+  ASSIGNMENT
+  draw=new Runnable(){public void run(){View drawingCell=next;UPDATES}};
+ }
+ public static void main(String[]args){
+  View original=new View(),replacement=new View();
+  Probe p=new Probe(null,null,null,original,null,0,0,null,0,0,false);
+  if(p.cell!=original)throw new AssertionError("source owner lost");
+  p.next=replacement;p.draw.run();if(p.cell!=replacement)throw new AssertionError("recycled owner not updated");
+  View next=new View();p.next=next;p.draw.run();if(p.cell!=next)throw new AssertionError("stale owner captured");
+ }
+}'''.replace('CONSTRUCTOR',constructor).replace('ASSIGNMENT',assignment).replace('UPDATES','\n'.join(updates))}, [])

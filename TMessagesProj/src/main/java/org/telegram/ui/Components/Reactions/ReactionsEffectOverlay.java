@@ -109,7 +109,8 @@ public class ReactionsEffectOverlay {
     public boolean isStories;
     boolean isFinished;
 
-    public ReactionsEffectOverlay(Context context, BaseFragment fragment, ReactionsContainerLayout reactionsLayout, View cell, View fromAnimationView, float x, float y, ReactionsLayoutInBubble.VisibleReaction visibleReaction, int currentAccount, int animationType, boolean isStories) {
+    public ReactionsEffectOverlay(Context context, BaseFragment fragment, ReactionsContainerLayout reactionsLayout, View sourceCell, View fromAnimationView, float x, float y, ReactionsLayoutInBubble.VisibleReaction visibleReaction, int currentAccount, int animationType, boolean isStories) {
+        this.cell = sourceCell;
         this.isStories = isStories;
         final MessageObject messageObject;
         if (cell instanceof ChatMessageCell) {
@@ -128,7 +129,6 @@ public class ReactionsEffectOverlay {
         this.reaction = visibleReaction;
         this.animationType = animationType;
         this.currentAccount = currentAccount;
-        this.cell = cell;
         this.baseFragment = fragment;
         ReactionsLayoutInBubble.ReactionButton reactionButton = null;
         if (cell instanceof ChatMessageCell) {
