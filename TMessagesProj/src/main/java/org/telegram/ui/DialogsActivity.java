@@ -1803,6 +1803,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         public DialogsRecyclerView(Context context, ViewPage page) {
             super(context);
             parentPage = page;
+            if (isSignatureHome()) setScrollEffectsSurface(app.flexygram.scroll.ScrollEffectsConfig.CHATS);
             additionalClipBottom = dp(200);
         }
 
@@ -1877,6 +1878,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         @Override
         protected void dispatchDraw(Canvas canvas) {
+            if (animationSupportListView != null || drawMovingViewsOverlayed() || rightFragmentOpenedProgress != 0) resetScrollEffects();
+            beginScrollEffectsFrame(getPaddingTop() + scrollYOffset, getHeight() - getPaddingBottom());
             canvas.save();
             if (rightFragmentOpenedProgress > 0) {
                 canvas.clipRect(0, 0, AndroidUtilities.lerp(getMeasuredWidth(), dp(RightSlidingDialogContainer.getRightPaddingSize()), rightFragmentOpenedProgress), getMeasuredHeight());
@@ -2107,7 +2110,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (drawMovingViewsOverlayed() && child instanceof DialogCell && ((DialogCell) child).isMoving()) {
                 return true;
             }
-            return super.drawChild(canvas, child, drawingTime);
+            int effectSave = saveScrollEffect(canvas, child);
+            try { return super.drawChild(canvas, child, drawingTime); }
+            finally { restoreScrollEffect(canvas, effectSave); }
+        }
+
+        @Override protected boolean getScrollEffectBounds(View child, RectF bounds) {
+            return child instanceof DialogCell && super.getScrollEffectBounds(child, bounds);
         }
 
         @Override

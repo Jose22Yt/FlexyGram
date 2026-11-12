@@ -40,6 +40,7 @@ public final class Settings3Registry {
     }
     public static BaseFragment searchTarget(BaseFragment original,String key){
         if("dividerStyle".equals(key)||original instanceof app.flexygram.home.HomeListSettingsActivity)return open("home");
+        if(original instanceof app.flexygram.scroll.ScrollEffectsSettingsActivity || key != null && key.startsWith("flexyScroll"))return open("home");
         if("flexySmartPreviews".equals(key)||original instanceof app.flexygram.home.SmartPreviewsSettingsActivity)return open("home");
         if("flexyfilesEnabled".equals(key)||"flexyfilesHelp".equals(key))return open("flexyfiles");
         String route=null;

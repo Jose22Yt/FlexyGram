@@ -86,7 +86,7 @@ final class StudioClientCatalog {
             case "flexygram_bubbles":return "bubbles";
             case "flexygram_header":return "header";
             case "flexygram_composer":return "composer";
-            case "flexygram_home":case "flexy_bottom_tabs":case "flexy_signature_smart_previews":return "home";
+            case "flexygram_home":case "flexy_bottom_tabs":case "flexy_signature_smart_previews":case "flexygram_scroll_effects":return "home";
             case "flexy_bubble_interaction":case "flexy_delete_motion":return "chat";
             case "aiConfig":return "ai";
             case "exteraless_plugins":return "plugins";
@@ -109,6 +109,9 @@ final class StudioClientCatalog {
         for(ConfigItem item:app.exteraless.glyph.GlyphConfig.INSTANCE.getStudioItems())item(item,"appearance");
         // Legacy backups may contain layout 1 or 2; reload migrates both to the sole default.
         integer("flexygram_home","style",0);range("flexygram_home","style",0,2);
+        integer("flexygram_scroll_effects","chats",0);range("flexygram_scroll_effects","chats",0,3);
+        integer("flexygram_scroll_effects","conversation",0);range("flexygram_scroll_effects","conversation",0,3);
+        integer("flexygram_scroll_effects","intensity",1);range("flexygram_scroll_effects","intensity",0,2);
         String f="flexygram_bubbles";
         bool(f,"glass",false);bool(f,"border",false);bool(f,"edges",false);integer(f,"transparency",0);integer(f,"signature_border_tenths",11);
         integer(f,"surface_effect",2);bool(f,"small_timestamp",false);

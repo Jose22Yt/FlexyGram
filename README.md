@@ -19,9 +19,9 @@ Un cliente de mensajería para Android con personalidad propia, controles de apa
 ---
 
 > [!IMPORTANT]
-> **Versión Oficial Activa:** FlexyGram `v1.0.0-beta.50` (Build `1339`)
+> **Versión Oficial Activa:** FlexyGram `v1.0.0-beta.51` (Build `1340`, preparación sin APK)
 > **Rama Oficial de Desarrollo:** [`codex/flexygram-beta-glass`](https://github.com/Jose22Yt/FlexyGram/tree/codex/flexygram-beta-glass)  
-> Revisión actual: [notificaciones normales y apertura de chats, beta 50](docs/performance-current/BETA50_NATIVE_NOTIFICATIONS.md). Conserva el arranque optimizado de beta 46 y la pantalla principal por defecto de beta 45. Sin isla ni Camera Pop; compilación mediante el workflow oficial, sin seguimiento automático de esta sesión.
+> Revisión actual: [animaciones de desplazamiento, beta 51](docs/scroll/BETA51_SCROLL_EFFECTS.md): Rueda 3D, Perspectiva inclinada y Deslizamiento lateral, con selección por lista e intensidad compartida. Conserva las notificaciones normales de beta 50. Código preparado; sin compilar APK por indicación del propietario.
 > Para desarrolladores y agentes de IA (Codex, ChatGPT, Claude), consulta la guía obligatoria de desarrollo en [AGENTS.md](AGENTS.md).
 
 ## Tu espacio, tu estilo

@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.0.0-beta.51 — preparación, build 1340
+
+- Pantalla principal → Animaciones al desplazarse: Sin efecto, Rueda 3D, Perspectiva inclinada y Deslizamiento lateral. La lista de chats y el interior de las conversaciones se configuran por separado.
+- Intensidad compartida Suave/Marcada/Intensa, con Marcada como nivel inicial y efectos desactivados hasta elegirlos. Geometría normalizada y respuesta temporal comunes para ambas listas.
+- Entrada, inversión y asentamiento continuos; sin bitmaps, capas adicionales, cambios de layout ni temporizadores permanentes del efecto.
+- Se coordinan las capas de mensajes, fondos de álbumes, nombres, horas y reacciones. Las pulsaciones durante el efecto usan la proyección inversa y conservan las distancias nativas del gesto.
+- Respeta animaciones desactivadas y exploración táctil; libera el estado al separar la lista. Preferencias persistentes e incluidas en FlexyStudio.
+- Pruebas JVM y comprobación de tipos Android sin empaquetar la aplicación. Validación física de fluidez pendiente; no se compila APK en esta revisión.
+
 ## 1.0.0-beta.50 — build 1339
 
 - Se retiran completamente la isla de notificaciones y Camera Pop: vistas, animaciones, índices, temporizadores, ajustes, recursos y enlaces de ciclo de vida.

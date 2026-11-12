@@ -2199,6 +2199,17 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
+        MotionEvent nativeEvent = scrollEffectsTouchEvent(ev);
+        try { return dispatchNativeListTouchEvent(nativeEvent); }
+        finally {
+            if (nativeEvent != ev) nativeEvent.recycle();
+            if (ev.getActionMasked() == MotionEvent.ACTION_UP || ev.getActionMasked() == MotionEvent.ACTION_CANCEL) {
+                scrollTouchOffsetX = scrollTouchOffsetY = 0;
+            }
+        }
+    }
+
+    private boolean dispatchNativeListTouchEvent(MotionEvent ev) {
         final int action = ev.getAction();
         if (action == MotionEvent.ACTION_DOWN) {
             if (activeTouches == 0 && adaptiveOverScroll) {
@@ -2702,6 +2713,67 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         }
     }
 
+    private app.flexygram.scroll.ScrollEffectsController scrollEffects;
+    private RectF scrollEffectBounds;
+    private float[] scrollTouchPoint;
+    private float scrollTouchOffsetX, scrollTouchOffsetY;
+
+    protected float getScrollEffectTouchOffsetX() { return scrollTouchOffsetX; }
+    protected float getScrollEffectTouchOffsetY() { return scrollTouchOffsetY; }
+    private MotionEvent scrollEffectsTouchEvent(MotionEvent event) {
+        if (scrollEffects == null) return event;
+        if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            scrollTouchOffsetX = scrollTouchOffsetY = 0;
+            for (int i = scrollEffects.isActive() ? getChildCount() - 1 : -1; i >= 0; i--) {
+                View child = getChildAt(i);
+                if (child.getVisibility() != VISIBLE || !getScrollEffectBounds(child, scrollEffectBounds)) continue;
+                if (scrollEffects.mapTouch(event.getX(), event.getY(), scrollEffectBounds.top, scrollEffectBounds.bottom, scrollTouchPoint)
+                        && scrollTouchPoint[0] >= child.getX() && scrollTouchPoint[0] <= child.getX() + child.getWidth()
+                        && scrollTouchPoint[1] >= child.getY() && scrollTouchPoint[1] <= child.getY() + child.getHeight()) {
+                    scrollTouchOffsetX = scrollTouchPoint[0] - event.getX();
+                    scrollTouchOffsetY = scrollTouchPoint[1] - event.getY();
+                    break;
+                }
+            }
+            scrollEffects.onTouchDown();
+        }
+        if (scrollTouchOffsetX == 0 && scrollTouchOffsetY == 0) return event;
+        // A constant offset preserves velocity, touch slop, swipe-to-reply and multi-pointer deltas.
+        MotionEvent nativeEvent = MotionEvent.obtain(event);
+        nativeEvent.offsetLocation(scrollTouchOffsetX, scrollTouchOffsetY);
+        return nativeEvent;
+    }
+
+    public void setScrollEffectsSurface(int surface) {
+        if (scrollEffects == null) {
+            scrollEffectBounds = new RectF();
+            scrollTouchPoint = new float[2];
+            scrollEffects = new app.flexygram.scroll.ScrollEffectsController(this, surface);
+        }
+    }
+    public void beginScrollEffectsFrame(float top, float bottom) {
+        if (scrollEffects != null) scrollEffects.beginFrame(top, bottom);
+    }
+    public void resetScrollEffects() {
+        if (scrollEffects != null) scrollEffects.reset();
+    }
+    protected boolean getScrollEffectBounds(View child, RectF bounds) {
+        bounds.set(child.getLeft(), child.getY(), child.getRight(), child.getY() + child.getHeight());
+        return true;
+    }
+    public int saveScrollEffect(Canvas canvas, View child) {
+        if (scrollEffects == null || !scrollEffects.isActive() || !getScrollEffectBounds(child, scrollEffectBounds)) return -1;
+        return scrollEffects.save(canvas, scrollEffectBounds.top, scrollEffectBounds.bottom);
+    }
+    public void concatScrollEffect(Canvas canvas, View child) {
+        if (scrollEffects != null && scrollEffects.isActive() && getScrollEffectBounds(child, scrollEffectBounds)) {
+            scrollEffects.concat(canvas, scrollEffectBounds.top, scrollEffectBounds.bottom);
+        }
+    }
+    public void restoreScrollEffect(Canvas canvas, int save) {
+        if (save >= 0) canvas.restoreToCount(save);
+    }
+
     private boolean ignoreClipChild;
 
     @Override
@@ -2797,6 +2869,8 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
 
     @Override
     protected void onDetachedFromWindow() {
+        resetScrollEffects();
+        scrollTouchOffsetX = scrollTouchOffsetY = 0;
         scrollFrameRateHint.setScrolling(false);
         super.onDetachedFromWindow();
         selectorPosition = NO_POSITION;
@@ -3235,6 +3309,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
 
     @Override
     public void captureCalculateHash(IBlur3Hash builder, RectF position) {
+        if (scrollEffects != null) builder.add(scrollEffects.renderHash());
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             builder.unsupported();
             return;
