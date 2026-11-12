@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="FlexyScrollEffects">Animaciones al desplazarse</string>
+    <string name="FlexyScrollEffects">Efecto 3D fijo</string>
     <string name="FlexyScrollChats">Lista de chats</string>
     <string name="FlexyScrollConversation">Dentro de las conversaciones</string>
-    <string name="FlexyScrollIntensity">Intensidad compartida</string>
-    <string name="FlexyScrollNone">Sin efecto</string>
-    <string name="FlexyScrollWheel">Rueda 3D</string>
-    <string name="FlexyScrollPerspective">Perspectiva inclinada</string>
-    <string name="FlexyScrollLateral">Deslizamiento lateral</string>
-    <string name="FlexyScrollSoft">Suave</string>
-    <string name="FlexyScrollMarked">Equilibrada</string>
-    <string name="FlexyScrollStrong">Intensa</string>
-    <string name="FlexyScrollInfo">Elige una animación para cada lista. Ambas usan la misma intensidad. Los efectos siguen el desplazamiento y se asientan al detenerte. Se respetan los ajustes de animaciones del sistema y del lector de pantalla.</string>
+    <string name="FlexyScrollCurvature">Curvatura</string>
+    <string name="FlexyScrollInfo" formatted="false">La lista conserva su forma curva al detenerte o tocar. Ambas listas comparten la curvatura: 0% es plano y 100% es la curva máxima.</string>
 </resources>

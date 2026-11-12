@@ -112,6 +112,7 @@ final class StudioClientCatalog {
         integer("flexygram_scroll_effects","chats",0);range("flexygram_scroll_effects","chats",0,3);
         integer("flexygram_scroll_effects","conversation",0);range("flexygram_scroll_effects","conversation",0,3);
         integer("flexygram_scroll_effects","intensity",1);range("flexygram_scroll_effects","intensity",0,2);
+        integer("flexygram_scroll_effects","curvature",60);range("flexygram_scroll_effects","curvature",0,100);
         String f="flexygram_bubbles";
         bool(f,"glass",false);bool(f,"border",false);bool(f,"edges",false);integer(f,"transparency",0);integer(f,"signature_border_tenths",11);
         integer(f,"surface_effect",2);bool(f,"small_timestamp",false);

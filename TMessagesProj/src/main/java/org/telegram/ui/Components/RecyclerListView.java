@@ -2691,15 +2691,17 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
             selectorDrawable.setBounds(selectorRect);
         }
         canvas.save();
-        if ((translateSelector == -2 || translateSelector == selectorPosition) && selectorTransformer != null) {
-            selectorTransformer.accept(canvas);
-        }
-        if ((translateSelector == -2 || translateSelector == selectorPosition) && selectorView != null) {
-            canvas.translate(selectorView.getX() - selectorRect.left, selectorView.getY() - selectorRect.top);
-            selectorDrawable.setAlpha((int) (0xFF * selectorView.getAlpha()));
-        }
-        drawSelector(canvas);
-        canvas.restore();
+        int effectSave = selectorView == null ? -1 : saveScrollEffect(canvas, selectorView);
+        try {
+            if ((translateSelector == -2 || translateSelector == selectorPosition) && selectorTransformer != null) {
+                selectorTransformer.accept(canvas);
+            }
+            if ((translateSelector == -2 || translateSelector == selectorPosition) && selectorView != null) {
+                canvas.translate(selectorView.getX() - selectorRect.left, selectorView.getY() - selectorRect.top);
+                selectorDrawable.setAlpha((int) (0xFF * selectorView.getAlpha()));
+            }
+            drawSelector(canvas);
+        } finally { restoreScrollEffect(canvas, effectSave); canvas.restore(); }
     }
 
     private void drawSelector(Canvas canvas) {
@@ -2738,7 +2740,6 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
             // RecyclerListView only selects a child while idle. Stop the native fling before
             // dispatching this same DOWN so it can open a chat/press a bubble immediately.
             if (scrollEffects.isActive() && getScrollState() == SCROLL_STATE_SETTLING) stopScroll();
-            scrollEffects.onTouchDown();
         }
         if (scrollTouchOffsetX == 0 && scrollTouchOffsetY == 0) return event;
         // A constant offset preserves velocity, touch slop, swipe-to-reply and multi-pointer deltas.
@@ -2772,6 +2773,9 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         if (scrollEffects != null && scrollEffects.isActive() && getScrollEffectBounds(child, scrollEffectBounds)) {
             scrollEffects.concat(canvas, scrollEffectBounds.top, scrollEffectBounds.bottom);
         }
+    }
+    protected void concatScrollEffect(Canvas canvas, float top, float bottom) {
+        if (scrollEffects != null && scrollEffects.isActive()) scrollEffects.concat(canvas, top, bottom);
     }
     public void restoreScrollEffect(Canvas canvas, int save) {
         if (save >= 0) canvas.restoreToCount(save);

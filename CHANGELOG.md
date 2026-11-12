@@ -1,5 +1,15 @@
 # Cambios
 
+## 1.0.0-beta.54 — build 1343
+
+- Se conserva únicamente el aro 3D: la proyección depende de la posición de cada fila y de la curvatura, permanece al detenerse o tocar y deja de variar por velocidad o tiempo. Se elimina el motor temporal, incluidos resortes y retirada al tocar.
+- Pantalla principal → Efecto 3D fijo: interruptores independientes para lista de chats y conversaciones, con un deslizador compartido de curvatura de 0 a 100 %. El arrastre previsualiza en memoria y guarda al soltar; teclado y accesibilidad también guardan.
+- Las elecciones anteriores de Perspectiva y Deslizamiento lateral pasan al único efecto 3D; las listas desactivadas permanecen desactivadas. Se conserva la compatibilidad de preferencias y copias de FlexyStudio.
+- Se mantienen el scroll nativo, la proyección inversa del toque y la interrupción inmediata de la inercia. Selectores, álbumes, elementos diferidos y filas móviles comparten su proyección; menús y vídeo usan el dibujo nativo de su propia fila sin aplanar toda la conversación.
+- Cachés acotadas y reutilizadas, sin bucle de frames del efecto en reposo. Nuevas pruebas de persistencia estática, curvatura, toque, cachés y tipos Android. La fluidez en dispositivo queda para la revisión del propietario.
+- Regreso desde segundo plano: las diferencias de listas de 50 filas o más se calculan fuera de la interfaz en todas las variantes. Se congelan sus claves, se descartan resultados antiguos y se agrupan actualizaciones pendientes sin perder la última posición solicitada. La reconexión nativa comienza antes de reconstruir listas y se elimina una visita duplicada a las páginas visibles.
+- Compilación oficial solicitada tras las pruebas locales, sin supervisión posterior.
+
 ## 1.0.0-beta.53 — build 1342
 
 - Se recupera una presencia claramente visible de Rueda 3D, Perspectiva inclinada y Deslizamiento lateral en ambas listas. El objetivo de amplitud pasa de 0,30–0,85 a 0,65–0,90; se conservan el filtro de velocidad y la continuidad al invertir.

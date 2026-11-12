@@ -1878,7 +1878,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         @Override
         protected void dispatchDraw(Canvas canvas) {
-            if (animationSupportListView != null || rightFragmentOpenedProgress != 0) resetScrollEffects();
             beginScrollEffectsFrame(getPaddingTop() + scrollYOffset, getHeight() - getPaddingBottom());
             canvas.save();
             if (rightFragmentOpenedProgress > 0) {
@@ -1962,7 +1961,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
                 if (animationSupportListView != null) {
                     int restoreCount = canvas.save();
-
+                    if (dialogCell != null) {
+                        float y = view.getY() + dialogCell.collapseOffset - scrollOffset;
+                        concatScrollEffect(canvas, y, y + view.getMeasuredHeight());
+                    }
                     canvas.translate(view.getX(), view.getY());
                     if (dialogCell != null) {
                         dialogCell.rightFragmentOffset = -scrollOffset;
@@ -2041,11 +2043,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         dialogCell.setRightFragmentOpenedProgress(rightFragmentOpenedProgress);
 
                         int restoreCount = canvas.save();
-                        if (position > maxSupportedViewsPosition) {
-                            canvas.translate(view.getX(), maxBottom + view.getBottom() - maxUndrawBottom);
-                        } else {
-                            canvas.translate(view.getX(), maxBottom + view.getTop() - maxUndrawTop);
-                        }
+                        float y = position > maxSupportedViewsPosition
+                                ? maxBottom + view.getBottom() - maxUndrawBottom
+                                : maxBottom + view.getTop() - maxUndrawTop;
+                        concatScrollEffect(canvas, y, y + view.getMeasuredHeight());
+                        canvas.translate(view.getX(), y);
                         view.draw(canvas);
 
                         canvas.restoreToCount(restoreCount);
@@ -2075,6 +2077,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         } else {
                             canvas.save();
                         }
+                        concatScrollEffect(canvas, view);
                         canvas.translate(view.getX(), view.getY());
                         canvas.drawRect(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight(), paint);
                         view.draw(canvas);
@@ -2116,8 +2119,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         @Override protected boolean getScrollEffectBounds(View child, RectF bounds) {
-            // Moving rows are drawn separately by the native item animator; other rows keep the effect.
-            return child instanceof DialogCell && !((DialogCell) child).isMoving() && super.getScrollEffectBounds(child, bounds);
+            // Manual moving/support passes above use the same fixed projection as normal rows.
+            return child instanceof DialogCell && super.getScrollEffectBounds(child, bounds);
         }
 
         @Override
@@ -7453,17 +7456,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             blurredView.setVisibility(View.GONE);
             blurredView.setBackground(null);
         }
-        if (viewPages != null) {
-            final BaseFragment lastFragment = parentLayout != null ? parentLayout.getLastFragment() : null;
-            final long returnedDialogId = lastFragment instanceof ChatActivity ? ((ChatActivity) lastFragment).getDialogId() : 0;
-            for (int a = 0; a < viewPages.length; a++) {
-                if (returnedDialogId != 0 && viewPages[a].getVisibility() == View.VISIBLE) {
-                    viewPages[a].updateListAfterChat(returnedDialogId);
-                } else if (viewPages[a].getVisibility() == View.VISIBLE) {
-                    updateVisibleRows(0);
-                }
-            }
-        }
+        refreshDialogsOnResume();
         if (commentView != null) {
             commentView.onResume();
         }
@@ -11797,6 +11790,20 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 //            }
             viewPages[b].updateList(false);
         }
+    }
+
+    private void refreshDialogsOnResume() {
+        if (viewPages == null) return;
+        final BaseFragment lastFragment = parentLayout != null ? parentLayout.getLastFragment() : null;
+        final long returnedDialogId = lastFragment instanceof ChatActivity ? ((ChatActivity) lastFragment).getDialogId() : 0;
+        boolean refreshRows = false;
+        for (ViewPage page : viewPages) {
+            if (page.getVisibility() != View.VISIBLE) continue;
+            if (returnedDialogId != 0) page.updateListAfterChat(returnedDialogId);
+            else refreshRows = true;
+        }
+        // updateVisibleRows already visits every visible page and search list once.
+        if (refreshRows) updateVisibleRows(0);
     }
 
     private void updateVisibleRows(int mask) {

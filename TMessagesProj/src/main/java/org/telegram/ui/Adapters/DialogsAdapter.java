@@ -137,7 +137,6 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
     RecyclerListView recyclerListView;
     private PullForegroundDrawable pullForegroundDrawable;
     ArrayList<ItemInternal> itemInternals = new ArrayList<>();
-    ArrayList<ItemInternal> oldItems = new ArrayList<>();
 
     private Drawable arrowDrawable;
 
@@ -415,34 +414,6 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
             }
         }
 
-        boolean compare(ItemInternal itemInternal) {
-            if (viewType != itemInternal.viewType) {
-                return false;
-            }
-            if (viewType == VIEW_TYPE_DIALOG) {
-                return dialog != null && itemInternal.dialog != null && dialog.id == itemInternal.dialog.id
-                        && isFolder == itemInternal.isFolder &&
-                        isForumCell == itemInternal.isForumCell &&
-                        pinned == itemInternal.pinned;
-            }
-            if (viewType == VIEW_TYPE_HEADER_2) {
-                return dialog != null && itemInternal.dialog != null && dialog.id == itemInternal.dialog.id && dialog.isFolder == itemInternal.dialog.isFolder;
-            }
-            if (viewType == VIEW_TYPE_ME_URL) {
-                return recentMeUrl != null && itemInternal.recentMeUrl != null && recentMeUrl.url != null && recentMeUrl.url.equals(recentMeUrl.url);
-            }
-            if (viewType == VIEW_TYPE_USER) {
-                return contact != null && itemInternal.contact != null && contact.user_id == itemInternal.contact.user_id;
-            }
-            if (viewType == VIEW_TYPE_EMPTY) {
-                return emptyType == itemInternal.emptyType;
-            }
-            if (viewType == VIEW_TYPE_LAST_EMPTY) {
-                return false;
-            }
-            return true;
-        }
-
         @Override
         public int hashCode() {
             return Objects.hash(dialog, chat, recentMeUrl, contact, title);
@@ -546,78 +517,124 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
 
     boolean isCalculatingDiff;
     boolean updateListPending;
-    private final static boolean ALLOW_UPDATE_IN_BACKGROUND = BuildVars.DEBUG_PRIVATE_VERSION;
+    private long diffGeneration;
+    private Runnable pendingScrollPosition;
+
+    /** UI-captured primitives only: the worker must never read mutable Telegram objects. */
+    private static final class DiffItem {
+        final int viewType, emptyType;
+        final long id;
+        final boolean valid, folder, forum, pinned;
+        final String url;
+        DiffItem(ItemInternal item) {
+            viewType = item.viewType; emptyType = item.emptyType;
+            boolean dialog = viewType == VIEW_TYPE_DIALOG || viewType == VIEW_TYPE_HEADER_2;
+            valid = dialog ? item.dialog != null : viewType == VIEW_TYPE_USER ? item.contact != null
+                    : viewType != VIEW_TYPE_ME_URL || item.recentMeUrl != null;
+            id = dialog && valid ? item.dialog.id : viewType == VIEW_TYPE_USER && valid ? item.contact.user_id : 0;
+            folder = viewType == VIEW_TYPE_HEADER_2 ? valid && item.dialog.isFolder : item.isFolder;
+            forum = item.isForumCell; pinned = item.pinned;
+            url = item.recentMeUrl == null ? null : item.recentMeUrl.url;
+        }
+        boolean matches(DiffItem other) {
+            if (viewType != other.viewType) return false;
+            if (viewType == VIEW_TYPE_DIALOG) return valid && other.valid && id == other.id
+                    && folder == other.folder && forum == other.forum && pinned == other.pinned;
+            if (viewType == VIEW_TYPE_HEADER_2) return valid && other.valid && id == other.id && folder == other.folder;
+            if (viewType == VIEW_TYPE_USER) return valid && other.valid && id == other.id;
+            if (viewType == VIEW_TYPE_ME_URL) return valid && other.valid && url != null && url.equals(other.url);
+            if (viewType == VIEW_TYPE_EMPTY) return emptyType == other.emptyType;
+            return viewType != VIEW_TYPE_LAST_EMPTY;
+        }
+    }
+
+    private DiffItem[] snapshotDiffItems(ArrayList<ItemInternal> items) {
+        DiffItem[] snapshot = new DiffItem[items.size()];
+        for (int i = 0; i < snapshot.length; i++) snapshot[i] = new DiffItem(items.get(i));
+        return snapshot;
+    }
 
     public void updateList(Runnable saveScrollPosition) {
         if (isCalculatingDiff) {
             updateListPending = true;
+            pendingScrollPosition = saveScrollPosition;
             return;
         }
         isCalculatingDiff = true;
-        oldItems = new ArrayList<>();
-        oldItems.addAll(itemInternals);
+        updateListPending = false; pendingScrollPosition = null;
+        final long generation = ++diffGeneration;
+        final ArrayList<ItemInternal> oldItems = itemInternals;
+        final DiffItem[] before = snapshotDiffItems(oldItems);
+        itemInternals = new ArrayList<>();
         updateItemList();
-        ArrayList<ItemInternal> newItems = new ArrayList<>(itemInternals);
+        final ArrayList<ItemInternal> newItems = itemInternals;
+        final DiffItem[] after = snapshotDiffItems(newItems);
         itemInternals = oldItems;
 
         DiffUtil.Callback callback = new DiffUtil.Callback() {
             @Override
             public int getOldListSize() {
-                return oldItems.size();
+                return before.length;
             }
 
             @Override
             public int getNewListSize() {
-                return newItems.size();
+                return after.length;
             }
 
             @Override
             public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                return oldItems.get(oldItemPosition).compare(newItems.get(newItemPosition));
+                return before[oldItemPosition].matches(after[newItemPosition]);
             }
 
             @Override
             public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                return oldItems.get(oldItemPosition).viewType == newItems.get(newItemPosition).viewType;
+                return before[oldItemPosition].viewType == after[newItemPosition].viewType;
             }
         };
-        if (itemInternals.size() < 50 || !ALLOW_UPDATE_IN_BACKGROUND) {
-            DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
-            isCalculatingDiff = false;
-            if (saveScrollPosition != null) {
-                saveScrollPosition.run();
-            }
-            itemInternals = newItems;
-            result.dispatchUpdatesTo(this);
+        if (Math.max(before.length, after.length) < 50) {
+            applyListDiff(generation, newItems, DiffUtil.calculateDiff(callback), saveScrollPosition);
         } else {
             Utilities.searchQueue.postRunnable(() -> {
-                DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
-                AndroidUtilities.runOnUIThread(() -> {
-                    if (!isCalculatingDiff) {
-                        return;
-                    }
-                    isCalculatingDiff = false;
-                    if (saveScrollPosition != null) {
-                        saveScrollPosition.run();
-                    }
-                    itemInternals = newItems;
-                    result.dispatchUpdatesTo(this);
-                    if (updateListPending) {
-                        updateListPending = false;
-                        updateList(saveScrollPosition);
-                    }
-                });
+                DiffUtil.DiffResult result;
+                try { result = DiffUtil.calculateDiff(callback); }
+                catch (RuntimeException error) {
+                    FileLog.e(error);
+                    AndroidUtilities.runOnUIThread(() -> {
+                        if (generation == diffGeneration) notifyDataSetChanged();
+                    });
+                    return;
+                }
+                AndroidUtilities.runOnUIThread(() -> applyListDiff(generation, newItems, result, saveScrollPosition));
             });
         }
+    }
 
+    private void applyListDiff(long generation, ArrayList<ItemInternal> newItems, DiffUtil.DiffResult result, Runnable saveScrollPosition) {
+        if (generation != diffGeneration) return;
+        try {
+            if (saveScrollPosition != null) saveScrollPosition.run();
+            if (generation != diffGeneration) return;
+            itemInternals = newItems;
+            result.dispatchUpdatesTo(this);
+        } finally {
+            if (generation == diffGeneration) {
+                isCalculatingDiff = false;
+                if (updateListPending) {
+                    Runnable next = pendingScrollPosition;
+                    updateListPending = false; pendingScrollPosition = null;
+                    updateList(next);
+                }
+            }
+        }
     }
 
     @Override
     public void notifyDataSetChanged() {
-        if (isCalculatingDiff) {
-            itemInternals = new ArrayList<>();
-        }
+        ++diffGeneration;
+        updateListPending = false; pendingScrollPosition = null;
         isCalculatingDiff = false;
+        itemInternals = new ArrayList<>();
         updateItemList();
         super.notifyDataSetChanged();
     }

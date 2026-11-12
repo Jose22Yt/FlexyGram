@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="FlexyScrollEffects">Scroll animations</string>
+    <string name="FlexyScrollEffects">Fixed 3D effect</string>
     <string name="FlexyScrollChats">Chat list</string>
     <string name="FlexyScrollConversation">Inside conversations</string>
-    <string name="FlexyScrollIntensity">Shared intensity</string>
-    <string name="FlexyScrollNone">No effect</string>
-    <string name="FlexyScrollWheel">3D wheel</string>
-    <string name="FlexyScrollPerspective">Tilted perspective</string>
-    <string name="FlexyScrollLateral">Lateral slide</string>
-    <string name="FlexyScrollSoft">Soft</string>
-    <string name="FlexyScrollMarked">Balanced</string>
-    <string name="FlexyScrollStrong">Strong</string>
-    <string name="FlexyScrollInfo">Choose an animation for each list. Both use the same intensity. Effects follow your scroll and settle when you stop. System animation and screen reader settings are respected.</string>
+    <string name="FlexyScrollCurvature">Curvature</string>
+    <string name="FlexyScrollInfo" formatted="false">The list keeps its curved shape when you stop or tap. Curvature is shared by both lists: 0% is flat and 100% is the maximum curve.</string>
 </resources>

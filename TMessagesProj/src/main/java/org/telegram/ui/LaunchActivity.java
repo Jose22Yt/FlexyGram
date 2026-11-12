@@ -7282,6 +7282,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 4096);
         MediaController.getInstance().setFeedbackView(feedbackView = actionBarLayout.getView(), true);
         ApplicationLoader.mainInterfacePaused = false;
+        // Start the native reconnection before rebuilding dialog lists and resuming fragments.
+        ConnectionsManager cm = ConnectionsManager.getInstance(currentAccount);
+        cm.setAppPaused(false, false);
+        cm.resumeNetworkMaybe();
         MessagesController.getInstance(currentAccount).sortDialogs(null);
         showLanguageAlert(false);
         Utilities.stageQueue.postRunnable(() -> {
@@ -7322,9 +7326,6 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             ProxyUtil.registerNetworkCallback();
         }
 
-        ConnectionsManager cm = ConnectionsManager.getInstance(currentAccount);
-        cm.setAppPaused(false, false);
-        cm.resumeNetworkMaybe();
         updateCurrentConnectionState(currentAccount);
         if (PhotoViewer.hasInstance() && PhotoViewer.getInstance().isVisible()) {
             PhotoViewer.getInstance().onResume();

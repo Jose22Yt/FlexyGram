@@ -6349,10 +6349,7 @@ public class ChatActivity extends BaseFragment implements
 
             @Override
             protected void dispatchDraw(Canvas canvas) {
-                // Only attached external overlays suspend the effect. A retained video container
-                // may remain VISIBLE after removal; ordinary item animations compose with Canvas.
-                if (scrimView != null || videoPlayerContainer != null && videoPlayerContainer.getParent() == contentView
-                        && videoPlayerContainer.getVisibility() == View.VISIBLE) resetScrollEffects();
+                // The ring stays fixed. Only a cell owned by a native overlay is exempt below.
                 beginScrollEffectsFrame(Math.max(0, chatListViewPaddingTop - chatListViewPaddingVisibleOffset),
                         getHeight() - blurredViewBottomOffset);
                 drawLaterRoundProgressCell = null;
@@ -53003,10 +53000,16 @@ public class ChatActivity extends BaseFragment implements
         private MessageObject.GroupedMessages[] scrollEffectGroups;
         private float[] scrollEffectGroupTops, scrollEffectGroupBottoms;
         private int scrollEffectGroupCount;
+        private Object scrollEffectVideoSource;
+        private ChatMessageCell scrollEffectVideoCell;
+        private MessageObject.GroupedMessages scrollEffectVideoGroup;
+        private boolean scrollEffectVideoResolved;
 
         private void clearScrollEffectGroups() {
             for (int i = 0; i < scrollEffectGroupCount; i++) scrollEffectGroups[i] = null;
             scrollEffectGroupCount = 0;
+            scrollEffectVideoSource = scrollEffectVideoCell = null;
+            scrollEffectVideoGroup = null; scrollEffectVideoResolved = false;
         }
         @Override public void beginScrollEffectsFrame(float top, float bottom) {
             clearScrollEffectGroups();
@@ -53030,8 +53033,33 @@ public class ChatActivity extends BaseFragment implements
             setScrollEffectsSurface(app.flexygram.scroll.ScrollEffectsConfig.CONVERSATION);
         }
 
+        private boolean isNativeScrollEffectOverlay(View child) {
+            if (child == scrimView) return true;
+            if (!(child instanceof ChatMessageCell)) return false;
+            MessageObject.GroupedMessages group = ((ChatMessageCell) child).getCurrentMessagesGroup();
+            if (group != null && scrimView instanceof ChatMessageCell
+                    && ((ChatMessageCell) scrimView).getCurrentMessagesGroup() == group) return true;
+            if (videoPlayerContainer == null || videoPlayerContainer.getParent() != contentView
+                    || videoPlayerContainer.getVisibility() != View.VISIBLE) return false;
+            Object source = videoPlayerContainer.getTag(R.id.parent_tag);
+            if (source == null) return false;
+            if (!scrollEffectVideoResolved || source != scrollEffectVideoSource) {
+                scrollEffectVideoResolved = true; scrollEffectVideoSource = source;
+                scrollEffectVideoCell = null; scrollEffectVideoGroup = null;
+                for (int i = 0, count = getChildCount(); i < count; i++) {
+                    View candidate = getChildAt(i);
+                    if (candidate instanceof ChatMessageCell && ((ChatMessageCell) candidate).getPhotoImage() == source) {
+                        scrollEffectVideoCell = (ChatMessageCell) candidate;
+                        scrollEffectVideoGroup = scrollEffectVideoCell.getCurrentMessagesGroup();
+                        break;
+                    }
+                }
+            }
+            return child == scrollEffectVideoCell || group != null && group == scrollEffectVideoGroup;
+        }
         @Override protected boolean getScrollEffectBounds(View child, RectF bounds) {
-            if (!(child instanceof ChatMessageCell || child instanceof ChatActionCell || child instanceof ChatMessageUnsupportedCell)) return false;
+            if (!(child instanceof ChatMessageCell || child instanceof ChatActionCell || child instanceof ChatMessageUnsupportedCell)
+                    || isNativeScrollEffectOverlay(child)) return false;
             super.getScrollEffectBounds(child, bounds);
             if (child instanceof ChatMessageCell) {
                 MessageObject.GroupedMessages group = ((ChatMessageCell) child).getCurrentMessagesGroup();
