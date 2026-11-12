@@ -104,6 +104,7 @@ public class ReactionsEffectOverlay {
     private static final ArrayList<ReactionsEffectOverlay> activeOverlays = new ArrayList<>();
     private static long lastHapticTime;
     ArrayList<AvatarParticle> avatars = new ArrayList<>();
+    private boolean avatarsAttached;
     public long startTime;
     public boolean isStories;
     boolean isFinished;
@@ -185,6 +186,7 @@ public class ReactionsEffectOverlay {
 
                         AvatarParticle avatarParticle = new AvatarParticle();
                         avatarParticle.imageReceiver = imageReceiver;
+                        imageReceiver.setRoundRadius(AndroidUtilities.dp(16) >> 1);
                         avatarParticle.fromX = 0.5f;// + Math.abs(random.nextInt() % 100) / 100f * 0.2f;
                         avatarParticle.fromY = 0.5f;// + Math.abs(random.nextInt() % 100) / 100f * 0.2f;
                         avatarParticle.jumpY = 0.3f + Math.abs(random.nextInt() % 100) / 100f * 0.1f;
@@ -578,30 +580,21 @@ public class ReactionsEffectOverlay {
 
                 if (!avatars.isEmpty() && effectImageView.wasPlaying) {
                     RLottieDrawable animation = effectImageView.getImageReceiver().getLottieAnimation();
+                    boolean animationRunning = animation != null && animation.isRunning();
+                    int timeLeft = 0;
+                    if (animationRunning) {
+                        long duration = animation.getDuration();
+                        int frames = Math.max(1, animation.getFramesCount());
+                        timeLeft = (int) (duration - duration * (animation.getCurrentFrame() / (float) frames));
+                    }
 
                     for (int i = 0; i < avatars.size(); i++) {
                         AvatarParticle particle = avatars.get(i);
                         float progress = particle.progress;
-                        boolean isLeft;
-                        if (animation != null && animation.isRunning()) {
-                            long duration = effectImageView.getImageReceiver().getLottieAnimation().getDuration();
-                            int totalFramesCount = effectImageView.getImageReceiver().getLottieAnimation().getFramesCount();
-                            int currentFrame = effectImageView.getImageReceiver().getLottieAnimation().getCurrentFrame();
-                            int timeLeft = (int) (duration - duration * (currentFrame / (float) totalFramesCount));
-                            isLeft = timeLeft < particle.leftTime;
-                        } else {
-                            isLeft = true;
-                        }
-
-                        if (isLeft && particle.outProgress != 1f) {
-                            particle.outProgress = ReactionMotion.advance(particle.outProgress,frameMs,150f);
-                            if (particle.outProgress > 1f) {
-                                particle.outProgress = 1f;
-                                particle.imageReceiver.onDetachedFromWindow();
-                                avatars.remove(i);
-                                i--;
-                                continue;
-                            }
+                        boolean isLeft = !animationRunning || timeLeft < particle.leftTime;
+                        if (advanceAvatarExit(i, frameMs, isLeft)) {
+                            i--;
+                            continue;
                         }
                         float jumpProgress = progress < 0.5f ? (progress / 0.5f) : (1f - ((progress - 0.5f) / 0.5f));
                         float avatarX = particle.fromX * (1f - progress) + particle.toX * progress;
@@ -612,7 +605,6 @@ public class ReactionsEffectOverlay {
                         float cy = effectImageView.getY() + (effectImageView.getHeight() * effectImageView.getScaleY()) * avatarY;
                         int size = AndroidUtilities.dp(16);
                         avatars.get(i).imageReceiver.setImageCoords(cx - size / 2f, cy - size / 2f, size, size);
-                        avatars.get(i).imageReceiver.setRoundRadius(size >> 1);
                         canvas.save();
                         canvas.translate(0, particle.globalTranslationY);
                         canvas.scale(s, s, cx, cy);
@@ -623,9 +615,6 @@ public class ReactionsEffectOverlay {
 
                         if (particle.progress < 1f) {
                             particle.progress = ReactionMotion.advance(particle.progress,frameMs,350f);
-                            if (particle.progress > 1f) {
-                                particle.progress = 1f;
-                            }
                         }
                         if (progress >= 1f) {
                             particle.globalTranslationY += AndroidUtilities.dp(20) * frameMs / 500f;
@@ -652,6 +641,7 @@ public class ReactionsEffectOverlay {
             protected void onAttachedToWindow() {
                 super.onAttachedToWindow();
                 postDelayed(expireOverlay,5000);
+                avatarsAttached = true;
                 for (int i = 0; i < avatars.size(); i++) {
                     avatars.get(i).imageReceiver.onAttachedToWindow();
                 }
@@ -661,9 +651,7 @@ public class ReactionsEffectOverlay {
             protected void onDetachedFromWindow() {
                 super.onDetachedFromWindow();
                 removeCurrentView();
-                for (int i = 0; i < avatars.size(); i++) {
-                    avatars.get(i).imageReceiver.onDetachedFromWindow();
-                }
+                releaseAvatarParticles();
             }
         };
         effectImageView = new AnimationView(context);
@@ -798,6 +786,25 @@ public class ReactionsEffectOverlay {
         windowView.postInvalidateOnAnimation();
     }
 
+    /** Remove on the terminal frame, before any more transforms/draws for an invisible avatar. */
+    private boolean advanceAvatarExit(int index, float frameMs, boolean exiting) {
+        AvatarParticle particle = avatars.get(index);
+        if (exiting) particle.outProgress = ReactionMotion.advance(particle.outProgress, frameMs, 150f);
+        if (particle.outProgress < 1f) return false;
+        avatars.remove(index);
+        if (avatarsAttached) particle.imageReceiver.onDetachedFromWindow();
+        return true;
+    }
+
+    /** Remove before calling receiver cleanup so nested teardown cannot visit the same owner twice. */
+    private void releaseAvatarParticles() {
+        while (!avatars.isEmpty()) {
+            AvatarParticle particle = avatars.remove(avatars.size() - 1);
+            if (avatarsAttached) particle.imageReceiver.onDetachedFromWindow();
+        }
+        avatarsAttached = false;
+    }
+
     private void removeCurrentView() {
         if(removed)return;
         removed=true;iconHandoff.finish();
@@ -809,6 +816,7 @@ public class ReactionsEffectOverlay {
         if(sourceIconHidden&&holderView!=null&&reaction.equals(holderView.currentReaction)){holderView.enterImageView.setAlpha(sourceEnterAlpha);holderView.pressedBackupImageView.setAlpha(sourcePressedAlpha);}
         if(cell!=null)cell.invalidate();
         activeOverlays.remove(this);
+        releaseAvatarParticles();
         try {
             if (useWindow) {
                 windowManager.removeView(windowView);

@@ -82,3 +82,29 @@ En la próxima prueba física revisar:
    desde segundo plano. Revisar también historias por compartir la clase del overlay.
 
 Los commits de esta tarea usan `[skip ci]`: no se inicia una compilación de APK.
+
+## Limpieza al terminar las partículas
+
+`ReactionMotion.advance` limita el progreso a `1`. La salida de los avatares ya
+no espera un valor imposible `> 1`: `advanceAvatarExit` retira el avatar en el
+fotograma terminal y deja de transformarlo/dibujarlo. El recorrido conserva el
+índice correcto cuando terminan varios avatares consecutivos.
+
+El overlay registra si los receptores se adjuntaron. Al retirarlo, una limpieza
+compartida vacía las referencias y desadjunta cada receptor una sola vez, antes
+de retirar la ventana. Así funciona también ante interrupciones, desmontaje
+reentrante y una ventana que ya no pueda retirarse. Un overlay que todavía no se
+adjuntó solo libera sus referencias. La limpieza posterior de `onDetachedFromWindow`
+es idempotente.
+
+El tiempo restante de la animación se calcula una vez por fotograma para todos
+los avatares, y el radio constante se configura al crear cada receptor. Se
+elimina otra comprobación redundante de progreso superior a uno. No se cambian
+las curvas, duraciones ni preferencias de movimiento, ni se añaden asignaciones
+al recorrido de partículas por fotograma.
+
+Validación dirigida posterior: **17 pruebas aprobadas y 1 omitida** en las suites
+de reacciones, propiedad de animaciones y minirreproductor. Incluye ejecución de
+los métodos reales de salida/liberación, llegada exacta a uno, cuatro partículas
+consecutivas, limpieza anidada, interrupciones y fallo de retirada de ventana.
+No se compiló APK ni se midieron FPS en dispositivo.

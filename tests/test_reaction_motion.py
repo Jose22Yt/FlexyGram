@@ -30,17 +30,19 @@ public class Probe{static void check(boolean v){if(!v)throw new AssertionError()
 
 def test_retiring_overlay_cannot_clear_newer_reactions_or_strand_source_icons(tmp_path):
     source=OVERLAY.read_text()
-    methods='\n'.join(method(source,s)for s in ['private void removeCurrentView()','public static void dismissByFragment(','public static boolean isPlaying(int account,','public static boolean isPlaying(int messageId,','private void dismiss()','private static void retirePreviousFor(']).replace('ReactionsEffectOverlay','Probe')
+    methods='\n'.join(method(source,s)for s in ['private void releaseAvatarParticles()','private void removeCurrentView()','public static void dismissByFragment(','public static boolean isPlaying(int account,','public static boolean isPlaying(int messageId,','private void dismiss()','private static void retirePreviousFor(']).replace('ReactionsEffectOverlay','Probe')
     probe(tmp_path,{'Probe.java':'''import java.util.*;import app.flexygram.reactions.ReactionIconHandoff;
 public class Probe{
  static class BaseFragment{}static class View{float alpha=1;int invalidations;void invalidate(){invalidations++;}void setAlpha(float a){alpha=a;}}
  static class Animator{Animator setListener(Object o){return this;}void cancel(){}}
  static class WindowView extends View{int cancels,frames;void removeCallbacks(Runnable r){cancels++;}Animator animate(){return new Animator();}void postInvalidateOnAnimation(){frames++;}}
- static class WindowManager{void removeView(WindowView v){}}static class AndroidUtilities{static void removeFromParent(WindowView v){}}
+ static class WindowManager{boolean fail;void removeView(WindowView v){if(fail)throw new RuntimeException("already detached");}}static class AndroidUtilities{static void removeFromParent(WindowView v){}}
  static class Holder{Object currentReaction;View enterImageView=new View(),pressedBackupImageView=new View();}
  static class ReactionsLayoutInBubble{static class VisibleReaction{}}
  static final int ONLY_MOVE_ANIMATION=2,LONG_ANIMATION=0,SHORT_ANIMATION=1;int animationType=LONG_ANIMATION,currentAccount=1,messageId=5;long groupId;
  static Probe currentOverlay,currentShortOverlay;static ArrayList<Probe> activeOverlays=new ArrayList<>();
+ static class Receiver{int detaches;void onDetachedFromWindow(){detaches++;}}static class AvatarParticle{Receiver imageReceiver=new Receiver();}
+ ArrayList<AvatarParticle> avatars=new ArrayList<>();boolean avatarsAttached;
  boolean removed,useWindow,sourceIconHidden,started,dismissed,isStories;float sourceEnterAlpha=.6f,sourcePressedAlpha=.2f;
  Probe companion;Holder holderView;View cell=new View();BaseFragment baseFragment;WindowView windowView=new WindowView();WindowManager windowManager=new WindowManager();Runnable expireOverlay=()->{};
  ReactionIconHandoff iconHandoff=new ReactionIconHandoff();ReactionsLayoutInBubble.VisibleReaction reaction=new ReactionsLayoutInBubble.VisibleReaction();
@@ -49,6 +51,7 @@ public class Probe{
  public static void main(String[]args){
  Probe old=new Probe(),newer=new Probe();currentOverlay=newer;old.removeCurrentView();check(currentOverlay==newer&&old.removed);int canceled=old.windowView.cancels;old.removeCurrentView();check(old.windowView.cancels==canceled);
  currentOverlay=newer;newer.started=true;check(!isPlaying(1,newer.cell,5,0,newer.reaction));newer.iconHandoff.update(true,true);check(isPlaying(1,newer.cell,5,0,newer.reaction));check(!isPlaying(2,newer.cell,5,0,newer.reaction));check(!isPlaying(1,new View(),5,0,newer.reaction));newer.dismiss();check(!isPlaying(1,newer.cell,5,0,newer.reaction)&&newer.windowView.frames==1);
+ Probe retired=new Probe();retired.avatarsAttached=true;retired.useWindow=true;retired.windowManager.fail=true;AvatarParticle avatar=new AvatarParticle();retired.avatars.add(avatar);retired.removeCurrentView();retired.removeCurrentView();check(retired.avatars.isEmpty()&&!retired.avatarsAttached&&avatar.imageReceiver.detaches==1);
  Probe p=new Probe();p.holderView=new Holder();p.holderView.currentReaction=p.reaction;p.sourceIconHidden=true;p.holderView.enterImageView.alpha=0;p.removeCurrentView();check(p.holderView.enterImageView.alpha==.6f&&p.holderView.pressedBackupImageView.alpha==.2f);
  Probe reused=new Probe();reused.holderView=new Holder();reused.sourceIconHidden=true;reused.holderView.currentReaction=new Object();reused.holderView.enterImageView.alpha=.8f;reused.removeCurrentView();check(reused.holderView.enterImageView.alpha==.8f);
  // Removing a parent also retires its unstarted companion; reverse traversal
@@ -69,7 +72,8 @@ def test_completed_pose_draws_before_cleanup_and_waiting_has_a_bounded_lifetime(
     assert 'postDelayed(expireOverlay,5000)' in source
     assert 'windowView.removeCallbacks(expireOverlay)' in source
     assert 'avatars.size()>=4' in source
-    assert 'particle.imageReceiver.onDetachedFromWindow()' in draw
+    assert 'advanceAvatarExit(i, frameMs, isLeft)' in draw
+    assert 'particle.imageReceiver.onDetachedFromWindow()' in method(source,'private boolean advanceAvatarExit(')
     assert 'float flightFromX=fromX-(isStories?0:overlayLocation[0])' in draw
     assert '(reactionButton == null || reactionButton.drawingImageRect.width() <= 0' in draw
     assert 'if(!landingStarted){landingStarted=true;landingX=x;landingY=y;landingScale=scale;}' in draw
@@ -111,3 +115,36 @@ def test_decoding_placeholder_is_not_a_frame_and_rebinding_unregisters_the_old_e
  SETTER
  public static void main(String[]args){Probe p=new Probe();ImageReceiver r=new ImageReceiver();r.thumb=true;if(p.frameReady(r))throw new AssertionError("placeholder hides native icon");r.lottie=new Lottie();if(p.frameReady(r))throw new AssertionError("undecoded lottie");r.lottie.bitmap=true;if(!p.frameReady(r))throw new AssertionError();AnimatedEmojiDrawable old=new AnimatedEmojiDrawable(),next=new AnimatedEmojiDrawable();p.animatedEmojiDrawable=old;p.setAnimatedReactionDrawable(next);if(old.removes!=1||next.removes!=0||next.adds!=1||p.hasDrawnFrame||p.wasPlaying)throw new AssertionError("stale drawable attached");p.setAnimatedReactionDrawable(null);if(next.removes!=1)throw new AssertionError();}
  }'''.replace('READY',ready).replace('SETTER',setter)},[])
+
+
+def test_avatar_exit_releases_exact_endpoint_siblings_and_nested_teardown(tmp_path):
+    source=OVERLAY.read_text()
+    methods='\n'.join(method(source,s) for s in [
+        'private boolean advanceAvatarExit(', 'private void releaseAvatarParticles()'])
+    probe(tmp_path, {'Probe.java': '''import java.util.*;import app.flexygram.reactions.ReactionMotion;
+public class Probe{
+ static class Receiver{int detaches;Runnable callback;void onDetachedFromWindow(){detaches++;Runnable next=callback;callback=null;if(next!=null)next.run();}}
+ static class AvatarParticle{float outProgress;Receiver imageReceiver=new Receiver();}
+ ArrayList<AvatarParticle> avatars=new ArrayList<>();boolean avatarsAttached;
+ METHODS
+ static void check(boolean v){if(!v)throw new AssertionError();}
+ AvatarParticle add(float out){AvatarParticle p=new AvatarParticle();p.outProgress=out;avatars.add(p);return p;}
+ public static void main(String[]args){
+  Probe p=new Probe();p.avatarsAttached=true;AvatarParticle waiting=p.add(0f);
+  check(!p.advanceAvatarExit(0,16,false)&&waiting.outProgress==0&&waiting.imageReceiver.detaches==0);
+  check(!p.advanceAvatarExit(0,16,true)&&waiting.outProgress>0&&waiting.outProgress<1);
+  p.releaseAvatarParticles();check(waiting.imageReceiver.detaches==1);p.releaseAvatarParticles();check(waiting.imageReceiver.detaches==1);
+  // The real clamped clock reaches exactly 1, never greater than 1.
+  p.avatarsAttached=true;ArrayList<AvatarParticle> expired=new ArrayList<>();for(int i=0;i<4;i++)expired.add(p.add(.98f));
+  int drawn=0;for(int i=0;i<p.avatars.size();i++){if(p.advanceAvatarExit(i,16,true)){i--;continue;}drawn++;}
+  check(p.avatars.isEmpty()&&drawn==0);for(AvatarParticle a:expired)check(a.outProgress==1&&a.imageReceiver.detaches==1);
+  AvatarParticle terminal=p.add(1);check(p.advanceAvatarExit(0,0,false)&&terminal.imageReceiver.detaches==1);
+  // Unattached, queued overlays drop references without detaching unregistered receivers.
+  p.avatarsAttached=false;AvatarParticle queued=p.add(.5f);p.releaseAvatarParticles();check(p.avatars.isEmpty()&&queued.imageReceiver.detaches==0);
+  // Receiver cleanup can synchronously trigger parent teardown. Each owner is released once.
+  p.avatarsAttached=true;AvatarParticle a=p.add(.98f),b=p.add(.5f),c=p.add(.5f);a.imageReceiver.callback=p::releaseAvatarParticles;
+  check(p.advanceAvatarExit(0,16,true));check(p.avatars.isEmpty()&&!p.avatarsAttached);
+  check(a.imageReceiver.detaches==1&&b.imageReceiver.detaches==1&&c.imageReceiver.detaches==1);
+  p.releaseAvatarParticles();check(a.imageReceiver.detaches==1&&b.imageReceiver.detaches==1&&c.imageReceiver.detaches==1);
+ }
+}'''.replace('METHODS',methods)},[R/'ReactionMotion.java'])
