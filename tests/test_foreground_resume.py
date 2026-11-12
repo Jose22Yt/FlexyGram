@@ -122,5 +122,7 @@ def test_native_network_resumes_before_list_rebuild_and_fragment_resume():
     source = (JAVA / 'org/telegram/ui/LaunchActivity.java').read_text()
     resume = method(source, 'protected void onResume()')
     assert resume.index('ApplicationLoader.mainInterfacePaused = false') < resume.index('cm.setAppPaused(false, false)')
-    assert resume.index('cm.resumeNetworkMaybe()') < resume.index('sortDialogs(null)') < resume.index('actionBarLayout.onResume()')
-    assert resume.count('cm.setAppPaused(false, false)') == resume.count('cm.resumeNetworkMaybe()') == 1
+    assert resume.index('cm.setAppPaused(false, false)') < resume.index('executeOnAppEvent') < resume.index('sortDialogs(null)') < resume.index('actionBarLayout.onResume()')
+    assert 'needsDialogsSortOnResume()' in resume
+    assert resume.count('cm.setAppPaused(false, false)') == 1
+    assert 'cm.resumeNetworkMaybe()' not in resume

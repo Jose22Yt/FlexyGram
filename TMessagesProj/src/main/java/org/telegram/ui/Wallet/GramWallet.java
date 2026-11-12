@@ -309,6 +309,7 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
                 || ((TL_wallet.TL_walletState) this.state).balance
                 != ((TL_wallet.TL_walletState) state).balance);
         this.state = state;
+        stateLoad.clearError();
         onStateUpdate();
         notifyUpdate();
         if (balanceChanged && transactions != null) {
@@ -438,18 +439,59 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
         if (transactions != null) {
             transactions.invalidate();
         }
-        if (requestingStateId >= 0) return;
+        if (stateLoad.isLoading()) return;
         requestState();
     }
 
     private int requestingStateId = -1;
+    private final WalletLoadState stateLoad = new WalletLoadState();
+    private Runnable stateRequestTimeout;
+    private String engineError;
+    private int creatingStateAttempts;
+    private final Runnable refreshCreatingWallet = () -> {
+        if (!this.listeningTokens.isEmpty() && isWalletCreating()) requestState();
+    };
+
+    public boolean isStateLoading() { return stateLoad.isLoading(); }
+    public boolean hasState() { return state != null; }
+    public boolean isWalletCreating() {
+        return state instanceof TL_wallet.TL_walletStateEmpty && ((TL_wallet.TL_walletStateEmpty)state).creating;
+    }
+    public boolean isWalletEmpty() { return state instanceof TL_wallet.TL_walletStateEmpty && !isWalletCreating(); }
+    public String getStateError() { return stateLoad.getError() != null ? stateLoad.getError() : engineError; }
+    public void retryState() {
+        if (stateLoad.isLoading()) return;
+        creatingStateAttempts = 0;
+        AndroidUtilities.cancelRunOnUIThread(refreshCreatingWallet);
+        requestState();
+        notifyUpdate();
+    }
+    private void cancelStateTimeout() {
+        if (stateRequestTimeout != null) AndroidUtilities.cancelRunOnUIThread(stateRequestTimeout);
+        stateRequestTimeout = null;
+    }
 
     private void requestState() {
+        if (stateLoad.isLoading()) return;
         log("requesting state");
-        requestingStateId = getConnectionsManager().sendRequestTyped(new TL_wallet.getState(), AndroidUtilities::runOnUIThread, (state, err) -> {
+        final long token = stateLoad.begin();
+        cancelStateTimeout();
+        stateRequestTimeout = () -> {
+            if (!stateLoad.finish(token, "WALLET_STATE_TIMEOUT")) return;
+            stateRequestTimeout = null;
+            int requestId = requestingStateId;
             requestingStateId = -1;
+            if (requestId >= 0) getConnectionsManager().cancelRequest(requestId, true);
+            notifyUpdate();
+        };
+        AndroidUtilities.runOnUIThread(stateRequestTimeout, 20_000);
+        final int requestId = getConnectionsManager().sendRequestTyped(new TL_wallet.getState(), AndroidUtilities::runOnUIThread, (state, err) -> {
+            if (!stateLoad.finish(token, state == null ? (err != null && err.text != null ? err.text : "WALLET_STATE_UNAVAILABLE") : null)) return;
+            requestingStateId = -1;
+            cancelStateTimeout();
             if (state == null) {
-                err("requesting gasless info: " + (err != null ? err.text : "NULL_ERROR"));
+                err("requesting wallet state: " + stateLoad.getError());
+                notifyUpdate();
                 return;
             }
             final long now = System.currentTimeMillis();
@@ -469,8 +511,14 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
             }
             this.state = state;
             onStateUpdate();
+            if (isWalletCreating() && !listeningTokens.isEmpty()) {
+                AndroidUtilities.cancelRunOnUIThread(refreshCreatingWallet);
+                if (++creatingStateAttempts < 10) AndroidUtilities.runOnUIThread(refreshCreatingWallet, 2_000);
+                else stateLoad.setError("WALLET_INITIALIZING");
+            } else if (!isWalletCreating()) creatingStateAttempts = 0;
             notifyUpdate();
         });
+        if (stateLoad.owns(token)) requestingStateId = requestId;
     }
 
     private int requestingGaslessInfoId = -1;
@@ -502,6 +550,9 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
     }
 
     private void cancel() {
+        stateLoad.cancel();
+        cancelStateTimeout();
+        AndroidUtilities.cancelRunOnUIThread(refreshCreatingWallet);
         if (requestingStateId >= 0) {
             getConnectionsManager().cancelRequest(requestingStateId, true);
             requestingStateId = -1;
@@ -555,13 +606,17 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
         final int token = lastListenToken++;
         final boolean wasEmpty = listeningTokens.isEmpty();
         listeningTokens.add(token);
-        if (wasEmpty) onWalletPageUpdate();
+        if (wasEmpty) {
+            onWalletPageUpdate();
+            if (!isReady() && !stateLoad.isLoading()) retryState();
+        }
         return () -> {
             listeningTokens.remove(token);
             if (listeningTokens.isEmpty()) onWalletPageUpdate();
         };
     }
     private void onWalletPageUpdate() {
+        if (listeningTokens.isEmpty()) AndroidUtilities.cancelRunOnUIThread(refreshCreatingWallet);
         updatePolling();
         final boolean shouldOpen = isReady() && !TextUtils.isEmpty(getAddress()) && !listeningTokens.isEmpty();
         final boolean isOpen = streaming != null && streaming.isRunning();
@@ -820,6 +875,7 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
     }
 
     private void onStateUpdate() {
+        engineError = null;
         final String address;
         final byte[] public_key;
         if (state instanceof TL_wallet.TL_walletState) {
@@ -858,9 +914,10 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
             log("creating wallet-engine for " + address);
             try {
                 engine = new WalletEngine2(currentAccount, engineAddress = address, public_key);
-            } catch (Exception e) {
+            } catch (RuntimeException | LinkageError e) {
                 err("failed to create engine!", e);
                 engineAddress = null;
+                engineError = "WALLET_ENGINE_UNAVAILABLE";
             }
         }
         if (state instanceof TL_wallet.TL_walletState && engine != null) {
@@ -2711,6 +2768,8 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
         private boolean endReached;
 
         private boolean loadingInvalidation;
+        private long requestGeneration;
+        private String error;
         private int invalidationReqId = -1;
 
         private boolean loading;
@@ -2718,8 +2777,12 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
 
         private TransactionsList() {}
 
-        public boolean isLoading() {
-            return loading;
+        public boolean isLoading() { return loading; }
+        public boolean isRefreshing() { return loadingInvalidation; }
+        public String getError() { return error; }
+        public void retry() {
+            if (loading || loadingInvalidation) return;
+            if (endReached) invalidate(); else load();
         }
 
         public boolean hasEndReached() {
@@ -2727,7 +2790,7 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
         }
 
         public void invalidate() {
-            if (loadingInvalidation) return;
+            if (loadingInvalidation || !GramWallet.this.isReady()) return;
 
             // something happened, we are expecting new transaction
             // fetch first page of transactions, update ones that are already locally
@@ -2739,7 +2802,11 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
             req.limit = 10;
             req.offset = "";
 
-            invalidationReqId = getConnectionsManager().sendRequestTyped(req, AndroidUtilities::runOnUIThread, (result, error) -> {
+            loadingInvalidation = true;
+            error = null;
+            final long generation = requestGeneration;
+            final int requestId = getConnectionsManager().sendRequestTyped(req, AndroidUtilities::runOnUIThread, (result, failure) -> {
+                if (generation != requestGeneration || !loadingInvalidation) return;
                 invalidationReqId = -1;
                 loadingInvalidation = false;
                 boolean updated = false;
@@ -2796,11 +2863,11 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
                         }
                     }
                 }
-                if (updated) {
-                    updatedTransactions();
-                    notifyUpdate();
-                }
+                if (result == null) error = failure != null && failure.text != null ? failure.text : "WALLET_HISTORY_UNAVAILABLE";
+                if (updated) updatedTransactions();
+                notifyUpdate();
             });
+            if (loadingInvalidation && generation == requestGeneration) invalidationReqId = requestId;
         }
 
         private void updatedTransactions() {
@@ -2832,7 +2899,7 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
         }
 
         public void load() {
-            if (loading) return;
+            if (loading || loadingInvalidation || !GramWallet.this.isReady()) return;
             if (endReached) return;
 
             final TL_wallet.getTransactions req = new TL_wallet.getTransactions();
@@ -2841,7 +2908,11 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
             req.limit = 10;
             req.offset = lastOffset;
 
-            reqId = getConnectionsManager().sendRequestTyped(req, AndroidUtilities::runOnUIThread, (result, error) -> {
+            loading = true;
+            error = null;
+            final long generation = requestGeneration;
+            final int requestId = getConnectionsManager().sendRequestTyped(req, AndroidUtilities::runOnUIThread, (result, failure) -> {
+                if (generation != requestGeneration || !loading) return;
                 reqId = -1;
                 loading = false;
 
@@ -2857,12 +2928,13 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
                     if (result.transactions.size() < req.limit)
                         endReached = true;
                 } else {
-                    endReached = true;
+                    error = failure != null && failure.text != null ? failure.text : "WALLET_HISTORY_UNAVAILABLE";
                 }
 
                 updatedTransactions();
                 notifyUpdate();
             });
+            if (loading && generation == requestGeneration) reqId = requestId;
         }
 
         public boolean isEndReached() {
@@ -2876,6 +2948,7 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
             streamTraces.clear();
             lastOffset = "";
             endReached = false;
+            error = null;
             updatedTransactions();
         }
 
@@ -2888,6 +2961,7 @@ public class GramWallet implements GramWalletStreaming.IGramWalletStreamingSubsc
         }
 
         public void cancel() {
+            requestGeneration++;
             if (reqId >= 0) {
                 getConnectionsManager().cancelRequest(reqId, true);
                 reqId = -1;

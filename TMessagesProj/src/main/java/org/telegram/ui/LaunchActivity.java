@@ -310,6 +310,16 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     private ArrayList<TLRPC.User> contactsToSend;
     private Uri contactsToSendUri;
     private int currentConnectionState;
+    private final app.flexygram.performance.StartupStatus startupStatus = new app.flexygram.performance.StartupStatus();
+    private boolean startupStatusScheduled, startupUpdatingTitleVisible;
+    private final Runnable refreshStartupStatus = () -> {
+        startupStatusScheduled = false;
+        if (isResumed && !isFinishing()) updateCurrentConnectionState(currentAccount);
+    };
+    private void cancelStartupStatusRefresh() {
+        if (startupStatusScheduled) AndroidUtilities.cancelRunOnUIThread(refreshStartupStatus);
+        startupStatusScheduled = false;
+    }
     private final ArrayList<BaseFragment> mainFragmentsStack = new ArrayList<>();
     private final ArrayList<BaseFragment> layerFragmentsStack = new ArrayList<>();
     private final ArrayList<BaseFragment> rightFragmentsStack = new ArrayList<>();
@@ -1404,6 +1414,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             .add(NotificationCenter.mainUserInfoChanged)
             .add(NotificationCenter.attachMenuBotsDidLoad)
             .add(NotificationCenter.didUpdateConnectionState)
+            .add(NotificationCenter.dialogsNeedReload)
             .add(NotificationCenter.needShowAlert)
             .add(NotificationCenter.wasUnableToFindCurrentLocation)
             .add(NotificationCenter.openArticle)
@@ -6993,6 +7004,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onPause() {
+        cancelStartupStatusRefresh();
+        startupStatus.reset();
         refreshRateMonitor.stop();
         if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) app.flexygram.performance.FrameDiagnostics.pause(frameDiagnostics);
         // Пауза голосовых и кружков при сворачивании приложения.
@@ -7127,6 +7140,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onDestroy() {
+        cancelStartupStatusRefresh();
         refreshRateMonitor.stop();
         if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) app.flexygram.performance.FrameDiagnostics.pause(frameDiagnostics);
         app.flexygram.studio.FlexyStyleInstallHelper.cancelExternal(this);
@@ -7252,6 +7266,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onResume() {
         super.onResume();
+        // Resume once, before plugin/theme work can delay the native connection.
+        ApplicationLoader.mainInterfacePaused = false;
+        ConnectionsManager cm = ConnectionsManager.getInstance(currentAccount);
+        cm.setAppPaused(false, false);
         app.flexygram.performance.StartupSplash.refreshAfterFirstFrame(this);
         refreshRateMonitor.start();
         if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) {
@@ -7281,12 +7299,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         //FileLog.d("UI resume time = " + (SystemClock.elapsedRealtime() - ApplicationLoader.startTime));
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 4096);
         MediaController.getInstance().setFeedbackView(feedbackView = actionBarLayout.getView(), true);
-        ApplicationLoader.mainInterfacePaused = false;
-        // Start the native reconnection before rebuilding dialog lists and resuming fragments.
-        ConnectionsManager cm = ConnectionsManager.getInstance(currentAccount);
-        cm.setAppPaused(false, false);
-        cm.resumeNetworkMaybe();
-        MessagesController.getInstance(currentAccount).sortDialogs(null);
+        MessagesController resumeController = MessagesController.getInstance(currentAccount);
+        // Background changes mark the skipped native sort dirty; unchanged warm resumes reuse it.
+        if (resumeController.needsDialogsSortOnResume()) resumeController.sortDialogs(null);
         showLanguageAlert(false);
         Utilities.stageQueue.postRunnable(() -> {
             ApplicationLoader.mainInterfacePausedStageQueue = false;
@@ -7493,6 +7508,11 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 }
                 currentConnectionState = state;
                 updateCurrentConnectionState(account);
+            }
+        } else if (id == NotificationCenter.dialogsNeedReload) {
+            if (account == currentAccount && (startupStatusScheduled || startupUpdatingTitleVisible)) {
+                MessagesController controller = MessagesController.getInstance(currentAccount);
+                if (!controller.getAllDialogs().isEmpty() || !controller.getDialogs(0).isEmpty()) updateCurrentConnectionState(account);
             }
         } else if (id == NotificationCenter.mainUserInfoChanged) {
 
@@ -8524,16 +8544,23 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         int titleId = 0;
         Runnable action = null;
         currentConnectionState = ConnectionsManager.getInstance(currentAccount).getConnectionState();
+        cancelStartupStatusRefresh();
+        MessagesController controller = MessagesController.getInstance(currentAccount);
+        boolean initialDataMissing = controller.getAllDialogs().isEmpty() && controller.getDialogs(0).isEmpty();
+        long labelDelay = startupStatus.remaining(account, android.os.SystemClock.uptimeMillis(),
+                currentConnectionState == ConnectionsManager.ConnectionStateUpdating && initialDataMissing);
         if (currentConnectionState == ConnectionsManager.ConnectionStateWaitingForNetwork) {
             if (!ApplicationLoader.isNetworkOnline()) {
                 title = "WaitingForNetwork";
                 titleId = R.string.WaitingForNetwork;
             }
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateUpdating) {
-            MessagesController mc = MessagesController.getInstance(currentAccount);
-            if (!mc.dialogsLoaded || (mc.getAllDialogs().isEmpty() && mc.getDialogs(0).isEmpty())) {
+            if (initialDataMissing && labelDelay == 0) {
                 title = "Updating";
                 titleId = R.string.Updating;
+            } else if (initialDataMissing) {
+                startupStatusScheduled = true;
+                AndroidUtilities.runOnUIThread(refreshStartupStatus, labelDelay);
             }
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateConnectingToProxy) {
             title = "ConnectingToProxyWithDots";
@@ -8563,6 +8590,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 presentFragment(new ProxyListActivity());
             };
         }
+        startupUpdatingTitleVisible = "Updating".equals(title);
         actionBarLayout.setTitleOverlayText(title, titleId, action);
     }
 

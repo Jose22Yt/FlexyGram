@@ -372,6 +372,8 @@ public class MessagesController extends BaseController implements NotificationCe
     private Runnable currentDeleteTaskRunnable;
 
     public boolean dialogsLoaded;
+    private boolean dialogsSortPending;
+    public boolean needsDialogsSortOnResume() { return dialogsSortPending || !dialogsLoaded; }
     private SparseIntArray nextDialogsCacheOffset = new SparseIntArray();
     private SparseBooleanArray loadingDialogs = new SparseBooleanArray();
     private SparseBooleanArray dialogsEndReached = new SparseBooleanArray();
@@ -22936,8 +22938,10 @@ public class MessagesController extends BaseController implements NotificationCe
 
     public void sortDialogs(LongSparseArray<TLRPC.Chat> chatsDict) {
         if (chatsDict == null && ApplicationLoader.mainInterfacePaused) {
+            dialogsSortPending = true;
             return;
         }
+        dialogsSortPending = false;
         dialogsServerOnly.clear();
         dialogsCanAddUsers.clear();
         dialogsMyGroups.clear();

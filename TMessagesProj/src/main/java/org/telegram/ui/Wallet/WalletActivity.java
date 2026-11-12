@@ -237,11 +237,19 @@ public class WalletActivity extends UniversalFragment implements NotificationCen
     private GramWallet.TransactionsList transactionsList;
     private GramWallet.CollectiblesList nftsList;
     private static final int RETRY_NFTS = -10001;
+    private static final int RETRY_WALLET_STATE = -10002, RETRY_TRANSACTIONS = -10003;
+    private static final int CREATE_EMPTY_WALLET = -10004, IMPORT_EMPTY_WALLET = -10005;
     private final Runnable onNftsChanged = () -> {
         final boolean hasItems = nftsList != null && !nftsList.collectibles.isEmpty();
         if (hasCollectibles != hasItems) setHasCollectibles(hasItems);
         if (listView != null && listView.adapter != null) updateHistory(true);
     };
+
+    @Override
+    public boolean presentFragment(BaseFragment fragment) {
+        if (fragment.getCurrentAccount() != currentAccount) fragment.setCurrentAccount(currentAccount);
+        return super.presentFragment(fragment);
+    }
 
     @Override
     protected CharSequence getTitle() {
@@ -939,6 +947,7 @@ public class WalletActivity extends UniversalFragment implements NotificationCen
     private boolean shouldShowLearnCells() {
         return !hasCollectibles && transactionsList != null
                 && transactionsList.allTransactions.isEmpty()
+                && transactionsList.getError() == null
                 && !transactionsList.isLoading()
                 && transactionsList.isEndReached();
     }
@@ -981,6 +990,7 @@ public class WalletActivity extends UniversalFragment implements NotificationCen
         final UniversalRecyclerView page = historyLists[TAB_TRANSACTIONS];
         if (page != null && page.isAttachedToWindow() && transactionsList != null
                 && !transactionsList.isLoading() && !transactionsList.isEndReached()
+                && transactionsList.getError() == null
                 && page.layoutManager.findLastVisibleItemPosition() >= page.adapter.getItemCount() - 3) {
             transactionsList.load();
         }
@@ -2017,7 +2027,9 @@ public class WalletActivity extends UniversalFragment implements NotificationCen
             final BaseFragment fragment = LaunchActivity.getSafeLastFragment();
             if (fragment == null) return;
             sheet.dismiss();
-            fragment.presentFragment(new WalletSendSelectSender().setCollectible(collectible));
+            WalletSendSelectSender sender = new WalletSendSelectSender();
+            sender.setCurrentAccount(fragment.getCurrentAccount());
+            fragment.presentFragment(sender.setCollectible(collectible));
         });
         actions.getChildAt(1).setOnClickListener(v -> Browser.openUrlInSystemBrowser(context, "https://fragment.com/"));
         okButton.setOnClickListener(v -> sheet.dismiss());
@@ -3034,12 +3046,16 @@ public class WalletActivity extends UniversalFragment implements NotificationCen
     }
 
     private void update() {
+        if (balanceView == null || usdBalanceView == null || sendButton == null || addFundsButton == null) return;
         final GramWallet wallet = GramWallet.getInstance(currentAccount);
         updateWalletTopPanel();
-        sendButton.setEnabled(wallet.isReady() && wallet.canSend());
+        boolean available = getMessagesController().config.walletAvailable.get();
+        sendButton.setEnabled(available && wallet.isReady() && wallet.canSend());
+        addFundsButton.setEnabled(available && wallet.isReady());
         if (!wallet.isReady()) {
-            balanceView.setText(loading(0));
-            usdBalanceView.setText(loading(1));
+            boolean waiting = wallet.isStateLoading() && !wallet.hasState();
+            balanceView.setText(waiting ? loading(0) : "—");
+            usdBalanceView.setText(waiting ? loading(1) : "—");
             return;
         }
 
@@ -3054,12 +3070,34 @@ public class WalletActivity extends UniversalFragment implements NotificationCen
         }
     }
 
+    private int lastWalletPresentationFlags = Integer.MIN_VALUE;
+    private String lastWalletPresentationError;
+    private int walletPresentationFlags(GramWallet wallet) {
+        return (wallet.isReady() ? 1 : 0) | (wallet.isStateLoading() ? 2 : 0)
+                | (wallet.hasState() ? 4 : 0) | (wallet.isWalletCreating() ? 8 : 0)
+                | (wallet.isWalletEmpty() ? 16 : 0)
+                | (getMessagesController().config.walletAvailable.get() ? 32 : 0);
+    }
+    private boolean walletPresentationChanged(GramWallet wallet) {
+        return lastWalletPresentationFlags != walletPresentationFlags(wallet)
+                || !java.util.Objects.equals(lastWalletPresentationError, wallet.getStateError());
+    }
+    private void rememberWalletPresentation(GramWallet wallet) {
+        lastWalletPresentationFlags = walletPresentationFlags(wallet);
+        lastWalletPresentationError = wallet.getStateError();
+    }
+
     private HashSet<Runnable> updateRunnables = new HashSet<>();
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
         if (account != currentAccount) return;
-        if (id == NotificationCenter.walletUpdate && balanceView != null) {
+        if ((id == NotificationCenter.walletUpdate || id == NotificationCenter.appConfigUpdated) && balanceView != null) {
+            boolean presentationChanged = walletPresentationChanged(GramWallet.getInstance(currentAccount));
             update();
+            if (presentationChanged) {
+                if (listView != null && listView.adapter != null) listView.adapter.update(false);
+                updateHistory(false);
+            }
             for (Runnable callback : updateRunnables) {
                 callback.run();
             }
@@ -3076,7 +3114,7 @@ public class WalletActivity extends UniversalFragment implements NotificationCen
                 && args[0] == transactionsList
                 && listView != null
                 && listView.adapter != null) {
-            if (transactionsList.transactions.isEmpty() && !transactionsList.isEndReached()) {
+            if (transactionsList.transactions.isEmpty() && !transactionsList.isEndReached() && transactionsList.getError() == null) {
                 transactionsList.load();
             }
             updateHistory(true);
@@ -3212,6 +3250,21 @@ public class WalletActivity extends UniversalFragment implements NotificationCen
     protected void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
         final GramWallet wallet = GramWallet.getInstance(currentAccount);
         updateWalletTopPanel();
+        boolean available = getMessagesController().config.walletAvailable.get();
+        rememberWalletPresentation(wallet);
+        if (!available || wallet.getStateError() != null || !wallet.isReady() && wallet.hasState()) {
+            int message = !available ? R.string.FlexyWalletUnavailable
+                    : wallet.isWalletCreating() ? R.string.FlexyWalletPreparing
+                    : wallet.isWalletEmpty() ? R.string.FlexyWalletEmpty
+                    : "WALLET_ENGINE_UNAVAILABLE".equals(wallet.getStateError()) ? R.string.FlexyWalletEngineError
+                    : R.string.FlexyWalletStateLoadError;
+            items.add(UItem.asShadow(getString(message)));
+            if (available && wallet.isWalletEmpty()) {
+                items.add(UItem.asButton(CREATE_EMPTY_WALLET, getString(R.string.WalletCreateNew)).setEnabled(!wallet.isStateLoading()));
+                items.add(UItem.asButton(IMPORT_EMPTY_WALLET, getString(R.string.WalletImportExisting)).setEnabled(!wallet.isStateLoading()));
+            }
+            items.add(UItem.asButton(RETRY_WALLET_STATE, getString(R.string.Retry)).setEnabled(!wallet.isStateLoading()));
+        }
         // Keep a stable item even when empty, so visibility changes animate its
         // height instead of inserting/removing rows and shifting adapter positions.
         items.add(UItem.asCustomShadow(walletTopPanelContainer));
@@ -3278,12 +3331,18 @@ public class WalletActivity extends UniversalFragment implements NotificationCen
                 items.add(TransactionCell.Factory.of(transactionsList.allTransactions.get(i), transactionsList.addressFormatter));
             }
         }
-        if (transactionsList != null && (transactionsList.isLoading() || !transactionsList.hasEndReached())) {
+        if (transactionsList != null && transactionsList.getError() == null
+                && GramWallet.getInstance(currentAccount).isReady()
+                && (transactionsList.isLoading() || !transactionsList.hasEndReached())) {
             items.add(UItem.asFlicker(-1, FlickerLoadingView.WALLET_TRANSACTION));
             items.add(UItem.asFlicker(-2, FlickerLoadingView.WALLET_TRANSACTION));
             items.add(UItem.asFlicker(-3, FlickerLoadingView.WALLET_TRANSACTION));
         }
         adapter.whiteSectionEnd();
+        if (transactionsList != null && transactionsList.getError() != null) {
+            items.add(UItem.asButton(RETRY_TRANSACTIONS, getString(R.string.Retry)));
+            items.add(UItem.asShadow(getString(R.string.FlexyWalletHistoryError)));
+        }
         if (hasTransactions) {
             final long min_amount = getMessagesController().config.walletTransferMinNanos.get();
             if (min_amount > 0) {
@@ -3311,6 +3370,7 @@ public class WalletActivity extends UniversalFragment implements NotificationCen
     @Override
     public boolean onFragmentCreate() {
         getNotificationCenter().addObserver(this, NotificationCenter.walletUpdate);
+        getNotificationCenter().addObserver(this, NotificationCenter.appConfigUpdated);
         getNotificationCenter().addObserver(this, NotificationCenter.starBalanceUpdated);
         getNotificationCenter().addObserver(this, NotificationCenter.walletTransactionsUpdate);
         getNotificationCenter().addObserver(this, NotificationCenter.didSetOrRemoveTwoStepPassword);
@@ -3334,6 +3394,7 @@ public class WalletActivity extends UniversalFragment implements NotificationCen
             headerSnapHelper.attachToRecyclerView(null);
         }
         getNotificationCenter().removeObserver(this, NotificationCenter.walletUpdate);
+        getNotificationCenter().removeObserver(this, NotificationCenter.appConfigUpdated);
         getNotificationCenter().removeObserver(this, NotificationCenter.starBalanceUpdated);
         getNotificationCenter().removeObserver(this, NotificationCenter.walletTransactionsUpdate);
         getNotificationCenter().removeObserver(this, NotificationCenter.didSetOrRemoveTwoStepPassword);
@@ -3350,6 +3411,33 @@ public class WalletActivity extends UniversalFragment implements NotificationCen
 
     @Override
     protected void onClick(UItem item, View view, int position, float x, float y) {
+        final GramWallet wallet = GramWallet.getInstance(currentAccount);
+        if (item.id == RETRY_WALLET_STATE) {
+            if (wallet.isStateLoading()) return;
+            getMessagesController().loadAppConfig();
+            wallet.retryState();
+            return;
+        }
+        if (item.id == RETRY_TRANSACTIONS && transactionsList != null) {
+            transactionsList.retry();
+            updateHistory(false);
+            return;
+        }
+        if ((item.id == CREATE_EMPTY_WALLET || item.id == IMPORT_EMPTY_WALLET)
+                && wallet.isWalletEmpty() && !wallet.isStateLoading() && getMessagesController().config.walletAvailable.get()) {
+            if (item.id == IMPORT_EMPTY_WALLET) {
+                WalletImportFragment fragment = new WalletImportFragment();
+                fragment.setCurrentAccount(currentAccount);
+                presentFragment(fragment);
+            } else {
+                wallet.createNewWallet(error -> {
+                    if (isFinished) return;
+                    if (error != null) BulletinFactory.of(this).showForError(error);
+                    else wallet.retryState();
+                });
+            }
+            return;
+        }
         if (item.object instanceof TL_wallet.nftItem) {
             openCollectibleSheet(getContext(), (TL_wallet.nftItem) item.object, getResourceProvider());
             return;

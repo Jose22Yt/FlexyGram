@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyWalletUnavailable">Money is not available for this account in Telegram yet.</string>
+    <string name="FlexyWalletPreparing">Telegram is preparing your wallet. You can check its status again.</string>
+    <string name="FlexyWalletEmpty">There is no wallet on this account. You can create one or import your own.</string>
+    <string name="FlexyWalletEngineError">The wallet could not start on this device. Please try again.</string>
+    <string name="FlexyWalletStateLoadError">Could not load Money. Check your connection and try again.</string>
+    <string name="FlexyWalletHistoryError">Could not update the transaction history. Please try again.</string>
+</resources>

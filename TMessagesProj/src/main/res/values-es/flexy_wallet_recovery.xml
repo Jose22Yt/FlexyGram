@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyWalletUnavailable">Dinero aún no está disponible para esta cuenta en Telegram.</string>
+    <string name="FlexyWalletPreparing">Telegram está preparando tu monedero. Puedes volver a consultar su estado.</string>
+    <string name="FlexyWalletEmpty">No hay un monedero en esta cuenta. Puedes crear uno o importar el tuyo.</string>
+    <string name="FlexyWalletEngineError">No se pudo iniciar el monedero en este dispositivo. Vuelve a intentarlo.</string>
+    <string name="FlexyWalletStateLoadError">No se pudo cargar Dinero. Comprueba la conexión y vuelve a intentarlo.</string>
+    <string name="FlexyWalletHistoryError">No se pudo actualizar el historial. Vuelve a intentarlo.</string>
+</resources>

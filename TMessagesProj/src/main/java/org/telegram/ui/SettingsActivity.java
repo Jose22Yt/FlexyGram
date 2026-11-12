@@ -245,6 +245,8 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         getNotificationCenter().addObserver(this, NotificationCenter.updateInterfaces);
         getNotificationCenter().addObserver(this, NotificationCenter.starBalanceUpdated);
         getNotificationCenter().addObserver(this, NotificationCenter.newSuggestionsAvailable);
+        getNotificationCenter().addObserver(this, NotificationCenter.appConfigUpdated);
+        getNotificationCenter().addObserver(this, NotificationCenter.walletUpdate);
 
         if (arguments != null) {
             hasMainTabs = arguments.getBoolean("hasMainTabs", false);
@@ -571,6 +573,8 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         getNotificationCenter().removeObserver(this, NotificationCenter.updateInterfaces);
         getNotificationCenter().removeObserver(this, NotificationCenter.starBalanceUpdated);
         getNotificationCenter().removeObserver(this, NotificationCenter.newSuggestionsAvailable);
+        getNotificationCenter().removeObserver(this, NotificationCenter.appConfigUpdated);
+        getNotificationCenter().removeObserver(this, NotificationCenter.walletUpdate);
     }
 
     @Override
@@ -588,6 +592,8 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             }
         } else if (id == NotificationCenter.newSuggestionsAvailable) {
             scheduleItemsUpdate(true);
+        } else if (id == NotificationCenter.appConfigUpdated || id == NotificationCenter.walletUpdate) {
+            scheduleItemsUpdate(false);
         }
     }
 
@@ -871,6 +877,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
     }
 
     private void presentSettingFragment(BaseFragment fragment) {
+        fragment.setCurrentAccount(currentAccount);
         if (AndroidUtilities.isTablet() && LaunchActivity.instance != null && LaunchActivity.instance.getRightActionBarLayout() != null) {
             final INavigationLayout layout = LaunchActivity.instance.getRightActionBarLayout();
             if (!layout.getFragmentStack().isEmpty()) {
@@ -970,7 +977,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 presentSettingFragment(new PremiumPreviewFragment(PremiumPreviewFragment.FEATURES_BUSINESS, "settings"));
                 break;
             case 16:
-                UserSelectorBottomSheet.open(0, BirthdayController.getInstance(UserConfig.selectedAccount).getState());
+                UserSelectorBottomSheet.open(0, BirthdayController.getInstance(currentAccount).getState());
                 break;
 
             case 17:
