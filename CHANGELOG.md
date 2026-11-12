@@ -2,6 +2,8 @@
 
 ## 1.0.0-beta.51 — preparación, build 1340
 
+- Revisión de fluidez: inversión/salida con velocidad continua, una proyección compartida para Perspectiva y traslación directa para Deslizamiento lateral. Límites de álbumes reutilizados y pose coherente para captura/gestos. Intensidades conservadas; comparación de trabajo y regresiones en `docs/scroll/BETA51_SCROLL_EFFECTS_AUDIT.md`. Sin compilar APK.
+
 - Pantalla principal → Animaciones al desplazarse: Sin efecto, Rueda 3D, Perspectiva inclinada y Deslizamiento lateral. La lista de chats y el interior de las conversaciones se configuran por separado.
 - Intensidad compartida Suave/Marcada/Intensa, con Marcada como nivel inicial y efectos desactivados hasta elegirlos. Geometría normalizada y respuesta temporal comunes para ambas listas.
 - Entrada, inversión y asentamiento continuos; sin bitmaps, capas adicionales, cambios de layout ni temporizadores permanentes del efecto.

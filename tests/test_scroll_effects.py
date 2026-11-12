@@ -106,8 +106,8 @@ def test_settings_persist_independent_choices_share_intensity_and_refresh_on_imp
 def controller_hosts():
     return {
         'android/animation/ValueAnimator.java': 'package android.animation;public class ValueAnimator{public static boolean enabled=true;public static boolean areAnimatorsEnabled(){return enabled;}}',
-        'android/graphics/Matrix.java': 'package android.graphics;public class Matrix{public static int allocations;public Matrix(){allocations++;}public void preScale(float x,float y){}public void preTranslate(float x,float y){}public void postTranslate(float x,float y){}public void set(Matrix m){}public boolean invert(Matrix m){return true;}public void mapPoints(float[]p){}}',
-        'android/graphics/Camera.java': 'package android.graphics;public class Camera{public static int builds;public static float rotationX;public void save(){}public void restore(){}public void setLocation(float x,float y,float z){}public void rotateX(float x){rotationX=x;}public void rotateY(float y){}public void rotateZ(float z){}public void getMatrix(Matrix m){builds++;}}',
+        'android/graphics/Matrix.java': 'package android.graphics;public class Matrix{public static int allocations;public Matrix(){allocations++;}public static int inversions;public float tx,ty;public void setTranslate(float x,float y){tx=x;ty=y;}public void preScale(float x,float y){}public void preTranslate(float x,float y){tx+=x;ty+=y;}public void postTranslate(float x,float y){tx+=x;ty+=y;}public void set(Matrix m){tx=m.tx;ty=m.ty;}public boolean invert(Matrix m){inversions++;m.tx=-tx;m.ty=-ty;return true;}public void mapPoints(float[]p){p[0]+=tx;p[1]+=ty;}}',
+        'android/graphics/Camera.java': 'package android.graphics;public class Camera{public static int builds,rotations,locations;public static float rotationX;public void save(){}public void restore(){}public void setLocation(float x,float y,float z){locations++;}public void rotateX(float x){rotationX=x;rotations++;}public void rotateY(float y){rotations++;}public void rotateZ(float z){rotations++;}public void getMatrix(Matrix m){builds++;m.setTranslate(0,0);}}',
         'android/graphics/Canvas.java': 'package android.graphics;public class Canvas{public int saves,concats;public boolean fail;public int save(){return ++saves;}public void concat(Matrix m){concats++;if(fail)throw new RuntimeException();}}',
         'android/os/SystemClock.java': 'package android.os;public class SystemClock{public static long now;public static long elapsedRealtimeNanos(){return now;}}',
         'android/os/Build.java': 'package android.os;public class Build{public static class VERSION{public static int SDK_INT=35;}}',
@@ -123,7 +123,7 @@ def controller_hosts():
  public boolean isAttachedToWindow(){return attached;}public int getWindowVisibility(){return visibility;}public int getScrollState(){return state;}
  public int getWidth(){return 400;}public void invalidate(){invalidates++;}public void postInvalidateOnAnimation(){frames++;}}''',
         'app/flexygram/scroll/ScrollEffectsConfig.java': '''package app.flexygram.scroll;public class ScrollEffectsConfig{
- public static int NONE=0,PERSPECTIVE=2,current=1;public static void load(){}public static int style(int s){return current;}public static float intensity(){return 1;}}''',
+ public static int NONE=0,PERSPECTIVE=2,LATERAL=3,current=1;public static void load(){}public static int style(int s){return current;}public static float intensity(){return 1;}}''',
     }
 
 

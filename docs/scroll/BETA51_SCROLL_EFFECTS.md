@@ -79,6 +79,12 @@ python -m pytest tests/ -q -p no:cacheprovider
 La revisión de sintaxis comprende también ChatActivity, DialogsActivity y RecyclerListView.
 La compilación de tipos aislada no sustituye la compilación integrada de Android.
 
+## Revisión posterior de fluidez
+
+La [auditoría de coste y continuidad](BETA51_SCROLL_EFFECTS_AUDIT.md) documenta las
+optimizaciones posteriores de proyección, álbumes y movimiento con velocidad continua.
+Se mantienen los tres estilos, las intensidades y la preparación sin APK.
+
 ## Aceptación pendiente en dispositivo
 
 Con una APK solicitada posteriormente, comparar ambos espacios con cada efecto e

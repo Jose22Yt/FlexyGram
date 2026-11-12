@@ -52999,6 +52999,30 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private abstract class ChatListRecyclerView extends RecyclerListViewInternal {
+        private MessageObject.GroupedMessages[] scrollEffectGroups;
+        private float[] scrollEffectGroupTops, scrollEffectGroupBottoms;
+        private int scrollEffectGroupCount;
+
+        private void clearScrollEffectGroups() {
+            for (int i = 0; i < scrollEffectGroupCount; i++) scrollEffectGroups[i] = null;
+            scrollEffectGroupCount = 0;
+        }
+        @Override public void beginScrollEffectsFrame(float top, float bottom) {
+            clearScrollEffectGroups();
+            super.beginScrollEffectsFrame(top, bottom);
+        }
+        @Override public void onScrolled(int dx, int dy) {
+            clearScrollEffectGroups();
+            super.onScrolled(dx, dy);
+        }
+        @Override protected void onLayout(boolean changed, int l, int t, int r, int b) {
+            clearScrollEffectGroups();
+            super.onLayout(changed, l, t, r, b);
+        }
+        @Override protected void onDetachedFromWindow() {
+            clearScrollEffectGroups();
+            super.onDetachedFromWindow();
+        }
 
         public ChatListRecyclerView(Context context, ThemeDelegate themeDelegate) {
             super(context, themeDelegate);
@@ -53011,12 +53035,27 @@ public class ChatActivity extends BaseFragment implements
             if (child instanceof ChatMessageCell) {
                 MessageObject.GroupedMessages group = ((ChatMessageCell) child).getCurrentMessagesGroup();
                 if (group != null) {
+                    for (int i = 0; i < scrollEffectGroupCount; i++) {
+                        if (scrollEffectGroups[i] == group) {
+                            bounds.top = scrollEffectGroupTops[i]; bounds.bottom = scrollEffectGroupBottoms[i];
+                            return true;
+                        }
+                    }
                     for (int i = 0, count = getChildCount(); i < count; i++) {
                         View sibling = getChildAt(i);
                         if (sibling instanceof ChatMessageCell && ((ChatMessageCell) sibling).getCurrentMessagesGroup() == group) {
                             bounds.top = Math.min(bounds.top, sibling.getY());
                             bounds.bottom = Math.max(bounds.bottom, sibling.getY() + sibling.getHeight());
                         }
+                    }
+                    if (scrollEffectGroups == null) {
+                        scrollEffectGroups = new MessageObject.GroupedMessages[32];
+                        scrollEffectGroupTops = new float[32]; scrollEffectGroupBottoms = new float[32];
+                    }
+                    if (scrollEffectGroupCount < scrollEffectGroups.length) {
+                        int index = scrollEffectGroupCount++;
+                        scrollEffectGroups[index] = group;
+                        scrollEffectGroupTops[index] = bounds.top; scrollEffectGroupBottoms[index] = bounds.bottom;
                     }
                 }
             }

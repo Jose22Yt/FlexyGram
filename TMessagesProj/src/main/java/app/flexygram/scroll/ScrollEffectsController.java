@@ -23,12 +23,13 @@ public final class ScrollEffectsController extends RecyclerView.OnScrollListener
     private final Camera camera = new Camera();
     private final Matrix matrix = new Matrix();
     private final Matrix inverse = new Matrix();
+    private Matrix inverseSource;
     private final float[] cachedTops = new float[64], cachedBottoms = new float[64];
     private final Matrix[] cachedMatrices = new Matrix[64];
     private int cachedCount;
     private final AccessibilityManager accessibility;
-    private float top, bottom, frameIntensity;
-    private int style;
+    private float top, bottom, frameIntensity, frameAmount, frameDirection;
+    private int style, frameWidth, cameraWidth = -1;
     private boolean enabled;
 
     public ScrollEffectsController(RecyclerView list, int surface) {
@@ -44,6 +45,7 @@ public final class ScrollEffectsController extends RecyclerView.OnScrollListener
                 && (accessibility == null || !accessibility.isTouchExplorationEnabled());
     }
     @Override public void onScrolled(RecyclerView recycler, int dx, int dy) {
+        if (dy == 0) return;
         if (!allowed() || !list.isAttachedToWindow() || list.getWindowVisibility() != View.VISIBLE) { reset(); return; }
         // Only user drag/fling: opening a chat and restoring scroll must not animate its contents.
         if (list.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) return;
@@ -52,26 +54,31 @@ public final class ScrollEffectsController extends RecyclerView.OnScrollListener
     }
     public void beginFrame(float top, float bottom) {
         cachedCount = 0;
+        inverseSource = null;
         this.top = top; this.bottom = bottom;
         style = ScrollEffectsConfig.style(surface);
         frameIntensity = ScrollEffectsConfig.intensity();
+        frameWidth = list.getWidth();
         if (!allowed() || bottom <= top || !list.isAttachedToWindow()
                 || list.getWindowVisibility() != View.VISIBLE) { reset(); return; }
         enabled = motion.advance(SystemClock.elapsedRealtimeNanos());
+        frameAmount = motion.amount(); frameDirection = motion.direction();
         if (enabled) list.postInvalidateOnAnimation();
     }
     /** Bounds include a whole media group, so its background/caption/tiles share one projection. */
     public int save(Canvas canvas, float rowTop, float rowBottom) {
-        if (!enabled || motion.amount() == 0 || rowBottom <= rowTop) return -1;
+        if (!isActive() || rowBottom <= rowTop) return -1;
         int save = canvas.save();
         concat(canvas, rowTop, rowBottom);
         return save;
     }
     public void concat(Canvas canvas, float rowTop, float rowBottom) {
-        if (!enabled || motion.amount() == 0 || rowBottom <= rowTop) return;
+        if (!isActive() || rowBottom <= rowTop) return;
         canvas.concat(matrixForBounds(rowTop, rowBottom));
     }
     private Matrix matrixForBounds(float rowTop, float rowBottom) {
+        // Perspective is the same projection for the entire viewport, including deferred passes.
+        if (style == ScrollEffectsConfig.PERSPECTIVE) { rowTop = top; rowBottom = bottom; }
         for (int i = 0; i < cachedCount; i++) {
             if (cachedTops[i] == rowTop && cachedBottoms[i] == rowBottom) return cachedMatrices[i];
         }
@@ -91,41 +98,53 @@ public final class ScrollEffectsController extends RecyclerView.OnScrollListener
         float center = visibleTop <= visibleBottom ? (visibleTop + visibleBottom) * .5f
                 : Math.max(top, Math.min(bottom, (rowTop + rowBottom) * .5f));
         float position = (center - (top + bottom) * .5f) / (height * .5f);
-        geometry.calculate(style, position, list.getWidth(), height,
-                motion.amount(), motion.direction(), frameIntensity);
-        float pivotX = list.getWidth() * .5f;
+        geometry.calculate(style, position, frameWidth, height,
+                frameAmount, frameDirection, frameIntensity);
+        if (style == ScrollEffectsConfig.LATERAL) {
+            matrix.setTranslate(geometry.translationX, 0);
+            return;
+        }
+        float pivotX = frameWidth * .5f;
         float pivotY = style == ScrollEffectsConfig.PERSPECTIVE ? (top + bottom) * .5f : center;
-        camera.save();
         // Camera depth is proportional to viewport width in pixels: equal perspective across densities.
-        camera.setLocation(0, 0, -Math.max(1, list.getWidth()) * 3f / 72f);
+        if (cameraWidth != frameWidth) {
+            camera.setLocation(0, 0, -Math.max(1, frameWidth) * 3f / 72f);
+            cameraWidth = frameWidth;
+        }
+        camera.save();
         camera.rotateX(geometry.rotationX);
-        camera.rotateY(geometry.rotationY);
-        camera.rotateZ(geometry.rotationZ);
+        if (geometry.rotationY != 0) camera.rotateY(geometry.rotationY);
+        if (geometry.rotationZ != 0) camera.rotateZ(geometry.rotationZ);
         camera.getMatrix(matrix);
         camera.restore();
-        matrix.preScale(geometry.scaleX, 1f);
+        if (geometry.scaleX != 1) matrix.preScale(geometry.scaleX, 1f);
         matrix.preTranslate(-pivotX, -pivotY);
         matrix.postTranslate(pivotX + geometry.translationX, pivotY + geometry.translationY);
     }
     public boolean mapTouch(float x, float y, float rowTop, float rowBottom, float[] point) {
-        if (!enabled || motion.amount() == 0 || rowBottom <= rowTop || y < top || y > bottom) return false;
-        if (!matrixForBounds(rowTop, rowBottom).invert(inverse)) return false;
+        if (!isActive() || rowBottom <= rowTop || y < top || y > bottom) return false;
+        Matrix source = matrixForBounds(rowTop, rowBottom);
+        // The overflow scratch matrix is mutable; only retain inverses of the bounded cache.
+        if (source == matrix || source != inverseSource) {
+            if (!source.invert(inverse)) return false;
+            inverseSource = source == matrix ? null : source;
+        }
         point[0] = x; point[1] = y;
         inverse.mapPoints(point);
         return true;
     }
-    public boolean isActive() { return enabled && motion.amount() != 0; }
+    public boolean isActive() { return enabled && frameAmount != 0; }
     public long renderHash() {
         if (!isActive()) return 0;
         long hash = style;
-        hash = hash * 31 + Float.floatToIntBits(motion.amount());
-        hash = hash * 31 + Float.floatToIntBits(motion.direction());
+        hash = hash * 31 + Float.floatToIntBits(frameAmount);
+        hash = hash * 31 + Float.floatToIntBits(frameDirection);
         hash = hash * 31 + Float.floatToIntBits(frameIntensity);
         hash = hash * 31 + Float.floatToIntBits(top);
         hash = hash * 31 + Float.floatToIntBits(bottom);
-        return hash * 31 + list.getWidth();
+        return hash * 31 + frameWidth;
     }
-    public void reset() { motion.reset(); enabled = false; cachedCount = 0; }
+    public void reset() { motion.reset(); enabled = false; frameAmount = frameDirection = 0; cachedCount = 0; inverseSource = null; }
     /** Release smoothly; the list maps the initial hit and preserves raw movement deltas. */
     public void onTouchDown() { motion.stop(SystemClock.elapsedRealtimeNanos()); list.invalidate(); }
 }
