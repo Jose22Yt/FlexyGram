@@ -16,7 +16,12 @@ import org.telegram.tgnet.TLRPC;
 /** UI-owned, coalesced cold-peer lookups. Disk reads stay on Telegram's storage queue. */
 public final class ChatPeerPreloader {
     public interface Completion { void done(boolean found); }
-    private static final Map<String,ArrayList<Completion>> pending=new HashMap<>();
+    private static final class Request {
+        final ArrayList<Completion> callbacks = new ArrayList<>();
+        // Logout runs on UI; the storage queue must also see that this work was retired.
+        volatile boolean cancelled;
+    }
+    private static final Map<String,Request> pending=new HashMap<>();
     private static final Map<Integer,NotificationCenter.NotificationCenterDelegate> logoutObservers=new HashMap<>();
     private ChatPeerPreloader() { }
 
@@ -42,9 +47,9 @@ public final class ChatPeerPreloader {
 
         String key = account + ":" + owner + ":" + System.identityHashCode(controller) + ":"
                 + (chatId != 0 ? "c" + chatId : userId != 0 ? "u" + userId : "e" + encryptedId);
-        ArrayList<Completion> waiting=pending.get(key);
-        if(waiting!=null) {waiting.add(completion);return true;}
-        ArrayList<Completion> callbacks=new ArrayList<>();callbacks.add(completion);pending.put(key,callbacks);
+        Request waiting=pending.get(key);
+        if(waiting!=null) {waiting.callbacks.add(completion);return true;}
+        Request request=new Request();request.callbacks.add(completion);pending.put(key,request);
         if(!logoutObservers.containsKey(account)) {
             NotificationCenter.NotificationCenterDelegate observer=(event,id,arguments)->cancelAccount(id);
             logoutObservers.put(account,observer);
@@ -52,13 +57,13 @@ public final class ChatPeerPreloader {
         }
         MessagesStorage storage = MessagesStorage.getInstance(account);
         try {
-            storage.getStorageQueue().postRunnable(() -> {
+            boolean queued = storage.getStorageQueue().postRunnable(() -> {
                 TLRPC.Chat chat = null;
                 TLRPC.User user = null;
                 TLRPC.EncryptedChat encrypted = null;
                 try {
                     // A queued read that belongs to a logged-out owner does no further disk work.
-                    if (owns(account, owner)) {
+                    if (!request.cancelled && owns(account, owner)) {
                         if (chatId != 0) chat = storage.getChat(chatId);
                         else if (userId != 0) user = storage.getUser(userId);
                         else {
@@ -71,7 +76,9 @@ public final class ChatPeerPreloader {
                 TLRPC.User loadedUser = user;
                 TLRPC.EncryptedChat loadedEncrypted = encrypted;
                 AndroidUtilities.runOnUIThread(() -> {
-                    if (!owns(account, owner) || MessagesController.getInstance(account)!=controller) {finish(account,key, false);return;}
+                    // The same owner and peer key can be reused after logout/login.
+                    if (request.cancelled || pending.get(key) != request) return;
+                    if (!owns(account, owner) || MessagesController.getInstance(account)!=controller) {finish(account,key,request, false);return;}
                     // Live updates received during IO take precedence over an older storage snapshot.
                     if (loadedChat != null && controller.getChat(chatId) == null) controller.putChat(loadedChat, true);
                     if (loadedUser != null && controller.getUser(loadedUser.id) == null) controller.putUser(loadedUser, true);
@@ -80,11 +87,12 @@ public final class ChatPeerPreloader {
                             : userId != 0 ? controller.getUser(userId) != null
                             : controller.getEncryptedChat(encryptedId) != null
                               && controller.getUser(controller.getEncryptedChat(encryptedId).user_id) != null;
-                    finish(account,key, found);
+                    finish(account,key,request, found);
                 });
             });
+            if (!queued) finish(account,key,request,false);
         } catch (RuntimeException unavailable) {
-            FileLog.e(unavailable);finish(account,key,false);
+            FileLog.e(unavailable);finish(account,key,request,false);
         }
         return true;
     }
@@ -100,15 +108,24 @@ public final class ChatPeerPreloader {
     }
     private static void cancelAccount(int account) {
         // A storage queue can stop at logout. Do not retain its fragments indefinitely.
-        String prefix=account+":";pending.keySet().removeIf(key->key.startsWith(prefix));releaseObserver(account);
-    }
-    private static void finish(int account,String key,boolean found) {
-        // Remove before callbacks so an immediate retry creates a new request.
-        ArrayList<Completion> callbacks=pending.remove(key);
+        String prefix=account+":";
+        pending.entrySet().removeIf(entry -> {
+            if (!entry.getKey().startsWith(prefix)) return false;
+            entry.getValue().cancelled = true;
+            entry.getValue().callbacks.clear();
+            return true;
+        });
         releaseObserver(account);
-        if(callbacks==null)return;
-        for(Completion completion:callbacks) {
+    }
+    private static void finish(int account,String key,Request request,boolean found) {
+        // Remove before callbacks so an immediate retry creates a new request.
+        if (pending.get(key) != request) return;
+        pending.remove(key);
+        request.cancelled = true;
+        releaseObserver(account);
+        for(Completion completion:request.callbacks) {
             try {completion.done(found);}catch(RuntimeException failed){FileLog.e(failed);}
         }
+        request.callbacks.clear();
     }
 }

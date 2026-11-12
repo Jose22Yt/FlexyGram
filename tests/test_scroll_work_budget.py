@@ -17,7 +17,7 @@ public class Probe {
   static void runOnUIThread(Runnable r,long d){posts++;if(queued!=null)throw new AssertionError("duplicate queued scan");queued=r;delay=d;}
   static void fire(){Runnable r=queued;queued=null;if(r!=null)r.run();}
  }
- RecyclerView chatListView=new RecyclerView();long lastTranslationCheck;boolean translationCheckDeferred;int scans;
+ RecyclerView chatListView=new RecyclerView();long lastTranslationCheck;boolean paused,isFinished,translationCheckDeferred;int scans;
  ACTIVE
  SCHEDULE
  Runnable checkTranslationRunnable=()->{PREFIX translationCheckDeferred=false;lastTranslationCheck=System.currentTimeMillis();scans++;};

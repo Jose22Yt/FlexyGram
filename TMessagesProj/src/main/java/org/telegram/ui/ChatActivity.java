@@ -26971,6 +26971,10 @@ public class ChatActivity extends BaseFragment implements
         return chatListView != null && chatListView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE;
     }
     private void checkTranslation(boolean force) {
+        if (paused || isFinished) {
+            translationCheckDeferred = true;
+            return;
+        }
         // Do not scan the loaded history during a drag/fling, even after the old 1s timeout.
         // Explicit language/translation changes still run immediately.
         if (!force && isTranslationScrollActive()) {
@@ -26986,6 +26990,10 @@ public class ChatActivity extends BaseFragment implements
         AndroidUtilities.runOnUIThread(checkTranslationRunnable, force ? 0 : 150);
     }
     private Runnable checkTranslationRunnable = () -> {
+        if (paused || isFinished) {
+            translationCheckDeferred = true;
+            return;
+        }
         if (translationCheckDeferred && isTranslationScrollActive()) {
             return;
         }
@@ -32306,6 +32314,7 @@ public class ChatActivity extends BaseFragment implements
         }
 
         paused = false;
+        if (translationCheckDeferred) checkTranslation(false);
         pausedOnLastMessage = false;
         if (isFeedSearch() && feedIntegration != null) {
             feedIntegration.onHostResumed();
@@ -32424,6 +32433,9 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public void onPause() {
         cancelScrollHintChecks();
+        AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
+        // Refresh the visible translations once on return, rather than scanning a hidden chat.
+        translationCheckDeferred = true;
         if(chatListView!=null)for(int i=0;i<chatListView.getChildCount();i++){
             View child=chatListView.getChildAt(i);if(child instanceof ChatMessageCell)((ChatMessageCell)child).cancelSignatureTap();
         }

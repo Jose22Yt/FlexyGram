@@ -30,7 +30,7 @@ public class MessagesController {
 public class MessagesStorage {
  static MessagesStorage[]instances={new MessagesStorage(),new MessagesStorage()};public static MessagesStorage getInstance(int a){return instances[a];}
  public static boolean onStorage;public static int reads;public static boolean fail,missing;
- public static class Queue {public Runnable work;public void postRunnable(Runnable r){if(work!=null)throw new AssertionError();work=r;}
+ public static class Queue {public Runnable work;public boolean postRunnable(Runnable r){if(work!=null)throw new AssertionError();work=r;return true;}
  public void fire(){Runnable r=work;work=null;onStorage=true;try{r.run();}finally{onStorage=false;}}}
  public Queue queue=new Queue();public Queue getStorageQueue(){return queue;}
  static void reading(){if(!onStorage)throw new AssertionError("disk on UI");reads++;if(fail)throw new IllegalStateException();}

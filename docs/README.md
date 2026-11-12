@@ -20,6 +20,7 @@
 - [Diseño del reproductor](design/music/README.md)
 - [Desplazamiento nativo](scroll/NATIVE_SCROLL.md)
 - [Rendimiento del desplazamiento](performance/SCROLL_WORK_REDUCTION.md)
+- [Cargas de chats y traducción al pausar](performance/CHAT_LOAD_AND_TRANSLATION_LIFECYCLE.md)
 - [Carga de cartera y reanudación](performance/WALLET_SETTINGS_AND_FOREGROUND_RECOVERY.md)
 
 ## Referencias
