@@ -6349,9 +6349,10 @@ public class ChatActivity extends BaseFragment implements
 
             @Override
             protected void dispatchDraw(Canvas canvas) {
-                // External video/menu overlays have their own coordinate space.
-                if (scrimView != null || videoPlayerContainer != null && videoPlayerContainer.getVisibility() == View.VISIBLE
-                        || getItemAnimator() != null && getItemAnimator().isRunning()) resetScrollEffects();
+                // Only attached external overlays suspend the effect. A retained video container
+                // may remain VISIBLE after removal; ordinary item animations compose with Canvas.
+                if (scrimView != null || videoPlayerContainer != null && videoPlayerContainer.getParent() == contentView
+                        && videoPlayerContainer.getVisibility() == View.VISIBLE) resetScrollEffects();
                 beginScrollEffectsFrame(Math.max(0, chatListViewPaddingTop - chatListViewPaddingVisibleOffset),
                         getHeight() - blurredViewBottomOffset);
                 drawLaterRoundProgressCell = null;

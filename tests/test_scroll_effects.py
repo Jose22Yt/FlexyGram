@@ -39,7 +39,7 @@ def test_reversal_is_continuous_and_reset_removes_all_motion(tmp_path):
     probe(tmp_path, {'Probe.java': '''import app.flexygram.scroll.*;public class Probe{
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[]a){ScrollEffectMotion m=new ScrollEffectMotion();m.scroll(80,1000,0);
- m.advance(60_000_000L);float before=m.direction(),strength=m.amount();check(before>.6&&strength>.15&&strength<.35);
+ m.advance(60_000_000L);float before=m.direction(),strength=m.amount();check(before>.6&&strength>.4&&strength<.7);
  m.scroll(-80,1000,60_000_000L);m.advance(60_000_000L);check(m.direction()==before&&m.amount()==strength);
  m.advance(68_000_000L);check(m.direction()<before&&m.direction()>0&&m.amount()>=strength);
  m.scroll(-80,1000,110_000_000L);m.advance(140_000_000L);check(m.direction()<0);
@@ -48,14 +48,14 @@ def test_reversal_is_continuous_and_reset_removes_all_motion(tmp_path):
  }}'''}, [SCROLL / 'ScrollEffectMotion.java'])
 
 
-def test_three_distinct_soft_effects_have_identical_normalized_intensity(tmp_path):
+def test_three_distinct_visible_effects_have_identical_normalized_intensity(tmp_path):
     probe(tmp_path, {'Probe.java': '''import app.flexygram.scroll.*;public class Probe{
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[]a){ScrollEffectGeometry g=new ScrollEffectGeometry();
- g.calculate(1,1,400,800,1,1,1);check(Math.abs(g.rotationX)>20&&Math.abs(g.rotationX)<30&&g.scaleX>.97&&g.translationY<0&&g.translationY>-16);
+ g.calculate(1,1,400,800,1,1,1);check(Math.abs(g.rotationX)>30&&Math.abs(g.rotationX)<50&&g.scaleX>.96&&g.translationY<0&&g.translationY>-40);
  g.calculate(1,0,400,800,1,1,1);check(g.rotationX==0&&g.translationY==0&&g.scaleX==1);
- g.calculate(2,1,400,800,1,1,1);check(g.rotationX==5&&g.rotationY==-2.5f&&g.rotationZ<.5f);
- g.calculate(3,1,400,800,1,1,1);float x=g.translationX;check(x>16&&x<30&&g.rotationX==0&&g.rotationZ==0);
+ g.calculate(2,1,400,800,1,1,1);check(g.rotationX==9&&g.rotationY==-4.5f&&g.rotationZ<1);
+ g.calculate(3,1,400,800,1,1,1);float x=g.translationX;check(x>35&&x<55&&g.rotationX==0&&g.rotationZ==0);
  g.calculate(3,-1,400,800,1,1,1);check(g.translationX==-x);
  g.calculate(3,1,400,800,1,-1,1);check(g.translationX==-x);
  // Different densities/viewports, same normalized amplitude on both list types.

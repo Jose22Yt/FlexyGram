@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.0.0-beta.53 — build 1342
+
+- Se recupera una presencia claramente visible de Rueda 3D, Perspectiva inclinada y Deslizamiento lateral en ambas listas. El objetivo de amplitud pasa de 0,30–0,85 a 0,65–0,90; se conservan el filtro de velocidad y la continuidad al invertir.
+- Calibración intermedia entre beta 51 y beta 52: rueda nominal de 40°, perspectiva de 9°/4,5°/0,7° y lateral del 12 % del ancho, antes de modular por amplitud e intensidad. No se borran ni sustituyen las elecciones guardadas.
+- Una animación de elementos deja de reiniciar el efecto de toda la lista. En la pantalla principal solo se excluyen las filas móviles que el animador nativo dibuja aparte, tanto del efecto como de su proyección de toque.
+- Un contenedor de vídeo retenido pero retirado de la pantalla ya no cancela permanentemente los efectos de la conversación. Se mantiene la suspensión para vídeo realmente adjunto y menús externos.
+- Se conservan la proyección 3D coherente, los pivotes suaves, las cachés acotadas y la salida de 96 ms al tocar sin retrasar la acción nativa. Nuevas regresiones de visibilidad durante un arrastre corto y lento en todos los niveles.
+- Compilación oficial solicitada tras las pruebas locales; sin supervisión de progreso ni resultado.
+
 ## 1.0.0-beta.52 — build 1341
 
 - Se reduce claramente la fuerza de los tres efectos en todos los niveles: Rueda 3D de 58° a 26°, Perspectiva de 13°/7°/1,8° a 5°/2,5°/0,4° y desplazamiento lateral del 18 % al 6 % del ancho, antes de modular por velocidad e intensidad.

@@ -1878,7 +1878,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         @Override
         protected void dispatchDraw(Canvas canvas) {
-            if (animationSupportListView != null || drawMovingViewsOverlayed() || rightFragmentOpenedProgress != 0) resetScrollEffects();
+            if (animationSupportListView != null || rightFragmentOpenedProgress != 0) resetScrollEffects();
             beginScrollEffectsFrame(getPaddingTop() + scrollYOffset, getHeight() - getPaddingBottom());
             canvas.save();
             if (rightFragmentOpenedProgress > 0) {
@@ -2116,7 +2116,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         @Override protected boolean getScrollEffectBounds(View child, RectF bounds) {
-            return child instanceof DialogCell && super.getScrollEffectBounds(child, bounds);
+            // Moving rows are drawn separately by the native item animator; other rows keep the effect.
+            return child instanceof DialogCell && !((DialogCell) child).isMoving() && super.getScrollEffectBounds(child, bounds);
         }
 
         @Override

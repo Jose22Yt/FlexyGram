@@ -3,14 +3,14 @@ from test_scroll_effects import SCROLL, controller_hosts
 from test_render_work_reuse import probe
 
 
-def test_all_intensity_levels_are_substantially_softer_and_keep_the_same_limits(tmp_path):
+def test_all_intensity_levels_remain_visible_and_below_original_extremes(tmp_path):
     probe(tmp_path, {'Probe.java': '''import app.flexygram.scroll.*;public class Probe{
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[]a){ScrollEffectGeometry g=new ScrollEffectGeometry();
  for(float intensity:new float[]{.7f,1,1.3f}){
- g.calculate(1,1,400,800,1,1,intensity);check(Math.abs(g.rotationX)<35&&g.scaleX>.975&&Math.abs(g.translationY)<24);
- g.calculate(2,1,400,800,1,1,intensity);check(Math.abs(g.rotationX)<7&&Math.abs(g.rotationY)<3.5&&Math.abs(g.rotationZ)<.6);
- g.calculate(3,1,400,800,1,1,intensity);check(Math.abs(g.translationX)<400*.08);
+ g.calculate(1,1,400,800,1,1,intensity);check(Math.abs(g.rotationX)<56&&g.scaleX>.96&&Math.abs(g.translationY)<64);
+ g.calculate(2,1,400,800,1,1,intensity);check(Math.abs(g.rotationX)<12&&Math.abs(g.rotationY)<6&&Math.abs(g.rotationZ)<1);
+ g.calculate(3,1,400,800,1,1,intensity);check(Math.abs(g.translationX)<400*.16);
  }
  }}'''}, [SCROLL / 'ScrollEffectGeometry.java'])
 
@@ -80,7 +80,7 @@ def test_same_timestamp_callbacks_are_coalesced_without_strength_kicks(tmp_path)
  for(int i=1;i<=60;i++){long t=i*8_000_000L;single.scroll(40,1000,t);
  for(int j=0;j<4;j++)batched.scroll(10,1000,t);
  single.advance(t+4_000_000L);batched.advance(t+4_000_000L);
- check(Math.abs(single.amount()-batched.amount())<.00001&&single.amount()<.85);
+ check(Math.abs(single.amount()-batched.amount())<.00001&&single.amount()<.90);
  check(Math.abs(single.direction()-batched.direction())<.00001);
  }
  }}'''}, [SCROLL / 'ScrollEffectMotion.java'])

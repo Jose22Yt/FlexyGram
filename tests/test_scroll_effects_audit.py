@@ -75,7 +75,7 @@ def test_lateral_hit_projection_uses_inverse_translation_and_resets_between_fram
  public static void main(String[]a){ScrollEffectsConfig.current=3;SystemClock.now=0;
  RecyclerView list=new RecyclerView();ScrollEffectsController c=new ScrollEffectsController(list,0);c.beginFrame(100,900);c.onScrolled(list,0,100);
  SystemClock.now=60_000_000L;c.beginFrame(100,900);Canvas canvas=new Canvas();c.concat(canvas,850,890);
- float[]p=new float[2];check(c.mapTouch(200,870,850,890,p));check(p[0]<200&&p[0]>180&&p[1]==870);
+ float[]p=new float[2];check(c.mapTouch(200,870,850,890,p));check(p[0]<195&&p[0]>140&&p[1]==870);
  float before=p[0];SystemClock.now=100_000_000L;c.beginFrame(100,900);check(c.mapTouch(200,870,850,890,p)&&p[0]!=before);
  c.reset();check(!c.mapTouch(200,870,850,890,p));
  }}'''

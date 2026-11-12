@@ -19,9 +19,9 @@ Un cliente de mensajería para Android con personalidad propia, controles de apa
 ---
 
 > [!IMPORTANT]
-> **Versión Oficial Activa:** FlexyGram `v1.0.0-beta.52` (Build `1341`)
+> **Versión Oficial Activa:** FlexyGram `v1.0.0-beta.53` (Build `1342`)
 > **Rama Oficial de Desarrollo:** [`codex/flexygram-beta-glass`](https://github.com/Jose22Yt/FlexyGram/tree/codex/flexygram-beta-glass)  
-> Revisión actual: [scroll suave e interacción inmediata, beta 52](docs/scroll/BETA52_SOFT_INTERACTIVE_SCROLL.md): menor intensidad en los tres efectos, proyección 3D coherente y retirada breve al tocar, con acceso directo a chats y burbujas durante la inercia. Compilación mediante el workflow oficial; el propietario revisará su resultado.
+> Revisión actual: [efectos visibles restaurados, beta 53](docs/scroll/BETA53_VISIBLE_SCROLL_EFFECTS.md): Rueda 3D, Perspectiva y Deslizamiento lateral recuperan presencia; las animaciones de elementos y los contenedores de vídeo ya retirados no borran el efecto completo. Se conserva el toque inmediato y la salida breve. Compilación mediante el workflow oficial, sin supervisión posterior.
 > Para desarrolladores y agentes de IA (Codex, ChatGPT, Claude), consulta la guía obligatoria de desarrollo en [AGENTS.md](AGENTS.md).
 
 ## Tu espacio, tu estilo

@@ -45,7 +45,9 @@ public final class ScrollEffectMotion {
             if (sampleSeconds > 0) filteredSpeed = sampleBaseSpeed * sampleDecay
                     + pendingDistance / sampleSeconds * (1 - sampleDecay);
         }
-        target = (float) (.30 + .55 * filteredSpeed / (filteredSpeed + .8));
+        // Keep the selected effect clearly present during a slow drag. Velocity adds emphasis;
+        // it must not make the entire animation nearly disappear at ordinary input speeds.
+        target = (float) (.65 + .25 * filteredSpeed / (filteredSpeed + .8));
         targetDirection = Math.signum(dy);
         // Start the clock at input, not with an artificial first-frame impulse.
         if (lastFrame < 0) lastFrame = now;
