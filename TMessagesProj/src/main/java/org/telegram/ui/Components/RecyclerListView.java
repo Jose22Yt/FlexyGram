@@ -2735,6 +2735,9 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
                     break;
                 }
             }
+            // RecyclerListView only selects a child while idle. Stop the native fling before
+            // dispatching this same DOWN so it can open a chat/press a bubble immediately.
+            if (scrollEffects.isActive() && getScrollState() == SCROLL_STATE_SETTLING) stopScroll();
             scrollEffects.onTouchDown();
         }
         if (scrollTouchOffsetX == 0 && scrollTouchOffsetY == 0) return event;

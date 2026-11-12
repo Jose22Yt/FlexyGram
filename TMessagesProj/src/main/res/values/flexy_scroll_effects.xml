@@ -9,7 +9,7 @@
     <string name="FlexyScrollPerspective">Tilted perspective</string>
     <string name="FlexyScrollLateral">Lateral slide</string>
     <string name="FlexyScrollSoft">Soft</string>
-    <string name="FlexyScrollMarked">Marked</string>
+    <string name="FlexyScrollMarked">Balanced</string>
     <string name="FlexyScrollStrong">Strong</string>
     <string name="FlexyScrollInfo">Choose an animation for each list. Both use the same intensity. Effects follow your scroll and settle when you stop. System animation and screen reader settings are respected.</string>
 </resources>

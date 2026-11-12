@@ -93,10 +93,18 @@ public final class ScrollEffectsController extends RecyclerView.OnScrollListener
     }
     private void buildMatrix(float rowTop, float rowBottom) {
         float height = bottom - top;
-        // Tall messages/albums use their visible portion, never an offscreen pivot thousands of px away.
-        float visibleTop = Math.max(top, rowTop), visibleBottom = Math.min(bottom, rowBottom);
-        float center = visibleTop <= visibleBottom ? (visibleTop + visibleBottom) * .5f
-                : Math.max(top, Math.min(bottom, (rowTop + rowBottom) * .5f));
+        // A normal row keeps its own pivot as it crosses the edge: clipping must not move it.
+        float center = (rowTop + rowBottom) * .5f;
+        if (rowBottom - rowTop > height * .75f) {
+            // Blend into the bounded pivot around viewport-sized items. A hard height switch
+            // would jump the pivot as an album or long message changes size.
+            float visibleTop = Math.max(top, rowTop), visibleBottom = Math.min(bottom, rowBottom);
+            float boundedCenter = visibleTop <= visibleBottom ? (visibleTop + visibleBottom) * .5f
+                    : Math.max(top, Math.min(bottom, center));
+            float blend = Math.min(1, ((rowBottom - rowTop) / height - .75f) * 2);
+            blend = blend * blend * (3 - 2 * blend);
+            center += (boundedCenter - center) * blend;
+        }
         float position = (center - (top + bottom) * .5f) / (height * .5f);
         geometry.calculate(style, position, frameWidth, height,
                 frameAmount, frameDirection, frameIntensity);
@@ -146,5 +154,9 @@ public final class ScrollEffectsController extends RecyclerView.OnScrollListener
     }
     public void reset() { motion.reset(); enabled = false; frameAmount = frameDirection = 0; cachedCount = 0; inverseSource = null; }
     /** Release smoothly; the list maps the initial hit and preserves raw movement deltas. */
-    public void onTouchDown() { motion.stop(SystemClock.elapsedRealtimeNanos()); list.invalidate(); }
+    public void onTouchDown() {
+        if (!isActive()) return;
+        motion.interrupt(SystemClock.elapsedRealtimeNanos(), frameAmount, frameDirection);
+        list.invalidate();
+    }
 }

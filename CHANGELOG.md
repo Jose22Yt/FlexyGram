@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.0.0-beta.52 — build 1341
+
+- Se reduce claramente la fuerza de los tres efectos en todos los niveles: Rueda 3D de 58° a 26°, Perspectiva de 13°/7°/1,8° a 5°/2,5°/0,4° y desplazamiento lateral del 18 % al 6 % del ancho, antes de modular por velocidad e intensidad.
+- Velocidad filtrada y callbacks coincidentes agrupados; envolvente más suave de 0,30 a 0,85, sin impulsos por intervalos inventados. Se conserva el mismo motor e intensidad en ambas listas.
+- Rueda 3D: separación de centros calculada con el ángulo realmente mostrado. Pivote estable en filas normales y transición gradual al pivote acotado de mensajes altos/álbumes, evitando saltos al cruzar bordes o cambiar de tamaño.
+- El toque interrumpe la inercia nativa antes de entregar ese mismo DOWN, permitiendo abrir chats y pulsar burbujas sin un primer toque dedicado solo a frenar. La retirada visual parte de la pose mostrada, es monótona y termina en 96 ms sin bloquear la acción.
+- Es posible retomar el arrastre durante la retirada. Se mantienen coordenadas del toque, deltas nativos, pulsación prolongada, selección y ciclo de vida. La intensidad intermedia pasa a llamarse Equilibrada; se conservan las elecciones guardadas.
+- Se conservan las optimizaciones de matrices, álbumes y capturas. Pruebas locales sin empaquetar APK; la compilación se solicita por el workflow oficial y el propietario revisará su resultado.
+
 ## 1.0.0-beta.51 — preparación, build 1340
 
 - Revisión de fluidez: inversión/salida con velocidad continua, una proyección compartida para Perspectiva y traslación directa para Deslizamiento lateral. Límites de álbumes reutilizados y pose coherente para captura/gestos. Intensidades conservadas; comparación de trabajo y regresiones en `docs/scroll/BETA51_SCROLL_EFFECTS_AUDIT.md`. Sin compilar APK.

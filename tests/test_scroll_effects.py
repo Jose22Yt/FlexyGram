@@ -39,7 +39,7 @@ def test_reversal_is_continuous_and_reset_removes_all_motion(tmp_path):
     probe(tmp_path, {'Probe.java': '''import app.flexygram.scroll.*;public class Probe{
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[]a){ScrollEffectMotion m=new ScrollEffectMotion();m.scroll(80,1000,0);
- m.advance(60_000_000L);float before=m.direction(),strength=m.amount();check(before>.6&&strength>.5);
+ m.advance(60_000_000L);float before=m.direction(),strength=m.amount();check(before>.6&&strength>.15&&strength<.35);
  m.scroll(-80,1000,60_000_000L);m.advance(60_000_000L);check(m.direction()==before&&m.amount()==strength);
  m.advance(68_000_000L);check(m.direction()<before&&m.direction()>0&&m.amount()>=strength);
  m.scroll(-80,1000,110_000_000L);m.advance(140_000_000L);check(m.direction()<0);
@@ -48,14 +48,14 @@ def test_reversal_is_continuous_and_reset_removes_all_motion(tmp_path):
  }}'''}, [SCROLL / 'ScrollEffectMotion.java'])
 
 
-def test_three_distinct_marked_effects_have_identical_normalized_intensity(tmp_path):
+def test_three_distinct_soft_effects_have_identical_normalized_intensity(tmp_path):
     probe(tmp_path, {'Probe.java': '''import app.flexygram.scroll.*;public class Probe{
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[]a){ScrollEffectGeometry g=new ScrollEffectGeometry();
- g.calculate(1,1,400,800,1,1,1);check(Math.abs(g.rotationX)>50&&g.scaleX<.95&&g.translationY<0);
+ g.calculate(1,1,400,800,1,1,1);check(Math.abs(g.rotationX)>20&&Math.abs(g.rotationX)<30&&g.scaleX>.97&&g.translationY<0&&g.translationY>-16);
  g.calculate(1,0,400,800,1,1,1);check(g.rotationX==0&&g.translationY==0&&g.scaleX==1);
- g.calculate(2,1,400,800,1,1,1);check(g.rotationX==13&&g.rotationY==-7&&g.rotationZ>1);
- g.calculate(3,1,400,800,1,1,1);float x=g.translationX;check(x>65&&g.rotationX==0&&g.rotationZ==0);
+ g.calculate(2,1,400,800,1,1,1);check(g.rotationX==5&&g.rotationY==-2.5f&&g.rotationZ<.5f);
+ g.calculate(3,1,400,800,1,1,1);float x=g.translationX;check(x>16&&x<30&&g.rotationX==0&&g.rotationZ==0);
  g.calculate(3,-1,400,800,1,1,1);check(g.translationX==-x);
  g.calculate(3,1,400,800,1,-1,1);check(g.translationX==-x);
  // Different densities/viewports, same normalized amplitude on both list types.
@@ -106,7 +106,7 @@ def test_settings_persist_independent_choices_share_intensity_and_refresh_on_imp
 def controller_hosts():
     return {
         'android/animation/ValueAnimator.java': 'package android.animation;public class ValueAnimator{public static boolean enabled=true;public static boolean areAnimatorsEnabled(){return enabled;}}',
-        'android/graphics/Matrix.java': 'package android.graphics;public class Matrix{public static int allocations;public Matrix(){allocations++;}public static int inversions;public float tx,ty;public void setTranslate(float x,float y){tx=x;ty=y;}public void preScale(float x,float y){}public void preTranslate(float x,float y){tx+=x;ty+=y;}public void postTranslate(float x,float y){tx+=x;ty+=y;}public void set(Matrix m){tx=m.tx;ty=m.ty;}public boolean invert(Matrix m){inversions++;m.tx=-tx;m.ty=-ty;return true;}public void mapPoints(float[]p){p[0]+=tx;p[1]+=ty;}}',
+        'android/graphics/Matrix.java': 'package android.graphics;public class Matrix{public static int allocations;public Matrix(){allocations++;}public static int inversions;public static float lastPreY;public float tx,ty;public void setTranslate(float x,float y){tx=x;ty=y;}public void preScale(float x,float y){}public void preTranslate(float x,float y){tx+=x;ty+=y;lastPreY=y;}public void postTranslate(float x,float y){tx+=x;ty+=y;}public void set(Matrix m){tx=m.tx;ty=m.ty;}public boolean invert(Matrix m){inversions++;m.tx=-tx;m.ty=-ty;return true;}public void mapPoints(float[]p){p[0]+=tx;p[1]+=ty;}}',
         'android/graphics/Camera.java': 'package android.graphics;public class Camera{public static int builds,rotations,locations;public static float rotationX;public void save(){}public void restore(){}public void setLocation(float x,float y,float z){locations++;}public void rotateX(float x){rotationX=x;rotations++;}public void rotateY(float y){rotations++;}public void rotateZ(float z){rotations++;}public void getMatrix(Matrix m){builds++;m.setTranslate(0,0);}}',
         'android/graphics/Canvas.java': 'package android.graphics;public class Canvas{public int saves,concats;public boolean fail;public int save(){return ++saves;}public void concat(Matrix m){concats++;if(fail)throw new RuntimeException();}}',
         'android/os/SystemClock.java': 'package android.os;public class SystemClock{public static long now;public static long elapsedRealtimeNanos(){return now;}}',
@@ -203,15 +203,16 @@ class View{int getVisibility(){return 0;}float getX(){return 0;}float getY(){ret
 class Effect{int downs;boolean isActive(){return true;}boolean mapTouch(float x,float y,float t,float b,float[]p){p[0]=x-20;p[1]=y+12;return true;}void onTouchDown(){downs++;}}
 public class Probe{
  final int VISIBLE=0;Effect scrollEffects=new Effect();RectF scrollEffectBounds=new RectF();float[]scrollTouchPoint=new float[2];float scrollTouchOffsetX,scrollTouchOffsetY;
- float nativeX,nativeY;boolean fail;MotionEvent forwarded;
+ float nativeX,nativeY;boolean fail;MotionEvent forwarded;int scrollState=2,stops,presses,taps;final int SCROLL_STATE_SETTLING=2;
+ int getScrollState(){return scrollState;}void stopScroll(){scrollState=0;stops++;}
  int getChildCount(){return 1;}View getChildAt(int i){return new View();}boolean getScrollEffectBounds(View v,RectF b){return true;}
- boolean dispatchNativeListTouchEvent(MotionEvent e){forwarded=e;nativeX=e.x;nativeY=e.y;if(fail)throw new RuntimeException();return true;}
+ boolean dispatchNativeListTouchEvent(MotionEvent e){forwarded=e;nativeX=e.x;nativeY=e.y;if(fail)throw new RuntimeException();if(e.action==0&&scrollState==0)presses++;if(e.action==1&&presses>0)taps++;return true;}
  METHODS
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[]args){Probe p=new Probe();MotionEvent down=new MotionEvent(0,70,130);p.dispatchTouchEvent(down);
- check(p.nativeX==50&&p.nativeY==142&&down.x==70&&!down.recycled&&p.forwarded.recycled&&p.scrollEffects.downs==1);
+ check(p.nativeX==50&&p.nativeY==142&&down.x==70&&!down.recycled&&p.forwarded.recycled&&p.scrollEffects.downs==1&&p.stops==1&&p.presses==1);
  p.dispatchTouchEvent(new MotionEvent(2,75,110));check(p.nativeX==55&&p.nativeY==122); // Same 5,-20 delta.
- p.dispatchTouchEvent(new MotionEvent(1,75,110));check(p.scrollTouchOffsetX==0&&p.scrollTouchOffsetY==0);
+ p.dispatchTouchEvent(new MotionEvent(1,75,110));check(p.scrollTouchOffsetX==0&&p.scrollTouchOffsetY==0&&p.taps==1&&p.scrollEffects.isActive());
  p.dispatchTouchEvent(new MotionEvent(0,70,130));p.fail=true;try{p.dispatchTouchEvent(new MotionEvent(3,70,130));throw new AssertionError();}catch(RuntimeException ok){}
  check(p.forwarded.recycled&&p.scrollTouchOffsetX==0&&p.scrollTouchOffsetY==0);
  }}'''.replace('METHODS', actual)})
