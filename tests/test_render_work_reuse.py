@@ -117,9 +117,9 @@ def test_settings_resource_cache_is_bounded_and_separates_resource_tables(tmp_pa
         'org/telegram/messenger/R.java':'package org.telegram.messenger;public class R{public static class drawable{'+''.join(f'public static final int {n}={i+1};' for i,n in enumerate(names))+'}}',
         'Probe.java':'''import app.exteraless.settings.utils.SettingsIcons;import android.content.Context;import org.telegram.messenger.R;
 public class Probe{static void check(boolean b){if(!b)throw new AssertionError();}public static void main(String[]args)throws Exception{
- Context a=new Context();a.resources.names.put(1000,"msg_discussion");for(int i=0;i<20000;i++)check(SettingsIcons.resolve(a,1000)==R.drawable.fg_settings_chat);check(a.resources.reads==1);
- Context b=new Context();b.resources.names.put(1000,"cloud_sync");check(SettingsIcons.resolve(b,1000)==R.drawable.fg_settings_cloud);
- check(SettingsIcons.resolve(b,999)==999);b.resources.names.put(999,"msg_discussion");check(SettingsIcons.resolve(b,999)==R.drawable.fg_settings_chat);
+ Context a=new Context();a.resources.names.put(1000,"msg_discussion");for(int i=0;i<20000;i++)check(SettingsIcons.resolve(a,1000)==R.drawable.fg_dm_conversaciones);check(a.resources.reads==1);
+ Context b=new Context();b.resources.names.put(1000,"cloud_sync");check(SettingsIcons.resolve(b,1000)==R.drawable.fg_dm_nube);
+ check(SettingsIcons.resolve(b,999)==999);b.resources.names.put(999,"msg_discussion");check(SettingsIcons.resolve(b,999)==R.drawable.fg_dm_conversaciones);
  b.resources.names.put(998,"custom_plugin_icon");check(SettingsIcons.resolve(b,998)==998);
  for(int i=2000;i<2500;i++){b.resources.names.put(i,"msg_discussion");SettingsIcons.resolve(b,i);}
  java.lang.reflect.Field f=SettingsIcons.class.getDeclaredField("resolvedIcons");f.setAccessible(true);check(((android.util.SparseIntArray)f.get(null)).size()<=128);

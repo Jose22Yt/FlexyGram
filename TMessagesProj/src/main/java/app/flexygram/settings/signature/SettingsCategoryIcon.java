@@ -8,16 +8,21 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import org.telegram.messenger.AndroidUtilities;
 
-/** Theme-tinted settings glyph: no colour tile, layers, animation or per-frame allocation. */
+/** Settings glyph factory: approved duotone or the original tinted fallback; no icon tile. */
 public final class SettingsCategoryIcon extends Drawable implements Drawable.Callback, app.flexygram.icons.IconPressFeedback.Target {
     private final Drawable glyph;
     public boolean isStandalone() { return true; }
     @Override public void setIconPressScale(float scale) {}
     public static Drawable create(Context context, int resource) {
-        return resource <= 0 ? null : new SettingsCategoryIcon(context, resource);
+        return create(context, resource, (org.telegram.ui.ActionBar.Theme.ResourcesProvider)null);
     }
     public static Drawable create(Context context, int resource, int top, int bottom) {
         return create(context, resource);
+    }
+    public static Drawable create(Context context, int resource, org.telegram.ui.ActionBar.Theme.ResourcesProvider provider) {
+        if (resource <= 0) return null;
+        Drawable duotone = DuotoneSettingsIcon.create(context, resource, provider);
+        return duotone != null ? duotone : new SettingsCategoryIcon(context, resource);
     }
     private SettingsCategoryIcon(Context context, int resource) {
         Drawable source = context.getDrawable(resource);

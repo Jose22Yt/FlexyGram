@@ -83,8 +83,13 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
     private final ArrayList<Integer> stableDividerIds = new ArrayList<>();
     private int nextDividerId = DIVIDER_ID_BASE;
 
+    @Override public java.util.ArrayList<org.telegram.ui.ActionBar.ThemeDescription> getThemeDescriptions() {
+        return app.flexygram.settings.signature.SettingsTheme.bind(this, listView, super.getThemeDescriptions());
+    }
+
     @Override
     public View createView(Context context) {
+        setResourceProvider(app.flexygram.settings.signature.SettingsTheme.wrap(getResourceProvider()));
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         actionBar.setAllowOverlayTitle(true);
         actionBar.setTitle(getString(R.string.OEAppNavigation));
@@ -98,7 +103,7 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
         });
 
         final FrameLayout contentView = new FrameLayout(context);
-        contentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
+        contentView.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
 
         listView = new UniversalRecyclerView(this, this::fillItems, this::onItemClick, this::onItemLongClick);
         app.flexygram.settings.signature.SettingsCardLists.apply(listView, getResourceProvider());
@@ -109,7 +114,9 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
         listView.listenReorder(this::onReordered);
         listView.setReorderClampToSection(true);
         contentView.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        actionBar.setAdaptiveBackground(listView);
+        actionBar.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
+        actionBar.setDrawGlassTitle(false);
+        actionBar.doNotDrawGlassMenu = true;
 
         // Кнопка сброса раскладки меню: появляется, только когда раскладка отличается
         // от дефолтной, и гаснет обратно после сброса.

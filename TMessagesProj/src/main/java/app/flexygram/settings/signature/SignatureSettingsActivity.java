@@ -70,7 +70,7 @@ public class SignatureSettingsActivity extends SignatureMatteSettingsActivity {
         @Override protected boolean isSectionContent(int type){return type==ENTRY;}
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,int type){
             View v;if(type==ENTRY)v=new Settings2Cell(parent.getContext(),resourcesProvider,true);
-            else{TextView t=new TextView(parent.getContext());t.setTag(RecyclerListView.TAG_NOT_SECTION);t.setPadding(AndroidUtilities.dp(20),AndroidUtilities.dp(12),AndroidUtilities.dp(20),AndroidUtilities.dp(6));t.setTextSize(12);t.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);v=t;}
+            else{TextView t=new TextView(parent.getContext());t.setTag(RecyclerListView.TAG_NOT_SECTION);t.setPadding(AndroidUtilities.dp(14),AndroidUtilities.dp(8),AndroidUtilities.dp(14),AndroidUtilities.dp(4));t.setTextSize(12);t.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);v=t;}
             v.setLayoutParams(new RecyclerView.LayoutParams(-1,-2));return new RecyclerListView.Holder(v);
         }
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder,int p,boolean partial){

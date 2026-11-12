@@ -42,7 +42,10 @@ public class Probe {
    int card=SettingsCardStyle.surface(page,page);
    if(card==page||(card>>>24)!=255)throw new AssertionError("card disappeared into page");
   }
-  if(SettingsCardStyle.surface(0xff22313f,0xff151f28)!=0xff22313f)throw new AssertionError("unnecessary palette change");
-  if(SettingsCardStyle.ICON!=36||SettingsCardStyle.GAP!=4)throw new AssertionError("compact sizing");
+  if(SettingsCardStyle.surface(0xffffffff,0xffeeeeee,0xff33aa33,false)!=0xffffffff)throw new AssertionError("light palette changed");
+  int green=SettingsCardStyle.surface(0xff000000,0xff000000,0xff00ff00,true);
+  int blue=SettingsCardStyle.surface(0xff000000,0xff000000,0xff0000ff,true);
+  if(green==blue||green==0xff000000||blue==0xff000000)throw new AssertionError("accent charcoal missing");
+  if(SettingsCardStyle.ICON!=22||SettingsCardStyle.GAP!=4)throw new AssertionError("compact sizing");
  }
 }'''}, [JAVA/'app/flexygram/settings/signature/SettingsCardStyle.java'])

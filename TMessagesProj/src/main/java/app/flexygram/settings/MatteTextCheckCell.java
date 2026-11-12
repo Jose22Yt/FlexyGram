@@ -10,12 +10,13 @@ import org.telegram.ui.Cells.TextCheckCell;
 /** Native switch/ripple/state handling; descriptions grow with Android font scaling. */
 public final class MatteTextCheckCell extends TextCheckCell {
     public MatteTextCheckCell(Context context, Theme.ResourcesProvider provider) {
-        super(context, provider);
+        super(context, 16, false, provider);
         setWrapTitle(true);
+        setHeight(48);
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
             if (child instanceof TextView) {
-                ((TextView) child).setTextSize(TypedValue.COMPLEX_UNIT_SP, i == 0 ? 16 : 13);
+                ((TextView) child).setTextSize(TypedValue.COMPLEX_UNIT_SP, i == 0 ? 15 : 13);
             }
         }
     }

@@ -17,7 +17,7 @@ public final class MatteDetailSettingsCell extends TextDetailSettingsCell {
         getTextView().setSingleLine(false);
         getTextView().setMaxLines(Integer.MAX_VALUE);
         getTextView().setEllipsize(null);
-        getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         getValueTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
@@ -41,6 +41,6 @@ public final class MatteDetailSettingsCell extends TextDetailSettingsCell {
         ((FrameLayout.LayoutParams) getValueTextView().getLayoutParams()).topMargin =
                 titleParams.topMargin + title.getMeasuredHeight() + AndroidUtilities.dp(4);
         super.onMeasure(widthSpec, heightSpec);
-        setMeasuredDimension(width, Math.max(AndroidUtilities.dp(64), getMeasuredHeight()));
+        setMeasuredDimension(width, Math.max(AndroidUtilities.dp(60), getMeasuredHeight()));
     }
 }

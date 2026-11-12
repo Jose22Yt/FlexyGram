@@ -95,8 +95,8 @@ public class BaseNekoXSettingsActivity extends BaseFragment implements app.flexy
     }
     private String signatureSource,signatureRoute;
     public final void useSignatureSettingsPage(String source,String route,int title){signatureSource=source;signatureRoute=route;useSignatureSettingsPage(title,c->app.flexygram.settings.signature.SignatureLegacyExtras.accepts(c,source,route));}
-    @Override public void saveSelfArgs(android.os.Bundle args){super.saveSelfArgs(args);if(signatureSource!=null){args.putString("settings2LegacySource",signatureSource);args.putString("settings2LegacyRoute",signatureRoute);args.putInt("settings2LegacyTitle",signatureSettingsTitle);}}
-    @Override public void restoreSelfArgs(android.os.Bundle args){super.restoreSelfArgs(args);String source=args.getString("settings2LegacySource");if(source!=null)useSignatureSettingsPage(source,args.getString("settings2LegacyRoute"),args.getInt("settings2LegacyTitle"));}
+    @Override public void saveSelfArgs(android.os.Bundle args){super.saveSelfArgs(args);args.putBoolean("settingsMonetPresentation",usesSolidSettingsSurfaces());if(signatureSource!=null){args.putString("settings2LegacySource",signatureSource);args.putString("settings2LegacyRoute",signatureRoute);args.putInt("settings2LegacyTitle",signatureSettingsTitle);}}
+    @Override public void restoreSelfArgs(android.os.Bundle args){super.restoreSelfArgs(args);if(args.getBoolean("settingsMonetPresentation",false))setResourceProvider(app.flexygram.settings.signature.SettingsTheme.wrap(getResourceProvider()));String source=args.getString("settings2LegacySource");if(source!=null)useSignatureSettingsPage(source,args.getString("settings2LegacyRoute"),args.getInt("settings2LegacyTitle"));}
     public final boolean settings3HasRow(String key){return rowMap.containsKey(key);}
     public final String getSignatureSettingsRoute(){return signatureRoute;}
     public final int getSignatureSearchGuid(){if(signatureRoute==null)return 0;int id=app.flexygram.settings.signature.SignatureSettingsRegistry.searchGuid(signatureRoute+"_"+signatureSource);return id!=0?id:app.flexygram.settings.signature.SignatureSettingsRegistry.searchGuid(signatureRoute);}
@@ -109,6 +109,9 @@ public class BaseNekoXSettingsActivity extends BaseFragment implements app.flexy
     protected HashMap<Integer, String> rowMapReverse = new HashMap<>(20);
     protected HashMap<Integer, ConfigItem> rowConfigMapReverse = new HashMap<>(20);
 
+    protected boolean usesSolidSettingsSurfaces() {
+        return isSignatureSettingsPage() || getResourceProvider() instanceof app.flexygram.settings.signature.SettingsTheme;
+    }
     protected BlurredRecyclerView createListView(Context context) {
         var list = new app.exteraless.appearance.SectionCardRecyclerView(context);
         list.setCardResourcesProvider(getResourceProvider());
@@ -124,9 +127,10 @@ public class BaseNekoXSettingsActivity extends BaseFragment implements app.flexy
 
     @Override
     public View createView(Context context) {
+        if (usesSolidSettingsSurfaces()) setResourceProvider(app.flexygram.settings.signature.SettingsTheme.wrap(getResourceProvider()));
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         actionBar.setTitle(isSignatureSettingsPage()?getString(signatureSettingsTitle):getTitle());
-        if(isSignatureSettingsPage()){actionBar.centerTitle();actionBar.setDrawGlassTitle(false);actionBar.doNotDrawGlassMenu=true;}
+        if(usesSolidSettingsSurfaces()){actionBar.centerTitle();actionBar.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));actionBar.setDrawGlassTitle(false);actionBar.doNotDrawGlassMenu=true;}
 
         if (AndroidUtilities.isTablet()) {
             actionBar.setOccupyStatusBar(false);
@@ -157,14 +161,14 @@ public class BaseNekoXSettingsActivity extends BaseFragment implements app.flexy
         itemAnimator.setDelayAnimations(false);
         itemAnimator.setSupportsChangeAnimations(false);
 
-        listView.setItemAnimator(isSignatureSettingsPage()?null:itemAnimator);
+        listView.setItemAnimator(usesSolidSettingsSurfaces()?null:itemAnimator);
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT));
 
         tooltip = new UndoView(context);
         frameLayout.addView(tooltip, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.LEFT, 8, 0, 8, 8));
 
         listView.setSections(true);
-        if(!isSignatureSettingsPage())actionBar.setAdaptiveBackground(listView);
+        if(!usesSolidSettingsSurfaces())actionBar.setAdaptiveBackground(listView);
         return fragmentView;
     }
 
@@ -457,7 +461,7 @@ public class BaseNekoXSettingsActivity extends BaseFragment implements app.flexy
         themeDescriptions.add(new ThemeDescription(listView, 0, new Class[]{TextDetailSettingsCell.class}, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText));
         themeDescriptions.add(new ThemeDescription(listView, 0, new Class[]{TextDetailSettingsCell.class}, new String[]{"valueTextView"}, null, null, null, Theme.key_windowBackgroundWhiteGrayText2));
 
-        return themeDescriptions;
+        return app.flexygram.settings.signature.SettingsTheme.bind(this, listView, themeDescriptions);
     }
 
     protected class BaseListAdapter extends RecyclerListView.SelectionAdapter implements app.flexygram.settings.signature.SettingsSectionTypes {
@@ -544,12 +548,12 @@ public class BaseNekoXSettingsActivity extends BaseFragment implements app.flexy
         protected View createDefaultViewByType(int viewType) {
             return switch (viewType) {
                 case CellGroup.ITEM_TYPE_DIVIDER -> new ShadowSectionCell(mContext);
-                case CellGroup.ITEM_TYPE_TEXT_SETTINGS_CELL -> isSignatureSettingsPage()?new app.flexygram.settings.MatteTextSettingsCell(mContext,getResourceProvider()):new TextSettingsCell(mContext);
-                case CellGroup.ITEM_TYPE_TEXT_CHECK -> isSignatureSettingsPage()?new app.flexygram.settings.MatteTextCheckCell(mContext,getResourceProvider()):new TextCheckCell(mContext);
+                case CellGroup.ITEM_TYPE_TEXT_SETTINGS_CELL -> usesSolidSettingsSurfaces()?new app.flexygram.settings.MatteTextSettingsCell(mContext,getResourceProvider()):new TextSettingsCell(mContext);
+                case CellGroup.ITEM_TYPE_TEXT_CHECK -> usesSolidSettingsSurfaces()?new app.flexygram.settings.MatteTextCheckCell(mContext,getResourceProvider()):new TextCheckCell(mContext);
                 case CellGroup.ITEM_TYPE_HEADER -> { HeaderCell header=new HeaderCell(mContext); header.setTag(RecyclerListView.TAG_NOT_SECTION); yield header; }
-                case CellGroup.ITEM_TYPE_TEXT_DETAIL -> isSignatureSettingsPage()?new app.flexygram.settings.MatteDetailSettingsCell(mContext):new TextDetailSettingsCell(mContext);
+                case CellGroup.ITEM_TYPE_TEXT_DETAIL -> usesSolidSettingsSurfaces()?new app.flexygram.settings.MatteDetailSettingsCell(mContext):new TextDetailSettingsCell(mContext);
                 case CellGroup.ITEM_TYPE_TEXT -> new TextInfoPrivacyCell(mContext);
-                case CellGroup.ITEM_TYPE_TEXT_CHECK_ICON -> isSignatureSettingsPage()
+                case CellGroup.ITEM_TYPE_TEXT_CHECK_ICON -> usesSolidSettingsSurfaces()
                         ? new app.exteraless.settings.utils.CompactSettingsTextCell(mContext,getResourceProvider()) : new TextCell(mContext);
                 default -> null;
             };

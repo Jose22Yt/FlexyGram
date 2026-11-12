@@ -15,7 +15,9 @@ public final class SettingsCardBackground {
     public void setResourcesProvider(Theme.ResourcesProvider provider) { this.provider=provider; }
     public void draw(Canvas canvas, RectF rect, float topRadius, float bottomRadius, float alpha) {
         int color=SettingsCardStyle.surface(Theme.getColor(Theme.key_windowBackgroundWhite,provider),
-                Theme.getColor(Theme.key_windowBackgroundGray,provider));
+                Theme.getColor(Theme.key_windowBackgroundGray,provider),
+                Theme.getColor(Theme.key_windowBackgroundWhiteBlueHeader,provider),
+                provider == null ? Theme.isCurrentThemeDark() : provider.isDark());
         paint.setColor(Theme.multAlpha(color,alpha));
         if(topRadius==bottomRadius)canvas.drawRoundRect(rect,topRadius,topRadius,paint);
         else {

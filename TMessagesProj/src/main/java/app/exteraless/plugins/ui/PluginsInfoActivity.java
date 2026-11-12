@@ -57,8 +57,13 @@ public class PluginsInfoActivity extends BaseFragment {
 
     private UniversalRecyclerView listView;
 
+    @Override public java.util.ArrayList<org.telegram.ui.ActionBar.ThemeDescription> getThemeDescriptions() {
+        return app.flexygram.settings.signature.SettingsTheme.bind(this, listView, super.getThemeDescriptions());
+    }
+
     @Override
     public View createView(Context context) {
+        setResourceProvider(app.flexygram.settings.signature.SettingsTheme.wrap(getResourceProvider()));
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         actionBar.setAllowOverlayTitle(true);
         actionBar.setTitle(getString(R.string.PluginsEngineTitle));
@@ -72,14 +77,16 @@ public class PluginsInfoActivity extends BaseFragment {
         });
 
         FrameLayout contentView = new FrameLayout(context);
-        contentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
+        contentView.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
 
         listView = new UniversalRecyclerView(this, this::fillItems, this::onItemClick, null);
         app.flexygram.settings.signature.SettingsCardLists.apply(listView, getResourceProvider());
         listView.adapter.setApplyBackground(false);
         contentView.addView(listView,
                 LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        actionBar.setAdaptiveBackground(listView);
+        actionBar.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
+        actionBar.setDrawGlassTitle(false);
+        actionBar.doNotDrawGlassMenu = true;
 
         fragmentView = contentView;
         return fragmentView;

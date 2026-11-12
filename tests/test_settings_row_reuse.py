@@ -25,12 +25,12 @@ def test_settings_row_reuses_drawables_and_updates_theme_geometry_resources(tmp_
         'android/graphics/drawable/InsetDrawable.java': '''package android.graphics.drawable; public class InsetDrawable {
             public static int instances; public int gap; public InsetDrawable(Object d,int a,int b,int c,int g){instances++;gap=g;}}''',
         'Probe.java': '''public class Probe {
-            static class Theme {static int key_windowBackgroundGray=0,key_windowBackgroundWhite=1,key_listSelector=2;
-                static int[] colors={1,2,3};static int getColor(int k,Object p){return colors[k];}}
-            static class SettingsCardStyle {static int OUTER_RADIUS=28,INNER_RADIUS=6;static int surface(int a,int b){return a+b;}}
-            static class SettingsCategoryIcon {static int creates;static Object create(Object c,int r){creates++;return r<=0?null:new Object();}}
+            static class Theme {static int key_windowBackgroundGray=0,key_windowBackgroundWhite=1,key_listSelector=2,key_windowBackgroundWhiteBlueHeader=3;static boolean isCurrentThemeDark(){return true;}
+                static int[] colors={1,2,3,4};static int getColor(int k,Object p){return colors[k];}}
+            static class SettingsCardStyle {static int OUTER_RADIUS=20,INNER_RADIUS=6,GAP=4;static int surface(int a,int b,int c,boolean dark){return a+b;}}
+            static class SettingsCategoryIcon {static int creates;static Object create(Object c,int r,Object provider){creates++;return r<=0?null:new Object();}}
             static class Icon {Object drawable;void setImageDrawable(Object d){drawable=d;}}
-            final Icon icon=new Icon();Object provider,background;int sets;boolean first,last;float density=1;
+            final Icon icon=new Icon();static class Provider {boolean isDark(){return true;}}Provider provider;Object background;int sets;boolean first,last;float density=1;
             android.content.res.Resources resources=new android.content.res.Resources();
             android.content.res.Resources getResources(){return resources;}Object getContext(){return this;}
             int dp(float v){return Math.round(v*density);}Object getBackground(){return background;}
@@ -44,11 +44,11 @@ def test_settings_row_reuses_drawables_and_updates_theme_geometry_resources(tmp_
                 check(p.background==bg&&p.sets==1&&p.icon.drawable==icon&&SettingsCategoryIcon.creates==1);
                 check(android.graphics.drawable.GradientDrawable.instances==2&&p.cardFill.radii==1&&p.cardFill.colors==1);
                 check(android.graphics.drawable.RippleDrawable.instances==1&&android.graphics.drawable.InsetDrawable.instances==1);
-                p.first=true;p.updateCard();check(p.cardFill.corners[0]==28&&p.cardFill.corners[7]==6);
-                p.last=true;p.updateCard();check(p.cardMask.corners[7]==28&&p.background==bg);
+                p.first=true;p.updateCard();check(p.cardFill.corners[0]==20&&p.cardFill.corners[7]==6);
+                p.last=true;p.updateCard();check(p.cardMask.corners[7]==20&&p.background==bg);
                 Theme.colors[1]=100;Theme.colors[2]=200;p.updateCard();
                 check(p.cardFill.color==101&&p.cardRipple.color==200&&p.background==bg);
-                p.density=2;p.updateCard();check(p.cardFill.corners[0]==56&&p.cardBackground.gap==8);
+                p.density=2;p.updateCard();check(p.cardFill.corners[0]==40&&p.cardBackground.gap==8);
                 p.background=null;p.updateCard();check(p.background==p.cardBackground);
                 p.bindIcon(43);check(p.icon.drawable!=icon);p.bindIcon(0);check(p.icon.drawable==null);
                 p.bindIcon(42);icon=p.icon.drawable;p.resources.config.version++;p.bindIcon(42);check(p.icon.drawable!=icon);

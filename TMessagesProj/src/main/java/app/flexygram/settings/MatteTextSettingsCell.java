@@ -21,8 +21,8 @@ public final class MatteTextSettingsCell extends TextSettingsCell {
 
     public MatteTextSettingsCell(Context context, Theme.ResourcesProvider provider) {
         super(context, provider);
-        getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        getValueTextView().setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14,
+        getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        getValueTextView().setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 13,
                 getResources().getDisplayMetrics()));
     }
 
@@ -46,7 +46,7 @@ public final class MatteTextSettingsCell extends TextSettingsCell {
     protected void onMeasure(int widthSpec, int heightSpec) {
         TextView title = getTextView();
         AnimatedTextView value = getValueTextView();
-        inset = AndroidUtilities.dp(21);
+        inset = AndroidUtilities.dp(16);
         gap = AndroidUtilities.dp(8);
         int width = MeasureSpec.getSize(widthSpec);
         int available = Math.max(0, width - inset * 2);
@@ -62,8 +62,8 @@ public final class MatteTextSettingsCell extends TextSettingsCell {
         int valueHeight = hasValue ? (int) Math.ceil(title.getLineHeight()) : 0;
         value.measure(MeasureSpec.makeMeasureSpec(stacked ? available : Math.min(available, valueWidth), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(valueHeight, MeasureSpec.EXACTLY));
-        int height = MatteSettingsLayout.rowHeight(AndroidUtilities.dp(50), title.getMeasuredHeight(),
-                stacked ? valueHeight : 0, AndroidUtilities.dp(12), AndroidUtilities.dp(4));
+        int height = MatteSettingsLayout.rowHeight(AndroidUtilities.dp(48), title.getMeasuredHeight(),
+                stacked ? valueHeight : 0, AndroidUtilities.dp(10), AndroidUtilities.dp(4));
         setMeasuredDimension(width, height + (needDivider ? 1 : 0));
     }
 
@@ -74,7 +74,7 @@ public final class MatteTextSettingsCell extends TextSettingsCell {
         AnimatedTextView value = getValueTextView();
         boolean rtl = LocaleController.isRTL;
         int contentHeight = getMeasuredHeight() - (needDivider ? 1 : 0);
-        int titleTop = stacked ? AndroidUtilities.dp(12) : (contentHeight - title.getMeasuredHeight()) / 2;
+        int titleTop = stacked ? AndroidUtilities.dp(10) : (contentHeight - title.getMeasuredHeight()) / 2;
         int titleLeft = rtl ? getMeasuredWidth() - inset - title.getMeasuredWidth() : inset;
         title.layout(titleLeft, titleTop, titleLeft + title.getMeasuredWidth(), titleTop + title.getMeasuredHeight());
         int gravity = (stacked ? (rtl ? Gravity.RIGHT : Gravity.LEFT) : (rtl ? Gravity.LEFT : Gravity.RIGHT)) | Gravity.CENTER_VERTICAL;

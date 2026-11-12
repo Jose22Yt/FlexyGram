@@ -64,7 +64,7 @@ public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsAct
                 tw.nekomimi.nekogram.ui.cells.HeaderCell header = (tw.nekomimi.nekogram.ui.cells.HeaderCell) holder.itemView;
                 header.setTextColor(matteHeaderColor());
                 if (header.getTextView() != null) {
-                    header.getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+                    header.getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
                     header.getTextView().setSingleLine(false);
                     header.getTextView().setMaxLines(Integer.MAX_VALUE);
                 }
@@ -72,7 +72,7 @@ public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsAct
             if (holder.itemView instanceof org.telegram.ui.Cells.CheckBoxCell) {
                 org.telegram.ui.Cells.CheckBoxCell cell = (org.telegram.ui.Cells.CheckBoxCell) holder.itemView;
                 cell.setMultiline(true);
-                if (cell.getTextView() != null) cell.getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                if (cell.getTextView() != null) cell.getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
             }
 
         }

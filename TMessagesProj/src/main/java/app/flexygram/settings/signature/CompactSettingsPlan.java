@@ -8,51 +8,51 @@ final class CompactSettingsPlan {
         Page(String id,int title,int icon){this.id=id;this.title=title;this.icon=icon;}
     }
     private static final Page[] HOME={
-        new Page("list",R.string.CompactList,R.drawable.fg_ios_original_chat_context_menu_list),
-        new Page("pills",R.string.CompactPills,R.drawable.fg_ios_original_chat_context_menu_tagfilter),
-        new Page("avatars",R.string.CompactAvatars,R.drawable.fg_ios_original_chat_context_menu_user),
-        new Page("folders",R.string.CompactFolders,R.drawable.fg_ios_original_chat_context_menu_folder),
-        new Page("visible",R.string.CompactVisible,R.drawable.fg_ios_original_chat_context_menu_eyelocked),
-        new Page("extras",R.string.CompactExtras,R.drawable.fg_ios_original_chat_context_menu_palette)
+        new Page("list",R.string.CompactList,R.drawable.fg_dm_lista_titulo),
+        new Page("pills",R.string.CompactPills,R.drawable.fg_dm_mini_pildoras),
+        new Page("avatars",R.string.CompactAvatars,R.drawable.fg_dm_avatares),
+        new Page("folders",R.string.CompactFolders,R.drawable.fg_dm_carpetas),
+        new Page("visible",R.string.CompactVisible,R.drawable.fg_dm_elementos_visibles),
+        new Page("extras",R.string.CompactExtras,R.drawable.fg_dm_apariencia)
     };
     private static final Page[] CHAT={
-        new Page("messages",R.string.CompactMessages,R.drawable.fg_ios_original_chat_context_menu_message),
-        new Page("menus",R.string.CompactMenus,R.drawable.fg_ios_original_chat_context_menu_list),
-        new Page("media",R.string.CompactMedia,R.drawable.fg_ios_original_chat_context_menu_videocall),
-        new Page("stickers",R.string.CompactStickers,R.drawable.fg_ios_original_chat_context_menu_sticker),
-        new Page("glare",R.string.CompactGlare,R.drawable.fg_ios_original_media_editor_blur),
-        new Page("members",R.string.CompactMembers,R.drawable.fg_ios_original_chat_context_menu_groups),
-        new Page("conversion",R.string.CompactConversion,R.drawable.fg_ios_original_chat_context_menu_replace),
-        new Page("animations",R.string.CompactAnimations,R.drawable.fg_ios_original_chat_context_menu_timer)
+        new Page("messages",R.string.CompactMessages,R.drawable.fg_dm_mensajes),
+        new Page("menus",R.string.CompactMenus,R.drawable.fg_dm_menus_acciones),
+        new Page("media",R.string.CompactMedia,R.drawable.fg_dm_fotos_video_voz),
+        new Page("stickers",R.string.CompactStickers,R.drawable.fg_dm_stickers_emoji),
+        new Page("glare",R.string.CompactGlare,R.drawable.fg_dm_bordes_reflejos),
+        new Page("members",R.string.CompactMembers,R.drawable.fg_dm_miembros),
+        new Page("conversion",R.string.CompactConversion,R.drawable.fg_dm_conversiones),
+        new Page("animations",R.string.CompactAnimations,R.drawable.fg_dm_animaciones)
     };
     private static final Page[] UNIVERSAL={
-        new Page("general",R.string.CompactBehavior,R.drawable.fg_ios_original_chat_context_menu_settings),
-        new Page("network",R.string.CompactNetwork,R.drawable.fg_ios_original_chat_context_menu_browser),
-        new Page("notifications",R.string.CompactNotifications,R.drawable.fg_ios_original_chat_context_menu_unmute),
-        new Page("maps",R.string.CompactMaps,R.drawable.fg_ios_original_location_sendlocationicon),
-        new Page("profile",R.string.CompactProfile,R.drawable.fg_ios_original_chat_context_menu_user),
-        new Page("archive",R.string.CompactArchive,R.drawable.fg_ios_original_chat_context_menu_archive),
-        new Page("fonts",R.string.CompactFonts,R.drawable.fg_ios_original_media_editor_addtext),
-        new Page("effects",R.string.CompactEffects,R.drawable.fg_ios_original_media_editor_blur),
-        new Page("launcher",R.string.CompactLauncher,R.drawable.fg_ios_original_location_homeicon),
-        new Page("advanced",R.string.CompactAdvanced,R.drawable.fg_ios_original_chat_context_menu_eyelocked),
-        new Page("extras",R.string.CompactSystemExtras,R.drawable.fg_ios_original_chat_context_menu_more)
+        new Page("general",R.string.CompactBehavior,R.drawable.fg_dm_general),
+        new Page("network",R.string.CompactNetwork,R.drawable.fg_dm_red_velocidad),
+        new Page("notifications",R.string.CompactNotifications,R.drawable.fg_dm_notificaciones),
+        new Page("maps",R.string.CompactMaps,R.drawable.fg_dm_mapas),
+        new Page("profile",R.string.CompactProfile,R.drawable.fg_dm_contactos),
+        new Page("archive",R.string.CompactArchive,R.drawable.fg_dm_archivo),
+        new Page("fonts",R.string.CompactFonts,R.drawable.fg_dm_fuentes),
+        new Page("effects",R.string.CompactEffects,R.drawable.fg_dm_superficies_efectos),
+        new Page("launcher",R.string.CompactLauncher,R.drawable.fg_dm_icono_app),
+        new Page("advanced",R.string.CompactAdvanced,R.drawable.fg_dm_privacidad),
+        new Page("extras",R.string.CompactSystemExtras,R.drawable.fg_dm_opciones_extra)
     };
     private static final Page[] NAVIGATION={
-        new Page("tabs",R.string.CompactTabs,R.drawable.fg_ios_original_chat_context_menu_reorderitems),
-        new Page("controls",R.string.CompactNavigationControls,R.drawable.fg_ios_original_chat_context_menu_settings),
-        new Page("gestures",R.string.CompactGestures,R.drawable.fg_ios_original_chat_context_menu_reply),
-        new Page("extras",R.string.CompactNavigationExtras,R.drawable.fg_ios_original_chat_context_menu_more)
+        new Page("tabs",R.string.CompactTabs,R.drawable.fg_dm_barra_inferior),
+        new Page("controls",R.string.CompactNavigationControls,R.drawable.fg_dm_comportamiento),
+        new Page("gestures",R.string.CompactGestures,R.drawable.fg_dm_gestos),
+        new Page("extras",R.string.CompactNavigationExtras,R.drawable.fg_dm_mas_opciones)
     };
     private static final Page[] AYU={
-        new Page("ghost",R.string.CompactGhost,R.drawable.fg_ios_original_chat_context_menu_eyelocked),
-        new Page("privacy",R.string.CompactStoryPrivacy,R.drawable.fg_ios_original_chat_context_menu_touchid),
-        new Page("saving",R.string.CompactHistory,R.drawable.fg_ios_original_chat_context_menu_archive),
-        new Page("tools",R.string.CompactHistoryTools,R.drawable.fg_ios_original_chat_context_menu_settings),
-        new Page("maintenance",R.string.CompactMaintenance,R.drawable.fg_ios_original_chat_context_menu_delete)
+        new Page("ghost",R.string.CompactGhost,R.drawable.fg_dm_modo_fantasma),
+        new Page("privacy",R.string.CompactStoryPrivacy,R.drawable.fg_dm_privacidad_historias),
+        new Page("saving",R.string.CompactHistory,R.drawable.fg_dm_guardado_historial),
+        new Page("tools",R.string.CompactHistoryTools,R.drawable.fg_dm_filtros_transferencia),
+        new Page("maintenance",R.string.CompactMaintenance,R.drawable.fg_dm_mantenimiento)
     };
     private static final Page[] PLUGINS={
-        new Page("translation",R.string.CompactTranslation,R.drawable.fg_ios_original_chat_context_menu_caption)
+        new Page("translation",R.string.CompactTranslation,R.drawable.fg_dm_traduccion)
     };
     static boolean hasOverview(String category){return category.equals("home")||category.equals("chat")||category.equals("universal")||category.equals("navigation")||category.equals("ayu")||category.equals("plugins");}
     static Page[] pages(String category){

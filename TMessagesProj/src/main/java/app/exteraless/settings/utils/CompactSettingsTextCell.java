@@ -5,11 +5,14 @@ import android.content.Context;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.TextCell;
 
-/** Settings-only navigation rows: 36dp theme-tinted glyphs, without changing touch targets. */
+/** Settings-only navigation rows: 22dp duotone glyphs, without changing touch targets. */
 public class CompactSettingsTextCell extends TextCell {
+    private final Theme.ResourcesProvider settingsProvider;
 
     public CompactSettingsTextCell(Context context, Theme.ResourcesProvider resourcesProvider) {
         super(context, resourcesProvider);
+        settingsProvider = resourcesProvider;
+        textView.setTextSize(15);
     }
 
     @Override
@@ -38,7 +41,7 @@ public class CompactSettingsTextCell extends TextCell {
 
     @Override
     public void setColorfulIcon(int top, int bottom, int icon) {
-        imageView.setImageDrawable(app.flexygram.settings.signature.SettingsCategoryIcon.create(getContext(),SettingsIcons.resolve(getContext(),icon),top,bottom));
+        imageView.setImageDrawable(app.flexygram.settings.signature.SettingsCategoryIcon.create(getContext(),SettingsIcons.resolve(getContext(),icon), settingsProvider));
         imageView.setBackground(null);
     }
 
@@ -46,9 +49,10 @@ public class CompactSettingsTextCell extends TextCell {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // Binding and recycling reset TextCell's icon flags. Normalize after binding,
         // before its measurement, so large intrinsic drawables cannot enlarge the icon.
+        heightDp = 48;
         setIsIcon(false);
-        setImageLeft(20);
-        setOffsetFromImage(72);
+        setImageLeft(14);
+        setOffsetFromImage(50);
         imageView.setBackground(null);
         imageView.setPadding(0, 0, 0, 0);
         imageView.setTranslationX(0);
@@ -58,7 +62,7 @@ public class CompactSettingsTextCell extends TextCell {
     }
 
     private void styleIcon(int resource){
-        imageView.setImageDrawable(app.flexygram.settings.signature.SettingsCategoryIcon.create(getContext(),SettingsIcons.resolve(getContext(),resource)));
+        imageView.setImageDrawable(app.flexygram.settings.signature.SettingsCategoryIcon.create(getContext(),SettingsIcons.resolve(getContext(),resource), settingsProvider));
         imageView.setBackground(null);
     }
 }

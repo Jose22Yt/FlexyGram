@@ -144,8 +144,13 @@ public class PluginSettingsActivity extends BasePreferencesActivity {
     private final Runnable reloadListener = this::rebuildFromEngine;
     private ActionBarMenuItem resetItem;
 
+    @Override public java.util.ArrayList<org.telegram.ui.ActionBar.ThemeDescription> getThemeDescriptions() {
+        return app.flexygram.settings.signature.SettingsTheme.bind(this, listView, super.getThemeDescriptions());
+    }
+
     @Override
     public View createView(Context context) {
+        setResourceProvider(app.flexygram.settings.signature.SettingsTheme.wrap(getResourceProvider()));
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         actionBar.setAllowOverlayTitle(true);
         actionBar.setTitle(getTitle());
@@ -159,7 +164,7 @@ public class PluginSettingsActivity extends BasePreferencesActivity {
         });
 
         final FrameLayout contentView = new FrameLayout(context);
-        contentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
+        contentView.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
 
         // Список наполняет обёртка, а не сам fillItems: строка разрешений должна
         // пережить хук плагина, а хук срабатывает на возврате из fillItems.
@@ -170,7 +175,9 @@ public class PluginSettingsActivity extends BasePreferencesActivity {
         layoutManager = (LinearLayoutManager) listView.getLayoutManager();
         contentView.addView(listView,
                 LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        actionBar.setAdaptiveBackground(listView);
+        actionBar.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
+        actionBar.setDrawGlassTitle(false);
+        actionBar.doNotDrawGlassMenu = true;
 
         // Кнопка сброса — как у exteraGram: только на корневом экране плагина и
         // только когда есть что сбрасывать.

@@ -22,7 +22,7 @@ def test_settings_icons_size_theme_and_recycling():
 
     stubs = {
         "android.util.SparseIntArray": "public class SparseIntArray {private java.util.Map<Integer,Integer> data=new java.util.HashMap<>();public int get(int k,int d){return data.getOrDefault(k,d);}public void put(int k,int v){data.put(k,v);}public void clear(){data.clear();}public int size(){return data.size();}}",
-        "app.flexygram.settings.signature.SettingsCategoryIcon": "public class SettingsCategoryIcon {public static Integer create(android.content.Context c,int r){return r;}public static Integer create(android.content.Context c,int r,int t,int b){return r;}}",
+        "app.flexygram.settings.signature.SettingsCategoryIcon": "public class SettingsCategoryIcon {public static Integer create(android.content.Context c,int r){return r;}public static Integer create(android.content.Context c,int r,org.telegram.ui.ActionBar.Theme.ResourcesProvider p){return r;}public static Integer create(android.content.Context c,int r,int t,int b){return r;}}",
         "org.telegram.messenger.AndroidUtilities": "public class AndroidUtilities {public static int dp(float n){return (int)Math.ceil(n);}}",
         "android.view.View": "public class View {public static class MeasureSpec {public static final int EXACTLY=1073741824;public static int makeMeasureSpec(int s,int m){return s|m;}public static int getSize(int s){return s&0x3fffffff;}}}",
         "android.graphics.Canvas": "public class Canvas {}",
@@ -50,7 +50,7 @@ def test_settings_icons_size_theme_and_recycling():
                 public Object getColorFilter(){return filter;}public void setColorFilter(Object f){filter=f;}
             }
             public final Icon imageView=new Icon();public boolean isIcon;public int imageLeft,offset,width;
-            public CharSequence title,value;private android.content.Context context;
+            public int heightDp; public static class Label{public void setTextSize(int v){}}public final Label textView=new Label();public CharSequence title,value;private android.content.Context context;
             public TextCell(android.content.Context c,org.telegram.ui.ActionBar.Theme.ResourcesProvider r){context=c;}
             public android.content.Context getContext(){return context;}
             public void setIsIcon(boolean value){isIcon=value;}
@@ -64,7 +64,8 @@ def test_settings_icons_size_theme_and_recycling():
             protected void dispatchDraw(android.graphics.Canvas c){}
         }""",
     }
-    values = ";".join(f"public static int {path.stem}={i+1}" for i, path in enumerate(resources)) + ";"
+    names = sorted(set(path.stem for path in resources) | set(path.stem for path in (root / "res/drawable-nodpi").glob("fg_dm_*.png")))
+    values = ";".join(f"public static int {name}={i+1}" for i, name in enumerate(names)) + ";"
     stubs["org.telegram.messenger.R"] = "public class R {public static class drawable {" + values + "}}"
     harness = """
 import android.content.Context;
@@ -79,14 +80,14 @@ public class SettingsIconsRegression extends CompactSettingsTextCell {
     public static void main(String[] args){
         SettingsIconsRegression cell=new SettingsIconsRegression();
         cell.setTextAndIcon("Conversaciones",1000,true);cell.onMeasure(360,64);cell.dispatchDraw(new Canvas());
-        require(cell.imageView.resource==R.drawable.fg_settings_chat,"replace known category with outline icon");
-        require(cell.imageView.size==36&&cell.imageLeft==20&&cell.offset==72,"normalize native colour tiles after binding");
+        require(cell.imageView.resource==R.drawable.fg_dm_conversaciones,"replace known category with outline icon");
+        require(cell.imageView.size==22&&cell.imageLeft==14&&cell.offset==50,"normalize native colour tiles after binding");
         require(cell.imageView.background==null&&cell.imageView.padding==0,"avoid duplicate image backgrounds and padding");
         Theme.foreground=0xfff1f3f5;cell.dispatchDraw(new Canvas());
-        require(cell.imageView.resource==R.drawable.fg_settings_chat,"theme changes preserve the assigned native tile");
+        require(cell.imageView.resource==R.drawable.fg_dm_conversaciones,"theme changes preserve the assigned native tile");
         cell.setTextAndValueAndIcon("Copias","Configurado",false,1001,true);
         cell.onMeasure(360,64);cell.dispatchDraw(new Canvas());
-        require(cell.imageView.size==36&&cell.imageView.resource==R.drawable.fg_settings_cloud,"recycling restores the semantic tile");
+        require(cell.imageView.size==22&&cell.imageView.resource==R.drawable.fg_dm_nube,"recycling restores the semantic tile");
         require("Configurado".contentEquals(cell.value),"preserve setting values");
         cell.setTextAndIcon("Plugin",1002,false);require(cell.imageView.resource==1002,"preserve unfamiliar plugin icon semantics");
         require(SettingsIcons.resolve(new Context(),0)==0,"retain absent icons");

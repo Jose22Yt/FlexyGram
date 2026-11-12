@@ -39,6 +39,7 @@ final class Settings3LinksSection extends SignatureMatteSettingsActivity {
             case "cloud":f=new app.exteraless.settings.OpenExteraCloudActivity();break;
             default:throw new IllegalArgumentException("Unknown specialized manager");
         }
+        f.setResourceProvider(SettingsTheme.wrap(getResourceProvider()));
         presentFragment(f);
     }
     @Override protected BaseListAdapter createAdapter(Context context){return new MatteListAdapter(context){

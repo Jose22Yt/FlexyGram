@@ -122,8 +122,8 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
         signatureRows=new app.flexygram.settings.signature.Settings2Policy.Rows(source,route);
         signatureTitle=title;signatureSource=source;signatureRoute=route;
     }
-    @Override public void saveSelfArgs(android.os.Bundle args){super.saveSelfArgs(args);if(signatureSource!=null){args.putString("settings2Source",signatureSource);args.putString("settings2Route",signatureRoute);args.putInt("settings2Title",signatureTitle);}}
-    @Override public void restoreSelfArgs(android.os.Bundle args){super.restoreSelfArgs(args);String source=args.getString("settings2Source");if(source!=null){useSignatureSettingsPage(source,args.getString("settings2Route"),args.getInt("settings2Title"));updateRows();}}
+    @Override public void saveSelfArgs(android.os.Bundle args){super.saveSelfArgs(args);args.putBoolean("settingsMonetPresentation",usesSolidSettingsSurfaces());if(signatureSource!=null){args.putString("settings2Source",signatureSource);args.putString("settings2Route",signatureRoute);args.putInt("settings2Title",signatureTitle);}}
+    @Override public void restoreSelfArgs(android.os.Bundle args){super.restoreSelfArgs(args);if(args.getBoolean("settingsMonetPresentation",false))setResourceProvider(app.flexygram.settings.signature.SettingsTheme.wrap(getResourceProvider()));String source=args.getString("settings2Source");if(source!=null){useSignatureSettingsPage(source,args.getString("settings2Route"),args.getInt("settings2Title"));updateRows();}}
     protected final boolean isSignatureSettingsPage(){return signatureRows!=null;}
     private String signaturePageTitle(){return signatureTitle!=0?getString(signatureTitle):getActionBarTitle();}
 
@@ -143,6 +143,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
 
     @Override
     public View createView(Context context) {
+        if (usesSolidSettingsSurfaces()) resourcesProvider = app.flexygram.settings.signature.SettingsTheme.wrap(resourcesProvider);
         fragmentView = usesSolidSettingsSurfaces() ? new SizeNotifierFrameLayout(context) : new BlurContentView(context);
         fragmentView.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
         SizeNotifierFrameLayout frameLayout = (SizeNotifierFrameLayout) fragmentView;
@@ -192,7 +193,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
         // Тень-elevation форсируется в SectionCardRecyclerView.drawBackgroundRect.
         // При sectionRadius == 0 — стоковый плоский вид (карточки визуально отсутствуют).
         listView.setSections(dp(isSignatureSettingsPage()?16:12), dp((isSettings3Embedded()||isSignatureSettingsPage())?20:app.exteraless.appearance.AppearanceConfig.sectionRadius()), true);
-        if(isSignatureSettingsPage())listView.setItemAnimator(null);
+        if(usesSolidSettingsSurfaces())listView.setItemAnimator(null);
         setupAdaptiveBackground();
         return fragmentView;
     }
@@ -207,9 +208,10 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
 
     @Override
     public ActionBar createActionBar(Context context) {
+        if (usesSolidSettingsSurfaces()) resourcesProvider = app.flexygram.settings.signature.SettingsTheme.wrap(resourcesProvider);
         ActionBar actionBar = super.createActionBar(context);
         if (hasWhiteActionBar()) {
-            actionBar.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
+            actionBar.setBackgroundColor(getThemedColor(usesSolidSettingsSurfaces() ? Theme.key_windowBackgroundGray : Theme.key_windowBackgroundWhite));
             actionBar.setItemsColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText), false);
             actionBar.setTitleColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
             actionBar.setCastShadows(false);
@@ -244,7 +246,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
      */
     /** Opt-in presentation only; existing settings screens retain their original pipeline. */
     protected boolean usesSolidSettingsSurfaces() {
-        return settings3Embedded || isSignatureSettingsPage();
+        return settings3Embedded || isSignatureSettingsPage() || resourcesProvider instanceof app.flexygram.settings.signature.SettingsTheme;
     }
 
     protected app.exteraless.appearance.SectionCardRecyclerView createSettingsList(Context context) {
@@ -254,11 +256,11 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
     }
 
     protected boolean needActionBarBlur() {
-        return !isSignatureSettingsPage();
+        return !usesSolidSettingsSurfaces();
     }
 
     protected void setupAdaptiveBackground() {
-        if(isSignatureSettingsPage()){actionBar.setDrawGlassTitle(false);actionBar.doNotDrawGlassMenu=true;}
+        if(usesSolidSettingsSurfaces()){actionBar.setDrawGlassTitle(false);actionBar.doNotDrawGlassMenu=true;}
         else actionBar.setAdaptiveBackground(listView);
     }
 
@@ -295,9 +297,11 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
             colors.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_AB_TITLECOLOR, null, null, null, null, Theme.key_windowBackgroundWhiteBlackText));
         }
         ThemeDescription.ThemeDescriptionDelegate invalidate = () -> {
+            if (usesSolidSettingsSurfaces()) app.flexygram.settings.signature.SettingsTheme.refresh(fragmentView, actionBar, listView, resourcesProvider);
             if (listView != null) listView.invalidateViews();
             if (fragmentView != null) fragmentView.invalidate();
         };
+        colors.add(new ThemeDescription(listView, 0, null, null, null, invalidate, Theme.key_windowBackgroundWhiteBlueHeader));
         colors.add(new ThemeDescription(listView, ThemeDescription.FLAG_SELECTOR, null, null, null, invalidate, Theme.key_listSelector));
         colors.add(new ThemeDescription(listView, 0, new Class[]{View.class}, Theme.dividerPaint, null, invalidate, Theme.key_divider));
         colors.add(new ThemeDescription(listView,0,new Class[]{app.flexygram.settings.signature.Settings2Cell.class},new String[]{"title"},null,null,null,Theme.key_windowBackgroundWhiteBlackText));
@@ -453,6 +457,10 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
         return signaturePageTitle();
     }
 
+    @Override public void setResourceProvider(Theme.ResourcesProvider provider) {
+        super.setResourceProvider(provider);
+        resourcesProvider = provider;
+    }
     @Override
     public Theme.ResourcesProvider getResourceProvider() {
         return resourcesProvider;
@@ -608,11 +616,11 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
                     view = new ShadowSectionCell(mContext, resourcesProvider);
                     break;
                 case TYPE_SETTINGS:
-                    view = isSignatureSettingsPage()?new app.flexygram.settings.MatteTextSettingsCell(mContext,resourcesProvider):new TextSettingsCell(mContext, resourcesProvider);
+                    view = usesSolidSettingsSurfaces()?new app.flexygram.settings.MatteTextSettingsCell(mContext,resourcesProvider):new TextSettingsCell(mContext, resourcesProvider);
                     view.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
                     break;
                 case TYPE_CHECK:
-                    view = isSignatureSettingsPage()?new app.flexygram.settings.MatteTextCheckCell(mContext,resourcesProvider):new TextCheckCell(mContext, resourcesProvider);
+                    view = usesSolidSettingsSurfaces()?new app.flexygram.settings.MatteTextCheckCell(mContext,resourcesProvider):new TextCheckCell(mContext, resourcesProvider);
                     ((TextCheckCell) view).setWrapTitle(true);
                     view.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
                     break;
@@ -639,7 +647,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
                     view.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
                     break;
                 case TYPE_DETAIL_SETTINGS:
-                    view = isSignatureSettingsPage()?new app.flexygram.settings.MatteDetailSettingsCell(mContext):new TextDetailSettingsCell(mContext);
+                    view = usesSolidSettingsSurfaces()?new app.flexygram.settings.MatteDetailSettingsCell(mContext):new TextDetailSettingsCell(mContext);
                     view.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
                     break;
                 case TYPE_INFO_PRIVACY:

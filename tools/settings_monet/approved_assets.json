@@ -1,0 +1,1192 @@
+[
+  {
+    "drawable": "fg_dm_abrir_archivo",
+    "coverage": "fg_dm_abrir_archivo_coverage",
+    "bounds": [
+      48,
+      57,
+      176,
+      168
+    ],
+    "size": [
+      128,
+      111
+    ]
+  },
+  {
+    "drawable": "fg_dm_acerca_de",
+    "coverage": "fg_dm_acerca_de_coverage",
+    "bounds": [
+      55,
+      56,
+      168,
+      167
+    ],
+    "size": [
+      113,
+      111
+    ]
+  },
+  {
+    "drawable": "fg_dm_animaciones",
+    "coverage": "fg_dm_animaciones_coverage",
+    "bounds": [
+      65,
+      56,
+      159,
+      167
+    ],
+    "size": [
+      94,
+      111
+    ]
+  },
+  {
+    "drawable": "fg_dm_apariencia",
+    "coverage": "fg_dm_apariencia_coverage",
+    "bounds": [
+      48,
+      61,
+      175,
+      163
+    ],
+    "size": [
+      127,
+      102
+    ]
+  },
+  {
+    "drawable": "fg_dm_aplicar_estilo",
+    "coverage": "fg_dm_aplicar_estilo_coverage",
+    "bounds": [
+      60,
+      62,
+      165,
+      162
+    ],
+    "size": [
+      105,
+      100
+    ]
+  },
+  {
+    "drawable": "fg_dm_archivo",
+    "coverage": "fg_dm_archivo_coverage",
+    "bounds": [
+      62,
+      72,
+      160,
+      151
+    ],
+    "size": [
+      98,
+      79
+    ]
+  },
+  {
+    "drawable": "fg_dm_avatares",
+    "coverage": "fg_dm_avatares_coverage",
+    "bounds": [
+      56,
+      57,
+      167,
+      167
+    ],
+    "size": [
+      111,
+      110
+    ]
+  },
+  {
+    "drawable": "fg_dm_ayuda",
+    "coverage": "fg_dm_ayuda_coverage",
+    "bounds": [
+      60,
+      62,
+      164,
+      161
+    ],
+    "size": [
+      104,
+      99
+    ]
+  },
+  {
+    "drawable": "fg_dm_ayumoments",
+    "coverage": "fg_dm_ayumoments_coverage",
+    "bounds": [
+      48,
+      71,
+      176,
+      153
+    ],
+    "size": [
+      128,
+      82
+    ]
+  },
+  {
+    "drawable": "fg_dm_barra_inferior",
+    "coverage": "fg_dm_barra_inferior_coverage",
+    "bounds": [
+      44,
+      86,
+      179,
+      138
+    ],
+    "size": [
+      135,
+      52
+    ]
+  },
+  {
+    "drawable": "fg_dm_bordes_reflejos",
+    "coverage": "fg_dm_bordes_reflejos_coverage",
+    "bounds": [
+      72,
+      66,
+      151,
+      158
+    ],
+    "size": [
+      79,
+      92
+    ]
+  },
+  {
+    "drawable": "fg_dm_borrador",
+    "coverage": "fg_dm_borrador_coverage",
+    "bounds": [
+      53,
+      60,
+      171,
+      164
+    ],
+    "size": [
+      118,
+      104
+    ]
+  },
+  {
+    "drawable": "fg_dm_burbujas",
+    "coverage": "fg_dm_burbujas_coverage",
+    "bounds": [
+      46,
+      64,
+      178,
+      159
+    ],
+    "size": [
+      132,
+      95
+    ]
+  },
+  {
+    "drawable": "fg_dm_buscar",
+    "coverage": "fg_dm_buscar_coverage",
+    "bounds": [
+      72,
+      74,
+      152,
+      150
+    ],
+    "size": [
+      80,
+      76
+    ]
+  },
+  {
+    "drawable": "fg_dm_carpeta_superior",
+    "coverage": "fg_dm_carpeta_superior_coverage",
+    "bounds": [
+      47,
+      62,
+      177,
+      162
+    ],
+    "size": [
+      130,
+      100
+    ]
+  },
+  {
+    "drawable": "fg_dm_carpetas",
+    "coverage": "fg_dm_carpetas_coverage",
+    "bounds": [
+      48,
+      66,
+      175,
+      158
+    ],
+    "size": [
+      127,
+      92
+    ]
+  },
+  {
+    "drawable": "fg_dm_cerrar",
+    "coverage": "fg_dm_cerrar_coverage",
+    "bounds": [
+      65,
+      65,
+      158,
+      158
+    ],
+    "size": [
+      93,
+      93
+    ]
+  },
+  {
+    "drawable": "fg_dm_codigo_acceso",
+    "coverage": "fg_dm_codigo_acceso_coverage",
+    "bounds": [
+      71,
+      67,
+      153,
+      156
+    ],
+    "size": [
+      82,
+      89
+    ]
+  },
+  {
+    "drawable": "fg_dm_compartir",
+    "coverage": "fg_dm_compartir_coverage",
+    "bounds": [
+      72,
+      74,
+      151,
+      150
+    ],
+    "size": [
+      79,
+      76
+    ]
+  },
+  {
+    "drawable": "fg_dm_comportamiento",
+    "coverage": "fg_dm_comportamiento_coverage",
+    "bounds": [
+      73,
+      74,
+      150,
+      149
+    ],
+    "size": [
+      77,
+      75
+    ]
+  },
+  {
+    "drawable": "fg_dm_comprimir_zip",
+    "coverage": "fg_dm_comprimir_zip_coverage",
+    "bounds": [
+      55,
+      61,
+      168,
+      162
+    ],
+    "size": [
+      113,
+      101
+    ]
+  },
+  {
+    "drawable": "fg_dm_configuracion_completa",
+    "coverage": "fg_dm_configuracion_completa_coverage",
+    "bounds": [
+      67,
+      63,
+      157,
+      161
+    ],
+    "size": [
+      90,
+      98
+    ]
+  },
+  {
+    "drawable": "fg_dm_confirmar",
+    "coverage": "fg_dm_confirmar_coverage",
+    "bounds": [
+      58,
+      71,
+      166,
+      152
+    ],
+    "size": [
+      108,
+      81
+    ]
+  },
+  {
+    "drawable": "fg_dm_contactos",
+    "coverage": "fg_dm_contactos_coverage",
+    "bounds": [
+      67,
+      71,
+      157,
+      152
+    ],
+    "size": [
+      90,
+      81
+    ]
+  },
+  {
+    "drawable": "fg_dm_conversaciones",
+    "coverage": "fg_dm_conversaciones_coverage",
+    "bounds": [
+      57,
+      67,
+      167,
+      157
+    ],
+    "size": [
+      110,
+      90
+    ]
+  },
+  {
+    "drawable": "fg_dm_conversiones",
+    "coverage": "fg_dm_conversiones_coverage",
+    "bounds": [
+      55,
+      63,
+      169,
+      160
+    ],
+    "size": [
+      114,
+      97
+    ]
+  },
+  {
+    "drawable": "fg_dm_descargas",
+    "coverage": "fg_dm_descargas_coverage",
+    "bounds": [
+      55,
+      64,
+      169,
+      160
+    ],
+    "size": [
+      114,
+      96
+    ]
+  },
+  {
+    "drawable": "fg_dm_deshacer",
+    "coverage": "fg_dm_deshacer_coverage",
+    "bounds": [
+      55,
+      74,
+      168,
+      149
+    ],
+    "size": [
+      113,
+      75
+    ]
+  },
+  {
+    "drawable": "fg_dm_desplegar",
+    "coverage": "fg_dm_desplegar_coverage",
+    "bounds": [
+      57,
+      77,
+      167,
+      146
+    ],
+    "size": [
+      110,
+      69
+    ]
+  },
+  {
+    "drawable": "fg_dm_documento",
+    "coverage": "fg_dm_documento_coverage",
+    "bounds": [
+      66,
+      62,
+      157,
+      162
+    ],
+    "size": [
+      91,
+      100
+    ]
+  },
+  {
+    "drawable": "fg_dm_editor_navegacion",
+    "coverage": "fg_dm_editor_navegacion_coverage",
+    "bounds": [
+      49,
+      83,
+      176,
+      141
+    ],
+    "size": [
+      127,
+      58
+    ]
+  },
+  {
+    "drawable": "fg_dm_elementos_visibles",
+    "coverage": "fg_dm_elementos_visibles_coverage",
+    "bounds": [
+      43,
+      69,
+      180,
+      154
+    ],
+    "size": [
+      137,
+      85
+    ]
+  },
+  {
+    "drawable": "fg_dm_emoji",
+    "coverage": "fg_dm_emoji_coverage",
+    "bounds": [
+      67,
+      68,
+      156,
+      156
+    ],
+    "size": [
+      89,
+      88
+    ]
+  },
+  {
+    "drawable": "fg_dm_enviar_copia_chat",
+    "coverage": "fg_dm_enviar_copia_chat_coverage",
+    "bounds": [
+      46,
+      61,
+      177,
+      162
+    ],
+    "size": [
+      131,
+      101
+    ]
+  },
+  {
+    "drawable": "fg_dm_exportar",
+    "coverage": "fg_dm_exportar_coverage",
+    "bounds": [
+      67,
+      79,
+      157,
+      145
+    ],
+    "size": [
+      90,
+      66
+    ]
+  },
+  {
+    "drawable": "fg_dm_filtros_transferencia",
+    "coverage": "fg_dm_filtros_transferencia_coverage",
+    "bounds": [
+      62,
+      76,
+      162,
+      148
+    ],
+    "size": [
+      100,
+      72
+    ]
+  },
+  {
+    "drawable": "fg_dm_flexyfiles",
+    "coverage": "fg_dm_flexyfiles_coverage",
+    "bounds": [
+      56,
+      64,
+      167,
+      159
+    ],
+    "size": [
+      111,
+      95
+    ]
+  },
+  {
+    "drawable": "fg_dm_flexystudio",
+    "coverage": "fg_dm_flexystudio_coverage",
+    "bounds": [
+      51,
+      63,
+      173,
+      160
+    ],
+    "size": [
+      122,
+      97
+    ]
+  },
+  {
+    "drawable": "fg_dm_fotos_video_voz",
+    "coverage": "fg_dm_fotos_video_voz_coverage",
+    "bounds": [
+      49,
+      73,
+      174,
+      150
+    ],
+    "size": [
+      125,
+      77
+    ]
+  },
+  {
+    "drawable": "fg_dm_fuentes",
+    "coverage": "fg_dm_fuentes_coverage",
+    "bounds": [
+      63,
+      79,
+      161,
+      145
+    ],
+    "size": [
+      98,
+      66
+    ]
+  },
+  {
+    "drawable": "fg_dm_general",
+    "coverage": "fg_dm_general_coverage",
+    "bounds": [
+      67,
+      68,
+      157,
+      155
+    ],
+    "size": [
+      90,
+      87
+    ]
+  },
+  {
+    "drawable": "fg_dm_gestos",
+    "coverage": "fg_dm_gestos_coverage",
+    "bounds": [
+      56,
+      85,
+      167,
+      139
+    ],
+    "size": [
+      111,
+      54
+    ]
+  },
+  {
+    "drawable": "fg_dm_guardado_historial",
+    "coverage": "fg_dm_guardado_historial_coverage",
+    "bounds": [
+      76,
+      74,
+      147,
+      149
+    ],
+    "size": [
+      71,
+      75
+    ]
+  },
+  {
+    "drawable": "fg_dm_guardar",
+    "coverage": "fg_dm_guardar_coverage",
+    "bounds": [
+      56,
+      61,
+      167,
+      163
+    ],
+    "size": [
+      111,
+      102
+    ]
+  },
+  {
+    "drawable": "fg_dm_icono_app",
+    "coverage": "fg_dm_icono_app_coverage",
+    "bounds": [
+      69,
+      71,
+      154,
+      153
+    ],
+    "size": [
+      85,
+      82
+    ]
+  },
+  {
+    "drawable": "fg_dm_importar",
+    "coverage": "fg_dm_importar_coverage",
+    "bounds": [
+      66,
+      77,
+      157,
+      146
+    ],
+    "size": [
+      91,
+      69
+    ]
+  },
+  {
+    "drawable": "fg_dm_informacion",
+    "coverage": "fg_dm_informacion_coverage",
+    "bounds": [
+      62,
+      62,
+      161,
+      161
+    ],
+    "size": [
+      99,
+      99
+    ]
+  },
+  {
+    "drawable": "fg_dm_inteligencia_artificial",
+    "coverage": "fg_dm_inteligencia_artificial_coverage",
+    "bounds": [
+      61,
+      71,
+      162,
+      153
+    ],
+    "size": [
+      101,
+      82
+    ]
+  },
+  {
+    "drawable": "fg_dm_interfaz_inferior",
+    "coverage": "fg_dm_interfaz_inferior_coverage",
+    "bounds": [
+      16,
+      83,
+      208,
+      141
+    ],
+    "size": [
+      192,
+      58
+    ]
+  },
+  {
+    "drawable": "fg_dm_interfaz_superior",
+    "coverage": "fg_dm_interfaz_superior_coverage",
+    "bounds": [
+      21,
+      82,
+      202,
+      141
+    ],
+    "size": [
+      181,
+      59
+    ]
+  },
+  {
+    "drawable": "fg_dm_lista_titulo",
+    "coverage": "fg_dm_lista_titulo_coverage",
+    "bounds": [
+      46,
+      65,
+      178,
+      159
+    ],
+    "size": [
+      132,
+      94
+    ]
+  },
+  {
+    "drawable": "fg_dm_mantenimiento",
+    "coverage": "fg_dm_mantenimiento_coverage",
+    "bounds": [
+      70,
+      71,
+      153,
+      154
+    ],
+    "size": [
+      83,
+      83
+    ]
+  },
+  {
+    "drawable": "fg_dm_mapas",
+    "coverage": "fg_dm_mapas_coverage",
+    "bounds": [
+      64,
+      68,
+      159,
+      157
+    ],
+    "size": [
+      95,
+      89
+    ]
+  },
+  {
+    "drawable": "fg_dm_mas_acciones",
+    "coverage": "fg_dm_mas_acciones_coverage",
+    "bounds": [
+      61,
+      84,
+      162,
+      139
+    ],
+    "size": [
+      101,
+      55
+    ]
+  },
+  {
+    "drawable": "fg_dm_mas_opciones",
+    "coverage": "fg_dm_mas_opciones_coverage",
+    "bounds": [
+      62,
+      82,
+      161,
+      142
+    ],
+    "size": [
+      99,
+      60
+    ]
+  },
+  {
+    "drawable": "fg_dm_mensajes",
+    "coverage": "fg_dm_mensajes_coverage",
+    "bounds": [
+      31,
+      70,
+      193,
+      154
+    ],
+    "size": [
+      162,
+      84
+    ]
+  },
+  {
+    "drawable": "fg_dm_menu_mensajes",
+    "coverage": "fg_dm_menu_mensajes_coverage",
+    "bounds": [
+      56,
+      63,
+      167,
+      160
+    ],
+    "size": [
+      111,
+      97
+    ]
+  },
+  {
+    "drawable": "fg_dm_menus_acciones",
+    "coverage": "fg_dm_menus_acciones_coverage",
+    "bounds": [
+      44,
+      71,
+      179,
+      153
+    ],
+    "size": [
+      135,
+      82
+    ]
+  },
+  {
+    "drawable": "fg_dm_miembros",
+    "coverage": "fg_dm_miembros_coverage",
+    "bounds": [
+      52,
+      68,
+      172,
+      154
+    ],
+    "size": [
+      120,
+      86
+    ]
+  },
+  {
+    "drawable": "fg_dm_mini_pildoras",
+    "coverage": "fg_dm_mini_pildoras_coverage",
+    "bounds": [
+      45,
+      68,
+      178,
+      155
+    ],
+    "size": [
+      133,
+      87
+    ]
+  },
+  {
+    "drawable": "fg_dm_modo_fantasma",
+    "coverage": "fg_dm_modo_fantasma_coverage",
+    "bounds": [
+      70,
+      71,
+      153,
+      151
+    ],
+    "size": [
+      83,
+      80
+    ]
+  },
+  {
+    "drawable": "fg_dm_navegacion",
+    "coverage": "fg_dm_navegacion_coverage",
+    "bounds": [
+      63,
+      63,
+      161,
+      160
+    ],
+    "size": [
+      98,
+      97
+    ]
+  },
+  {
+    "drawable": "fg_dm_notificaciones",
+    "coverage": "fg_dm_notificaciones_coverage",
+    "bounds": [
+      71,
+      68,
+      152,
+      156
+    ],
+    "size": [
+      81,
+      88
+    ]
+  },
+  {
+    "drawable": "fg_dm_nube",
+    "coverage": "fg_dm_nube_coverage",
+    "bounds": [
+      55,
+      76,
+      169,
+      148
+    ],
+    "size": [
+      114,
+      72
+    ]
+  },
+  {
+    "drawable": "fg_dm_opciones_extra",
+    "coverage": "fg_dm_opciones_extra_coverage",
+    "bounds": [
+      61,
+      70,
+      162,
+      153
+    ],
+    "size": [
+      101,
+      83
+    ]
+  },
+  {
+    "drawable": "fg_dm_packs_iconos",
+    "coverage": "fg_dm_packs_iconos_coverage",
+    "bounds": [
+      67,
+      69,
+      156,
+      153
+    ],
+    "size": [
+      89,
+      84
+    ]
+  },
+  {
+    "drawable": "fg_dm_pantalla_principal",
+    "coverage": "fg_dm_pantalla_principal_coverage",
+    "bounds": [
+      59,
+      64,
+      164,
+      160
+    ],
+    "size": [
+      105,
+      96
+    ]
+  },
+  {
+    "drawable": "fg_dm_pillstack",
+    "coverage": "fg_dm_pillstack_coverage",
+    "bounds": [
+      69,
+      69,
+      155,
+      154
+    ],
+    "size": [
+      86,
+      85
+    ]
+  },
+  {
+    "drawable": "fg_dm_plugins",
+    "coverage": "fg_dm_plugins_coverage",
+    "bounds": [
+      62,
+      60,
+      162,
+      164
+    ],
+    "size": [
+      100,
+      104
+    ]
+  },
+  {
+    "drawable": "fg_dm_plugins_herramientas",
+    "coverage": "fg_dm_plugins_herramientas_coverage",
+    "bounds": [
+      70,
+      72,
+      153,
+      152
+    ],
+    "size": [
+      83,
+      80
+    ]
+  },
+  {
+    "drawable": "fg_dm_privacidad",
+    "coverage": "fg_dm_privacidad_coverage",
+    "bounds": [
+      67,
+      65,
+      156,
+      158
+    ],
+    "size": [
+      89,
+      93
+    ]
+  },
+  {
+    "drawable": "fg_dm_privacidad_historias",
+    "coverage": "fg_dm_privacidad_historias_coverage",
+    "bounds": [
+      66,
+      74,
+      157,
+      150
+    ],
+    "size": [
+      91,
+      76
+    ]
+  },
+  {
+    "drawable": "fg_dm_red_velocidad",
+    "coverage": "fg_dm_red_velocidad_coverage",
+    "bounds": [
+      63,
+      69,
+      160,
+      154
+    ],
+    "size": [
+      97,
+      85
+    ]
+  },
+  {
+    "drawable": "fg_dm_reemplazar",
+    "coverage": "fg_dm_reemplazar_coverage",
+    "bounds": [
+      55,
+      67,
+      169,
+      156
+    ],
+    "size": [
+      114,
+      89
+    ]
+  },
+  {
+    "drawable": "fg_dm_rehacer",
+    "coverage": "fg_dm_rehacer_coverage",
+    "bounds": [
+      52,
+      74,
+      171,
+      149
+    ],
+    "size": [
+      119,
+      75
+    ]
+  },
+  {
+    "drawable": "fg_dm_restablecer",
+    "coverage": "fg_dm_restablecer_coverage",
+    "bounds": [
+      63,
+      66,
+      160,
+      157
+    ],
+    "size": [
+      97,
+      91
+    ]
+  },
+  {
+    "drawable": "fg_dm_sangria",
+    "coverage": "fg_dm_sangria_coverage",
+    "bounds": [
+      41,
+      70,
+      183,
+      153
+    ],
+    "size": [
+      142,
+      83
+    ]
+  },
+  {
+    "drawable": "fg_dm_sistema",
+    "coverage": "fg_dm_sistema_coverage",
+    "bounds": [
+      59,
+      63,
+      165,
+      160
+    ],
+    "size": [
+      106,
+      97
+    ]
+  },
+  {
+    "drawable": "fg_dm_stickers_emoji",
+    "coverage": "fg_dm_stickers_emoji_coverage",
+    "bounds": [
+      60,
+      66,
+      164,
+      158
+    ],
+    "size": [
+      104,
+      92
+    ]
+  },
+  {
+    "drawable": "fg_dm_superficies_efectos",
+    "coverage": "fg_dm_superficies_efectos_coverage",
+    "bounds": [
+      62,
+      71,
+      162,
+      153
+    ],
+    "size": [
+      100,
+      82
+    ]
+  },
+  {
+    "drawable": "fg_dm_traduccion",
+    "coverage": "fg_dm_traduccion_coverage",
+    "bounds": [
+      64,
+      70,
+      159,
+      154
+    ],
+    "size": [
+      95,
+      84
+    ]
+  },
+  {
+    "drawable": "fg_dm_traductor",
+    "coverage": "fg_dm_traductor_coverage",
+    "bounds": [
+      52,
+      71,
+      172,
+      152
+    ],
+    "size": [
+      120,
+      81
+    ]
+  },
+  {
+    "drawable": "fg_dm_validar",
+    "coverage": "fg_dm_validar_coverage",
+    "bounds": [
+      63,
+      60,
+      161,
+      164
+    ],
+    "size": [
+      98,
+      104
+    ]
+  },
+  {
+    "drawable": "fg_dm_vista_html",
+    "coverage": "fg_dm_vista_html_coverage",
+    "bounds": [
+      61,
+      59,
+      162,
+      164
+    ],
+    "size": [
+      101,
+      105
+    ]
+  },
+  {
+    "drawable": "fg_dm_volver",
+    "coverage": "fg_dm_volver_coverage",
+    "bounds": [
+      68,
+      79,
+      157,
+      144
+    ],
+    "size": [
+      89,
+      65
+    ]
+  }
+]

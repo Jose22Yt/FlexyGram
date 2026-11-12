@@ -1,0 +1,72 @@
+package app.flexygram.settings.signature;
+import static org.junit.Assert.*;
+import org.junit.Test;import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;import org.robolectric.annotation.GraphicsMode;
+import android.content.*;import android.content.res.*;import android.util.TypedValue;
+import android.graphics.*;import android.graphics.drawable.*;import android.view.*;import java.io.*;
+import org.telegram.messenger.R;import org.telegram.ui.ActionBar.Theme;
+@RunWith(RobolectricTestRunner.class) @Config(sdk=35,manifest=Config.NONE) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class NativeMonetTest {
+ static class IconResources extends Resources {
+  int reads;
+  IconResources(){super(RuntimeEnvironment.getApplication().getAssets(),RuntimeEnvironment.getApplication().getResources().getDisplayMetrics(),RuntimeEnvironment.getApplication().getResources().getConfiguration());}
+  String file(int id){RAW_MAPPING return null;}
+  @Override public InputStream openRawResource(int id,TypedValue value){String name=file(id);if(name==null)return super.openRawResource(id,value);reads++;value.density=TypedValue.DENSITY_NONE;try{return new FileInputStream("RAW_PATH/"+name);}catch(IOException e){throw new AssertionError(e);}}
+  @Override public String getResourceEntryName(int id){DRAWABLE_MAPPING return super.getResourceEntryName(id);}
+ }
+ static class TestContext extends ContextWrapper {
+  final IconResources res=new IconResources();TestContext(){super(RuntimeEnvironment.getApplication());}
+  @Override public Resources getResources(){return res;}
+ }
+ static Bitmap render(Drawable icon){Bitmap b=Bitmap.createBitmap(66,66,Bitmap.Config.ARGB_8888);icon.setBounds(0,0,66,66);icon.draw(new Canvas(b));return b;}
+ static boolean contains(Bitmap b,int rgb){for(int y=0;y<b.getHeight();y++)for(int x=0;x<b.getWidth();x++)if(b.getPixel(x,y)==rgb)return true;return false;}
+ @Test public void twoColorsFollowLiveThemeAndIgnoreParentMonochromeTint(){
+  Theme.dark=true;Theme.accent=0xff3399ff;TestContext c=new TestContext();
+  Drawable icon=SettingsCategoryIcon.create(c,R.drawable.fg_dm_conversaciones,SettingsTheme.wrap(null));
+  assertTrue(icon instanceof DuotoneSettingsIcon);Bitmap b=render(icon);assertTrue(contains(b,0xffffffff));assertTrue(contains(b,Theme.accent));
+  icon.setColorFilter(new PorterDuffColorFilter(0xffff0000,PorterDuff.Mode.SRC_IN));b=render(icon);assertTrue(contains(b,0xffffffff));assertTrue(contains(b,Theme.accent));
+  Theme.dark=false;Theme.accent=0xffd49900;b=render(icon);assertTrue(contains(b,0xff000000));assertTrue(contains(b,Theme.accent));
+  assertEquals(22,icon.getIntrinsicWidth());
+ }
+ @Test public void steadyDrawingAndRebindingShareOneDecodeButRespectResourceIdentity(){
+  Theme.dark=true;Theme.accent=0xff66bb55;TestContext c=new TestContext();Drawable icon=SettingsCategoryIcon.create(c,R.drawable.fg_dm_ayumoments,null);
+  render(icon);assertEquals(1,c.res.reads);for(int i=0;i<1000;i++)render(icon);assertEquals(1,c.res.reads);
+  Drawable reused=SettingsCategoryIcon.create(c,R.drawable.fg_dm_ayumoments,null);render(reused);assertEquals(1,c.res.reads);
+  Theme.accent=0xff9933ee;render(icon);assertEquals(2,c.res.reads);
+  TestContext other=new TestContext();render(SettingsCategoryIcon.create(other,R.drawable.fg_dm_ayumoments,null));assertEquals(1,other.res.reads);
+ }
+ @Test public void coverageNeverLosesAlphaWhenBodyAndAccentOverlap(){
+  assertEquals(0,DuotoneSettingsIcon.tintCoverage(0,0,0xffffffff,0xff112233));
+  assertEquals(0xff0000ff,DuotoneSettingsIcon.tintCoverage(0,255,0xffffffff,0xff0000ff));
+  assertEquals(0xff000000,DuotoneSettingsIcon.tintCoverage(255,0,0xff000000,0xffff0000));
+  for(int a=0;a<256;a++)for(int split=0;split<=a;split++)assertEquals(a,DuotoneSettingsIcon.tintCoverage(split,a-split,0xffffffff,0xff556677)>>>24);
+ }
+ @Test public void paletteIsLocalAmoledPageCharcoalCardsAndTracksAccent(){
+  Theme.dark=true;Theme.accent=0xff44aa44;Theme.ResourcesProvider p=SettingsTheme.wrap(null);
+  assertSame(p,SettingsTheme.wrap(p));assertEquals(0xff000000,p.getColor(Theme.key_windowBackgroundGray));
+  int card=p.getColor(Theme.key_windowBackgroundWhite);assertNotEquals(0xff000000,card);assertTrue(Color.green(card)>Color.red(card));
+  assertEquals(0xff000000,Theme.getColor(Theme.key_windowBackgroundWhite,null));
+  Theme.accent=0xff4444ff;assertNotEquals(card,p.getColor(Theme.key_windowBackgroundWhite));
+  Theme.dark=false;assertEquals(0xffeeeeee,p.getColor(Theme.key_windowBackgroundGray));assertEquals(0xffffffff,p.getColor(Theme.key_windowBackgroundWhite));
+ }
+ @Test public void allApprovedResourcesLoadWithTheirOwnGeometryInBothModes(){
+  TestContext c=new TestContext();int[] resources={ALL_DRAWABLES};assertEquals(85,resources.length);
+  for(boolean dark:new boolean[]{true,false}){
+   Theme.dark=dark;Theme.accent=dark?0xff5577cc:0xffaa6600;
+   for(int id:resources){Drawable icon=SettingsCategoryIcon.create(c,id,SettingsTheme.wrap(null));assertTrue(icon instanceof DuotoneSettingsIcon);Bitmap bitmap=render(icon);boolean visible=false;for(int y=0;y<66;y++)for(int x=0;x<66;x++)if(Color.alpha(bitmap.getPixel(x,y))>128)visible=true;assertTrue(visible);}
+  }
+ }
+ @Test public void rowExpandsForLargeFontsRtlAndKeepsNativeClickHandling(){
+  Theme.dark=true;TestContext c=new TestContext();Settings2Cell cell=new Settings2Cell(c,SettingsTheme.wrap(null));
+  cell.bind("Conversaciones","",R.drawable.fg_dm_conversaciones,0,false);cell.setCardEdges(true,true);
+  cell.measure(View.MeasureSpec.makeMeasureSpec(340,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));cell.layout(0,0,340,cell.getMeasuredHeight());assertTrue(cell.getMeasuredHeight()>=48);
+  int compact=cell.getMeasuredHeight();
+  org.telegram.messenger.LocaleController.isRTL=true;
+  ((android.widget.TextView)cell.getChildAt(1)).setTextSize(36);
+  cell.bind("Una descripción muy larga para comprobar el tamaño ampliado y el ancho reducido", "",R.drawable.fg_dm_sistema,0,false);
+  cell.measure(View.MeasureSpec.makeMeasureSpec(240,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));cell.layout(0,0,240,cell.getMeasuredHeight());assertTrue(cell.getMeasuredHeight()>compact);
+  View icon=cell.getChildAt(0),title=cell.getChildAt(1);assertTrue(title.getRight()<icon.getLeft());
+  final boolean[] click={false};cell.setOnClickListener(v->click[0]=true);assertTrue(cell.performClick());assertTrue(click[0]);org.telegram.messenger.LocaleController.isRTL=false;
+ }
+}

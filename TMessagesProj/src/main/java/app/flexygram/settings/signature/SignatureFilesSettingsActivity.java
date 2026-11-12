@@ -26,7 +26,7 @@ public final class SignatureFilesSettingsActivity extends OpenExteraGeneralActiv
             @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){
                 if(p==filesHeader)((tw.nekomimi.nekogram.ui.cells.HeaderCell)h.itemView).setText("FlexyFiles");
                 else if(p==enabled)((TextCheckCell)h.itemView).setTextAndValueAndCheck(LocaleController.getString(R.string.FlexyFilesEnable),LocaleController.getString(app.flexygram.files.FlexyFiles.enabled()?R.string.FlexyFilesDormant:R.string.FlexyFilesDisabled),app.flexygram.files.FlexyFiles.enabled(),true,true,false);
-                else if(p==help)((Settings2Cell)h.itemView).bind(LocaleController.getString(R.string.FlexyFilesHow),"",R.drawable.msg_info,0xFF8B50DE,false);
+                else if(p==help)((Settings2Cell)h.itemView).bind(LocaleController.getString(R.string.FlexyFilesHow),"",R.drawable.fg_dm_ayuda,0xFF8B50DE,false);
                 else if(p!=shadow)original.onBindViewHolder(h,p,partial);
             }
             @Override public boolean isEnabled(RecyclerView.ViewHolder h){return h.getItemViewType()==220||original.isEnabled(h);}
