@@ -142,6 +142,7 @@ public final class SignatureSettingsRegistry {
         if("ayuMoments".equals(key))return Settings3Registry.open("ayu");
         if(key!=null&&key.startsWith("flexyScroll"))return Settings3Registry.open("home");
         if(key!=null){
+            String canonical=SignatureLegacyExtras.canonicalRouteForKey(key);if(canonical!=null)return open(canonical);
             BaseFragment extra=SignatureLegacyExtras.forKey(key);if(extra!=null)return Settings3Registry.searchPage(SignatureLegacyExtras.categoryForKey(key),SignatureLegacyExtras.routeForKey(key));
             switch(key){
                 case "dividerStyle":return new SignatureDirectSettingsActivity("home","list");

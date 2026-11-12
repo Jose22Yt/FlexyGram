@@ -161,6 +161,8 @@ public final class Settings2Policy {
         own("chats:trackingFilter", "messages");
         own("chats:transcribeHeader", "media");
         own("chats:transcribeProvider", "media");
+        own("chats:transcribeProviderOpenAI", "media");
+        own("chats:voskModels", "media");
         own("chats:unlimited", "stickers");
         own("chats:unmuteWithVolumeButtons", "media");
         own("chats:videoMessagesCamera", "media");
@@ -439,6 +441,8 @@ public final class Settings2Policy {
         ALIASES.put("chats:trackingFilter","messages");
         ALIASES.put("chats:transcribeHeader","media");
         ALIASES.put("chats:transcribeProvider","media");
+        ALIASES.put("chats:TranscribeProviderOpenAI","media");
+        ALIASES.put("chats:VoskModelsShort","media");
         ALIASES.put("chats:unlimited","stickers");
         ALIASES.put("chats:unlimitedRecentStickers","stickers");
         ALIASES.put("chats:unmuteWithVolumeButtons","media");

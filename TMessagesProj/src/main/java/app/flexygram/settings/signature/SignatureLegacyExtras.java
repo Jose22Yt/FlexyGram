@@ -9,6 +9,7 @@ import tw.nekomimi.nekogram.config.cell.*;
 public final class SignatureLegacyExtras {
     private static final Map<String,String[]> owners=new LinkedHashMap<>();
     private static final Set<String> owned=new HashSet<>();
+    private static final Map<String,String> canonicalRoutes=new LinkedHashMap<>();
     static {
         own("AlwaysShowDownloadIcon","ng","appearance_extra");
         own("ArchiveFiles","ng","advanced_extra");
@@ -246,6 +247,18 @@ public final class SignatureLegacyExtras {
         owned.add("uploadBoost");
         owned.add("useOSMDroidMap");
     }
+    static {
+        canonical("CloudflareCredentials","media");
+        canonical("LlmProviderGeminiKey","media");
+        canonical("TranscribeProviderOpenAI","media");
+        canonical("TextStyle","menus");
+        canonical("SensitiveDisableFiltering","advanced_controls");
+        canonical("EmojiSets","emoji");
+        canonical("HideReactions","visible");
+    }
+    private static void canonical(String key,String route){owned.add(key);canonicalRoutes.put(key,route);}
+    /** Existing native editor for a suppressed legacy duplicate; no preference is deleted. */
+    public static String canonicalRouteForKey(String key){return canonicalRoutes.get(key);}
     private static void own(String key,String source,String route){owners.put(key,new String[]{source,route});}
     private static String key(AbstractConfigCell cell){return cell instanceof WithKey?((WithKey)cell).getKey():null;}
     public static boolean accepts(AbstractConfigCell cell,String source,String route){
@@ -263,7 +276,7 @@ public final class SignatureLegacyExtras {
         return Settings3Registry.category(owner!=null?owner[1]:source.equals("nc")?"messages_extra":source.equals("nx")?"advanced_extra":"general_extra");
     }
     public static String routeForKey(String key){String[] owner=owners.get(key);return owner==null?"general_extra":owner[1];}
-    public static BaseFragment forKey(String key){String[] owner=owners.get(key);return owner==null?null:screen(owner[0],owner[1]);}
+    public static BaseFragment forKey(String key){if(canonicalRoutes.containsKey(key))return null;String[] owner=owners.get(key);return owner==null?null:screen(owner[0],owner[1]);}
     public static BaseFragment open(String route){
         Set<String> sources=sources(route);if(sources.size()==1)return screen(sources.iterator().next(),route);
         return new SignatureSettingsActivity(route);

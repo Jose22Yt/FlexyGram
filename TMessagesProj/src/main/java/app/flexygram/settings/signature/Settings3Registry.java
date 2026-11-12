@@ -49,6 +49,7 @@ public final class Settings3Registry {
         return CompactSettingsPlan.hasOverview(category)?new SignatureDirectSettingsActivity(category,CompactSettingsPlan.segment(category,route)):open(category);
     }
     public static BaseFragment searchTarget(BaseFragment original,String key){
+        String canonical=SignatureLegacyExtras.canonicalRouteForKey(key);if(canonical!=null)return SignatureSettingsRegistry.open(canonical);
         if("dividerStyle".equals(key)||original instanceof app.flexygram.home.HomeListSettingsActivity)return searchPage("home","chat_list");
         if(key!=null&&key.startsWith("flexyScroll"))return open("home");
         if("flexySmartPreviews".equals(key)||original instanceof app.flexygram.home.SmartPreviewsSettingsActivity)return searchPage("home","smart_previews");
