@@ -752,7 +752,7 @@ public class ReactionsLayoutInBubble {
 
         @Override
         protected boolean isPlaying() {
-            return ReactionsEffectOverlay.isPlaying(messageObject.getId(), messageObject.getGroupId(), visibleReaction);
+            return ReactionsEffectOverlay.isPlaying(ReactionsLayoutInBubble.this.currentAccount, ReactionsLayoutInBubble.this.parentView, messageObject.getId(), messageObject.getGroupId(), visibleReaction);
         }
 
         @Override
@@ -1251,6 +1251,7 @@ public class ReactionsLayoutInBubble {
             return true;
         }
 
+        private long inlineFadeTime;
         private void drawImage(Canvas canvas, Rect bounds, float alpha) {
             ImageReceiver imageReceiver = animatedEmojiDrawable != null && animatedEmojiDrawable.getImageReceiver() != null ? animatedEmojiDrawable.getImageReceiver() : this.imageReceiver;
             if (imageReceiver != null && bounds != null) {
@@ -1263,6 +1264,9 @@ public class ReactionsLayoutInBubble {
                 ImageReceiver imageReceiver2 = getImageReceiver();
                 boolean drawStaticImage = true;
                 if (imageReceiver2 != null) {
+                    long now=android.os.SystemClock.uptimeMillis();
+                    float fadeMs=inlineFadeTime==0?0:app.flexygram.reactions.ReactionMotion.elapsed(inlineFadeTime,now);
+                    inlineFadeTime=now;
                     if (imageReceiver2.getLottieAnimation() != null && imageReceiver2.getLottieAnimation().hasBitmap()) {
                         drawStaticImage = false;
                     }
@@ -1273,9 +1277,11 @@ public class ReactionsLayoutInBubble {
                             removeImageReceiver();
                         }
                     } else {
-                        if (imageReceiver2.getLottieAnimation() != null && !imageReceiver2.getLottieAnimation().isRunning()) {
+                        if (imageReceiver2.getLottieAnimation() != null && imageReceiver2.getLottieAnimation().hasBitmap()
+                                && !imageReceiver2.getLottieAnimation().isRunning()
+                                && imageReceiver2.getLottieAnimation().getCurrentFrame() >= imageReceiver2.getLottieAnimation().getFramesCount()-1) {
                             drawStaticImage = true;
-                            float alpha1 = imageReceiver2.getAlpha() - 16f / 200;
+                            float alpha1 = imageReceiver2.getAlpha() - fadeMs / 200f;
                             if (alpha1 <= 0) {
                                 imageReceiver2.onDetachedFromWindow();
                                 removeImageReceiver();

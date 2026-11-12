@@ -180,7 +180,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
     private boolean mirrorX;
     private boolean isFlippedVertically;
     private float flipVerticalProgress;
-    private long lastUpdate;
+    private final app.flexygram.reactions.ReactionMotion selectorMotion=new app.flexygram.reactions.ReactionMotion();
 
     ValueAnimator cancelPressedAnimation;
     FrameLayout premiumLockContainer;
@@ -662,8 +662,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        long dt = Math.min(16, System.currentTimeMillis() - lastUpdate);
-        lastUpdate = System.currentTimeMillis();
+        float dt = selectorMotion.tick(android.os.SystemClock.uptimeMillis());
 
         if (isFlippedVertically && flipVerticalProgress != 1f) {
             flipVerticalProgress = Math.min(1f, flipVerticalProgress + dt / 220f);
@@ -688,9 +687,9 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
             invalidate();
         }
 
-        if (pressedReaction != null && type != TYPE_MESSAGE_EFFECTS && (delegate == null || delegate.allowLongPress())) {
+        if (pressedReaction != null && cancelPressedAnimation == null && !clicked && type != TYPE_MESSAGE_EFFECTS && (delegate == null || delegate.allowLongPress())) {
             if (pressedProgress != 1f) {
-                pressedProgress += 16f / (pressedReaction.isStar ? ViewConfiguration.getLongPressTimeout() : 1500f);
+                pressedProgress += dt / (pressedReaction.isStar ? ViewConfiguration.getLongPressTimeout() : 1500f);
                 if (pressedProgress >= 1f) {
                     pressedProgress = 1f;
                 }
@@ -2395,6 +2394,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
                 } catch (Exception ignored) {}
                 pressedReactionPosition = visibleReactionsList.indexOf(currentReaction);
                 pressedReaction = currentReaction;
+                selectorMotion.reset();
                 ReactionsContainerLayout.this.invalidate();
             }
         };
@@ -2477,6 +2477,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
     }
 
     private void cancelPressed() {
+        if(cancelPressedAnimation!=null)return;
         if (pressedReaction != null) {
             cancelPressedProgress = 0f;
             float fromProgress = pressedProgress;
@@ -2484,6 +2485,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
             cancelPressedAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    if(cancelPressedAnimation!=valueAnimator)return;
                     cancelPressedProgress = (float) valueAnimator.getAnimatedValue();
                     pressedProgress = fromProgress * (1f - cancelPressedProgress);
                     ReactionsContainerLayout.this.invalidate();
@@ -2493,6 +2495,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
+                    if(cancelPressedAnimation!=animation)return;
                     cancelPressedAnimation = null;
                     pressedProgress = 0;
                     pressedReaction = null;
