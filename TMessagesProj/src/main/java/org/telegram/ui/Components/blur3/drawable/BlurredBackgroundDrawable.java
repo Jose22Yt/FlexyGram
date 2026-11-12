@@ -247,11 +247,14 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
 
         final GlassOutlineStyle outlineStyle = GlassOutlineStyle.current();
         final boolean glare = outlineStyle == GlassOutlineStyle.GLARE;
-        final boolean solid = outlineStyle == GlassOutlineStyle.SOLID;
+        final boolean micro = outlineStyle == GlassOutlineStyle.MICRO;
+        final boolean solid = outlineStyle == GlassOutlineStyle.SOLID || micro;
+        final boolean changed = boundProps.useFullStroke != solid || boundProps.microContour != micro;
+        boundProps.microContour = micro;
+        boundProps.useFullStroke = solid;
         applyOutlineWidth();
 
-        if (boundProps.useFullStroke != solid) {
-            boundProps.useFullStroke = solid;
+        if (changed) {
             boundProps.build();onBoundPropsChanged();
         }
 
@@ -265,7 +268,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         shadowColor = glare ? colorProvider.getShadowColor() : 0;
         strokeColorTop = glare ? colorProvider.getStrokeColorTop() : 0;
         strokeColorBottom = glare ? colorProvider.getStrokeColorBottom() : 0;
-        strokeColorFull = solid ? colorProvider.getStrokeColorFull() : 0;
+        strokeColorFull = micro ? org.telegram.ui.Components.blur3.MicroContourStroke.COLOR : solid ? colorProvider.getStrokeColorFull() : 0;
 
         if (colorProvider instanceof BlurredBackgroundProvider) {
             final BlurredBackgroundProvider provider = (BlurredBackgroundProvider) colorProvider;
@@ -299,6 +302,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         public float strokeWidthBottom;
         public float strokeWidthFull;
         public boolean useFullStroke = false;
+        public boolean microContour;
 
         public final Path path = new Path();
         public boolean radiiAreSame = true;
@@ -336,6 +340,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
                     boundsWithPadding.left, boundsWithPadding.top,
                     boundsWithPadding.right, boundsWithPadding.bottom,
                     tmpRadii, Path.Direction.CW);
+                if(microContour)for(int i=0;i<8;i++)tmpRadii[i]=Math.max(0,tmpRadii[i]-strokeWidthFull);
                 strokePathTop.addRoundRect(
                     boundsWithPadding.left + strokeWidthFull, boundsWithPadding.top + strokeWidthFull,
                     boundsWithPadding.right - strokeWidthFull, boundsWithPadding.bottom - strokeWidthFull,
@@ -673,8 +678,9 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
     private void applyOutlineWidth() {
         float factor = org.telegram.ui.Components.blur3.GlareStrokeWidth.factor();
         float top = baseStrokeWidthTop * factor, bottom = baseStrokeWidthBottom * factor;
-        if (boundProps.strokeWidthTop == top && boundProps.strokeWidthBottom == bottom && boundProps.strokeWidthFull == factor) return;
-        boundProps.strokeWidthTop = top;boundProps.strokeWidthBottom = bottom;boundProps.strokeWidthFull = factor;
+        float full = boundProps.microContour ? org.telegram.ui.Components.blur3.MicroContourStroke.widthPx() : factor;
+        if (boundProps.strokeWidthTop == top && boundProps.strokeWidthBottom == bottom && boundProps.strokeWidthFull == full) return;
+        boundProps.strokeWidthTop = top;boundProps.strokeWidthBottom = bottom;boundProps.strokeWidthFull = full;
         boundProps.build();onBoundPropsChanged();
     }
 
@@ -916,6 +922,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         ninePatchHashBuilder.add(withStroke);
         if (withStroke) {
             ninePatchHashBuilder.add(boundProps.useFullStroke);
+            ninePatchHashBuilder.add(boundProps.microContour);
             if (boundProps.useFullStroke) {
                 ninePatchHashBuilder.add(strokeColorFull);
                 ninePatchHashBuilder.addF(boundProps.strokeWidthFull);
@@ -968,6 +975,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
                             final Path strokePathFull = new Path();
                             strokePathFull.addRoundRect(rect.left, rect.top, rect.right, rect.bottom,
                                     tmpRadii, Path.Direction.CW);
+                            if(boundProps.microContour)for(int i=0;i<8;i++)tmpRadii[i]=Math.max(0,tmpRadii[i]-boundProps.strokeWidthFull);
                             strokePathFull.addRoundRect(
                                     rect.left + boundProps.strokeWidthFull, rect.top + boundProps.strokeWidthFull,
                                     rect.right - boundProps.strokeWidthFull, rect.bottom - boundProps.strokeWidthFull,

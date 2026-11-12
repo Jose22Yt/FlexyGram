@@ -20,7 +20,7 @@ public final class GlareSettingsSection extends SignatureMatteSettingsActivity {
     @Override public int getSearchIcon(){return R.drawable.settings3_sliders;}
     @Override public String getSearchPrefix(){return "Flexy";}
     @Override protected void updateRows(){super.updateRows();headerRow=addRow("flexyGlareHeader");typeRow=addRow("glareEffects");}
-    private String[] choices(){return new String[]{LocaleController.getString(R.string.FlexyGlareDisabled),LocaleController.getString(R.string.FlexyGlareDefault),LocaleController.getString(R.string.FlexyGlareSolid)};}
+    private String[] choices(){return new String[]{LocaleController.getString(R.string.FlexyGlareDisabled),LocaleController.getString(R.string.FlexyGlareDefault),LocaleController.getString(R.string.FlexyGlareSolid),LocaleController.getString(R.string.FlexyGlareMicro)};}
     @Override protected void onItemClick(View view,int position,float x,float y){
         if(position!=typeRow||getParentActivity()==null)return;
         showDialog(AlertsCreator.createSingleChoiceDialog(getParentActivity(),choices(),

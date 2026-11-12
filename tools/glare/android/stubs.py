@@ -21,7 +21,7 @@ def write(dest,root):
  J=root/'TMessagesProj/src/main/java'
  def emit(path,text):
   p=dest/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
- for path in ['app/flexygram/effects/GlareMode.java','app/flexygram/effects/GlareSettingsSection.java','org/telegram/ui/Components/blur3/StaticOutlineStroke.java','org/telegram/ui/Components/blur3/GlareStrokeWidth.java','org/telegram/ui/Components/blur3/GlassOutlineStyle.java','org/telegram/ui/Components/blur3/StrokeDrawable.java','tw/nekomimi/nekogram/config/ConfigItem.java']:
+ for path in ['app/flexygram/effects/GlareMode.java','app/flexygram/effects/GlareSettingsSection.java','org/telegram/ui/Components/blur3/StaticOutlineStroke.java','org/telegram/ui/Components/blur3/GlareStrokeWidth.java','org/telegram/ui/Components/blur3/MicroContourStroke.java','org/telegram/ui/Components/blur3/GlassOutlineStyle.java','org/telegram/ui/Components/blur3/StrokeDrawable.java','tw/nekomimi/nekogram/config/ConfigItem.java']:
   emit(path,(J/path).read_text())
  emit('androidx/recyclerview/widget/RecyclerView.java','''package androidx.recyclerview.widget;
 public class RecyclerView extends android.view.ViewGroup {

@@ -124,6 +124,8 @@ def test_theme_refreshes_retained_tabs_and_original_glare_key_is_preserved():
             assert current.count(getter)==1
             from test_glare_effects import without_width_extension
             current=without_width_extension(current.replace(getter,b'').decode()).encode()
+        if path.endswith('GlareMode.java'):
+            current=current.replace(b',MICRO=3',b'').replace(b'case 3:return MICRO;',b'').replace(b'case MICRO:return 3;',b'')
         assert current==subprocess.check_output(['git','show','bf96667efac14d0cbbf6677471890a366c3ef3c0:'+path],cwd=ROOT)
 
 def test_transformed_reaction_preview_does_not_use_source_row_clip():

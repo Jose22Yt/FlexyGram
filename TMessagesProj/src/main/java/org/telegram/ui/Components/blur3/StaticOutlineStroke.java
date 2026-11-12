@@ -23,24 +23,24 @@ public final class StaticOutlineStroke {
     public static boolean drawOverride(Canvas c,float l,float t,float r,float b,float radius,boolean top,Paint p,GlassOutlineStyle mode){
         if(mode==GlassOutlineStyle.GLARE)return false;
         if(skip(mode,top)||r<=l||b<=t)return true;
-        float width=Math.min(AndroidUtilities.dpf2(1)*GlareStrokeWidth.factor(),Math.min(r-l,b-t)),half=width*.5f;
-        Paint.Style style=p.getStyle();float oldWidth=p.getStrokeWidth();Shader shader=p.getShader();
-        try{p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(width);p.setShader(null);
+        float width=Math.min(mode==GlassOutlineStyle.MICRO?MicroContourStroke.widthPx():AndroidUtilities.dpf2(1)*GlareStrokeWidth.factor(),Math.min(r-l,b-t)),half=width*.5f;
+        Paint.Style style=p.getStyle();float oldWidth=p.getStrokeWidth();Shader shader=p.getShader();int oldColor=p.getColor();
+        try{p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(width);p.setShader(null);if(mode==GlassOutlineStyle.MICRO)p.setColor((Math.min(oldColor>>>24,MicroContourStroke.COLOR>>>24)<<24));
             float round=Math.max(0,Math.min(radius,Math.min(r-l,b-t)*.5f)-half);
             c.drawRoundRect(l+half,t+half,r-half,b-half,round,round,p);
-        }finally{p.setShader(shader);p.setStrokeWidth(oldWidth);p.setStyle(style);}
+        }finally{p.setShader(shader);p.setStrokeWidth(oldWidth);p.setStyle(style);p.setColor(oldColor);}
         return true;
     }
     public static boolean drawOverride(Canvas c,float l,float t,float r,float b,float[] radii,boolean top,Paint p,GlassOutlineStyle mode){
         if(mode==GlassOutlineStyle.GLARE)return false;
         if(skip(mode,top)||r<=l||b<=t)return true;
-        Scratch s=SCRATCH.get();float width=Math.min(AndroidUtilities.dpf2(1)*GlareStrokeWidth.factor(),Math.min(r-l,b-t)),half=width*.5f;
+        Scratch s=SCRATCH.get();float width=Math.min(mode==GlassOutlineStyle.MICRO?MicroContourStroke.widthPx():AndroidUtilities.dpf2(1)*GlareStrokeWidth.factor(),Math.min(r-l,b-t)),half=width*.5f;
         s.rect.set(l+half,t+half,r-half,b-half);
         for(int i=0;i<8;i++)s.radii[i]=Math.max(0,radii[i]-half);
         s.path.rewind();s.path.addRoundRect(s.rect,s.radii,Path.Direction.CW);
-        Paint.Style style=p.getStyle();float oldWidth=p.getStrokeWidth();Shader shader=p.getShader();
-        try{p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(width);p.setShader(null);c.drawPath(s.path,p);}
-        finally{p.setShader(shader);p.setStrokeWidth(oldWidth);p.setStyle(style);}
+        Paint.Style style=p.getStyle();float oldWidth=p.getStrokeWidth();Shader shader=p.getShader();int oldColor=p.getColor();
+        try{p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(width);p.setShader(null);if(mode==GlassOutlineStyle.MICRO)p.setColor((Math.min(oldColor>>>24,MicroContourStroke.COLOR>>>24)<<24));c.drawPath(s.path,p);}
+        finally{p.setShader(shader);p.setStrokeWidth(oldWidth);p.setStyle(style);p.setColor(oldColor);}
         return true;
     }
 }

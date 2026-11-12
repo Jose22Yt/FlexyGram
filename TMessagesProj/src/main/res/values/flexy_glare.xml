@@ -5,4 +5,5 @@
   <string name="FlexyGlareDisabled">Disabled</string>
   <string name="FlexyGlareDefault">Default</string>
   <string name="FlexyGlareSolid">Solid stroke</string>
+  <string name="FlexyGlareMicro">Dark micro outline</string>
 </resources>

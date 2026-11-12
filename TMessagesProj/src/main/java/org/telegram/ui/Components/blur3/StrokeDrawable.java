@@ -71,15 +71,16 @@ public class StrokeDrawable extends Drawable implements GlassOutlineStyle.Listen
             strokeColorTop = 0;
             strokeColorBottom = 0;
         }
-        strokeColorFull = outlineStyle == GlassOutlineStyle.SOLID
-            ? Theme.multAlpha(colorProvider.getStrokeColorFull(), alpha) : 0;
+        strokeColorFull = outlineStyle == GlassOutlineStyle.MICRO
+            ? Theme.multAlpha(MicroContourStroke.COLOR, alpha)
+            : outlineStyle == GlassOutlineStyle.SOLID ? Theme.multAlpha(colorProvider.getStrokeColorFull(), alpha) : 0;
 
         paintStrokeTop.setColor(strokeColorTop);
         paintStrokeTop.setStrokeWidth(dpf2(1));
         paintStrokeBottom.setColor(strokeColorBottom);
         paintStrokeBottom.setStrokeWidth(dpf2(2 / 3f));
         paintStrokeFull.setColor(strokeColorFull);
-        paintStrokeFull.setStrokeWidth(dpf2(1)*GlareStrokeWidth.factor());
+        paintStrokeFull.setStrokeWidth(outlineStyle==GlassOutlineStyle.MICRO?MicroContourStroke.widthPx():dpf2(1)*GlareStrokeWidth.factor());
     }
 
     public boolean nonRound;

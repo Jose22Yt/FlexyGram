@@ -18,6 +18,8 @@ def test_no_preference_migration_or_backend_replacement():
    getter='\n    /** Native metadata only; account/session preferences are not part of this catalog. */\n    fun getStudioItems(): List<ConfigItem> = configs.toList()\n'
    assert current.count(getter)==1
    current=without_width_extension(current.replace(getter,''))
+  if p.endswith('GlassOutlineStyle.java'):
+   current=current.replace('    HIDDEN,\n    /** Fine translucent black rim, appended to preserve existing ordinals. */\n    MICRO;', '    HIDDEN;')
   assert current==subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT,text=True)
  assert 'AP_GlareEffect' not in (J/'app/flexygram/effects/GlareSettingsSection.java').read_text()
 def test_one_owner_and_direct_chat_entry():
@@ -63,7 +65,7 @@ def test_three_locales_have_exact_same_keys():
  values=[]
  for folder in ['values','values-es','values-ru']:
   items=list(E.parse(ROOT/'TMessagesProj/src/main/res'/folder/'flexy_glare.xml').getroot())
-  assert len(items)==5 and all(x.text and x.text.strip() for x in items)
+  assert len(items)==6 and all(x.text and x.text.strip() for x in items)
   values.append({x.get('name') for x in items})
  assert values[0]==values[1]==values[2]
 
@@ -85,7 +87,7 @@ def test_fixed_emphasis_does_not_compound_or_rebuild_unchanged_geometry(tmp_path
  methods=method(source,'public void setStrokeWidth(')+method(source,'private void applyOutlineWidth(')
  probe(tmp_path,{
  'Probe.java':'''public class Probe{
- static class Props{float strokeWidthTop=3,strokeWidthBottom=2,strokeWidthFull=1;int builds;void build(){builds++;}}
+ static class Props{float strokeWidthTop=3,strokeWidthBottom=2,strokeWidthFull=1;boolean microContour;int builds;void build(){builds++;}}
  Props boundProps=new Props();float baseStrokeWidthTop,baseStrokeWidthBottom;int notifications;
  void onBoundPropsChanged(){notifications++;}
  METHODS
@@ -96,4 +98,5 @@ def test_fixed_emphasis_does_not_compound_or_rebuild_unchanged_geometry(tmp_path
  p.setStrokeWidth(6,4);check(p.boundProps.strokeWidthTop==6*factor&&p.boundProps.strokeWidthBottom==4*factor&&p.notifications==2);
  }
 }'''.replace('METHODS',methods)
+ ,'org/telegram/ui/Components/blur3/MicroContourStroke.java':'package org.telegram.ui.Components.blur3;public class MicroContourStroke{public static float widthPx(){return 1f;}}'
  },[J/'org/telegram/ui/Components/blur3/GlareStrokeWidth.java'])
