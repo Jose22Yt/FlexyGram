@@ -40,7 +40,7 @@ public final class SettingsTheme implements Theme.ResourcesProvider {
         for (int i=0; i<list.getChildCount(); i++) {
             android.view.View child = list.getChildAt(i);
             if (child.getBackground() instanceof android.graphics.drawable.ColorDrawable
-                    && !org.telegram.ui.Components.RecyclerListView.TAG_NOT_SECTION.equals(child.getTag())) {
+                    && !java.util.Objects.equals(child.getTag(), org.telegram.ui.Components.RecyclerListView.TAG_NOT_SECTION)) {
                 ((android.graphics.drawable.ColorDrawable)child.getBackground()).setColor(surface);
             }
         }

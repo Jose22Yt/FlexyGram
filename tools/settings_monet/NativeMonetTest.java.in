@@ -69,4 +69,22 @@ public class NativeMonetTest {
   View icon=cell.getChildAt(0),title=cell.getChildAt(1);assertTrue(title.getRight()<icon.getLeft());
   final boolean[] click={false};cell.setOnClickListener(v->click[0]=true);assertTrue(cell.performClick());assertTrue(click[0]);org.telegram.messenger.LocaleController.isRTL=false;
  }
+ @Test public void numericNonSectionMarkerSurvivesPaletteRefresh(){
+  Theme.dark=true;Theme.accent=0xff4488bb;android.content.Context c=RuntimeEnvironment.getApplication();
+  android.widget.FrameLayout page=new android.widget.FrameLayout(c);
+  org.telegram.ui.Components.RecyclerListView list=new org.telegram.ui.Components.RecyclerListView(c);
+  View header=new View(c),row=new View(c);
+  header.setTag(org.telegram.ui.Components.RecyclerListView.TAG_NOT_SECTION);
+  header.setBackgroundColor(0xff123456);row.setBackgroundColor(0xff000000);
+  list.addView(header);list.addView(row);
+  Theme.ResourcesProvider palette=SettingsTheme.wrap(null);
+  SettingsTheme.refresh(page,null,list,palette);
+  assertEquals(0xff000000,((ColorDrawable)page.getBackground()).getColor());
+  assertEquals(0xff123456,((ColorDrawable)header.getBackground()).getColor());
+  assertEquals(palette.getColor(Theme.key_windowBackgroundWhite),((ColorDrawable)row.getBackground()).getColor());
+  Theme.accent=0xffcc8844;SettingsTheme.refresh(page,null,list,palette);
+  assertEquals(0xff123456,((ColorDrawable)header.getBackground()).getColor());
+  assertEquals(palette.getColor(Theme.key_windowBackgroundWhite),((ColorDrawable)row.getBackground()).getColor());
+ }
+
 }
