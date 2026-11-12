@@ -75,7 +75,8 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         surface.setCornerRadius(dp(LiquidNavigationConfig.radiusDp()));
         for(int i=0;i<getChildCount();i++)if(getChildAt(i) instanceof GlassTabView)((GlassTabView)getChildAt(i)).setSkipDrawSelector(true);
         if (glassBackground != null) glassBackground.updateColors();
-        requestLayout();invalidate();
+        // This method changes drawables only. Geometry setters already request layout when needed.
+        invalidate();
     }
     @Override protected void onMeasure(int ws,int hs){
         int available=MeasureSpec.getSize(ws);if(maxWidthPx>0)available=Math.min(available,maxWidthPx);

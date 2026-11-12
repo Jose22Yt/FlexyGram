@@ -324,7 +324,6 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                 // умолчанию — патчим assetName после инициализации конфигов.
                 org.telegram.ui.ActionBar.Theme.reloadMonetThemes();
             }
-            app.exteraless.plugins.PluginsController.getInstance().init(applicationContext);
             if (BuildConfig.DEBUG_TOOLS) {
                 app.exteraless.debug.EnergyProfiler.resumeIfEnabled(applicationContext);
             }
@@ -347,6 +346,9 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                 initializeStartupAccount(a, prepareDialogs && a == startupAccount);
             }
         }
+
+        // Queue the selected account's local dialogs before Python/storage startup competes for I/O.
+        app.exteraless.plugins.PluginsController.getInstance().init(applicationContext);
 
         app.exteraless.proxy.ProxyPingController.init();
         PushListenerController.reconcilePushRegistration();
@@ -387,9 +389,22 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                 // Enqueue the selected account's native SQLite read before ancillary accounts/services.
                 // Native loading/reset guards, notifications, validation and network sync stay intact.
                 if (prepareDialogs) prepareSelectedDialogs();
-                SendMessagesHelper.getInstance(a).checkUnsentMessages();
+                if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+                    // Constructing the sender can initialize media controllers and scan pending files.
+                    // Keep it on main, but let the selected account enqueue its local list first.
+                    AndroidUtilities.runOnUIThread(() -> checkStartupUnsentMessages(a));
+                } else {
+                    checkStartupUnsentMessages(a);
+                }
             }
         } finally { android.os.Trace.endSection(); }
+    }
+
+    private static void checkStartupUnsentMessages(int account) {
+        // A session can be removed between startup and the queued UI callback.
+        if (UserConfig.getInstance(account).getCurrentUser() != null) {
+            SendMessagesHelper.getInstance(account).checkUnsentMessages();
+        }
     }
 
     private static void initializeDeferredStartupAccount(int account) {

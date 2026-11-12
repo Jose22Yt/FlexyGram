@@ -16,6 +16,17 @@ No signing, transaction preparation/submission, encryption, secret storage or ba
 
 ## First screen and foreground resume
 
+Cold startup requests the selected account's native local dialog list before starting
+the plugin engine. UI startup queues pending-send initialization on the main handler,
+so another account's sender/media setup cannot precede that local request. Background
+callers retain their direct initialization path; queued sender work checks that the
+account still has a user before proceeding. This does not gate synchronization or
+pending sends on a display frame or a network response.
+
+The bottom bar updates its layout parameters only when its search margins actually
+change. Refreshing its colors and corner radius invalidates drawing without requesting
+an additional layout; geometry setters remain responsible for actual size changes.
+
 The native foreground network resume starts before plugin and theme work. The second `resumeNetworkMaybe` call was removed because `setAppPaused(false, false)` already resumes the native network.
 
 The native dialog sorter marks work pending when its existing background guard skips a sort. Foreground entry sorts only if pending or dialogs have not loaded; quick returns with unchanged data reuse the existing ordered lists. Background message changes still force the native sort before fragments resume. Message synchronization, difference loading, network sleep and connectivity checks remain active.
@@ -26,4 +37,4 @@ The initial-data Updating label has a 350ms delay. Cached data, a connection cha
 
 Executable Java probes exercise the actual read-only request methods, history loading/cancellation methods, configuration boolean and navigation methods, plus the production load/status classes. Cases cover timeouts, stale responses, duplicate dispatch, retries, streamed balance preservation, bounded wallet creation polling, account ownership, paused dialog sorting, status text and callback cleanup. XML resources are checked in English and Spanish.
 
-The full regression run completed with 454 passed and 39 skipped. An additional Java compilation probe, added after that run was collected, passed and verifies the wallet poll callback in its actual field initialization order. No Gradle/APK build, live transaction or device startup-time/FPS measurement was performed. Pushes use `[skip ci]`.
+The integrated regression run completed with 464 passed and 39 skipped. Startup probes execute the production account initialization helpers with controlled UI queues, covering selected-account priority, background entry, pending sends and logout before callback dispatch. Bottom-bar probes cover unchanged margins, RTL, search visibility and theme/radius refresh without additional layout requests. No Gradle/APK build, live transaction or device startup-time/FPS measurement was performed. Pushes use `[skip ci]`.

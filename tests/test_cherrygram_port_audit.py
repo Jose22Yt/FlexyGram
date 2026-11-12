@@ -103,7 +103,8 @@ def test_search_is_independent_and_removes_only_the_duplicate_destination():
     assert 'tabsViewWrapper.addView(separateSearchButton' in host
     assert 'separateSearchButton.setOnClickListener(v -> openChatsSearch())' in host
     assert 'separateSearchButton.setContentDescription' in host
-    assert 'dockParams.rightMargin = LocaleController.isRTL ? 0 : reservedSearch' in host
+    assert 'final int rightMargin = LocaleController.isRTL ? 0 : reservedSearch' in host
+    assert 'dockParams.leftMargin != leftMargin || dockParams.rightMargin != rightMargin' in host
     assert 'separateSearchButton.setVisibility(separate ? View.VISIBLE : View.GONE)' in host
     dialogs=src('org/telegram/ui/DialogsActivity.java')
     assert 'actionBar.isSearchFieldVisible()) return' in dialogs

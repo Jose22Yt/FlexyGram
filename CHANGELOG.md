@@ -1,5 +1,11 @@
 # Cambios
 
+## En desarrollo — prioridad de arranque y reanudación
+
+- La carga local de chats se solicita antes de iniciar el motor de plugins y la preparación de mensajes pendientes en UI.
+- Los mensajes pendientes conservan su procesamiento y se comprueba la sesión antes de ejecutar tareas diferidas.
+- La barra inferior evita solicitudes de layout cuando sus márgenes no cambian o solo se actualiza su apariencia.
+
 ## Mantenimiento del repositorio
 
 - Portada y guías actualizadas, con índices de documentación, pruebas y herramientas.

@@ -7,22 +7,25 @@ from test_composer_layout import method
 def test_selected_account_precedes_deferred_sessions_and_headless_never_waits_for_frame(tmp_path):
     source=(JAVA/'org/telegram/messenger/ApplicationLoader.java').read_text()
     start=source.index('        for (int position = 0;',source.index('final int startupAccount ='))
-    end=source.index('\n\n        app.exteraless.proxy.ProxyPingController.init();',start)
+    end=source.index('\n\n        // Queue the selected account',start)
     loop=source[start:end]
     helpers='\n'.join(method(source,s)for s in [
         'private static void initializeStartupAccount(int a, boolean prepareDialogs)',
+        'private static void checkStartupUnsentMessages(int account)',
         'private static void initializeDeferredStartupAccount(int account)',
         'private static void initializePendingStartupAccounts()',
         'private static void initializeAccountServices(boolean incremental)',
         'private static void initializeAccountSlot(int account)',
         'private static void scheduleAccountServices(int start)'])
     probe(tmp_path,{
+'android/os/Looper.java':'package android.os;public class Looper{static final Looper MAIN=new Looper();public static boolean main;public static Looper myLooper(){return main?MAIN:null;}public static Looper getMainLooper(){return MAIN;}}',
 'android/os/Trace.java':'package android.os;public class Trace{public static void beginSection(String n){}public static void endSection(){}}',
 'android/view/Choreographer.java':'''package android.view;public class Choreographer{static Choreographer c=new Choreographer();public static java.util.ArrayDeque<java.util.function.LongConsumer> frames=new java.util.ArrayDeque<>();public static Choreographer getInstance(){return c;}public void postFrameCallback(java.util.function.LongConsumer r){frames.add(r);}public static void tick(){frames.remove().accept(1L);}}''',
 'Probe.java':'''import java.util.*;public class Probe{
  static final List<Integer> core=new ArrayList<>(),unsent=new ArrayList<>(),loaded=new ArrayList<>();static int dialogs,contacts,billing;
  static final boolean[] deferredStartupAccounts=new boolean[10];static int deferredStartupAccountCount;
  static class Handler{ArrayDeque<Runnable> tasks=new ArrayDeque<>();void post(Runnable r){tasks.add(r);}void run(){while(!tasks.isEmpty())tasks.remove().run();}}static Handler applicationHandler=new Handler();
+ static class AndroidUtilities{static void runOnUIThread(Runnable r){applicationHandler.post(r);}}
  static class TLRPC{static class User{}}
  static class UserConfig{static final int MAX_ACCOUNT_COUNT=10;static int selectedAccount=3;static UserConfig[] values=new UserConfig[10];int id;boolean active;TLRPC.User user=new TLRPC.User();static UserConfig getInstance(int a){return values[a];}void loadConfig(){loaded.add(id);}boolean isClientActivated(){return active;}TLRPC.User getCurrentUser(){return active?user:null;}}
  static class MessagesController{static boolean[] ready=new boolean[10];static MessagesController getInstance(int a){if(!ready[a]){ready[a]=true;core.add(a);}return new MessagesController();}void putUser(TLRPC.User u,boolean cache){}}
@@ -34,13 +37,13 @@ def test_selected_account_precedes_deferred_sessions_and_headless_never_waits_fo
  static class DownloadController{static void getInstance(int a){}}
  static class BillingController{static BillingController getInstance(){return new BillingController();}void startConnection(){billing++;}}
  static void prepareSelectedDialogs(){dialogs++;}
- static void launch(boolean prepareDialogs,boolean uiStartup){int startupAccount=UserConfig.selectedAccount;LOOP}
+ static void launch(boolean prepareDialogs,boolean uiStartup){android.os.Looper.main=uiStartup;int startupAccount=UserConfig.selectedAccount;LOOP}
  HELPERS
  static void check(boolean b){if(!b)throw new AssertionError("core="+core+" unsent="+unsent+" pending="+deferredStartupAccountCount);}
  static void reset(int selected){core.clear();unsent.clear();loaded.clear();dialogs=contacts=billing=deferredStartupAccountCount=0;Arrays.fill(deferredStartupAccounts,false);Arrays.fill(MessagesController.ready,false);android.view.Choreographer.frames.clear();applicationHandler.tasks.clear();UserConfig.selectedAccount=selected;for(int i=0;i<10;i++){UserConfig c=new UserConfig();c.id=i;c.active=i==0||i==1||i==3||i==8;UserConfig.values[i]=c;}}
  public static void main(String[]args){
-  reset(3);launch(true,true);check(core.equals(List.of(0,3))&&unsent.equals(List.of(0,3))&&dialogs==1&&deferredStartupAccountCount==2);check(loaded.size()==9&&loaded.get(0)==3);
-  initializeDeferredStartupAccount(1);check(core.equals(List.of(0,3,1))&&deferredStartupAccountCount==1);initializeDeferredStartupAccount(1);check(unsent.size()==3);
+  reset(3);launch(true,true);check(core.equals(List.of(0,3))&&unsent.isEmpty()&&dialogs==1&&deferredStartupAccountCount==2);applicationHandler.run();check(unsent.equals(List.of(0,3)));check(loaded.size()==9&&loaded.get(0)==3);
+  initializeDeferredStartupAccount(1);check(core.equals(List.of(0,3,1))&&deferredStartupAccountCount==1);initializeDeferredStartupAccount(1);applicationHandler.run();check(unsent.size()==3);
   UserConfig.values[8].active=false;initializePendingStartupAccounts();check(deferredStartupAccountCount==0&&!core.contains(8));
   reset(3);launch(false,false);check(core.equals(List.of(0,3,1,8))&&deferredStartupAccountCount==0&&dialogs==0);
   reset(3);launch(true,false);check(core.equals(List.of(0,3,1,8))&&deferredStartupAccountCount==0&&dialogs==1);
@@ -49,6 +52,8 @@ def test_selected_account_precedes_deferred_sessions_and_headless_never_waits_fo
   reset(3);launch(true,true);UserConfig.values[1].active=false;initializeAccountServices(true);
   while(!android.view.Choreographer.frames.isEmpty()){android.view.Choreographer.tick();applicationHandler.run();}
   check(deferredStartupAccountCount==0&&!core.contains(1)&&core.contains(8)&&contacts==3&&billing==1);
+  reset(3);launch(true,true);UserConfig.values[3].active=false;applicationHandler.run();check(unsent.equals(List.of(0)));
+
  }
 }'''.replace('LOOP',loop).replace('HELPERS',helpers)
     },[JAVA/'app/flexygram/performance/StartupAccounts.java'])

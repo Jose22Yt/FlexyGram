@@ -1142,9 +1142,13 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             androidx.core.view.ViewCompat.requestApplyInsets(fragmentView);
         FrameLayout.LayoutParams dockParams = (FrameLayout.LayoutParams) tabsView.getLayoutParams();
         if (dockParams != null) {
-            dockParams.leftMargin = LocaleController.isRTL ? reservedSearch : 0;
-            dockParams.rightMargin = LocaleController.isRTL ? 0 : reservedSearch;
-            tabsView.setLayoutParams(dockParams);
+            final int leftMargin = LocaleController.isRTL ? reservedSearch : 0;
+            final int rightMargin = LocaleController.isRTL ? 0 : reservedSearch;
+            if (dockParams.leftMargin != leftMargin || dockParams.rightMargin != rightMargin) {
+                dockParams.leftMargin = leftMargin;
+                dockParams.rightMargin = rightMargin;
+                tabsView.setLayoutParams(dockParams);
+            }
         }
         if (separateSearchButton != null) {
             FrameLayout.LayoutParams searchParams = (FrameLayout.LayoutParams) separateSearchButton.getLayoutParams();
