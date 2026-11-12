@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CompactSections">Options by section</string>
+    <string name="CompactList">Chat list and title</string>
+    <string name="CompactPills">Mini pills</string>
+    <string name="CompactAvatars">Avatars</string>
+    <string name="CompactFolders">Chat folders</string>
+    <string name="CompactVisible">Visible elements</string>
+    <string name="CompactExtras">Additional appearance options</string>
+    <string name="CompactMessages">Messages and replies</string>
+    <string name="CompactMenus">Menus and actions</string>
+    <string name="CompactMedia">Photos, video and voice</string>
+    <string name="CompactStickers">Stickers and emoji</string>
+    <string name="CompactGlare">Bubble borders and highlights</string>
+    <string name="CompactMembers">Member information</string>
+    <string name="CompactConversion">Conversions in messages</string>
+    <string name="CompactAnimations">Message animations</string>
+    <string name="CompactPreview">Show preview</string>
+    <string name="CompactHidePreview">Hide preview</string>
+    <string name="CompactMotion">Movement and scrolling</string>
+</resources>

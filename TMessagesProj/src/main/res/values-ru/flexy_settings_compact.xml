@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CompactSections">Настройки по разделам</string>
+    <string name="CompactList">Список чатов и заголовок</string>
+    <string name="CompactPills">Мини-плашки</string>
+    <string name="CompactAvatars">Аватары</string>
+    <string name="CompactFolders">Папки чатов</string>
+    <string name="CompactVisible">Видимые элементы</string>
+    <string name="CompactExtras">Другие настройки оформления</string>
+    <string name="CompactMessages">Сообщения и ответы</string>
+    <string name="CompactMenus">Меню и действия</string>
+    <string name="CompactMedia">Фото, видео и голос</string>
+    <string name="CompactStickers">Стикеры и эмодзи</string>
+    <string name="CompactGlare">Границы и блики пузырьков</string>
+    <string name="CompactMembers">Информация об участниках</string>
+    <string name="CompactConversion">Преобразования в сообщениях</string>
+    <string name="CompactAnimations">Анимации сообщений</string>
+    <string name="CompactPreview">Показать предпросмотр</string>
+    <string name="CompactHidePreview">Скрыть предпросмотр</string>
+    <string name="CompactMotion">Движение и прокрутка</string>
+</resources>

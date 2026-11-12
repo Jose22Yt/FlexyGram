@@ -34,26 +34,37 @@ public final class Settings3Registry {
         if(route.equals("files"))return "files";
         if(route.equals("plugins")||route.equals("extensions")||route.equals("ai")||route.equals("translator")||route.equals("translation")||route.equals("translation_options")||route.equals("pillstack"))return "plugins";
         if(route.equals("navigation")||route.equals("bottom_tabs")||route.equals("app_navigation")||route.equals("gestures")||route.startsWith("navigation_extra"))return "navigation";
+        if(route.equals("motion")||route.equals("scroll_effects"))return "home";
         if(route.equals("appearance")||route.equals("chat_list")||route.equals("layout")||route.equals("avatars")||route.equals("folders")||route.equals("visible")||route.equals("smart_previews")||route.startsWith("appearance_extra"))return "home";
         if(route.equals("advanced")||route.equals("advanced_controls")||route.equals("general")||route.equals("general_controls")||route.equals("fonts")||route.equals("effects")||route.equals("surfaces")||route.equals("icons")||route.equals("launcher")||route.equals("profile")||route.equals("archive")||route.startsWith("general_extra")||route.startsWith("advanced_extra"))return "universal";
         return "chat";
     }
+    public static BaseFragment openRoute(String route){
+        String category=category(route);
+        if(CompactSettingsPlan.hasOverview(category)&&!java.util.Arrays.asList("home","chat","appearance","conversations").contains(route))return searchPage(category,route);
+        return open(category);
+    }
+    static BaseFragment searchPage(String category,String route){
+        return CompactSettingsPlan.hasOverview(category)?new SignatureDirectSettingsActivity(category,CompactSettingsPlan.segment(category,route)):open(category);
+    }
     public static BaseFragment searchTarget(BaseFragment original,String key){
-        if("dividerStyle".equals(key)||original instanceof app.flexygram.home.HomeListSettingsActivity)return open("home");
-        if(original instanceof app.flexygram.scroll.ScrollEffectsSettingsActivity || key != null && key.startsWith("flexyScroll"))return open("home");
-        if("flexySmartPreviews".equals(key)||original instanceof app.flexygram.home.SmartPreviewsSettingsActivity)return open("home");
+        if("dividerStyle".equals(key)||original instanceof app.flexygram.home.HomeListSettingsActivity)return searchPage("home","chat_list");
+        if(original instanceof app.flexygram.scroll.ScrollEffectsSettingsActivity || key != null && key.startsWith("flexyScroll"))return searchPage("home","motion");
+        if("flexySmartPreviews".equals(key)||original instanceof app.flexygram.home.SmartPreviewsSettingsActivity)return searchPage("home","smart_previews");
         if("flexyfilesEnabled".equals(key)||"flexyfilesHelp".equals(key))return open("flexyfiles");
         String route=null;
         if(original instanceof tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity)route=((tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity)original).getSignatureSettingsRoute();
-        if(original instanceof tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity){route=((tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity)original).getSignatureSettingsRoute();if(route!=null)return open(SignatureLegacyExtras.categoryForKey(key));}
-        if(route!=null)return open(category(route));
-        if(original instanceof app.flexygram.header.HeaderSettingsActivity||original instanceof app.flexygram.bubbles.BubbleSettingsActivity||original instanceof app.flexygram.composer.FlexyComposerSettingsActivity)return original;
-        if(original instanceof app.flexygram.bubbles.interaction.BubbleInteractionSettingsActivity||original instanceof app.flexygram.bubbles.deletion.MessageAnimationsActivity)return open("chat");
+        if(original instanceof tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity){
+            route=((tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity)original).getSignatureSettingsRoute();
+            if(route!=null)return searchPage(SignatureLegacyExtras.categoryForKey(key),SignatureLegacyExtras.routeForKey(key));
+        }
+        if(route!=null)return searchPage(category(route),route);
+        if(original instanceof app.flexygram.bubbles.deletion.MessageAnimationsActivity)return new SignatureDirectSettingsActivity("chat","animations");
         if(original instanceof app.flexygram.navigation.BottomTabsSettingsActivity)return open("navigation");
         if(original instanceof app.exteraless.settings.OpenExteraAyuMomentsActivity)return open("ayu");
-        if(original instanceof app.flexygram.inlineconverter.InlineConversionSettingsSection)return open("chat");
-        if(original instanceof app.flexygram.memberlens.MemberLensSettingsSection)return open("chat");
-        if(original instanceof app.flexygram.effects.GlareSettingsSection)return open("chat");
+        if(original instanceof app.flexygram.inlineconverter.InlineConversionSettingsSection)return new SignatureDirectSettingsActivity("chat","conversion");
+        if(original instanceof app.flexygram.memberlens.MemberLensSettingsSection)return new SignatureDirectSettingsActivity("chat","members");
+        if(original instanceof app.flexygram.effects.GlareSettingsSection)return new SignatureDirectSettingsActivity("chat","glare");
         if(original instanceof SignatureLauncherSettingsActivity)return open("universal");
         return original;
     }

@@ -27,7 +27,7 @@ def test_one_owner_and_direct_chat_entry():
  direct=(S/'SignatureDirectSettingsActivity.java').read_text()
  assert direct.count('new app.flexygram.effects.GlareSettingsSection()')==1
  assert direct.index('"composer_style"')<direct.index('new app.flexygram.effects.GlareSettingsSection()')
- assert 'case "glassOutline":case "glareEffects":return Settings3Registry.open("chat")' in (S/'SignatureSettingsRegistry.java').read_text()
+ assert 'case "glassOutline":case "glareEffects":return new SignatureDirectSettingsActivity("chat","glare")' in (S/'SignatureSettingsRegistry.java').read_text()
 def test_default_static_renderer_is_preserved():
  p='TMessagesProj/src/main/java/org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawable.java'
  old=subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT,text=True)

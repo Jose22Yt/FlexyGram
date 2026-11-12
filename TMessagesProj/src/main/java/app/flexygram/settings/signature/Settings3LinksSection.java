@@ -9,13 +9,18 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.Components.RecyclerListView;
-/** Specialized managers only. Simple preferences belong to the directly embedded native rows. */
+/** Native navigation rows and section headings. No editor is created during binding. */
 final class Settings3LinksSection extends SignatureMatteSettingsActivity {
     private final String[] ids;private final int[] titles,icons;
     Settings3LinksSection(String[] ids,int[] titles,int[] icons){this.ids=ids;this.titles=titles;this.icons=icons;}
     @Override protected String getActionBarTitle(){return "";}
     @Override protected void updateRows(){super.updateRows();for(String id:ids)addRow(id);}
     @Override protected void onItemClick(View view,int p,float x,float y){
+        if(ids[p].startsWith("#"))return;
+        if(ids[p].startsWith("section:")){
+            String[] target=ids[p].split(":");
+            presentFragment(new SignatureDirectSettingsActivity(target[1],target[2]));return;
+        }
         BaseFragment f;
         switch(ids[p]){
             case "composer_style":f=new ConversationStyleSettingsActivity(false);break;
@@ -37,9 +42,9 @@ final class Settings3LinksSection extends SignatureMatteSettingsActivity {
         presentFragment(f);
     }
     @Override protected BaseListAdapter createAdapter(Context context){return new MatteListAdapter(context){
-        @Override public int getItemViewType(int p){return 240;}
-        @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup p,int type){return new RecyclerListView.Holder(new Settings2Cell(p.getContext(),resourcesProvider,true));}
-        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){((Settings2Cell)h.itemView).bind(LocaleController.getString(titles[p]),"",icons[p],0,p+1<ids.length);}
-        @Override public boolean isEnabled(RecyclerView.ViewHolder h){return true;}
+        @Override public int getItemViewType(int p){return ids[p].startsWith("#")?TYPE_HEADER:240;}
+        @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup p,int type){if(type==TYPE_HEADER)return super.onCreateViewHolder(p,type);return new RecyclerListView.Holder(new Settings2Cell(p.getContext(),resourcesProvider,true));}
+        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){if(ids[p].startsWith("#")){((tw.nekomimi.nekogram.ui.cells.HeaderCell)h.itemView).setText(LocaleController.getString(titles[p]));return;}((Settings2Cell)h.itemView).bind(LocaleController.getString(titles[p]),"",icons[p],0,p+1<ids.length);}
+        @Override public boolean isEnabled(RecyclerView.ViewHolder h){int p=settingsRowPosition(h);return p>=0&&p<ids.length&&!ids[p].startsWith("#");}
     };}
 }
