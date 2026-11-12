@@ -86,7 +86,7 @@ public final class SignatureSettingsRegistry {
     public static boolean visible(String id){if(id.endsWith("_extra")&&SignatureLegacyExtras.sources(id).isEmpty())return false;return !"passcode".equals(id)||!tw.nekomimi.nekogram.helpers.PasscodeHelper.isSettingsHidden();}
     private static BaseFragment scope(BaseNekoSettingsActivity f,String source,String route,String title){f.useSignatureSettingsPage(source,route,entry(title).title);return f;}
     private static BaseFragment chats(int screen,String route,String title){return scope(new OpenExteraChatsActivity(screen),"chats",route,title);}
-    public static BaseFragment open(String id){if(id.equals("bubbles"))return new app.flexygram.bubbles.BubbleSettingsActivity();if(id.equals("header"))return new ConversationStyleSettingsActivity(true);if(id.equals("composer"))return new ConversationStyleSettingsActivity(false);if(java.util.Arrays.asList("icon_packs","emoji","translator","ai","pillstack","cloud","passcode").contains(id))return openLegacyEditor(id);if(id.equals("context"))return new app.flexygram.bubbles.interaction.BubbleInteractionSettingsActivity();return Settings3Registry.openRoute(id);}
+    public static BaseFragment open(String id){if(id.equals("app_navigation"))return new OpenExteraAppNavigationActivity(true);if(id.equals("bubbles"))return new app.flexygram.bubbles.BubbleSettingsActivity();if(id.equals("header"))return new ConversationStyleSettingsActivity(true);if(id.equals("composer"))return new ConversationStyleSettingsActivity(false);if(java.util.Arrays.asList("icon_packs","emoji","translator","ai","pillstack","cloud","passcode").contains(id))return openLegacyEditor(id);if(id.equals("context"))return new app.flexygram.bubbles.interaction.BubbleInteractionSettingsActivity();return Settings3Registry.openRoute(id);}
     private static BaseFragment openLegacyEditor(String id){
         switch(id){
             case "advanced_extra_nx":return SignatureLegacyExtras.screen("nx","advanced_extra");
@@ -137,7 +137,9 @@ public final class SignatureSettingsRegistry {
         }
     }
     public static BaseFragment legacy(String screen,String key){
-        if("ayumoments".equals(screen)||"exteraless_ayumoments".equals(screen)||"ayuMoments".equals(key)||"ClearMessageDatabase".equals(key))return Settings3Registry.open("ayu");
+        if("ClearMessageDatabase".equals(key))return new SignatureDirectSettingsActivity("ayu","maintenance");
+        if("ayumoments".equals(screen)||"exteraless_ayumoments".equals(screen))return key==null?Settings3Registry.open("ayu"):Settings3Registry.searchPage("ayu",Settings2Policy.owner("ayu",key));
+        if("ayuMoments".equals(key))return Settings3Registry.open("ayu");
         if(key!=null&&key.startsWith("flexyScroll"))return new SignatureDirectSettingsActivity("home","motion");
         if(key!=null){
             BaseFragment extra=SignatureLegacyExtras.forKey(key);if(extra!=null)return Settings3Registry.searchPage(SignatureLegacyExtras.categoryForKey(key),SignatureLegacyExtras.routeForKey(key));
@@ -161,7 +163,7 @@ public final class SignatureSettingsRegistry {
                 if(owner.equals("@native"))return new org.telegram.ui.PrivacySettingsActivity();
                 if(owner.equals("chat_list"))return open(source.equals("chats")?"smart_previews":"layout");
                 if(owner.equals("effects"))return open("surfaces");if(owner.equals("advanced"))return open("advanced_controls");
-                if(owner.equals("general"))return open("general_controls");
+                if(owner.equals("general"))return Settings3Registry.searchPage("universal",Settings2Policy.generalSection(key));
                 if(!owner.startsWith("@")&&ENTRIES.containsKey(owner))return open(owner);
             }
         }

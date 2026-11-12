@@ -18,4 +18,25 @@
     <string name="CompactPreview">Mostrar vista previa</string>
     <string name="CompactHidePreview">Ocultar vista previa</string>
     <string name="CompactMotion">Movimiento y desplazamiento</string>
+    <string name="CompactBehavior">Comportamiento general</string>
+    <string name="CompactNetwork">Red y velocidad de transferencia</string>
+    <string name="CompactNotifications">Notificaciones y batería</string>
+    <string name="CompactMaps">Mapas y ubicación</string>
+    <string name="CompactProfile">Información de contactos</string>
+    <string name="CompactArchive">Archivo y organización</string>
+    <string name="CompactFonts">Fuentes de texto</string>
+    <string name="CompactEffects">Superficies y efectos visuales</string>
+    <string name="CompactLauncher">Icono de la aplicación</string>
+    <string name="CompactAdvanced">Privacidad y diagnóstico</string>
+    <string name="CompactSystemExtras">Más opciones del sistema</string>
+    <string name="CompactTabs">Barra de navegación inferior</string>
+    <string name="CompactNavigationControls">Comportamiento de navegación</string>
+    <string name="CompactGestures">Acciones y gestos de mensajes</string>
+    <string name="CompactNavigationExtras">Más opciones de navegación</string>
+    <string name="CompactGhost">Modo fantasma</string>
+    <string name="CompactStoryPrivacy">Privacidad de historias</string>
+    <string name="CompactHistory">Guardado e historial de mensajes</string>
+    <string name="CompactHistoryTools">Filtros y transferencia de base de datos</string>
+    <string name="CompactMaintenance">Desactivar y borrar historial</string>
+    <string name="CompactTranslation">Preferencias de traducción</string>
 </resources>

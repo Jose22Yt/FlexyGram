@@ -26,9 +26,9 @@ def test_compact_plan_routes_are_stable_and_immutable(tmp_path):
 public class PlanProbe{public static void main(String[] args){
  if(CompactSettingsPlan.pages("home").length!=7||CompactSettingsPlan.pages("chat").length!=8)throw new AssertionError("unbounded overview");
  var copy=CompactSettingsPlan.pages("home");copy[0]=null;if(CompactSettingsPlan.pages("home")[0]==null)throw new AssertionError("mutable shared plan");
- String[][] cases={{"home","scroll_effects","motion"},{"home","avatars","avatars"},{"home","folders","folders"},{"home","layout","list"},{"home","smart_previews","pills"},{"home","visible","visible"},{"home","appearance_extra_ng","extras"},{"chat","media_extra_nc","media"},{"chat","stickers_extra_nx","stickers"},{"chat","post_appearance","messages"},{"chat","menus","menus"}};
+ String[][] cases={{"home","scroll_effects","motion"},{"home","avatars","avatars"},{"home","folders","folders"},{"home","layout","list"},{"home","smart_previews","pills"},{"home","visible","visible"},{"home","appearance_extra_ng","extras"},{"chat","media_extra_nc","media"},{"chat","stickers_extra_nx","stickers"},{"chat","post_appearance","messages"},{"chat","menus","menus"},{"universal","general_network","network"},{"universal","general_notifications","notifications"},{"universal","general_maps","maps"},{"universal","general_behavior","general"},{"universal","general_extra_ng","extras"},{"universal","advanced_extra_nx","advanced"},{"universal","surfaces","effects"},{"navigation","bottom_tabs","tabs"},{"navigation","navigation_extra_ng","extras"},{"navigation","gestures","gestures"},{"ayu","ayu_saving","saving"},{"ayu","ayu_tools","tools"},{"ayu","ayu_maintenance","maintenance"},{"plugins","translation_options","translation"}};
  for(String[] c:cases)if(!CompactSettingsPlan.segment(c[0],c[1]).equals(c[2]))throw new AssertionError(java.util.Arrays.toString(c));
- for(String category:new String[]{"home","chat"}){
+ for(String category:new String[]{"home","chat","universal","navigation","ayu","plugins"}){
   var icons=new java.util.HashSet<Integer>();for(var p:CompactSettingsPlan.pages(category)){if(!icons.add(p.icon))throw new AssertionError("repeated icon");if(CompactSettingsPlan.page(category,p.id)!=p)throw new AssertionError();}
  }
  try{CompactSettingsPlan.page("home","missing");throw new AssertionError("invalid restore accepted");}catch(IllegalArgumentException expected){}
@@ -64,7 +64,7 @@ public class Probe{
  void open(String category,String segment){this.category=category;this.segment=segment;rows.clear();overviewCalls=0;build();}
  void expect(String row){if(!rows.contains(row))throw new AssertionError(category+":"+segment+" lost "+row);}
  public static void main(String[]args){Probe p=new Probe();
- for(String cat:new String[]{"home","chat"}){p.open(cat,"");if(p.overviewCalls!=1||!p.rows.isEmpty())throw new AssertionError("eager editors");}
+ for(String cat:new String[]{"home","chat","universal","navigation","ayu","plugins"}){p.open(cat,"");if(p.overviewCalls!=1||!p.rows.isEmpty())throw new AssertionError("eager editors");}
  p.open("home","list");p.expect("HomeListSettingsActivity");p.expect("appearance:chat_list");p.expect("chats:chat_list");if(p.rows.contains("SmartPreviewsSettingsActivity"))throw new AssertionError("eager preview");
  p.open("home","motion");if(!p.rows.equals(List.of("ScrollEffectsSettingsActivity")))throw new AssertionError("scroll controls lost");
  p.open("home","pills");if(!p.rows.equals(List.of("SmartPreviewsSettingsActivity")))throw new AssertionError(p.rows.toString());
@@ -75,6 +75,15 @@ public class Probe{
  for(String route:new String[]{"media","stickers"}){p.open("chat",route);p.expect("chats:"+route);for(String source:new String[]{"ng","nc","nx"})p.expect(source+":"+route+"_extra");}
  String[][] special={{"glare","GlareSettingsSection"},{"members","MemberLensSettingsSection"},{"conversion","InlineConversionSettingsSection"},{"animations","MessageAnimationsActivity"}};
  for(String[] c:special){p.open("chat",c[0]);if(!p.rows.equals(List.of(c[1])))throw new AssertionError("wrong special editor");}
+ for(String[] c:new String[][]{{"general","general_behavior"},{"network","general_network"},{"notifications","general_notifications"},{"maps","general_maps"},{"profile","profile"},{"archive","archive"}}){p.open("universal",c[0]);p.expect("general:"+c[1]);}
+ for(String route:new String[]{"fonts","effects"}){p.open("universal",route);p.expect("appearance:"+route);}
+ p.open("universal","launcher");p.expect("SignatureLauncherSettingsActivity");
+ p.open("universal","advanced");p.expect("other:advanced");p.expect("ng:advanced_extra");p.expect("nx:advanced_extra");
+ p.open("universal","extras");p.expect("ng:general_extra|appearance_extra");
+ p.open("navigation","tabs");p.expect("BottomTabsSettingsActivity");p.open("navigation","controls");p.expect("NativeControls");
+ p.open("navigation","gestures");p.expect("chats:gestures");p.open("navigation","extras");p.expect("ng:navigation_extra");p.expect("nx:navigation_extra");
+ p.open("ayu","ghost");p.expect("GhostModeActivity");for(String route:new String[]{"privacy","saving","tools","maintenance"}){p.open("ayu",route);p.expect("ayu:ayu_"+route);}
+ p.open("plugins","translation");p.expect("general:translation_options");
  }}'''.replace('BODY', body)
     files['Probe.java'] = source
     files['org/telegram/messenger/R.java'] = resources(body)
@@ -86,8 +95,10 @@ def test_icons_are_distinct_real_assets_and_localization_is_complete():
     direct = (S / 'SignatureDirectSettingsActivity.java').read_text()
     overview = method(direct, 'private void overview()')
     # Compare actual packaged image contents, not merely aliases with different names.
-    for text in [plan[plan.index('CHAT='):plan.index('static boolean')]+overview,
-                 plan[plan.index('HOME='):plan.index('CHAT=')]]:
+    blocks = dict(re.findall(r'private static final Page\[\] (\w+)=\{(.*?)\n    \};', plan, re.S))
+    for category, block in blocks.items():
+        specialized = re.search(r'if\(category.equals\("'+category.lower()+r'"\)\)links\((.*?);', overview)
+        text = block + (specialized[1] if specialized else "")
         names = re.findall(r'R.drawable.(\w+)', text)
         digests = []
         for name in names:
@@ -135,3 +146,95 @@ p.onBindViewHolder(holder,2,false);if(p.preview!=view)throw new AssertionError()
 // RecyclerView can return the same holder without invoking onCreateViewHolder.
 p.onBindViewHolder(holder,2,false);if(p.preview!=view||view.themes!=2)throw new AssertionError("recycled preview disconnected");}}
 '''.replace('BIND', bind)}, [])
+
+
+def test_system_partition_preserves_every_general_control_and_group_children(tmp_path):
+    policy = (S/'Settings2Policy.java').read_text()
+    probe(tmp_path, {
+        'app/flexygram/settings/signature/Settings2Policy.java': policy,
+        'Probe.java': '''import app.flexygram.settings.signature.Settings2Policy;public class Probe{public static void main(String[]args){
+ String[] parts={"general_behavior","general_network","general_notifications","general_maps"};
+ for(var entry:Settings2Policy.inventory().entrySet())if(entry.getKey().startsWith("general:")&&entry.getValue().equals("general")){
+  String key=entry.getKey().substring(8);int owners=0;
+  for(String part:parts){var rows=new Settings2Policy.Rows("general",part);boolean accepted=rows.named(key);if(accepted)owners++;if(rows.anonymous()!=accepted)throw new AssertionError("orphan child: "+key);}
+  if(owners!=1||!new Settings2Policy.Rows("general","general").named(key))throw new AssertionError("lost or duplicated: "+key);
+ }
+ if(!Settings2Policy.matches("general","general_network","DnsType")||!Settings2Policy.matches("general","general_network","CustomDoH"))throw new AssertionError("network aliases");
+ if(Settings2Policy.matches("general","general_notifications","SaveToChatSubfolder"))throw new AssertionError("storage moved");
+ var saving=new Settings2Policy.Rows("ayu","ayu_saving");if(!saving.named("MessageSavingSaveMedia")||!saving.anonymous())throw new AssertionError("media group lost");if(saving.named("ayuDangerHeader")||saving.anonymous())throw new AssertionError("destructive controls leaked");
+ if(!Settings2Policy.matches("ayu","ayu_tools","databaseImport")||!Settings2Policy.matches("ayu","ayu_maintenance","ayuClearDatabase"))throw new AssertionError("database controls lost");
+ }}'''}, [])
+
+
+def test_every_ayu_named_control_has_one_section_and_callbacks_are_unchanged():
+    # Resolve real ConfigItem keys from Kotlin, so changing a key cannot silently
+    # remove an existing toggle from the new filtered section.
+    ayu = (JAVA/'app/exteraless/settings/OpenExteraAyuMomentsActivity.java').read_text()
+    rows = method(ayu,'protected void updateRows()')
+    kotlin = (ROOT/'TMessagesProj/src/main/kotlin/xyz/nextalone/nagram/NaConfig.kt').read_text()
+    keys = re.findall(r'addRow\("(\w+)"',rows)
+    for getter in re.findall(r'addRow\(NaConfig.INSTANCE.get(\w+)\(\).getKey\(\)\)',rows):
+        name = getter[0].lower()+getter[1:]
+        match = re.search(r'val '+name+r'\s*=\s*addConfig\(\s*"(\w+)"',kotlin)
+        assert match, name
+        keys.append(match[1])
+    policy = (S/'Settings2Policy.java').read_text()
+    for key in keys:
+        assert len(re.findall(r'own\("ayu:'+key+r'","ayu_\w+"\)',policy))==1,key
+    # All changes stay in the composite host; database transfer/confirmation
+    # callbacks, which include privacy-sensitive actions, are reused verbatim.
+    import subprocess
+    assert ayu == subprocess.check_output(['git','show','9037e41cf:TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAyuMomentsActivity.java'],cwd=ROOT,text=True)
+
+
+def test_all_root_categories_have_compact_or_already_short_destinations():
+    plan = (S/'CompactSettingsPlan.java').read_text()
+    registered = re.findall(r'new Entry\("(\w+)"',(S/'Settings3Registry.java').read_text())
+    assert set(registered)=={'home','chat','universal','navigation','ayu','plugins','files','flexyfiles','studio','about'}
+    for category in set(registered)-{'files','flexyfiles','studio','about'}:
+        assert 'case "'+category+'":return '+category.upper()+'.clone()' in plan
+    for category, path, keys in [
+        ('flexyfiles',S/'SignatureFlexyFilesActivity.java',['flexyfilesEnabled','flexyfilesHelp']),
+        ('studio',JAVA/'app/flexygram/studio/FlexyStudioActivity.java',['flexystudioExport','flexystudioImport','flexystudioShare'])]:
+        assert re.findall(r'addRow\("(\w+)"',method(path.read_text(),'protected void updateRows()'))==keys,category
+    policy=(S/'Settings2Policy.java').read_text()
+    assert set(re.findall(r'own\("general:(\w+)", "files"\)',policy))=={'settings2FilesHeader','flexyfilesEnabled','flexyfilesHelp','savePath','saveToChatSubfolder','storageHeader'}
+
+
+def test_search_and_old_routes_reach_exact_sections_in_all_categories(tmp_path):
+    registry = (S/'Settings3Registry.java').read_text()
+    plan = (S/'CompactSettingsPlan.java').read_text()
+    files={
+        'org/telegram/messenger/R.java':resources(registry,plan),
+        'org/telegram/ui/ActionBar/BaseFragment.java':'package org.telegram.ui.ActionBar;public class BaseFragment{}',
+        'app/flexygram/settings/signature/Settings3Registry.java':registry,
+        'app/flexygram/settings/signature/CompactSettingsPlan.java':plan,
+        'app/flexygram/settings/signature/Settings2Policy.java':(S/'Settings2Policy.java').read_text(),
+        'tw/nekomimi/nekogram/settings/BaseNekoSettingsActivity.java':'''package tw.nekomimi.nekogram.settings;public class BaseNekoSettingsActivity extends org.telegram.ui.ActionBar.BaseFragment{public String route;public String getSignatureSettingsRoute(){return route;}public void useSignatureSettingsPage(String source,String route,int title){this.route=route;}}''',
+        'tw/nekomimi/nekogram/settings/BaseNekoXSettingsActivity.java':'''package tw.nekomimi.nekogram.settings;public class BaseNekoXSettingsActivity extends org.telegram.ui.ActionBar.BaseFragment{public String getSignatureSettingsRoute(){return "general_extra";}}''',
+        'app/flexygram/settings/signature/SignatureLegacyExtras.java':'''package app.flexygram.settings.signature;public class SignatureLegacyExtras{public static String categoryForKey(String key){return "universal";}public static String routeForKey(String key){return "appearance_extra";}}''',
+        'app/flexygram/settings/signature/SignatureDirectSettingsActivity.java':'''package app.flexygram.settings.signature;public class SignatureDirectSettingsActivity extends tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity{public String category,segment;public SignatureDirectSettingsActivity(String c){category=c;segment="";}public SignatureDirectSettingsActivity(String c,String s){category=c;segment=s;}}''',
+    }
+    names=set(re.findall(r'(?:new |instanceof )((?:app|tw)\.[\w.]+)',registry))
+    names.update(['app.flexygram.settings.signature.SignatureFlexyFilesActivity','app.flexygram.settings.signature.SignatureLauncherSettingsActivity'])
+    for cls in names:
+        path=cls.replace('.','/')+'.java'
+        if path in files:
+            continue
+        package,name=cls.rsplit('.',1)
+        files[path]='package '+package+';public class '+name+' extends tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity{}'
+    files['Probe.java']='''import app.flexygram.settings.signature.*;import org.telegram.ui.ActionBar.BaseFragment;
+public class Probe{
+ static void expect(BaseFragment f,String category,String segment){if(!(f instanceof SignatureDirectSettingsActivity))throw new AssertionError("not a section");var page=(SignatureDirectSettingsActivity)f;if(!category.equals(page.category)||!segment.equals(page.segment))throw new AssertionError(page.category+":"+page.segment+" expected "+category+":"+segment);}
+ public static void main(String[]args){
+ var general=new app.exteraless.settings.OpenExteraGeneralActivity();general.route="general";
+ for(String[] c:new String[][]{{"DnsType","network"},{"CustomDoH","network"},{"pushStatus","notifications"},{"batteryOptimization","notifications"},{"mapPreview","maps"},{"formatTimeWithSeconds","general"}})expect(Settings3Registry.searchTarget(general,c[0]),"universal",c[1]);
+ general.route="general_network";expect(Settings3Registry.searchTarget(general,"IPv6"),"universal","network");
+ expect(Settings3Registry.openRoute("profile"),"universal","profile");expect(Settings3Registry.openRoute("fonts"),"universal","fonts");expect(Settings3Registry.openRoute("general_extra_ng"),"universal","extras");expect(Settings3Registry.openRoute("navigation_extra_nx"),"navigation","extras");
+ expect(Settings3Registry.searchTarget(new app.flexygram.navigation.BottomTabsSettingsActivity(),"anything"),"navigation","tabs");
+ var ayu=new app.exteraless.settings.OpenExteraAyuMomentsActivity();for(String[] c:new String[][]{{"AskBeforeOpeningStory","privacy"},{"EnableSaveDeletedMessages","saving"},{"databaseImport","tools"},{"ayuClearDatabase","maintenance"}})expect(Settings3Registry.searchTarget(ayu,c[0]),"ayu",c[1]);
+ ayu.route="ayu_tools";expect(Settings3Registry.searchTarget(ayu,"databaseExport"),"ayu","tools");
+ expect(Settings3Registry.searchTarget(new app.flexygram.settings.signature.SignatureLauncherSettingsActivity(),"settings2Launcher"),"universal","launcher");
+ expect(Settings3Registry.searchTarget(new tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity(),"SwitchStyle"),"universal","extras");
+ }}'''
+    probe(tmp_path,files,[])

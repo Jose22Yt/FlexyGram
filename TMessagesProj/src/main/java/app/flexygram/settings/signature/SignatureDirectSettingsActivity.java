@@ -31,6 +31,9 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
     private boolean include(String id){return segment.equals(id);}
     private void overview(){
         if(category.equals("chat"))links(new String[]{"composer_style","header_style","bubble_style","context"},new int[]{R.string.FlexyInterfaceLower,R.string.FlexyInterfaceUpper,R.string.FlexyBubblesTitle,R.string.FlexyMenuTitle},new int[]{R.drawable.fg_ios_original_chat_list_composeicon,R.drawable.fg_ios_original_chat_context_menu_user,R.drawable.fg_ios_original_chat_list_tabs_iconchats,R.drawable.fg_ios_original_chat_context_menu_more});
+        if(category.equals("universal"))links(new String[]{"icon_packs","emoji","cloud","passcode"},new int[]{R.string.Settings2_icon_packs,R.string.Settings2_emoji,R.string.Settings2_cloud,R.string.Settings2_passcode},new int[]{R.drawable.fg_ios_original_chat_context_menu_palette,R.drawable.fg_ios_original_chat_context_menu_sticker,R.drawable.fg_ios_original_chat_context_menu_cloud,R.drawable.fg_ios_original_chat_context_menu_touchid});
+        if(category.equals("navigation"))links(new String[]{"navigationEditor"},new int[]{R.string.Settings2_app_navigation},new int[]{R.drawable.fg_ios_original_chat_context_menu_list});
+        if(category.equals("plugins"))links(new String[]{"plugins","ai","translator","pillstack"},new int[]{R.string.Settings2_plugins,R.string.Settings2_ai,R.string.Settings2_translator,R.string.Settings2_pillstack},new int[]{R.drawable.fg_settings_plugins,R.drawable.fg_ios_original_chat_context_menu_bots,R.drawable.fg_ios_original_chat_context_menu_replace,R.drawable.fg_ios_original_chat_context_menu_reorderitems});
         CompactSettingsPlan.Page[] pages=CompactSettingsPlan.pages(category);
         String[] ids=new String[pages.length+1];int[] titles=new int[ids.length],icons=new int[ids.length];
         ids[0]="#sections";titles[0]=R.string.CompactSections;
@@ -90,21 +93,31 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
                 if(include("visible"))add(scope(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_HIDING),"chats","visible"));
                 if(include("extras")){extra("ng","appearance_extra");extra("nx","appearance_extra");}break;
             case "universal":
-                add(scope(new OpenExteraGeneralActivity(),"general","general|profile|archive"));
-                add(scope(new OpenExteraAppearanceActivity(),"appearance","fonts|effects"));
-                add(scope(new OpenExteraOtherActivity(),"other","advanced"));
-                add(new SignatureLauncherSettingsActivity());
-                extra("ng","general_extra","advanced_extra","appearance_extra");extra("nx","advanced_extra");
-                links(new String[]{"icon_packs","emoji","cloud","passcode"},new int[]{R.string.Settings2_icon_packs,R.string.Settings2_emoji,R.string.Settings2_cloud,R.string.Settings2_passcode},new int[]{R.drawable.fg_ios_original_chat_context_menu_palette,R.drawable.fg_ios_original_chat_context_menu_sticker,R.drawable.fg_ios_original_chat_context_menu_cloud,R.drawable.fg_ios_original_chat_context_menu_touchid});break;
-            case "ayu":add(new GhostModeActivity());add(new OpenExteraAyuMomentsActivity());break;
+                if(segment.isEmpty()){overview();break;}
+                if(include("general"))add(scope(new OpenExteraGeneralActivity(),"general","general_behavior"));
+                if(include("network"))add(scope(new OpenExteraGeneralActivity(),"general","general_network"));
+                if(include("notifications"))add(scope(new OpenExteraGeneralActivity(),"general","general_notifications"));
+                if(include("maps"))add(scope(new OpenExteraGeneralActivity(),"general","general_maps"));
+                if(include("profile")||include("archive"))add(scope(new OpenExteraGeneralActivity(),"general",segment));
+                if(include("fonts")||include("effects"))add(scope(new OpenExteraAppearanceActivity(),"appearance",segment));
+                if(include("advanced")){
+                    add(scope(new OpenExteraOtherActivity(),"other","advanced"));
+                    extra("ng","advanced_extra");extra("nx","advanced_extra");
+                }
+                if(include("extras"))extra("ng","general_extra","appearance_extra");
+                if(include("launcher"))add(new SignatureLauncherSettingsActivity());break;
+            case "ayu":
+                if(segment.isEmpty()){overview();break;}
+                if(include("ghost"))add(new GhostModeActivity());
+                else add(scope(new OpenExteraAyuMomentsActivity(),"ayu","ayu_"+segment));break;
             case "navigation":
-                add(new app.flexygram.navigation.BottomTabsSettingsActivity());
-                add(new OpenExteraAppNavigationActivity.NativeControls());
-                add(scope(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_SIGNATURE_MESSAGES),"chats","gestures"));
-                extra("ng","navigation_extra");extra("nx","navigation_extra");
-                links(new String[]{"navigationEditor"},new int[]{R.string.Settings2_app_navigation},new int[]{R.drawable.fg_settings_estilo_de_interfaz});break;
+                if(segment.isEmpty()){overview();break;}
+                if(include("tabs"))add(new app.flexygram.navigation.BottomTabsSettingsActivity());
+                if(include("controls"))add(new OpenExteraAppNavigationActivity.NativeControls());
+                if(include("gestures"))add(scope(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_SIGNATURE_MESSAGES),"chats","gestures"));
+                if(include("extras")){extra("ng","navigation_extra");extra("nx","navigation_extra");}break;
             case "plugins":
-                links(new String[]{"plugins","ai","translator","pillstack"},new int[]{R.string.Settings2_plugins,R.string.Settings2_ai,R.string.Settings2_translator,R.string.Settings2_pillstack},new int[]{R.drawable.fg_settings_plugins,R.drawable.fg_ios_original_chat_context_menu_bots,R.drawable.fg_ios_original_chat_context_menu_replace,R.drawable.fg_ios_original_chat_context_menu_reorderitems});
+                if(segment.isEmpty()){overview();break;}
                 add(scope(new OpenExteraGeneralActivity(),"general","translation_options"));break;
             default:throw new IllegalArgumentException("Not a direct settings category");
         }

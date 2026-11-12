@@ -18,4 +18,25 @@
     <string name="CompactPreview">Показать предпросмотр</string>
     <string name="CompactHidePreview">Скрыть предпросмотр</string>
     <string name="CompactMotion">Движение и прокрутка</string>
+    <string name="CompactBehavior">Общее поведение</string>
+    <string name="CompactNetwork">Сеть и скорость передачи</string>
+    <string name="CompactNotifications">Уведомления и батарея</string>
+    <string name="CompactMaps">Карты и местоположение</string>
+    <string name="CompactProfile">Информация о контактах</string>
+    <string name="CompactArchive">Архив и организация</string>
+    <string name="CompactFonts">Шрифты</string>
+    <string name="CompactEffects">Поверхности и визуальные эффекты</string>
+    <string name="CompactLauncher">Значок приложения</string>
+    <string name="CompactAdvanced">Конфиденциальность и диагностика</string>
+    <string name="CompactSystemExtras">Другие системные настройки</string>
+    <string name="CompactTabs">Нижняя панель навигации</string>
+    <string name="CompactNavigationControls">Поведение навигации</string>
+    <string name="CompactGestures">Действия и жесты сообщений</string>
+    <string name="CompactNavigationExtras">Другие настройки навигации</string>
+    <string name="CompactGhost">Режим призрака</string>
+    <string name="CompactStoryPrivacy">Конфиденциальность историй</string>
+    <string name="CompactHistory">Сохранение сообщений и история</string>
+    <string name="CompactHistoryTools">Фильтры и перенос базы данных</string>
+    <string name="CompactMaintenance">Отключение и очистка истории</string>
+    <string name="CompactTranslation">Настройки перевода</string>
 </resources>

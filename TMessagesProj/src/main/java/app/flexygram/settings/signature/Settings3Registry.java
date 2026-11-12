@@ -29,19 +29,19 @@ public final class Settings3Registry {
         return new SignatureDirectSettingsActivity(id);
     }
     public static String category(String route){
-        if(route.equals("ayu")||route.equals("ayumoments"))return "ayu";
+        if(route.equals("ayu")||route.equals("ayumoments")||route.startsWith("ayu_"))return "ayu";
         if(route.equals("studio"))return "studio";
         if(route.equals("files"))return "files";
         if(route.equals("plugins")||route.equals("extensions")||route.equals("ai")||route.equals("translator")||route.equals("translation")||route.equals("translation_options")||route.equals("pillstack"))return "plugins";
         if(route.equals("navigation")||route.equals("bottom_tabs")||route.equals("app_navigation")||route.equals("gestures")||route.startsWith("navigation_extra"))return "navigation";
         if(route.equals("motion")||route.equals("scroll_effects"))return "home";
         if(route.equals("appearance")||route.equals("chat_list")||route.equals("layout")||route.equals("avatars")||route.equals("folders")||route.equals("visible")||route.equals("smart_previews")||route.startsWith("appearance_extra"))return "home";
-        if(route.equals("advanced")||route.equals("advanced_controls")||route.equals("general")||route.equals("general_controls")||route.equals("fonts")||route.equals("effects")||route.equals("surfaces")||route.equals("icons")||route.equals("launcher")||route.equals("profile")||route.equals("archive")||route.startsWith("general_extra")||route.startsWith("advanced_extra"))return "universal";
+        if(route.startsWith("general_")||route.equals("advanced")||route.equals("advanced_controls")||route.equals("general")||route.equals("general_controls")||route.equals("fonts")||route.equals("effects")||route.equals("surfaces")||route.equals("icons")||route.equals("launcher")||route.equals("profile")||route.equals("archive")||route.startsWith("general_extra")||route.startsWith("advanced_extra"))return "universal";
         return "chat";
     }
     public static BaseFragment openRoute(String route){
         String category=category(route);
-        if(CompactSettingsPlan.hasOverview(category)&&!java.util.Arrays.asList("home","chat","appearance","conversations").contains(route))return searchPage(category,route);
+        if(CompactSettingsPlan.hasOverview(category)&&!java.util.Arrays.asList("home","chat","appearance","conversations","universal","general","navigation","ayu","ayumoments","plugins","extensions","advanced").contains(route))return searchPage(category,route);
         return open(category);
     }
     static BaseFragment searchPage(String category,String route){
@@ -58,14 +58,15 @@ public final class Settings3Registry {
             route=((tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity)original).getSignatureSettingsRoute();
             if(route!=null)return searchPage(SignatureLegacyExtras.categoryForKey(key),SignatureLegacyExtras.routeForKey(key));
         }
-        if(route!=null)return searchPage(category(route),route);
+        if(route!=null)return searchPage(category(route),route.equals("general")?Settings2Policy.generalSection(key):route);
         if(original instanceof app.flexygram.bubbles.deletion.MessageAnimationsActivity)return new SignatureDirectSettingsActivity("chat","animations");
-        if(original instanceof app.flexygram.navigation.BottomTabsSettingsActivity)return open("navigation");
-        if(original instanceof app.exteraless.settings.OpenExteraAyuMomentsActivity)return open("ayu");
+        if(original instanceof app.flexygram.navigation.BottomTabsSettingsActivity)return new SignatureDirectSettingsActivity("navigation","tabs");
+        if(original instanceof app.exteraless.settings.OpenExteraAyuMomentsActivity)return searchPage("ayu",Settings2Policy.owner("ayu",key));
+        if(original instanceof tw.nekomimi.nekogram.settings.GhostModeActivity)return new SignatureDirectSettingsActivity("ayu","ghost");
         if(original instanceof app.flexygram.inlineconverter.InlineConversionSettingsSection)return new SignatureDirectSettingsActivity("chat","conversion");
         if(original instanceof app.flexygram.memberlens.MemberLensSettingsSection)return new SignatureDirectSettingsActivity("chat","members");
         if(original instanceof app.flexygram.effects.GlareSettingsSection)return new SignatureDirectSettingsActivity("chat","glare");
-        if(original instanceof SignatureLauncherSettingsActivity)return open("universal");
+        if(original instanceof SignatureLauncherSettingsActivity)return new SignatureDirectSettingsActivity("universal","launcher");
         return original;
     }
     private Settings3Registry(){}

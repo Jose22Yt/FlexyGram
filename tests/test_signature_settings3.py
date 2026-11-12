@@ -148,6 +148,7 @@ def test_global_widgets_are_not_placed_in_home_and_search_uses_canonical_target(
  for key in ['SwitchStyle','SliderStyle','IconReplacements','CenterActionBarTitleType']:assert '"'+key+'"' in method(text,'public static String categoryForKey(String key,String source)')
  page=(S/'SignatureDirectSettingsActivity.java').read_text()
  assert 'category.equals(SignatureLegacyExtras.categoryForKey(' in page
- assert '"general_extra","advanced_extra","appearance_extra"' in page
+ assert 'extra("ng","general_extra","appearance_extra")' in page
+ assert 'extra("ng","advanced_extra");extra("nx","advanced_extra")' in page
  helper=source('tw/nekomimi/nekogram/helpers/SettingsHelper.java')
  assert helper.count('Settings3Registry.searchTarget(fragment,key)')==2

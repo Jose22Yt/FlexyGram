@@ -225,6 +225,36 @@ public final class Settings2Policy {
         own("other:resetSettings", "advanced");
         own("other:sensitiveDisableFiltering", "advanced");
     }
+    static {
+        own("ayu:ayuHeader","ayu_privacy");
+        own("ayu:ayuGhost","ayu_privacy");
+        own("ayu:AskBeforeOpeningStory","ayu_privacy");
+        own("ayu:ayuSavingHeader","ayu_saving");
+        own("ayu:EnableSaveDeletedMessages","ayu_saving");
+        own("ayu:EnableSaveEditsHistory","ayu_saving");
+        own("ayu:saveInArchived","ayu_saving");
+        own("ayu:MessageSavingSaveMedia","ayu_saving");
+        own("ayu:SaveDeletedInPrivateChats","ayu_saving");
+        own("ayu:SaveDeletedInGroups","ayu_saving");
+        own("ayu:SaveDeletedInChannels","ayu_saving");
+        own("ayu:SaveDeletedMessageForBotUser","ayu_saving");
+        own("ayu:SaveDeletedMessageForBot","ayu_saving");
+        own("ayu:SaveLocalLastSeen","ayu_saving");
+        own("ayu:OEAyuSaveReadDate","ayu_saving");
+        own("ayu:ayuDeletedHeader","ayu_saving");
+        own("ayu:ReplyToDeletedAsQuote","ayu_saving");
+        own("ayu:TranslucentDeletedMessages","ayu_saving");
+        own("ayu:UseDeletedIcon","ayu_saving");
+        own("ayu:CustomDeletedMark","ayu_saving");
+        own("ayu:ayuOtherHeader","ayu_tools");
+        own("ayu:RegexFilters","ayu_tools");
+        own("ayu:ForwardProtectedAsCopy","ayu_tools");
+        own("ayu:databaseExport","ayu_tools");
+        own("ayu:databaseImport","ayu_tools");
+        own("ayu:ayuDangerHeader","ayu_maintenance");
+        own("ayu:ayuDisableAll","ayu_maintenance");
+        own("ayu:ayuClearDatabase","ayu_maintenance");
+    }
     private static void own(String key,String route){if(OWNERS.put(key,route)!=null)throw new IllegalStateException("Duplicate settings owner");}
     private static final Map<String,String> ALIASES=new HashMap<>();
     static {
@@ -480,17 +510,39 @@ public final class Settings2Policy {
         ALIASES.put("other:sensitiveDisableFiltering","advanced");
     }
     private static final Map<String,String> FOLDED_ALIASES=new HashMap<>();
-    static { for(Map.Entry<String,String> e:ALIASES.entrySet())FOLDED_ALIASES.put(e.getKey().toLowerCase(java.util.Locale.ROOT),e.getValue()); }
+    static { for(Map.Entry<String,String> e:OWNERS.entrySet())if(e.getKey().startsWith("ayu:"))FOLDED_ALIASES.put(e.getKey().toLowerCase(java.util.Locale.ROOT),e.getValue());for(Map.Entry<String,String> e:ALIASES.entrySet())FOLDED_ALIASES.put(e.getKey().toLowerCase(java.util.Locale.ROOT),e.getValue()); }
     public static String aliasOwner(String source,String key){String exact=ALIASES.get(source+":"+key);if(exact!=null)return exact;return FOLDED_ALIASES.getOrDefault((source+":"+key).toLowerCase(java.util.Locale.ROOT),owner(source,key));}
     public static String owner(String source,String key){
         return OWNERS.getOrDefault(source+":"+key,source);
     }
     public static Map<String,String> inventory(){return Collections.unmodifiableMap(OWNERS);}
+    /** Resolve aliases before selecting a small subsection of the original general page. */
+    public static String generalSection(String key){
+        String name=key==null?"":key.toLowerCase(java.util.Locale.ROOT);
+        switch(name){
+            case "ipv6":case "customdoh":case "dnstype":case "downloadspeed":case "speedheader":case "uploadboost":return "general_network";
+            case "batteryoptimization":case "disablenotificationbubbles":case "glyph":case "notificationsheader":case "pushservicetype":case "pushservicetypeinappdialog":case "pushservicetypeunifiedgateway":case "pushstatus":return "general_notifications";
+            case "mapdriftingfix":case "mappreview":case "mapprovider":case "mapsheader":return "general_maps";
+            default:return "general_behavior";
+        }
+    }
+    public static boolean matches(String source,String routes,String key){
+        String owner=aliasOwner(source,key);
+        for(String route:routes.split("\\|")){
+            if(route.equals(owner))return true;
+            if(source.equals("general")&&owner.equals("general")&&route.equals(generalSection(key)))return true;
+        }
+        return false;
+    }
     public static final class Rows {
         private final String source,route;private final java.util.Set<String> routes;private boolean previous;
         public Rows(String source,String route){this.source=source;this.route=route;this.routes=new java.util.HashSet<>(java.util.Arrays.asList(route.split("\\|")));previous=false;}
         public void reset(){previous=false;}
-        public boolean named(String... keys){if(keys.length>0&&source.equals("chats")&&keys[0].equals("settings3StickerReset")){previous=routes.contains("stickers");return previous;}previous=keys.length>0&&!(source.equals("other")&&keys[0].equals("ayuMoments"))&&routes.contains(owner(source,keys[0]));return previous;}
+        private boolean accepts(String key){
+            String owner=owner(source,key);
+            return routes.contains(owner)||source.equals("general")&&owner.equals("general")&&routes.contains(generalSection(key));
+        }
+        public boolean named(String... keys){if(keys.length>0&&source.equals("chats")&&keys[0].equals("settings3StickerReset")){previous=routes.contains("stickers");return previous;}previous=keys.length>0&&!(source.equals("other")&&keys[0].equals("ayuMoments"))&&accepts(keys[0]);return previous;}
         public boolean anonymous(){return previous;}
     }
     private Settings2Policy(){}

@@ -433,7 +433,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
         updateRows();
     }
 
-    public final boolean settings3HasRow(String key){if(rowMap.containsKey(key))return true;if(signatureSource==null)return false;String owner=app.flexygram.settings.signature.Settings2Policy.aliasOwner(signatureSource,key);return java.util.Arrays.asList(signatureRoute.split("\\|")).contains(owner);}
+    public final boolean settings3HasRow(String key){if(rowMap.containsKey(key))return true;if(signatureSource==null)return false;return app.flexygram.settings.signature.Settings2Policy.matches(signatureSource,signatureRoute,key);}
     public final String getSignatureSettingsRoute(){return signatureRoute;}
     public final int getSignatureSearchGuid(){return signatureRoute==null?0:app.flexygram.settings.signature.SignatureSettingsRegistry.searchGuid(signatureRoute);}
 
