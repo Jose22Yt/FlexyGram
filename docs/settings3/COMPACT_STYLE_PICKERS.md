@@ -2,6 +2,11 @@
 
 Una vista previa principal y una cuadrícula de miniaturas con nombre sustituyen las galerías verticales de diseños completos. Interfaz inferior conserva sus dos estilos e Interfaz superior sus cinco estilos. La cuadrícula adapta columnas al ancho y al tamaño de fuente, respeta RTL y expone cada tarjeta como opción de radio accesible. Solo la vista previa principal observa y prepara el fondo: las miniaturas no cargan wallpapers ni ejecutan animaciones.
 
+Cada opción tiene una sola píldora independiente con un único ejemplo y el nombre
+debajo, fuera del marco. Las opciones de burbujas muestran una sola burbuja;
+la vista previa principal mantiene dos mensajes. Las opciones de interfaz inferior
+y superior muestran una única barra o cabecera respectivamente.
+
 Burbujas ofrece Telegram, FlexyGram y Telegram para iPhone. La forma es independiente del material. Personalizar burbujas despliega debajo los controles existentes de superficie, transparencia, blur, bordes y fusión. Todos los estilos admiten estos controles. La búsqueda expande el grupo necesario, se conserva su estado y las vistas recicladas vuelven a conectarse a su controlador.
 
 ## Geometría de Telegram para iPhone

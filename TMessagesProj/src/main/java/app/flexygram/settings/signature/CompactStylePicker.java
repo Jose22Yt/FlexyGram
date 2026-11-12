@@ -60,14 +60,17 @@ public final class CompactStylePicker extends LinearLayout implements Theme.Colo
         Tile(Context context, int id, String name, View preview, Runnable choose) {
             super(context); this.id = id; this.name = name; this.preview = preview;
             setOrientation(VERTICAL); setGravity(Gravity.CENTER); setPadding(dp(4), dp(4), dp(4), dp(6));
-            background.setCornerRadius(dp(16)); setBackground(background); setClipToOutline(true);
+            background.setCornerRadius(dp(20));
             setFocusable(true); setClickable(true); setContentDescription(name);
             preview.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
-            addView(new Miniature(context, preview), new LayoutParams(-1, dp(56)));
+            Miniature pill=new Miniature(context,preview);
+            pill.setBackground(background);pill.setClipToOutline(true);
+            addView(pill,new LayoutParams(-1,dp(56)));
             label = new TextView(context); label.setText(name); label.setTextSize(12);
             label.setGravity(Gravity.CENTER); label.setMinHeight(dp(32));
             label.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
-            addView(label, new LayoutParams(-1, -2));
+            LayoutParams caption=new LayoutParams(-1,-2);caption.topMargin=dp(4);
+            addView(label, caption);
             setOnClickListener(view -> choose.run()); colors();
         }
         void bind(boolean selected) { setSelected(selected); colors(); }
