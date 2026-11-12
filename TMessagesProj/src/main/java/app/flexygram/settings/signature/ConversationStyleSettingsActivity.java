@@ -68,36 +68,34 @@ public final class ConversationStyleSettingsActivity extends SignatureMatteSetti
     @Override public void saveSelfArgs(Bundle args){super.saveSelfArgs(args);args.putBoolean("headerStyleGallery",header);}
     @Override public void restoreSelfArgs(Bundle args){super.restoreSelfArgs(args);header=args.getBoolean("headerStyleGallery",false);}
     private final class Gallery extends LinearLayout {
-        private final TextView hint;
-        private final StylePreviewCard[] choices;
-        private final int[] styles;
+        private final CompactStylePicker picker;
+        private final View livePreview;
         Gallery(Context context){
-            super(context);setOrientation(VERTICAL);setPadding(dp(12),dp(8),dp(12),dp(header?12:4));
-            setTag(RecyclerListView.TAG_NOT_SECTION);
-            setLayoutParams(new RecyclerView.LayoutParams(-1,-2));
-            hint=new TextView(context);hint.setTextSize(14);hint.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));hint.setPadding(dp(8),dp(8),dp(8),dp(header?16:8));
-            hint.setText(LocaleController.getString(R.string.FlexyStyleTapHint));addView(hint,new LayoutParams(-1,-2));
-            styles=header?new int[]{1,0,2,3,4}:new int[]{0,1};choices=new StylePreviewCard[styles.length];
+            super(context);setOrientation(VERTICAL);
+            setTag(RecyclerListView.TAG_NOT_SECTION);setLayoutParams(new RecyclerView.LayoutParams(-1,-2));
+            FlexyComposerSettingsActivity composer=new FlexyComposerSettingsActivity();
+            livePreview=header?new HeaderPreviewView(context):composer.createStylePreview(context,-1);
+            picker=new CompactStylePicker(context,resourcesProvider,livePreview,2);
+            addView(picker,new LayoutParams(-1,-2));
+            int[] styles=header?new int[]{1,0,2,3,4}:new int[]{0,1};
             int[] labels=header?new int[]{R.string.FlexyStyleDefault,R.string.FlexyHeaderSignature,R.string.FlexyHeaderFusion,R.string.FlexyHeaderPortrait,R.string.FlexyHeaderFloating}:new int[]{R.string.FlexyStyleDefault,R.string.FlexyStyleCompact};
-            LinearLayout strip=new LinearLayout(context);strip.setOrientation(VERTICAL);
-            addView(strip,new LayoutParams(-1,-2));
             for(int i=0;i<styles.length;i++){
-                final int index=i;
-                View preview=header?new HeaderPreviewView(context,styles[i]):new FlexyComposerSettingsActivity().createStylePreview(context,styles[i]);
-                choices[i]=new StylePreviewCard(context,resourcesProvider,LocaleController.getString(labels[i]),preview,()->{
-                    if(header){HeaderConfig.style(styles[index]);bind();}
-                    else{FlexyComposerConfig.setStyle(styles[index]);refreshComposerChoices();}
-                },!header);
-                choices[i].setSegmentEdges(i==0,i==styles.length-1);
-                LayoutParams params=new LayoutParams(-1,-2);
-                params.bottomMargin=i==styles.length-1?0:dp(4);
-                strip.addView(choices[i],params);
+                final int style=styles[i];
+                View miniature=header?new HeaderPreviewView(context,style,true):composer.createStyleMiniature(context,style);
+                picker.addChoice(style,LocaleController.getString(labels[i]),miniature,()->{
+                    if(header){HeaderConfig.style(style);bind();}
+                    else{FlexyComposerConfig.setStyle(style);refreshComposerChoices();}
+                });
             }
             bind();
         }
-        @Override protected void dispatchDraw(android.graphics.Canvas canvas){int color=getThemedColor(Theme.key_windowBackgroundWhiteGrayText2);if(hint.getCurrentTextColor()!=color)hint.setTextColor(color);super.dispatchDraw(canvas);}
-        void bind(){int selected=header?HeaderConfig.style():FlexyComposerConfig.compact()?1:0;for(int i=0;i<styles.length;i++)choices[i].bind(styles[i]==selected);}
-        void invalidatePreviews(){for(StylePreviewCard card:choices)card.refreshPreview();}
+        void bind(){
+            picker.select(header?HeaderConfig.style():FlexyComposerConfig.compact()?1:0);
+            if(livePreview instanceof HeaderPreviewView)((HeaderPreviewView)livePreview).settingsChanged();
+            else livePreview.invalidate();
+            picker.refreshMiniatures();
+        }
+        void invalidatePreviews(){livePreview.invalidate();picker.refreshMiniatures();}
     }
     private final class PositionCell extends LinearLayout implements Theme.Colorable {
         private final TextView title,value;
@@ -150,7 +148,7 @@ public final class ConversationStyleSettingsActivity extends SignatureMatteSetti
             return holder;
         }
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder,int position,boolean partial){
-            if(position==galleryRow){((Gallery)holder.itemView).bind();return;}
+            if(position==galleryRow){gallery=(Gallery)holder.itemView;gallery.bind();return;}
             if(position==layoutHeaderRow){((HeaderCell)holder.itemView).setText(LocaleController.getString(R.string.FlexyComposerLayoutSection));return;}
             if(position==positionRow){((PositionCell)holder.itemView).bind();return;}
             if(position==infoRow){((TextInfoPrivacyCell)holder.itemView).setText(LocaleController.getString(R.string.FlexyComposerAdjustmentsInfo));return;}

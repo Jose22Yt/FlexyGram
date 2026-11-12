@@ -37,7 +37,8 @@ public final class BubblePreviewView extends View implements NotificationCenter.
     private final Path frame = new Path();
     private final RectF frameBounds = new RectF();
     private final Rect wallpaperBounds = new Rect();
-    private final Drawable check, halfCheck;
+    private Drawable check, halfCheck;
+    private boolean signatureTicks;
     private Drawable wallpaper;
     private final app.flexygram.preview.SignatureWallpaperPreview wallpaperPreview;
     private boolean wallpaperMotion;
@@ -56,6 +57,12 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         }
     };
     public void settingsChanged() {
+        boolean useSignatureTicks=BubbleStyle.signature();
+        if(check==null||signatureTicks!=useSignatureTicks) {
+            signatureTicks=useSignatureTicks;
+            check=getResources().getDrawable(useSignatureTicks?R.drawable.flexy_check_ios27:R.drawable.msg_check_s).mutate();
+            halfCheck=getResources().getDrawable(useSignatureTicks?R.drawable.flexy_halfcheck_ios27:R.drawable.msg_halfcheck).mutate();
+        }
         float previousFontSpacing = time.getFontSpacing();
         if (Theme.chat_timePaint != null) time.set(Theme.chat_timePaint);
         if (BubbleConfig.smallTimestamps()) time.setTextSize(AndroidUtilities.dpf2(9));
@@ -86,6 +93,7 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         }
         check = context.getResources().getDrawable(BubbleStyle.signature() ? R.drawable.flexy_check_ios27 : R.drawable.msg_check_s).mutate();
         halfCheck = context.getResources().getDrawable(BubbleStyle.signature() ? R.drawable.flexy_halfcheck_ios27 : R.drawable.msg_halfcheck).mutate();
+        signatureTicks=BubbleStyle.signature();
         setContentDescription(String.join("\n", samples));
         refreshTheme();
     }

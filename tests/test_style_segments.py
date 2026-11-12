@@ -27,17 +27,17 @@ def test_grouped_segment_preserves_thin_frame_and_clips_wallpaper(tmp_path):
 }'''.replace('METHODS',methods)})
 
 
-def test_gallery_is_vertical_full_width_with_native_selection_and_wallpaper_updates():
+def test_gallery_has_one_live_preview_and_compact_native_style_choices():
     gallery=(JAVA/'app/flexygram/settings/signature/ConversationStyleSettingsActivity.java').read_text()
-    card=(JAVA/'app/flexygram/settings/signature/StylePreviewCard.java').read_text()
+    picker=(JAVA/'app/flexygram/settings/signature/CompactStylePicker.java').read_text()
     assert 'HorizontalScrollView' not in gallery and 'scrollTo(' not in gallery
-    assert 'strip.setOrientation(VERTICAL)' in gallery
-    assert 'LayoutParams params=new LayoutParams(-1,-2)' in gallery
-    assert 'setSegmentEdges(i==0,i==styles.length-1)' in gallery
-    assert 'HeaderConfig.style(styles[index])' in gallery and 'FlexyComposerConfig.setStyle(styles[index])' in gallery
-    assert 'TextView' not in card and 'setPadding(dp(2),dp(2),dp(2),dp(2))' in card
-    assert 'info.setContentDescription(name)' in card and 'info.setChecked(isSelected())' in card
+    assert 'new CompactStylePicker(context,resourcesProvider,livePreview,2)' in gallery
+    assert 'HeaderConfig.style(style)' in gallery and 'FlexyComposerConfig.setStyle(style)' in gallery
+    assert 'new HeaderPreviewView(context,style,true)' in gallery and 'createStyleMiniature(context,style)' in gallery
+    assert 'info.setChecked(isSelected())' in picker and 'label.setText(name)' in picker
+    assert 'fontScale' in picker and 'LocaleController.isRTL' in picker
     for path in ['header/HeaderPreviewView.java','composer/FlexyComposerSettingsActivity.java']:
         preview=(JAVA/'app/flexygram'/path).read_text()
+        assert 'if(miniature)return;' in preview
         assert 'NotificationCenter.didSetNewWallpapper' in preview
         assert 'wallpaperPreview.refresh()' in preview and 'wallpaperPreview.close()' in preview

@@ -535,7 +535,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
         searchDividerRow = addRow();
 
         messagesHeaderRow = addRow("messagesHeader");
-        removeMessageTailRow = app.flexygram.bubbles.BubbleStyle.signature() ? -1 : addRow("removeMessageTail");
+        removeMessageTailRow = app.flexygram.bubbles.BubbleStyle.customShape() ? -1 : addRow("removeMessageTail");
         replaceEditedRow = addRow("replaceEdited");
         showOnlineStatusRow = addRow("showOnlineStatus");
         showResultsBeforeVotingRow = addRow("showResultsBeforeVoting");

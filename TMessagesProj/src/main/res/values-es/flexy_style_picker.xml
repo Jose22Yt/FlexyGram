@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyBubbleShapeTelegram">Telegram</string>
+    <string name="FlexyBubbleShapeFlexyGram">FlexyGram</string>
+    <string name="FlexyBubbleShapeIPhone">Telegram para iPhone</string>
+    <string name="FlexyBubblePersonalization">Personalizar burbujas</string>
+    <string name="FlexyBubblePersonalizationShow">Material, blur y bordes</string>
+    <string name="FlexyBubblePersonalizationHide">Ocultar controles</string>
+</resources>

@@ -2,7 +2,13 @@ package app.flexygram.bubbles;
 
 /** Pure bounded presentation policy. Native message layout/selection/media are unchanged. */
 public final class BubbleStyle {
-    public static boolean signature() { return org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && BubbleConfig.surfaceEffect() != BubbleConfig.DEFAULT; }
+    public static boolean signature() {
+        return org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && (BubbleConfig.shape() != BubbleConfig.TELEGRAM
+                || BubbleConfig.surfaceEffect() != BubbleConfig.DEFAULT || BubbleConfig.outlineEnabled()
+                || BubbleConfig.backgroundBlur() || BubbleConfig.transparency() != 0);
+    }
+    public static boolean flexyShape() { return org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && BubbleConfig.shape() == BubbleConfig.FLEXYGRAM; }
+    public static boolean customShape() { return org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && BubbleConfig.shape() != BubbleConfig.TELEGRAM; }
     private BubbleStyle() { }
     public static int transparency(int percent) { return Math.max(0, Math.min(100, percent)); }
     // Only fill alpha changes. Text, media, selection and contour keep their own alpha.
@@ -13,6 +19,7 @@ public final class BubbleStyle {
         r += (target-r)*28/100; g += (target-g)*28/100; b += (target-b)*28/100;
         return 0xff000000 | (r << 16) | (g << 8) | b;
     }
-    public static int effectiveRadius(boolean signature, int stored) { return signature ? 20 : stored; }
+    // The Telegram radius stays intact; each custom shape owns its radius in MessageDrawable.
+    public static int effectiveRadius(boolean signature, int stored) { return stored; }
     public static int defaultRadius(boolean alpha) { return 17; }
 }

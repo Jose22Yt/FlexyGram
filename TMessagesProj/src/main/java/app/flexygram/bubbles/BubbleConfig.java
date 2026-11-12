@@ -10,6 +10,10 @@ public final class BubbleConfig {
     public static final String GLASS = "glass", TRANSPARENCY = "transparency", BORDER = "border", EDGES = "edges";
     public static final String SURFACE_EFFECT = "surface_effect";
     public static final int ADAPTIVE = 0, LEGACY = 1, DEFAULT = 2;
+    public static final int TELEGRAM = 0, FLEXYGRAM = 1, IPHONE = 2;
+    public static final String SHAPE = "shape";
+    private static int shape = TELEGRAM;
+    private static boolean customizationEnabled;
     private static int surfaceEffect = DEFAULT;
     private static boolean smallTimestamps = false;
     private static boolean loaded, glass, border, edges, cachedBlur;
@@ -26,6 +30,10 @@ public final class BubbleConfig {
     public static void reload() {
         SharedPreferences p = preferences();
         surfaceEffect = normalizeSurfaceEffect(p.getInt(SURFACE_EFFECT, DEFAULT));
+        int savedShape = p.getInt(SHAPE, -1);
+        shape = normalizeShape(savedShape < 0 ? surfaceEffect == DEFAULT ? TELEGRAM : FLEXYGRAM : savedShape);
+        // Preserve the old native/default appearance when saved effects used to be dormant.
+        customizationEnabled = savedShape >= 0 || surfaceEffect != DEFAULT;
         smallTimestamps = p.getBoolean("small_timestamp", false);
         outlineEnabled = p.getBoolean("signature_outline_enabled", false);
         outlineStyle = Math.max(0, Math.min(3, p.getInt("signature_outline_style", 1)));
@@ -49,13 +57,24 @@ public final class BubbleConfig {
     public static boolean edges() { return loaded && edges; }
     private static int normalizeSurfaceEffect(int value) { return value == LEGACY || value == ADAPTIVE ? value : DEFAULT; }
     public static int surfaceEffect() { return surfaceEffect; }
+    public static int normalizeShape(int value) { return value >= TELEGRAM && value <= IPHONE ? value : TELEGRAM; }
+    public static int shape() { return shape; }
+    public static void setShape(int value) {
+        if (!loaded) load(); value = normalizeShape(value);
+        shape = value; customizationEnabled = true; preferences().edit().putInt(SHAPE, value).apply();
+    }
+    private static void enableCustomization() {
+        if (!customizationEnabled) { customizationEnabled=true;preferences().edit().putInt(SHAPE,shape).apply(); }
+    }
     public static boolean adaptive() { return surfaceEffect == ADAPTIVE; }
     public static void setSurfaceEffect(int value) {
         if (!loaded) load();
         value = normalizeSurfaceEffect(value);
         if (surfaceEffect == value) return;
         surfaceEffect = value;
-        preferences().edit().putInt(SURFACE_EFFECT, value).apply();
+        customizationEnabled = true;
+        // Freeze the legacy-derived shape before changing the independent material.
+        preferences().edit().putInt(SHAPE, shape).putInt(SURFACE_EFFECT, value).apply();
     }
     public static boolean smallTimestamps() { return smallTimestamps; }
     public static void setSmallTimestamps(boolean value) {
@@ -65,7 +84,7 @@ public final class BubbleConfig {
         preferences().edit().putBoolean("small_timestamp", value).apply();
     }
     // Both surface materials share the same optional wallpaper blur cache.
-    public static boolean backgroundBlur() { return surfaceEffect != DEFAULT && cachedBlur; }
+    public static boolean backgroundBlur() { return customizationEnabled && cachedBlur; }
     /** Renderer compatibility only: saved matte flags can never tint a bubble again. */
     @Deprecated public static boolean matteEnabled() { return false; }
     @Deprecated public static int matteStrength() { return 0; }
@@ -73,11 +92,12 @@ public final class BubbleConfig {
     @Deprecated public static void setMatteStrength(int ignored) { }
     public static void setBackgroundBlur(boolean value) {
         if (!loaded) load();
+        enableCustomization();
         if (cachedBlur == value) return;
         cachedBlur = value;
         preferences().edit().putBoolean("signature_cached_blur", value).apply();
     }
-    public static boolean outlineEnabled() { return surfaceEffect != DEFAULT && outlineEnabled; }
+    public static boolean outlineEnabled() { return customizationEnabled && outlineEnabled; }
     public static int outlineStyle() { return outlineStyle; }
     public static int pearlIntensity() { return pearlIntensity; }
     public static int skin() { return 0; }
@@ -102,10 +122,10 @@ public final class BubbleConfig {
         if (!loaded) load(); if ((value?1:0) == fusionMode) return;
         setFusionMode(value?1:0);
     }
-    public static void setOutlineEnabled(boolean value) { if (!loaded) load(); outlineEnabled = value; preferences().edit().putBoolean("signature_outline_enabled", value).putInt("signature_border_position", borderPosition).apply(); }
+    public static void setOutlineEnabled(boolean value) { if (!loaded) load(); enableCustomization();outlineEnabled = value; preferences().edit().putBoolean("signature_outline_enabled", value).putInt("signature_border_position", borderPosition).apply(); }
     public static void setOutlineStyle(int value) { if (!loaded) load(); outlineStyle = Math.max(0, Math.min(3, value)); preferences().edit().putInt("signature_outline_style", outlineStyle).apply(); }
     public static void setPearlIntensity(int value) { if (!loaded) load(); value = Math.max(0, Math.min(100, value)); if (value == pearlIntensity) return; pearlIntensity = value; preferences().edit().putInt("signature_pearl_intensity", value).apply(); }
-    public static int transparency() { return transparency; }
+    public static int transparency() { return customizationEnabled ? transparency : 0; }
     public static int borderTenths() { return borderTenths; }
     public static float borderDp() { return borderTenths / 10f; }
     public static void setBorderTenths(int value) {
@@ -126,6 +146,7 @@ public final class BubbleConfig {
     }
     public static void setTransparency(int value) {
         if (!loaded) load(); value = BubbleStyle.transparency(value);
+        enableCustomization();
         if (transparency == value) return;
         transparency = value; preferences().edit().putInt(TRANSPARENCY, value).apply();
     }

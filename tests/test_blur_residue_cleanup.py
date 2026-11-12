@@ -28,14 +28,20 @@ def test_preview_material_changes_repaint_without_rebuilding_text_layout(tmp_pat
  static class AndroidUtilities{static float dpf2(float n){return n;}}
  static class BubbleConfig{static boolean small;static boolean smallTimestamps(){return small;}static boolean adaptive(){return true;}}
  static class ServiceBubbleSurface{static int textColor(Object o){return 3;}}
- static class Drawable{void setTint(int n){}}
+ static class BubbleStyle{static boolean signature;static boolean signature(){return signature;}}
+ static class R{static class drawable{static final int flexy_check_ios27=1,msg_check_s=2,flexy_halfcheck_ios27=3,msg_halfcheck=4;}}
+ static class Drawable{void setTint(int n){}Drawable mutate(){return this;}}
+ static class Resources{int loads;Drawable getDrawable(int id){loads++;return new Drawable();}}
+ boolean signatureTicks;Resources resources=new Resources();Resources getResources(){return resources;}
  static class Owner{void prepare(Object w,boolean m,int c){}}
  Paint time=new Paint();int measuredWidth=300,checkColor,layouts,draws;
  Drawable check=new Drawable(),halfCheck=new Drawable();Owner blurOwner;Object wallpaper;boolean wallpaperMotion;
  void requestLayout(){layouts++;}void invalidate(){draws++;}
  BODY
  public static void main(String[]args){Probe p=new Probe();for(int i=0;i<1000;i++)p.settingsChanged();
- if(p.layouts!=0||p.draws!=1000||p.measuredWidth!=300)throw new AssertionError();
+ if(p.layouts!=0||p.draws!=1000||p.measuredWidth!=300||p.resources.loads!=0)throw new AssertionError();
+ BubbleStyle.signature=true;p.settingsChanged();if(p.resources.loads!=2||p.layouts!=0)throw new AssertionError();
+ p.settingsChanged();if(p.resources.loads!=2)throw new AssertionError();
  BubbleConfig.small=true;p.settingsChanged();if(p.layouts!=1||p.measuredWidth!=-1)throw new AssertionError();
  p.measuredWidth=300;p.settingsChanged();if(p.layouts!=1)throw new AssertionError();
  BubbleConfig.small=false;p.settingsChanged();if(p.layouts!=2)throw new AssertionError();

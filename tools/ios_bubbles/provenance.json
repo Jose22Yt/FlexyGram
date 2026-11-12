@@ -1,0 +1,18 @@
+{
+  "repository": "TelegramMessenger/Telegram-iOS",
+  "commit": "24638bc69bd083981b178dd1e7f921eebbf7fc46",
+  "path": "submodules/TelegramPresentationData/Sources/ChatMessageBubbleImages.swift",
+  "sha256": "769184b7b7eaac118f68fccaa89d1d2d4db1ad74434169a0ca68a8a6ca2c1a3d",
+  "source_url": "https://github.com/TelegramMessenger/Telegram-iOS/blob/24638bc69bd083981b178dd1e7f921eebbf7fc46/submodules/TelegramPresentationData/Sources/ChatMessageBubbleImages.swift",
+  "default_corners_source": "submodules/TelegramUIPreferences/Sources/PresentationThemeSettings.swift",
+  "main_radius": 16,
+  "auxiliary_radius": 8,
+  "template_size": [
+    43,
+    37
+  ],
+  "outgoing_stretch_point": [
+    18,
+    19
+  ]
+}

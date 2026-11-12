@@ -3,6 +3,7 @@ package app.flexygram.bubbles;
 import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.LocaleController.getString;
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -21,6 +22,9 @@ import app.flexygram.settings.SignatureMatteSettingsActivity;
 /** Local native preview, fill opacity, border width and optional cached wallpaper blur. */
 public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity {
     private static final int SLIDER = 110, PREVIEW = 111;
+    private boolean personalizationExpanded;
+    private int personalizationRow;
+    private app.flexygram.settings.signature.CompactStylePicker picker;
     private int effectRow, timestampRow;
     private int appearanceHeaderRow, borderHeaderRow, fusionHeaderRow;
     private int transparencyRow, borderRow, previewRow, positionRow, blurRow, enabledRow, fuseRow, styleRow, pearlRow, fusionIntensityRow, fusionAdaptRow;
@@ -31,12 +35,16 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     @Override protected void updateRows() {
         super.updateRows(); BubbleConfig.load();
         previewRow = addRow();
+        personalizationRow = addRow("flexyBubblePersonalization");
+        appearanceHeaderRow = borderHeaderRow = fusionHeaderRow = -1;
+        effectRow = timestampRow = transparencyRow = blurRow = enabledRow = -1;
+        borderRow = positionRow = fuseRow = styleRow = pearlRow = fusionIntensityRow = fusionAdaptRow = -1;
+        if (!personalizationExpanded) return;
         appearanceHeaderRow = addHeader("FlexyBubbleAppearanceSection");
         effectRow = addRow("flexyBubbleSurfaceEffect");
         timestampRow = addRow("flexyBubbleSmallTimestamp");
         transparencyRow = blurRow = borderHeaderRow = enabledRow = fusionHeaderRow = -1;
         borderRow = positionRow = fuseRow = styleRow = pearlRow = fusionIntensityRow = fusionAdaptRow = -1;
-        if (BubbleConfig.surfaceEffect() == BubbleConfig.DEFAULT) return;
         transparencyRow = addRow("flexyBubbleTransparency");
         blurRow = addRow("flexyBubbleBlur");
         borderHeaderRow = addHeader("FlexyBubbleBorderSection");
@@ -63,36 +71,66 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     }
     @Override protected void onItemClick(View view, int position, float x, float y) {
         if (position < 0) return;
-        if (position == effectRow) {
+        if (position == personalizationRow) {
+            personalizationExpanded = !personalizationExpanded;
+            updateRows(); listAdapter.notifyDataSetChanged();
+        } else if (position == effectRow) {
             showDialog(new AlertDialog.Builder(getParentActivity(), resourcesProvider)
                     .setTitle(getString(R.string.FlexyBubbleSurfaceEffect))
                     .setItems(new CharSequence[]{getString(R.string.Default), getString(R.string.FlexyBubbleAdaptiveSurface), getString(R.string.FlexyBubbleLegacySurface)}, (dialog, which) -> {
                         BubbleConfig.setSurfaceEffect(new int[]{BubbleConfig.DEFAULT, BubbleConfig.ADAPTIVE, BubbleConfig.LEGACY}[which]);
                         updateRows(); listAdapter.notifyDataSetChanged();
-                        if (preview != null) preview.settingsChanged();
+                        settingsChanged();
                     }).create());
         } else if (position == timestampRow) {
             BubbleConfig.setSmallTimestamps(!BubbleConfig.smallTimestamps());
             listAdapter.notifyItemChanged(position);
-            if (preview != null) preview.settingsChanged();
+            settingsChanged();
         } else if (position == enabledRow) {
             BubbleConfig.setOutlineEnabled(!BubbleConfig.outlineEnabled());
-            updateRows(); listAdapter.notifyDataSetChanged(); if (preview != null) preview.settingsChanged();
+            updateRows(); listAdapter.notifyDataSetChanged(); settingsChanged();
         } else if (position == fuseRow) {
-            showDialog(new AlertDialog.Builder(getParentActivity(),resourcesProvider).setTitle(getString(R.string.FlexyBubbleFusionMode)).setItems(new CharSequence[]{getString(R.string.FlexyBubbleFusionNone),getString(R.string.FlexyBubbleFusionClassic),"Flexy Bubble Fusion 2.0"},(dialog,which)->{BubbleConfig.setFusionMode(which);updateRows();listAdapter.notifyDataSetChanged();if(preview!=null)preview.settingsChanged();}).create());
+            showDialog(new AlertDialog.Builder(getParentActivity(),resourcesProvider).setTitle(getString(R.string.FlexyBubbleFusionMode)).setItems(new CharSequence[]{getString(R.string.FlexyBubbleFusionNone),getString(R.string.FlexyBubbleFusionClassic),"Flexy Bubble Fusion 2.0"},(dialog,which)->{BubbleConfig.setFusionMode(which);updateRows();listAdapter.notifyDataSetChanged();settingsChanged();}).create());
         } else if(position==fusionAdaptRow){
-            BubbleConfig.setFusionAdapt(!BubbleConfig.fusionAdapt());listAdapter.notifyItemChanged(position);if(preview!=null)preview.settingsChanged();
+            BubbleConfig.setFusionAdapt(!BubbleConfig.fusionAdapt());listAdapter.notifyItemChanged(position);settingsChanged();
         } else if (position == styleRow) {
             showDialog(new AlertDialog.Builder(getParentActivity(), resourcesProvider).setTitle(getString(R.string.FlexyBubbleOutlineStyle))
                 .setItems(new CharSequence[]{getString(R.string.FlexyBubbleOriginal),getString(R.string.FlexyBubbleGlassOriginal),getString(R.string.FlexyBubbleGlassPearl),getString(R.string.FlexyBubbleGlassSatin)},(dialog,which)->{
                     BubbleConfig.setOutlineStyle(new int[]{0, 3, 1, 2}[which]); updateRows(); listAdapter.notifyDataSetChanged();
-                    if (preview != null) preview.settingsChanged();
+                    settingsChanged();
                 }).create());
         } else if (position == blurRow) {
             BubbleConfig.setBackgroundBlur(!BubbleConfig.backgroundBlur());
             updateRows(); listAdapter.notifyDataSetChanged();
-            if (preview != null) preview.settingsChanged();
+            settingsChanged();
         }
+    }
+    @Override public void saveSelfArgs(Bundle args) { super.saveSelfArgs(args);args.putBoolean("bubblePersonalizationExpanded",personalizationExpanded); }
+    @Override public void restoreSelfArgs(Bundle args) { super.restoreSelfArgs(args);personalizationExpanded=args.getBoolean("bubblePersonalizationExpanded",false); }
+    @Override public void scrollToRow(String key, Runnable unknown) {
+        if (key != null && key.startsWith("flexyBubble") && !personalizationExpanded) {
+            personalizationExpanded=true;updateRows();if(listAdapter!=null)listAdapter.notifyDataSetChanged();
+        }
+        super.scrollToRow(key,unknown);
+    }
+    private View createGallery(Context context) {
+        preview = new BubblePreviewView(context,contextualWallpaper);
+        picker = new app.flexygram.settings.signature.CompactStylePicker(context,resourcesProvider,preview,3);
+        int[] styles={BubbleConfig.TELEGRAM,BubbleConfig.FLEXYGRAM,BubbleConfig.IPHONE};
+        int[] names={R.string.FlexyBubbleShapeTelegram,R.string.FlexyBubbleShapeFlexyGram,R.string.FlexyBubbleShapeIPhone};
+        for(int i=0;i<styles.length;i++) {
+            final int shape=styles[i];
+            picker.addChoice(shape,getString(names[i]),new BubbleShapeMiniature(context,shape),()->{
+                BubbleConfig.setShape(shape);picker.select(shape);picker.refreshMiniatures();preview.settingsChanged();
+            });
+        }
+        picker.select(BubbleConfig.shape());
+        picker.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+        return picker;
+    }
+    private void settingsChanged() {
+        if(preview!=null)preview.settingsChanged();
+        if(picker!=null)picker.refreshMiniatures();
     }
     private String[] borderPositions() {
         return new String[]{getString(R.string.FlexyBubbleBorderTop),
@@ -116,7 +154,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
                 public void onStartTrackingTouch(SeekBar bar) { bar.getParent().requestDisallowInterceptTouchEvent(true); }
                 public void onStopTrackingTouch(SeekBar bar) { bar.getParent().requestDisallowInterceptTouchEvent(false); }
                 public void onProgressChanged(SeekBar bar, int value, boolean user) {
-                    if (user && !binding) { if(fusion)BubbleConfig.setFusionIntensity(value);else if (position) BubbleConfig.setBorderPosition(value + 1); else if (border) BubbleConfig.setBorderTenths(value); else if (pearl) BubbleConfig.setPearlIntensity(value); else BubbleConfig.setTransparency(value); if (preview != null) preview.settingsChanged(); }
+                    if (user && !binding) { if(fusion)BubbleConfig.setFusionIntensity(value);else if (position) BubbleConfig.setBorderPosition(value + 1); else if (border) BubbleConfig.setBorderTenths(value); else if (pearl) BubbleConfig.setPearlIntensity(value); else BubbleConfig.setTransparency(value); settingsChanged(); }
                     label(value);
                 }
             });
@@ -139,7 +177,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         Adapter(Context context) { super(context); }
         @Override public int getItemViewType(int position) {
             if (position == appearanceHeaderRow || position == borderHeaderRow || position == fusionHeaderRow) return TYPE_HEADER;
-            return position == previewRow ? PREVIEW : position == timestampRow || position == blurRow || position == fusionAdaptRow || position == enabledRow ? TYPE_CHECK : position == effectRow || position == styleRow || position == fuseRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == fusionIntensityRow ? SLIDER : TYPE_INFO_PRIVACY;
+            return position == previewRow ? PREVIEW : position == timestampRow || position == blurRow || position == fusionAdaptRow || position == enabledRow ? TYPE_CHECK : position == personalizationRow || position == effectRow || position == styleRow || position == fuseRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == fusionIntensityRow ? SLIDER : TYPE_INFO_PRIVACY;
         }
         @Override protected boolean isSectionContent(int type) {
             // Wallpaper and section labels separate the three compact control groups.
@@ -147,14 +185,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         }
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
             if (type == PREVIEW) {
-                preview = new BubblePreviewView(parent.getContext(), contextualWallpaper);
-                preview.setTag(RecyclerListView.TAG_NOT_SECTION);
-                RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                // The preview has an 8dp internal inset; align it with the shared 12dp cards.
-                params.setMargins(dp(4), dp(12), dp(4), dp(8));
-                preview.setLayoutParams(params);
-                return new RecyclerListView.Holder(preview);
+                return new RecyclerListView.Holder(createGallery(parent.getContext()));
             }
             if (type == SLIDER) {
                 TransparencyCell cell = new TransparencyCell(parent.getContext());
@@ -174,7 +205,16 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
             return holder;
         }
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
-            if (position == previewRow) { holder.itemView.invalidate(); return; }
+            if (position == previewRow) {
+                picker=(app.flexygram.settings.signature.CompactStylePicker)holder.itemView;
+                preview=(BubblePreviewView)picker.previewView();
+                picker.select(BubbleConfig.shape());picker.refreshMiniatures();holder.itemView.invalidate();return;
+            }
+            if(position==personalizationRow) {
+                ((TextSettingsCell)holder.itemView).setTextAndValue(getString(R.string.FlexyBubblePersonalization),
+                        getString(personalizationExpanded?R.string.FlexyBubblePersonalizationHide:R.string.FlexyBubblePersonalizationShow),false);
+                return;
+            }
             if (position == timestampRow) {
                 ((TextCheckCell) holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleSmallTimestamp), BubbleConfig.smallTimestamps(), false);
                 return;
@@ -204,6 +244,6 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
 
 
         }
-        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = settingsRowPosition(holder); if (p < 0) return false; return p == timestampRow || p == effectRow || p == blurRow || p == styleRow || p == fuseRow || p == enabledRow || p==fusionAdaptRow; }
+        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = settingsRowPosition(holder); if (p < 0) return false; return p == personalizationRow || p == timestampRow || p == effectRow || p == blurRow || p == styleRow || p == fuseRow || p == enabledRow || p==fusionAdaptRow; }
     }
 }

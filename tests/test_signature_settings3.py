@@ -65,10 +65,14 @@ def test_original_editor_click_logic_is_unchanged():
    current=current.replace('getString(R.string.FlexyHeaderFloating),\n                            ','').replace('new int[]{4, 3, 0, 2, 1}','new int[]{3, 0, 2, 1}')
   if path.endswith('/BubbleSettingsActivity.java'):
    # Material and timestamp controls are additive; earlier callbacks stay intact.
-   for key in ['effectRow','timestampRow']:
+   for key in ['personalizationRow','effectRow','timestampRow']:
     added=method(current,'if (position == '+key+')')
     current=current.replace(added+' else ','',1)
-  assert current==method(original(path),'protected void onItemClick(')
+  expected=method(original(path),'protected void onItemClick(')
+  if path.endswith('/BubbleSettingsActivity.java'):
+   current=re.sub(r'if\s*\(preview\s*!=\s*null\)\s*preview.settingsChanged\(\);','settingsChanged();',current)
+   expected=re.sub(r'if\s*\(preview\s*!=\s*null\)\s*preview.settingsChanged\(\);','settingsChanged();',expected)
+  assert current==expected
  tabs = source('app/flexygram/navigation/BottomTabsSettingsActivity.java')
  assert 'showTabActionDialog(' in tabs and 'LiquidNavigationConfig.setOrder(' in tabs
  # The original sticker reset is surfaced as a direct row, with the rest of its click handler unchanged.

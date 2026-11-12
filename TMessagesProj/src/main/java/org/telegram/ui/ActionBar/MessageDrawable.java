@@ -43,6 +43,13 @@ public class MessageDrawable extends Drawable {
     private final Paint flexyFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint flexyBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final app.flexygram.bubbles.SignatureBorderPath signatureBorderPath = new app.flexygram.bubbles.SignatureBorderPath();
+    private app.flexygram.bubbles.IosBubbleShape iosBubbleShape;
+    private int previewBubbleShape = -1;
+    public void setFlexyBubbleShapePreview(int shape) { previewBubbleShape = app.flexygram.bubbles.BubbleConfig.normalizeShape(shape); }
+    private int bubbleShape() {
+        return previewBubbleShape >= 0 ? previewBubbleShape : org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+                ? app.flexygram.bubbles.BubbleConfig.shape() : app.flexygram.bubbles.BubbleConfig.TELEGRAM;
+    }
     /** Kept for old preview callers; skins no longer alter the native geometry or finish. */
     public void setFlexySkinPreview(int skin) { }
     private final app.flexygram.bubbles.BubbleFusion bubbleFusion=new app.flexygram.bubbles.BubbleFusion();
@@ -59,10 +66,11 @@ public class MessageDrawable extends Drawable {
     }
     public void setFlexyGlassSource(GlassSource source) { flexyGlassSource = source; }
     private boolean flexySurface() {
-        return currentType != TYPE_PREVIEW && app.flexygram.bubbles.BubbleStyle.signature();
+        return currentType != TYPE_PREVIEW && (app.flexygram.bubbles.BubbleStyle.signature() || bubbleShape() != app.flexygram.bubbles.BubbleConfig.TELEGRAM);
     }
     private int bubbleRadius() {
-        return app.flexygram.bubbles.BubbleStyle.signature() ? 20 : SharedConfig.bubbleRadius;
+        return bubbleShape() == app.flexygram.bubbles.BubbleConfig.IPHONE ? 16
+                : bubbleShape() == app.flexygram.bubbles.BubbleConfig.FLEXYGRAM ? 20 : SharedConfig.bubbleRadius;
     }
     private int signatureColor() {
         if (overrideColor != null) return overrideColor;
@@ -619,13 +627,13 @@ public class MessageDrawable extends Drawable {
             nearRad = overrideRoundRadius;
         } else if (overrideRounding > 0) {
             rad = AndroidUtilities.lerp(dp(bubbleRadius()), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
-            nearRad = AndroidUtilities.lerp(dp(Math.min(6, bubbleRadius())), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
+            nearRad = AndroidUtilities.lerp(dp(Math.min(bubbleShape() == app.flexygram.bubbles.BubbleConfig.IPHONE ? 8 : 6, bubbleRadius())), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
         } else if (currentType == TYPE_PREVIEW) {
             rad = dp(6);
             nearRad = dp(6);
         } else {
             rad = dp(bubbleRadius());
-            nearRad = dp(Math.min(6, bubbleRadius()));
+            nearRad = dp(Math.min(bubbleShape() == app.flexygram.bubbles.BubbleConfig.IPHONE ? 8 : 6, bubbleRadius()));
         }
         int smallRad = dp(6);
 
@@ -652,7 +660,7 @@ public class MessageDrawable extends Drawable {
         if (pathDrawCacheParams != null) {
             path = pathDrawCacheParams.path;
             invalidatePath = pathDrawCacheParams.invalidatePath(bounds, drawFullBottom, drawFullTop)
-                | pathDrawCacheParams.invalidateShape(rad, nearRad, smallRad, padding, currentType, isTopNear, isBottomNear, botButtonsBottom, drawFullBubble, isOut, paintToUse != null);
+                | pathDrawCacheParams.invalidateShape(rad, nearRad, smallRad, padding, currentType | (bubbleShape() << 8), isTopNear, isBottomNear, botButtonsBottom, drawFullBubble, isOut, paintToUse != null);
         } else {
             path = this.path;
             invalidatePath = true;
@@ -717,7 +725,7 @@ public class MessageDrawable extends Drawable {
                         bounds, rad, nearRad, smallRad, padding, currentType,
                         (isTopNear ? 1 : 0) | (isBottomNear ? 2 : 0) | (botButtonsBottom ? 4 : 0)
                                 | (drawFullBubble ? 8 : 0) | (isOut ? 16 : 0)
-                                | (drawFullTop ? 32 : 0) | (drawFullBottom ? 64 : 0), top);
+                                | (drawFullTop ? 32 : 0) | (drawFullBottom ? 64 : 0) | (bubbleShape() << 8), top);
                 flexyBorderPaint.setShader(borderCache == null ? null : borderCache.fade(contour));
                 flexyBorderPaint.setStrokeCap(Paint.Cap.ROUND);
                 flexyBorderPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -762,13 +770,13 @@ public class MessageDrawable extends Drawable {
             nearRad = overrideRoundRadius;
         } else if (overrideRounding > 0) {
             rad = AndroidUtilities.lerp(dp(bubbleRadius()), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
-            nearRad = AndroidUtilities.lerp(dp(Math.min(6, bubbleRadius())), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
+            nearRad = AndroidUtilities.lerp(dp(Math.min(bubbleShape() == app.flexygram.bubbles.BubbleConfig.IPHONE ? 8 : 6, bubbleRadius())), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
         } else if (currentType == TYPE_PREVIEW) {
             rad = dp(6);
             nearRad = dp(6);
         } else {
             rad = dp(bubbleRadius());
-            nearRad = dp(Math.min(6, bubbleRadius()));
+            nearRad = dp(Math.min(bubbleShape() == app.flexygram.bubbles.BubbleConfig.IPHONE ? 8 : 6, bubbleRadius()));
         }
         int smallRad = dp(6);
         int top = Math.max(bounds.top, 0);
@@ -785,7 +793,7 @@ public class MessageDrawable extends Drawable {
         if (pathDrawCacheParams != null) {
             path = pathDrawCacheParams.path;
             invalidatePath = pathDrawCacheParams.invalidatePath(bounds, drawFullBottom, drawFullTop)
-                | pathDrawCacheParams.invalidateShape(rad, nearRad, smallRad, padding, currentType, isTopNear, isBottomNear, botButtonsBottom, drawFullBubble, isOut, true);
+                | pathDrawCacheParams.invalidateShape(rad, nearRad, smallRad, padding, currentType | (bubbleShape() << 8), isTopNear, isBottomNear, botButtonsBottom, drawFullBubble, isOut, true);
         } else {
             path = this.path;
             invalidatePath = true;
@@ -814,6 +822,14 @@ public class MessageDrawable extends Drawable {
             rad = heightHalf;
         }
         final boolean oeNoTail = oeRemoveMessageTail();
+        if (currentType != TYPE_PREVIEW && bubbleShape() == app.flexygram.bubbles.BubbleConfig.IPHONE) {
+            app.flexygram.bubbles.IosBubbleShape shape;
+            if(pathDrawCacheParams!=null)shape=pathDrawCacheParams.iosShape();
+            else { if(iosBubbleShape==null)iosBubbleShape=new app.flexygram.bubbles.IosBubbleShape();shape=iosBubbleShape; }
+            shape.build(path, bounds, AndroidUtilities.density, rad, nearRad, isOut,
+                    isTopNear, isBottomNear, currentType == TYPE_MEDIA, oeNoTail, botButtonsBottom);
+            return;
+        }
         if (isOut) {
             // LEFT-BOTTOM <- RIGHT-BOTTOM
             if (drawFullBubble || currentType == TYPE_PREVIEW || customPaint || drawFullBottom) {
@@ -821,7 +837,7 @@ public class MessageDrawable extends Drawable {
                 if (currentType == TYPE_MEDIA || oeNoTail) {
                     path.moveTo(bounds.right - dp(8) - radToUse, bounds.bottom - padding);
                 } else {
-                    path.moveTo(bounds.right - dp(flexySurface() ? 22f : 2.6f), bounds.bottom - padding);
+                    path.moveTo(bounds.right - dp(bubbleShape() == app.flexygram.bubbles.BubbleConfig.FLEXYGRAM ? 22f : 2.6f), bounds.bottom - padding);
                 }
                 path.lineTo(bounds.left + padding + radToUse, bounds.bottom - padding);
                 rect.set(bounds.left + padding, bounds.bottom - padding - radToUse * 2, bounds.left + padding + radToUse * 2, bounds.bottom - padding);
@@ -876,7 +892,7 @@ public class MessageDrawable extends Drawable {
                         rect.set(bounds.right - dp(8) - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - dp(8), bounds.bottom - padding);
                         path.arcTo(rect, 0, 90, false);
                     } else {
-                        if (flexySurface()) {
+                        if (bubbleShape() == app.flexygram.bubbles.BubbleConfig.FLEXYGRAM) {
                             appendSignatureTail(path, bounds.right - dp(8), bounds.bottom - padding, 1);
                         } else {
                     path.lineTo(bounds.right - dp(8), bounds.bottom - padding - smallRad - dp(3));
@@ -895,7 +911,7 @@ public class MessageDrawable extends Drawable {
                 if (currentType == TYPE_MEDIA || oeNoTail) {
                     path.moveTo(bounds.left + dp(8) + radToUse, bounds.bottom - padding);
                 } else {
-                    path.moveTo(bounds.left + dp(flexySurface() ? 22f : 2.6f), bounds.bottom - padding);
+                    path.moveTo(bounds.left + dp(bubbleShape() == app.flexygram.bubbles.BubbleConfig.FLEXYGRAM ? 22f : 2.6f), bounds.bottom - padding);
                 }
                 path.lineTo(bounds.right - padding - radToUse, bounds.bottom - padding);
                 rect.set(bounds.right - padding - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - padding, bounds.bottom - padding);
@@ -944,7 +960,7 @@ public class MessageDrawable extends Drawable {
                         rect.set(bounds.left + dp(8), bounds.bottom - padding - radToUse * 2, bounds.left + dp(8) + radToUse * 2, bounds.bottom - padding);
                         path.arcTo(rect, 180, -90, false);
                     } else {
-                        if (flexySurface()) {
+                        if (bubbleShape() == app.flexygram.bubbles.BubbleConfig.FLEXYGRAM) {
                             appendSignatureTail(path, bounds.left + dp(8), bounds.bottom - padding, -1);
                         } else {
                     path.lineTo(bounds.left + dp(8), bounds.bottom - padding - smallRad - dp(3));
@@ -1018,7 +1034,7 @@ public class MessageDrawable extends Drawable {
 
     /** openExtera: убрать «хвостик» пузыря сообщения (ChatsConfig.removeMessageTail). */
     private static boolean oeRemoveMessageTail() {
-        if (app.flexygram.bubbles.BubbleStyle.signature()) return false;
+        if (app.flexygram.bubbles.BubbleStyle.customShape()) return false;
         try {
             app.exteraless.chats.ChatsConfig.ensureLoaded();
             return app.exteraless.chats.ChatsConfig.removeMessageTail.Bool();
@@ -1029,6 +1045,11 @@ public class MessageDrawable extends Drawable {
 
     public static class PathDrawParams {
         Path path = new Path();
+        private app.flexygram.bubbles.IosBubbleShape iosShape;
+        private app.flexygram.bubbles.IosBubbleShape iosShape() {
+            if(iosShape==null)iosShape=new app.flexygram.bubbles.IosBubbleShape();
+            return iosShape;
+        }
         // Lazily allocated only for partial Signature borders; recycled with this
         // cell's native path. No bitmap, message reference or global size cache.
         private app.flexygram.bubbles.SignatureBorderPath signatureBorder;

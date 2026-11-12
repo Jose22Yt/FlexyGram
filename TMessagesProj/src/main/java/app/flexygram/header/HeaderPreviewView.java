@@ -35,10 +35,12 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
     private final android.text.TextPaint scratchPaint = new android.text.TextPaint();
     private String displayName = "", displayStatus = "";
     private final int forcedStyle;
+    private final boolean miniature;
     private final app.flexygram.preview.SignatureWallpaperPreview wallpaperPreview;
     public HeaderPreviewView(Context context) { this(context, -1); }
-    public HeaderPreviewView(Context context, int style) {
-        super(context); forcedStyle=style;
+    public HeaderPreviewView(Context context, int style) { this(context, style, false); }
+    public HeaderPreviewView(Context context, int style, boolean miniature) {
+        super(context); forcedStyle=style; this.miniature=miniature;
         wallpaperPreview=new app.flexygram.preview.SignatureWallpaperPreview(this,null,this::invalidate);
         setLayoutParams(new androidx.recyclerview.widget.RecyclerView.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
         text.setTextAlign(Paint.Align.CENTER);
@@ -50,7 +52,7 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
     private boolean previewFusion(){return previewStyle()==2||previewStyle()==3||previewStyle()==4;}
     private boolean previewFloating(){return previewStyle()==4;}
     private boolean previewPortrait(){return previewStyle()==3;}
-    @Override protected void onAttachedToWindow(){super.onAttachedToWindow();wallpaperPreview.attach();var center=org.telegram.messenger.NotificationCenter.getGlobalInstance();center.addObserver(this,org.telegram.messenger.NotificationCenter.didSetNewTheme);center.addObserver(this,org.telegram.messenger.NotificationCenter.didApplyNewTheme);center.addObserver(this,org.telegram.messenger.NotificationCenter.didSetNewWallpapper);}
+    @Override protected void onAttachedToWindow(){super.onAttachedToWindow();if(miniature)return;wallpaperPreview.attach();var center=org.telegram.messenger.NotificationCenter.getGlobalInstance();center.addObserver(this,org.telegram.messenger.NotificationCenter.didSetNewTheme);center.addObserver(this,org.telegram.messenger.NotificationCenter.didApplyNewTheme);center.addObserver(this,org.telegram.messenger.NotificationCenter.didSetNewWallpapper);}
     @Override protected void onDetachedFromWindow(){var center=org.telegram.messenger.NotificationCenter.getGlobalInstance();center.removeObserver(this,org.telegram.messenger.NotificationCenter.didSetNewTheme);center.removeObserver(this,org.telegram.messenger.NotificationCenter.didApplyNewTheme);center.removeObserver(this,org.telegram.messenger.NotificationCenter.didSetNewWallpapper);wallpaperPreview.close();super.onDetachedFromWindow();}
     @Override public void didReceivedNotification(int id,int account,Object... args){wallpaperPreview.refresh();settingsChanged();}
     public void settingsChanged() { requestLayout(); invalidate(); }

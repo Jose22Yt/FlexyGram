@@ -23,7 +23,7 @@ public class Probe {
  }
  static class RecyclerView{static class LayoutParams extends ViewGroup.LayoutParams{int leftMargin,topMargin,rightMargin,bottomMargin;LayoutParams(int w,int h){super(w,h);}void setMargins(int l,int t,int r,int b){leftMargin=l;topMargin=t;rightMargin=r;bottomMargin=b;}}static class ViewHolder{View itemView;ViewHolder(View v){itemView=v;}}}
  static class RecyclerListView{static final int TAG_NOT_SECTION=12;static class Holder extends RecyclerView.ViewHolder{Holder(View v){super(v);}}}
- static class BubblePreviewView extends View{BubblePreviewView(Context c,Object wallpaper){super(c);}}
+ static class Gallery extends View{Gallery(Context c){super(c);}}
  static class HeaderCell extends View{HeaderCell(Context c){super(c);}void setHeight(int v){}}
  static class TransparencyCell extends View{TransparencyCell(Context c){super(c);}}
  static class BubbleConfig{static final int DEFAULT=2;static int surfaceEffect(){return adaptive?0:1;}static boolean outline,adaptive;static boolean adaptive(){return adaptive;}static int style,fusion;static void load(){}static boolean outlineEnabled(){return outline;}static int outlineStyle(){return style;}static int fusionMode(){return fusion;}}
@@ -42,9 +42,10 @@ public class Probe {
   public View createView(Context c){return new View(c);}
  }
  static class Page extends BasePage{
-  int effectRow,timestampRow,appearanceHeaderRow,borderHeaderRow,fusionHeaderRow;
+  boolean personalizationExpanded=true;int personalizationRow;int effectRow,timestampRow,appearanceHeaderRow,borderHeaderRow,fusionHeaderRow;
   int transparencyRow,borderRow,previewRow,positionRow,blurRow,enabledRow,fuseRow,styleRow,pearlRow,fusionIntensityRow,fusionAdaptRow;
-  Object contextualWallpaper;BubblePreviewView preview;
+  Object contextualWallpaper;
+  View createGallery(Context c){Gallery view=new Gallery(c);view.setTag(RecyclerListView.TAG_NOT_SECTION);view.setLayoutParams(new RecyclerView.LayoutParams(-1,-2));return view;}
   UPDATE_ROWS
   CREATE_VIEW
   class Adapter extends MatteAdapter{
@@ -68,9 +69,9 @@ public class Probe {
     int type=adapter.getItemViewType(position);View view=adapter.onCreateViewHolder(parent,type).itemView;
     check(view.params!=null&&view.params.width==-1&&view.params.height==-2);
     if(position==page.previewRow){
-     check(view instanceof BubblePreviewView&&Objects.equals(view.tag,RecyclerListView.TAG_NOT_SECTION));
+     check(view instanceof Gallery&&Objects.equals(view.tag,RecyclerListView.TAG_NOT_SECTION));
      RecyclerView.LayoutParams p=(RecyclerView.LayoutParams)view.params;
-     check(p.leftMargin+8==12&&p.rightMargin+8==12&&p.topMargin>=0&&p.bottomMargin>0);
+     check(p.width==-1&&p.height==-2);
     }else if(type==TYPE_HEADER){
      check(!adapter.isSectionContent(type)&&!adapter.isSettingsContentType(type));
      check(Objects.equals(view.tag,RecyclerListView.TAG_NOT_SECTION));
@@ -80,7 +81,7 @@ public class Probe {
     }
    }
    // Explicit boundaries prevent sliders/switches from becoming one unstructured card.
-   check(page.appearanceHeaderRow==page.previewRow+1);
+   check(page.personalizationRow==page.previewRow+1);check(page.appearanceHeaderRow==page.personalizationRow+1);
    check(page.effectRow==page.appearanceHeaderRow+1);
    check(page.timestampRow==page.effectRow+1&&adapter.getItemViewType(page.timestampRow)==TYPE_CHECK);
    check(page.transparencyRow==page.timestampRow+1);
@@ -96,7 +97,7 @@ public class Probe {
     check((page.fusionAdaptRow>=0)==(fusion==2));
    }else check(page.fusionHeaderRow==-1&&page.fuseRow==-1);
    BubbleConfig.adaptive=true;page.updateRows();
-   check(page.effectRow==2&&adapter.getItemViewType(page.effectRow)==TYPE_SETTINGS);
+   check(page.effectRow==3&&adapter.getItemViewType(page.effectRow)==TYPE_SETTINGS);
    check(page.transparencyRow==page.timestampRow+1&&page.blurRow==page.transparencyRow+1);
    check(page.timestampRow==page.effectRow+1&&adapter.getItemViewType(page.timestampRow)==TYPE_CHECK);
    check(page.borderHeaderRow==page.blurRow+1&&page.enabledRow==page.borderHeaderRow+1);
@@ -105,9 +106,11 @@ public class Probe {
    check((page.pearlRow>=0)==(outline&&style!=0));
    check((page.fusionIntensityRow>=0)==(outline&&fusion==2));
    check((page.fusionAdaptRow>=0)==(outline&&fusion==2));
-   check(page.rowCount==(outline?(style==0?13:14)+(fusion==2?2:0):8));
+   check(page.rowCount==(outline?(style==0?14:15)+(fusion==2?2:0):9));
+   page.personalizationExpanded=false;page.updateRows();check(page.rowCount==2&&page.effectRow==-1&&page.borderHeaderRow==-1);
+   page.personalizationExpanded=true;
    BubbleConfig.adaptive=false;page.updateRows();
-   check(page.rowCount==(outline?(style==0?13:14)+(fusion==2?2:0):8));
+   check(page.rowCount==(outline?(style==0?14:15)+(fusion==2?2:0):9));
   }
  }
 }'''

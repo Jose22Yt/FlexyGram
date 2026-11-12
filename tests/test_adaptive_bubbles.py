@@ -85,9 +85,17 @@ def test_mode_default_validation_and_legacy_preferences_survive_switches(tmp_pat
  BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);check(!BubbleConfig.smallTimestamps());
  BubbleConfig.setSmallTimestamps(true);BubbleConfig.load();check(BubbleConfig.smallTimestamps());
  BubbleConfig.setOutlineEnabled(true);BubbleConfig.setSurfaceEffect(BubbleConfig.DEFAULT);BubbleConfig.load();
- check(!BubbleStyle.signature()&&!BubbleConfig.backgroundBlur()&&!BubbleConfig.outlineEnabled());
+ check(BubbleStyle.signature()&&BubbleConfig.backgroundBlur()&&BubbleConfig.outlineEnabled());
  BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);BubbleConfig.load();
  check(BubbleStyle.signature()&&BubbleConfig.backgroundBlur()&&BubbleConfig.outlineEnabled()&&BubbleConfig.transparency()==29);
+ for(int shape=0;shape<=2;shape++)for(int material=0;material<=2;material++){
+   BubbleConfig.setShape(shape);BubbleConfig.setSurfaceEffect(material);BubbleConfig.load();
+   check(BubbleConfig.shape()==shape&&BubbleConfig.surfaceEffect()==material&&BubbleConfig.backgroundBlur()&&BubbleConfig.outlineEnabled()&&BubbleConfig.transparency()==29);
+ }
+ p.values.clear();p.putInt(BubbleConfig.SURFACE_EFFECT,BubbleConfig.DEFAULT);p.putBoolean("signature_cached_blur",true);p.putBoolean("signature_outline_enabled",true);p.putInt("transparency",55);
+ BubbleConfig.load();check(BubbleConfig.shape()==BubbleConfig.TELEGRAM&&!BubbleStyle.signature()&&!BubbleConfig.backgroundBlur()&&!BubbleConfig.outlineEnabled()&&BubbleConfig.transparency()==0);
+ p.putInt(BubbleConfig.SURFACE_EFFECT,BubbleConfig.LEGACY);BubbleConfig.load();check(BubbleConfig.shape()==BubbleConfig.FLEXYGRAM&&BubbleConfig.backgroundBlur());
+ BubbleConfig.setSurfaceEffect(BubbleConfig.DEFAULT);BubbleConfig.load();check(BubbleConfig.shape()==BubbleConfig.FLEXYGRAM);
  }}''',
     }, [JAVA/'app/flexygram/bubbles/BubbleConfig.java', JAVA/'app/flexygram/bubbles/BubbleStyle.java'])
 

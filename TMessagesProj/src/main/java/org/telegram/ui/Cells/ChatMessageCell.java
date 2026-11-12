@@ -1497,7 +1497,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
      * Здесь только зависимые от хвостика геометрии в ячейке.
      */
     private static boolean oeRemoveMessageTail() {
-        if (app.flexygram.bubbles.BubbleStyle.signature()) return false;
+        if (app.flexygram.bubbles.BubbleStyle.customShape()) return false;
         app.exteraless.chats.ChatsConfig.ensureLoaded();
         return app.exteraless.chats.ChatsConfig.removeMessageTail.Bool();
     }

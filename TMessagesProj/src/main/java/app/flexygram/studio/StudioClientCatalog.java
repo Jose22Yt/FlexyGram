@@ -116,6 +116,7 @@ final class StudioClientCatalog {
         integer("flexygram_scroll_effects","intensity",1);range("flexygram_scroll_effects","intensity",0,2);
         integer("flexygram_scroll_effects","curvature",60);range("flexygram_scroll_effects","curvature",0,100);
         String f="flexygram_bubbles";
+        integer(f,"shape",0);range(f,"shape",0,2);
         bool(f,"glass",false);bool(f,"border",false);bool(f,"edges",false);integer(f,"transparency",0);integer(f,"signature_border_tenths",11);
         integer(f,"surface_effect",2);bool(f,"small_timestamp",false);
         bool(f,"signature_cached_blur",false);bool(f,"signature_outline_enabled",false);integer(f,"signature_outline_style",1);integer(f,"signature_border_position",5);

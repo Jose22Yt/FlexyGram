@@ -138,6 +138,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
         }
     }
     public View createStylePreview(Context context, int style) { return new Preview(context, style); }
+    public View createStyleMiniature(Context context, int style) { return new Preview(context, style, true); }
 
     /** Component preview uses the same geometry and icon assets as the chat. */
     private final class Preview extends View implements org.telegram.messenger.NotificationCenter.NotificationCenterDelegate {
@@ -145,9 +146,11 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
         final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         final Drawable plus, clip, smile, folded, voice;
         final int forcedStyle;
+        final boolean miniature;
         Preview(Context c) { this(c, -1); }
-        Preview(Context c, int style) {
-            super(c); forcedStyle=style; setContentDescription(getString(R.string.FlexyComposerPreview));
+        Preview(Context c, int style) { this(c, style, false); }
+        Preview(Context c, int style, boolean miniature) {
+            super(c); forcedStyle=style; this.miniature=miniature; setContentDescription(getString(R.string.FlexyComposerPreview));
             wallpaperPreview = new app.flexygram.preview.SignatureWallpaperPreview(this, contextualWallpaper, this::invalidate);
             clip = app.flexygram.icons.ConversationControlIcons.load(c,R.drawable.flexy_composer_clip);
             folded = app.flexygram.icons.ConversationControlIcons.load(c,R.drawable.flexy_composer_folded);
@@ -157,6 +160,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
         }
         @Override protected void onAttachedToWindow() {
             super.onAttachedToWindow();
+            if(miniature)return;
             var center = org.telegram.messenger.NotificationCenter.getGlobalInstance();
             center.addObserver(this, org.telegram.messenger.NotificationCenter.didSetNewTheme);
             center.addObserver(this, org.telegram.messenger.NotificationCenter.didApplyNewTheme);

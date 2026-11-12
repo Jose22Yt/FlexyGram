@@ -1,0 +1,30 @@
+import android.graphics.*;import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;import app.flexygram.bubbles.*;import org.telegram.messenger.*;import org.telegram.ui.ActionBar.*;import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class NativeStylesTest{
+@Before public void setup(){ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit().clear().commit();BubbleConfig.load();AndroidUtilities.density=1;}
+@Test public void stylesRemainDistinctAndSwitchBackCleanly(){Bitmap[]images=new Bitmap[3];MessageDrawable bubble=new MessageDrawable(0,true,false);MessageDrawable.PathDrawParams cache=new MessageDrawable.PathDrawParams();bubble.setBounds(4,4,164,84);bubble.setTop(0,180,100,false,false);for(int shape=0;shape<3;shape++){BubbleConfig.setShape(shape);images[shape]=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);bubble.drawCached(new Canvas(images[shape]),cache);}assertFalse(images[0].sameAs(images[1]));assertFalse(images[1].sameAs(images[2]));BubbleConfig.setShape(0);Bitmap back=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);bubble.drawCached(new Canvas(back),cache);assertTrue(back.sameAs(images[0]));}
+@Test public void silhouetteIsMirroredExactly(){IosBubbleShape s=new IosBubbleShape();Path a=new Path(),b=new Path();s.build(a,new Rect(0,0,180,80),1,16,8,true,false,false,false,false,false);s.build(b,new Rect(0,0,180,80),1,16,8,false,false,false,false,false,false);Matrix mirror=new Matrix();mirror.setScale(-1,1);mirror.postTranslate(180,0);a.transform(mirror);Bitmap x=Bitmap.createBitmap(180,80,Bitmap.Config.ARGB_8888),y=Bitmap.createBitmap(180,80,Bitmap.Config.ARGB_8888);Paint p=new Paint(3);new Canvas(x).drawPath(a,p);new Canvas(y).drawPath(b,p);assertTrue(x.sameAs(y));}
+@Test public void allShapesSupportIndependentCustomization(){for(int shape=0;shape<3;shape++)for(int material=0;material<3;material++){BubbleConfig.setShape(shape);BubbleConfig.setSurfaceEffect(material);BubbleConfig.setOutlineEnabled(true);BubbleConfig.setTransparency(25);BubbleConfig.setBackgroundBlur(true);BubbleConfig.load();assertEquals(shape,BubbleConfig.shape());assertTrue(BubbleConfig.outlineEnabled());assertTrue(BubbleConfig.backgroundBlur());}}
+@Test public void compactPickerKeepsChoicesInsideBoundsAndAccessible() throws Exception{
+ android.app.Activity activity=Robolectric.buildActivity(android.app.Activity.class).setup().get();
+ app.flexygram.settings.signature.CompactStylePicker picker=new app.flexygram.settings.signature.CompactStylePicker(activity,key->key==Theme.key_windowBackgroundWhite?0xffeeeeee:key==Theme.key_windowBackgroundWhiteBlueText?0xff4488dd:0xff333333,new BubbleShapeMiniature(activity,1),3);
+ for(int n=0;n<3;n++){final int shape=n;picker.addChoice(shape,new String[]{"Telegram","FlexyGram","Telegram for iPhone"}[n],new BubbleShapeMiniature(activity,shape),()->{BubbleConfig.setShape(shape);picker.select(shape);});}
+ activity.setContentView(picker);picker.select(1);picker.measure(android.view.View.MeasureSpec.makeMeasureSpec(360,1073741824),0);picker.layout(0,0,360,picker.getMeasuredHeight());
+ android.view.ViewGroup grid=(android.view.ViewGroup)picker.getChildAt(1);assertEquals(3,grid.getChildCount());
+ for(int n=0;n<3;n++){android.view.View tile=grid.getChildAt(n);assertTrue(tile.getLeft()>=0&&tile.getRight()<=grid.getWidth());assertTrue(tile.getHeight()>=48);}
+ grid.getChildAt(2).performClick();assertEquals(2,BubbleConfig.shape());assertTrue(grid.getChildAt(2).isSelected());assertFalse(grid.getChildAt(1).isSelected());
+ Bitmap image=Bitmap.createBitmap(360,picker.getHeight(),Bitmap.Config.ARGB_8888);picker.draw(new Canvas(image));try(java.io.FileOutputStream stream=new java.io.FileOutputStream(System.getProperty("probe.root")+"/compact-bubbles.png")){image.compress(Bitmap.CompressFormat.PNG,100,stream);}
+ picker.measure(android.view.View.MeasureSpec.makeMeasureSpec(180,1073741824),0);picker.layout(0,0,180,picker.getMeasuredHeight());assertTrue(grid.getChildAt(1).getTop()>=grid.getChildAt(0).getBottom());
+}
+@Test public void templateMatchesOfficialCoreGraphicsConstruction(){
+ for(boolean outgoing:new boolean[]{true,false})for(boolean grouped:new boolean[]{false,true}){
+  Bitmap expected=Bitmap.createBitmap(129,111,Bitmap.Config.ARGB_8888),actual=Bitmap.createBitmap(129,111,Bitmap.Config.ARGB_8888);
+  Canvas c=new Canvas(expected);c.scale(3,3);if(!outgoing){c.translate(43,0);c.scale(-1,1);}c.translate(2,2);
+  Paint p=new Paint(3);p.setColor(Color.BLACK);Path shape=new Path();float corner=grouped?8:16;shape.addRoundRect(new RectF(0,0,33,33),new float[]{16,16,16,16,corner,corner,16,16},Path.Direction.CW);c.drawPath(shape,p);
+  if(!grouped){Path tail=new Path();tail.moveTo(24,24.5f);tail.quadTo(24,33,37.5f,33);tail.quadTo(51,33,51,24.5f);tail.close();c.drawPath(tail,p);c.drawRect(16.5f,16,33,25,p);p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));c.drawOval(new RectF(33,14,56,35),p);p.setXfermode(null);}
+  new IosBubbleShape().build(shape,new Rect(0,0,129,111),3,48,24,outgoing,false,grouped,false,false,false);new Canvas(actual).drawPath(shape,p);
+  int difference=0;for(int y=0;y<111;y++)for(int x=0;x<129;x++)if((Color.alpha(expected.getPixel(x,y))>127)!=(Color.alpha(actual.getPixel(x,y))>127))difference++;
+  assertTrue("reference mask mismatch: "+difference,difference<32);
+ }
+}
+}

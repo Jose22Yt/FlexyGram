@@ -1,5 +1,13 @@
 # Cambios
 
+## En desarrollo — selectores compactos de estilos, sin compilar APK
+
+- Interfaz inferior y superior: una vista previa principal y miniaturas con nombre en cuadrícula adaptable, con selección accesible y soporte RTL. Se conservan los dos estilos inferiores y los cinco superiores.
+- Burbujas: formas independientes Telegram, FlexyGram y Telegram para iPhone. La geometría para iPhone procede del código oficial de Telegram-iOS, con pico, radios y puntos de estiramiento originales; fuente y hash conservados.
+- Personalización desplegable debajo del selector, con superficie, transparencia, blur, bordes y fusión disponibles para todas las formas. Se conservan preferencias y copias de FlexyStudio, sin alterar el radio guardado de Telegram.
+- Las miniaturas no cargan fondos ni animaciones. Caché de contorno por celda y perfil; reconexión de vistas previas recicladas. Se mantiene el rediseño compacto y la consolidación de ajustes de la rama oficial.
+- Pruebas JVM y cinco pruebas de gráficos/widgets Android nativos; sin empaquetar APK.
+
 ## En desarrollo — desplazamiento nativo, sin compilar APK
 
 - Se retira por completo el efecto de desplazamiento de la lista de chats y de las conversaciones: motor 3D, curvatura, proyecciones, cachés y adaptación del toque. Dibujo, inercia, selección y gestos vuelven a sus recorridos nativos.
