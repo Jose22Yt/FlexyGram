@@ -207,7 +207,7 @@ def test_every_ayu_named_control_has_one_section_and_callbacks_are_unchanged():
     # All changes stay in the composite host; database transfer/confirmation
     # callbacks, which include privacy-sensitive actions, are reused verbatim.
     import subprocess
-    assert ayu == subprocess.check_output(['git','show','9037e41cf:TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAyuMomentsActivity.java'],cwd=ROOT,text=True)
+    assert ayu == subprocess.check_output(['git','show','9037e41cfde3c8bf2de7bb30d675186471988238:TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAyuMomentsActivity.java'],cwd=ROOT,text=True)
 
 
 def test_all_root_categories_have_compact_or_already_short_destinations():
