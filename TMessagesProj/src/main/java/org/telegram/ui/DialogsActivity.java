@@ -4876,7 +4876,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             }
                         }
                     }
-                    checkListLoad(viewPage);
+                    // Reuse the adapter range just scanned instead of traversing the layout twice more.
+                    checkListLoad(viewPage, firstVisiblePosition, lastVisiblePosition);
                     invalidateScrollY = true;
                     if (initialDialogsType != DIALOGS_TYPE_WIDGET && wasManualScroll && recyclerView.getChildCount() > 0) {
                         if (firstVisiblePosition != RecyclerView.NO_POSITION) {
@@ -8297,6 +8298,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 load = true;
             }
         }
+        // The controller already owns in-flight requests; do not queue another check each pixel.
+        load &= !getMessagesController().isLoadingDialogs(folderId);
+        loadArchived &= !getMessagesController().isLoadingDialogs(1);
         if (load || loadArchived) {
             boolean loadFinal = load;
             boolean loadFromCacheFinal = loadFromCache;

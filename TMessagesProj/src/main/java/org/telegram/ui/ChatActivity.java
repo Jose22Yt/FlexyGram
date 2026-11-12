@@ -3831,6 +3831,7 @@ public class ChatActivity extends BaseFragment implements
         app.exteraless.plugins.menus.MenuInjector.releaseMessageMenu(this);
         super.onFragmentDestroy();
         AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
+        cancelScrollHintChecks();
         if (contentView != null && contentView.signatureWallpaperBlur != null) {
             contentView.signatureWallpaperBlur.close(); contentView.signatureWallpaperBlur = null;
         }
@@ -7782,8 +7783,8 @@ public class ChatActivity extends BaseFragment implements
                         savedMessagesTagHint.hide();
                     } else if (!savedMessagesTagHintShown) {
                         lastScrollTime = System.currentTimeMillis();
-                        AndroidUtilities.cancelRunOnUIThread(ChatActivity.this::checkSavedMessagesTagHint);
-                        AndroidUtilities.runOnUIThread(ChatActivity.this::checkSavedMessagesTagHint, 2000);
+                        AndroidUtilities.cancelRunOnUIThread(checkSavedMessagesTagHintRunnable);
+                        AndroidUtilities.runOnUIThread(checkSavedMessagesTagHintRunnable, 2000);
                     }
                 }
                 if (videoConversionTimeHint != null && videoConversionTimeHint.shown()) {
@@ -7792,8 +7793,8 @@ public class ChatActivity extends BaseFragment implements
                 if (botMessageHint != null && botMessageHint.shown()) {
                     botMessageHint.hide();
                 } else {
-                    AndroidUtilities.cancelRunOnUIThread(ChatActivity.this::checkBotMessageHint);
-                    AndroidUtilities.runOnUIThread(ChatActivity.this::checkBotMessageHint, 2000);
+                    AndroidUtilities.cancelRunOnUIThread(checkBotMessageHintRunnable);
+                    AndroidUtilities.runOnUIThread(checkBotMessageHintRunnable, 2000);
                 }
                 if (timeHint != null && timeHint.shown()) {
                     timeHint.hide();
@@ -9985,8 +9986,16 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
+    private final Runnable checkBotMessageHintRunnable = this::checkBotMessageHint;
+    private final Runnable checkSavedMessagesTagHintRunnable = this::checkSavedMessagesTagHint;
+
+    private void cancelScrollHintChecks() {
+        AndroidUtilities.cancelRunOnUIThread(checkBotMessageHintRunnable);
+        AndroidUtilities.cancelRunOnUIThread(checkSavedMessagesTagHintRunnable);
+    }
+
     private void checkBotMessageHint() {
-        if (botMessageHint != null) {
+        if (paused || chatListView == null || isTranslationScrollActive() || botMessageHint != null) {
             return;
         }
         ChatMessageCell cell = null;
@@ -15310,7 +15319,14 @@ public class ChatActivity extends BaseFragment implements
             return;
         }
 
+        // Most scroll steps need no I/O; leave the UI queue free until a load edge is reached.
+        boolean canLoadOlder = totalItemCount - firstVisibleItemFinal - visibleItemCountFinal <= checkLoadCount
+                && !loading && (!endReached[0] || mergeDialogId != 0 && !endReached[1]);
+        boolean canLoadNewer = visibleItemCountFinal > 0 && firstVisibleItemFinal <= 10
+                && !loadingForward && (!forwardEndReached[0] || mergeDialogId != 0 && !forwardEndReached[1]);
+        if (!canLoadOlder && !canLoadNewer) return;
         AndroidUtilities.runOnUIThread(() -> {
+            if (paused || isFinished || chatAdapter.isFrozen || waitingForGetDifference) return;
             if (totalItemCount - firstVisibleItemFinal - visibleItemCountFinal <= checkLoadCount && !loading) {
                 if (!endReached[0]) {
                     loading = true;
@@ -26957,16 +26973,20 @@ public class ChatActivity extends BaseFragment implements
     private void checkTranslation(boolean force) {
         // Do not scan the loaded history during a drag/fling, even after the old 1s timeout.
         // Explicit language/translation changes still run immediately.
-        translationCheckDeferred = !force && isTranslationScrollActive();
-        if (!translationCheckDeferred && System.currentTimeMillis() - lastTranslationCheck > 1000) {
+        if (!force && isTranslationScrollActive()) {
+            if (!translationCheckDeferred) AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
+            translationCheckDeferred = true;
+            return; // The idle scroll notification schedules the scan; no per-pixel queue churn.
+        }
+        translationCheckDeferred = false;
+        if (System.currentTimeMillis() - lastTranslationCheck > 1000) {
             force = true;
         }
         AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
-        AndroidUtilities.runOnUIThread(checkTranslationRunnable, force && !translationCheckDeferred ? 0 : 150);
+        AndroidUtilities.runOnUIThread(checkTranslationRunnable, force ? 0 : 150);
     }
     private Runnable checkTranslationRunnable = () -> {
         if (translationCheckDeferred && isTranslationScrollActive()) {
-            checkTranslation(false);
             return;
         }
         translationCheckDeferred = false;
@@ -29330,7 +29350,7 @@ public class ChatActivity extends BaseFragment implements
     private long lastScrollTime;
     private boolean savedMessagesTagHintShown;
     private void checkSavedMessagesTagHint() {
-        if (savedMessagesTagHint == null || savedMessagesTagHint.shown() || savedMessagesTagHintShown || !checkedSavedMessagesHint) {
+        if (paused || chatListView == null || isTranslationScrollActive() || savedMessagesTagHint == null || savedMessagesTagHint.shown() || savedMessagesTagHintShown || !checkedSavedMessagesHint) {
             return;
         }
         if (savedMessagesTagHint != null && !isMessagesSearchListVisible() && System.currentTimeMillis() - lastScrollTime > 1800 && MessagesController.getGlobalMainSettings().getInt("savedsearchtaghint", 0) < 1) {
@@ -29362,8 +29382,8 @@ public class ChatActivity extends BaseFragment implements
 
                 MessagesController.getGlobalMainSettings().edit().putInt("savedsearchtaghint", 1).apply();
             } else {
-                AndroidUtilities.cancelRunOnUIThread(ChatActivity.this::checkSavedMessagesTagHint);
-                AndroidUtilities.runOnUIThread(ChatActivity.this::checkSavedMessagesTagHint, 2000);
+                AndroidUtilities.cancelRunOnUIThread(checkSavedMessagesTagHintRunnable);
+                AndroidUtilities.runOnUIThread(checkSavedMessagesTagHintRunnable, 2000);
             }
         }
     }
@@ -32403,6 +32423,7 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onPause() {
+        cancelScrollHintChecks();
         if(chatListView!=null)for(int i=0;i<chatListView.getChildCount();i++){
             View child=chatListView.getChildAt(i);if(child instanceof ChatMessageCell)((ChatMessageCell)child).cancelSignatureTap();
         }
