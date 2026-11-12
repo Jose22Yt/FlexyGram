@@ -11,7 +11,7 @@ public final class BubbleTapMotion implements Runnable {
     private final Spring x = new Spring(1f, 900f, .78f, .0002f);
     private final Spring y = new Spring(1f, 900f, .78f, .0002f);
     private boolean pressed, running;
-    private long last;
+    private long last, generation;
     public BubbleTapMotion(View owner) { this.owner = owner; }
     public float scale() { return (x.value + y.value) * .5f; }
     public float scaleX() { return x.value; }
@@ -22,19 +22,23 @@ public final class BubbleTapMotion implements Runnable {
 
     public void press(float compression, float rebound, long duration) {
         // Old arguments are retained for binary/source compatibility only. Physics is fixed.
+        if(pressed)return;
         pressed = true;
         x.target = .978f;
         y.target = .965f;
         // Integrate the first sub-frame on DOWN; no abrupt scale assignment.
         x.stepExact(1f / 240f); y.stepExact(1f / 240f);
+        long pressGeneration=generation;
         invalidate();
-        schedule();
+        if(generation==pressGeneration&&pressed)schedule();
     }
     public void drag(float dx, float dy, float slop) {
         if (!pressed || slop <= 0f) return;
         // Small resistance inside native touch slop. Retarget, never assign position.
-        x.target=.978f+.004f*Math.min(1f,Math.abs(dx)/slop);
-        y.target=.965f+.006f*Math.min(1f,Math.abs(dy)/slop);
+        float tx=.978f+.004f*Math.min(1f,Math.abs(dx)/slop);
+        float ty=.965f+.006f*Math.min(1f,Math.abs(dy)/slop);
+        if(x.target==tx&&y.target==ty)return;
+        x.target=tx;y.target=ty;
         schedule();
     }
     public void release() {
@@ -50,11 +54,14 @@ public final class BubbleTapMotion implements Runnable {
     }
     @Override public void run() {
         if (!running) return;
+        long frameGeneration=generation;
         long now = SystemClock.uptimeMillis();
-        float dt = Math.max(0f, (now-last)/1000f); last = now;
-        boolean movingX = x.stepExact(dt), movingY = y.stepExact(dt);
+        float dt = Math.max(0f, (now-last)/1000f); last = Math.max(last,now);
+        x.stepExact(dt); y.stepExact(dt);
         invalidate();
-        running = movingX || movingY;
+        // An invalidate callback may cancel, replace or retarget this gesture.
+        if(generation!=frameGeneration||!running)return;
+        running = !x.settled() || !y.settled();
         if (running) owner.postOnAnimation(this);
     }
     /** Compatibility utility; production movement uses the live spring state above. */
@@ -62,6 +69,7 @@ public final class BubbleTapMotion implements Runnable {
         return DampedSpringCurve.progress(Math.max(0f, fraction) * .330f);
     }
     public void reset() {
+        generation++;
         if (!pressed && !running && x.value == 1f && y.value == 1f) return;
         owner.removeCallbacks(this); pressed = running = false;
         x.snap(1f); y.snap(1f); invalidate();

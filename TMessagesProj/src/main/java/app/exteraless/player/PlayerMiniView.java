@@ -4,6 +4,8 @@ import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.LocaleController.getString;
 
 import android.animation.ValueAnimator;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import org.telegram.messenger.BuildConfig;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -307,7 +309,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         if (signatureHost != null) { signatureHost.detachFromWindow(); signatureHost = null; }
         super.onDetachedFromWindow();
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
-        if (showAnimator != null) { showAnimator.cancel(); showAnimator = null; }
+        cancelShowAnimation();
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             NotificationCenter nc = NotificationCenter.getInstance(a);
             nc.removeObserver(this, NotificationCenter.messagePlayingDidStart);
@@ -383,15 +385,18 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         playButton.setContentDescription(getString(MediaController.getInstance().isMessagePaused() ? R.string.AccActionPlay : R.string.AccActionPause));
     }
 
+    private void cancelShowAnimation(){
+        ValueAnimator previous=showAnimator;
+        showAnimator=null;
+        if(previous!=null)previous.cancel();
+    }
+
     private void setShown(boolean value, boolean animated) {
-        if (shown == value && (showAnimator != null || showProgress == (value ? 1f : 0f))) {
+        if (shown == value && ((animated && showAnimator != null) || (showAnimator==null && showProgress == (value ? 1f : 0f)))) {
             return;
         }
         shown = value;
-        if (showAnimator != null) {
-            showAnimator.cancel();
-            showAnimator = null;
-        }
+        cancelShowAnimation();
         float target = value ? 1f : 0f;
         if (!animated || !isAttachedToWindow()) {
             showProgress = target;
@@ -401,9 +406,15 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         }
         showAnimator = ValueAnimator.ofFloat(showProgress, target);
         showAnimator.addUpdateListener(a -> {
+            if(showAnimator!=a)return;
             showProgress = (float) a.getAnimatedValue();
             applyTransform();
             notifyOffset();
+        });
+        showAnimator.addListener(new AnimatorListenerAdapter(){
+            @Override public void onAnimationEnd(Animator animation){
+                if(showAnimator==animation)showAnimator=null;
+            }
         });
         showAnimator.setDuration(180);
         showAnimator.setInterpolator(value ? new CubicBezierInterpolator(0.05, 0.7, 0.1, 1) : new CubicBezierInterpolator(0.3, 0, 0.8, 0.15));

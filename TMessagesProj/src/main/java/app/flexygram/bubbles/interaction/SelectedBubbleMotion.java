@@ -55,7 +55,10 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     public void enter(Runnable redraw) { enter(redraw, 1f, 1f, 0f, 0f); }
     public void enter(Runnable redraw, float sx, float sy) { enter(redraw, sx, sy, 0f, 0f); }
     public void enter(Runnable redraw, float sx, float sy, float vx, float vy) {
+        long expectedGeneration=generation+1;
         reset();
+        // Cleanup can synchronously hand ownership to a newer selection.
+        if(generation!=expectedGeneration&&invalidate!=null)return;
         invalidate = redraw; closing = false;
         x.setState(sx, vx); y.setState(sy, vy); x.target = y.target = OPEN_MESSAGE_SCALE;
         phase.snap(0f); phase.target = 1f;
