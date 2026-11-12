@@ -34,12 +34,13 @@ public final class Settings3Registry {
         if(route.equals("files"))return "files";
         if(route.equals("plugins")||route.equals("extensions")||route.equals("ai")||route.equals("translator")||route.equals("translation")||route.equals("translation_options")||route.equals("pillstack"))return "plugins";
         if(route.equals("navigation")||route.equals("bottom_tabs")||route.equals("app_navigation")||route.equals("gestures")||route.startsWith("navigation_extra"))return "navigation";
-        if(route.equals("motion")||route.equals("scroll_effects"))return "home";
         if(route.equals("appearance")||route.equals("chat_list")||route.equals("layout")||route.equals("avatars")||route.equals("folders")||route.equals("visible")||route.equals("smart_previews")||route.startsWith("appearance_extra"))return "home";
         if(route.startsWith("general_")||route.equals("advanced")||route.equals("advanced_controls")||route.equals("general")||route.equals("general_controls")||route.equals("fonts")||route.equals("effects")||route.equals("surfaces")||route.equals("icons")||route.equals("launcher")||route.equals("profile")||route.equals("archive")||route.startsWith("general_extra")||route.startsWith("advanced_extra"))return "universal";
         return "chat";
     }
     public static BaseFragment openRoute(String route){
+        // Shared links to the retired effect return to the current home overview.
+        if("motion".equals(route)||"scroll_effects".equals(route))return open("home");
         String category=category(route);
         if(CompactSettingsPlan.hasOverview(category)&&!java.util.Arrays.asList("home","chat","appearance","conversations","universal","general","navigation","ayu","ayumoments","plugins","extensions","advanced").contains(route))return searchPage(category,route);
         return open(category);
@@ -49,7 +50,7 @@ public final class Settings3Registry {
     }
     public static BaseFragment searchTarget(BaseFragment original,String key){
         if("dividerStyle".equals(key)||original instanceof app.flexygram.home.HomeListSettingsActivity)return searchPage("home","chat_list");
-        if(original instanceof app.flexygram.scroll.ScrollEffectsSettingsActivity || key != null && key.startsWith("flexyScroll"))return searchPage("home","motion");
+        if(key!=null&&key.startsWith("flexyScroll"))return open("home");
         if("flexySmartPreviews".equals(key)||original instanceof app.flexygram.home.SmartPreviewsSettingsActivity)return searchPage("home","smart_previews");
         if("flexyfilesEnabled".equals(key)||"flexyfilesHelp".equals(key))return open("flexyfiles");
         String route=null;

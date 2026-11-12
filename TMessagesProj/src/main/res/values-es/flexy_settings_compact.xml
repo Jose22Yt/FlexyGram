@@ -17,7 +17,6 @@
     <string name="CompactAnimations">Animaciones de mensajes</string>
     <string name="CompactPreview">Mostrar vista previa</string>
     <string name="CompactHidePreview">Ocultar vista previa</string>
-    <string name="CompactMotion">Movimiento y desplazamiento</string>
     <string name="CompactBehavior">Comportamiento general</string>
     <string name="CompactNetwork">Red y velocidad de transferencia</string>
     <string name="CompactNotifications">Notificaciones y batería</string>

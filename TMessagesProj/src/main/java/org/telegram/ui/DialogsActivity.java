@@ -1803,7 +1803,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         public DialogsRecyclerView(Context context, ViewPage page) {
             super(context);
             parentPage = page;
-            if (isSignatureHome()) setScrollEffectsSurface(app.flexygram.scroll.ScrollEffectsConfig.CHATS);
             additionalClipBottom = dp(200);
         }
 
@@ -1878,7 +1877,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         @Override
         protected void dispatchDraw(Canvas canvas) {
-            beginScrollEffectsFrame(getPaddingTop() + scrollYOffset, getHeight() - getPaddingBottom());
             canvas.save();
             if (rightFragmentOpenedProgress > 0) {
                 canvas.clipRect(0, 0, AndroidUtilities.lerp(getMeasuredWidth(), dp(RightSlidingDialogContainer.getRightPaddingSize()), rightFragmentOpenedProgress), getMeasuredHeight());
@@ -1961,10 +1959,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
                 if (animationSupportListView != null) {
                     int restoreCount = canvas.save();
-                    if (dialogCell != null) {
-                        float y = view.getY() + dialogCell.collapseOffset - scrollOffset;
-                        concatScrollEffect(canvas, y, y + view.getMeasuredHeight());
-                    }
+
                     canvas.translate(view.getX(), view.getY());
                     if (dialogCell != null) {
                         dialogCell.rightFragmentOffset = -scrollOffset;
@@ -2043,11 +2038,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         dialogCell.setRightFragmentOpenedProgress(rightFragmentOpenedProgress);
 
                         int restoreCount = canvas.save();
-                        float y = position > maxSupportedViewsPosition
-                                ? maxBottom + view.getBottom() - maxUndrawBottom
-                                : maxBottom + view.getTop() - maxUndrawTop;
-                        concatScrollEffect(canvas, y, y + view.getMeasuredHeight());
-                        canvas.translate(view.getX(), y);
+                        if (position > maxSupportedViewsPosition) {
+                            canvas.translate(view.getX(), maxBottom + view.getBottom() - maxUndrawBottom);
+                        } else {
+                            canvas.translate(view.getX(), maxBottom + view.getTop() - maxUndrawTop);
+                        }
                         view.draw(canvas);
 
                         canvas.restoreToCount(restoreCount);
@@ -2077,7 +2072,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         } else {
                             canvas.save();
                         }
-                        concatScrollEffect(canvas, view);
                         canvas.translate(view.getX(), view.getY());
                         canvas.drawRect(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight(), paint);
                         view.draw(canvas);
@@ -2113,14 +2107,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (drawMovingViewsOverlayed() && child instanceof DialogCell && ((DialogCell) child).isMoving()) {
                 return true;
             }
-            int effectSave = saveScrollEffect(canvas, child);
-            try { return super.drawChild(canvas, child, drawingTime); }
-            finally { restoreScrollEffect(canvas, effectSave); }
-        }
-
-        @Override protected boolean getScrollEffectBounds(View child, RectF bounds) {
-            // Manual moving/support passes above use the same fixed projection as normal rows.
-            return child instanceof DialogCell && super.getScrollEffectBounds(child, bounds);
+            return super.drawChild(canvas, child, drawingTime);
         }
 
         @Override

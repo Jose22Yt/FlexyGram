@@ -86,7 +86,6 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
                     add(scope(new OpenExteraAppearanceActivity(),"appearance","chat_list"));
                     add(scope(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_CHATS),"chats","chat_list"));
                 }
-                if(include("motion"))add(new app.flexygram.scroll.ScrollEffectsSettingsActivity());
                 if(include("pills"))add(new app.flexygram.home.SmartPreviewsSettingsActivity());
                 if(include("avatars"))add(scope(new OpenExteraAppearanceActivity(),"appearance","avatars"));
                 if(include("folders"))add(scope(new OpenExteraAppearanceActivity(),"appearance","folders"));
@@ -144,6 +143,12 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
     @Override public void onActivityResultFragment(int request,int result,Intent data){for(NativeSettingsSection s:sections)s.settings3Controller().onActivityResultFragment(request,result,data);}
     @Override public void onRequestPermissionsResultFragment(int request,String[] permissions,int[] grants){for(NativeSettingsSection s:sections)s.settings3Controller().onRequestPermissionsResultFragment(request,permissions,grants);}
     @Override public void saveSelfArgs(Bundle args){super.saveSelfArgs(args);args.putString("settings3Category",category);args.putString("settings3Segment",segment);if(layoutManager!=null)args.putParcelable("settings3Scroll",layoutManager.onSaveInstanceState());}
-    @Override public void restoreSelfArgs(Bundle args){super.restoreSelfArgs(args);String saved=args.getString("settings3Category","chat");Settings3Registry.entry(saved);category=saved;segment=args.getString("settings3Segment","");if(!segment.isEmpty())CompactSettingsPlan.page(category,segment);scrollState=args.getParcelable("settings3Scroll");}
+    @Override public void restoreSelfArgs(Bundle args){
+        super.restoreSelfArgs(args);String saved=args.getString("settings3Category","chat");Settings3Registry.entry(saved);category=saved;
+        segment=args.getString("settings3Segment","");
+        if(category.equals("home")&&segment.equals("motion"))segment="";
+        if(!segment.isEmpty())CompactSettingsPlan.page(category,segment);
+        scrollState=args.getParcelable("settings3Scroll");
+    }
     @Override public ArrayList<ThemeDescription> getThemeDescriptions(){ArrayList<ThemeDescription> colors=super.getThemeDescriptions();for(NativeSettingsSection s:sections)colors.addAll(s.settings3Controller().getThemeDescriptions());return colors;}
 }

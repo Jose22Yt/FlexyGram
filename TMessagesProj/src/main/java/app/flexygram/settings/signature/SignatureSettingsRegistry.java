@@ -140,7 +140,7 @@ public final class SignatureSettingsRegistry {
         if("ClearMessageDatabase".equals(key))return new SignatureDirectSettingsActivity("ayu","maintenance");
         if("ayumoments".equals(screen)||"exteraless_ayumoments".equals(screen))return key==null?Settings3Registry.open("ayu"):Settings3Registry.searchPage("ayu",Settings2Policy.owner("ayu",key));
         if("ayuMoments".equals(key))return Settings3Registry.open("ayu");
-        if(key!=null&&key.startsWith("flexyScroll"))return new SignatureDirectSettingsActivity("home","motion");
+        if(key!=null&&key.startsWith("flexyScroll"))return Settings3Registry.open("home");
         if(key!=null){
             BaseFragment extra=SignatureLegacyExtras.forKey(key);if(extra!=null)return Settings3Registry.searchPage(SignatureLegacyExtras.categoryForKey(key),SignatureLegacyExtras.routeForKey(key));
             switch(key){

@@ -9,7 +9,7 @@ No se migra, reinicia ni duplica ninguna configuración.
 
 ## Organización
 
-- Pantalla principal: lista y título, movimiento y desplazamiento, mini píldoras, avatares, carpetas,
+- Pantalla principal: lista y título, mini píldoras, avatares, carpetas,
   elementos visibles y opciones adicionales de apariencia.
 - Conversaciones: interfaz inferior, interfaz superior, burbujas y menú;
   mensajes y respuestas, menús y acciones, multimedia, stickers, bordes y
@@ -50,7 +50,7 @@ previa vuelve a conectar la vista al controlador al mostrarla de nuevo.
 
 ## Comprobación manual pendiente
 
-1. Abrir Pantalla principal: comprobar los siete accesos y que no se cargan
+1. Abrir Pantalla principal: comprobar los seis accesos y que no se cargan
    demostraciones en el índice. Entrar en cada apartado y volver.
 2. Abrir Conversaciones: comprobar los cuatro iconos de diseño y los ocho
    apartados. Cambiar una preferencia y confirmar que se conserva al volver.
@@ -84,7 +84,11 @@ No hay mediciones de fluidez o memoria en un teléfono. La versión de distribuc
 no se incrementa hasta preparar la próxima beta. Los commits de esta tarea usan
 `[skip ci]` para respetar la petición de no iniciar compilaciones.
 
-Validación final de esta ampliación: **431 pruebas aprobadas y 40 omitidas**.
+Validación de la ampliación anterior a la retirada de efectos: **431 pruebas aprobadas y 40 omitidas**.
 Los siete archivos Java modificados pasan el análisis sintáctico; los tres XML
 de localización pasan AAPT2 de forma aislada. No se han compilado APK ni
 ejecutado pruebas físicas durante esta tarea.
+
+La revisión posterior retira el apartado de movimiento, conserva los otros seis
+apartados y restaura los estados guardados de la página eliminada al índice.
+Validación de esa revisión: [desplazamiento nativo](../scroll/NATIVE_SCROLL.md).

@@ -109,6 +109,8 @@ final class StudioClientCatalog {
         for(ConfigItem item:app.exteraless.glyph.GlyphConfig.INSTANCE.getStudioItems())item(item,"appearance");
         // Legacy backups may contain layout 1 or 2; reload migrates both to the sole default.
         integer("flexygram_home","style",0);range("flexygram_home","style",0,2);
+        // Retired scroll settings are decoded only for compatibility with existing backups.
+        // No renderer or settings screen reads them; importing them cannot enable an effect.
         integer("flexygram_scroll_effects","chats",0);range("flexygram_scroll_effects","chats",0,3);
         integer("flexygram_scroll_effects","conversation",0);range("flexygram_scroll_effects","conversation",0,3);
         integer("flexygram_scroll_effects","intensity",1);range("flexygram_scroll_effects","intensity",0,2);

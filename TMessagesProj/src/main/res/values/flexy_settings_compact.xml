@@ -17,7 +17,6 @@
     <string name="CompactAnimations">Message animations</string>
     <string name="CompactPreview">Show preview</string>
     <string name="CompactHidePreview">Hide preview</string>
-    <string name="CompactMotion">Movement and scrolling</string>
     <string name="CompactBehavior">General behavior</string>
     <string name="CompactNetwork">Network and transfer speed</string>
     <string name="CompactNotifications">Notifications and battery</string>

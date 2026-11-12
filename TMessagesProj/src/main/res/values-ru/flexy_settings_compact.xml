@@ -17,7 +17,6 @@
     <string name="CompactAnimations">Анимации сообщений</string>
     <string name="CompactPreview">Показать предпросмотр</string>
     <string name="CompactHidePreview">Скрыть предпросмотр</string>
-    <string name="CompactMotion">Движение и прокрутка</string>
     <string name="CompactBehavior">Общее поведение</string>
     <string name="CompactNetwork">Сеть и скорость передачи</string>
     <string name="CompactNotifications">Уведомления и батарея</string>

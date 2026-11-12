@@ -9,7 +9,6 @@ final class CompactSettingsPlan {
     }
     private static final Page[] HOME={
         new Page("list",R.string.CompactList,R.drawable.fg_ios_original_chat_context_menu_list),
-        new Page("motion",R.string.CompactMotion,R.drawable.fg_ios_original_chat_context_menu_reorderitems),
         new Page("pills",R.string.CompactPills,R.drawable.fg_ios_original_chat_context_menu_tagfilter),
         new Page("avatars",R.string.CompactAvatars,R.drawable.fg_ios_original_chat_context_menu_user),
         new Page("folders",R.string.CompactFolders,R.drawable.fg_ios_original_chat_context_menu_folder),
@@ -68,7 +67,6 @@ final class CompactSettingsPlan {
     static String segment(String category,String route){
         for(Page page:pages(category))if(page.id.equals(route))return route;
         if(category.equals("home")){
-            if(route.equals("scroll_effects"))return "motion";
             if(route.equals("smart_previews"))return "pills";
             if(route.equals("avatars")||route.equals("folders")||route.equals("visible"))return route;
             if(route.startsWith("appearance_extra"))return "extras";

@@ -24,20 +24,21 @@ def test_compact_plan_routes_are_stable_and_immutable(tmp_path):
              'org/telegram/messenger/R.java': resources(plan),
              'app/flexygram/settings/signature/PlanProbe.java': '''package app.flexygram.settings.signature;
 public class PlanProbe{public static void main(String[] args){
- if(CompactSettingsPlan.pages("home").length!=7||CompactSettingsPlan.pages("chat").length!=8)throw new AssertionError("unbounded overview");
+ if(CompactSettingsPlan.pages("home").length!=6||CompactSettingsPlan.pages("chat").length!=8)throw new AssertionError("unbounded overview");
  var copy=CompactSettingsPlan.pages("home");copy[0]=null;if(CompactSettingsPlan.pages("home")[0]==null)throw new AssertionError("mutable shared plan");
- String[][] cases={{"home","scroll_effects","motion"},{"home","avatars","avatars"},{"home","folders","folders"},{"home","layout","list"},{"home","smart_previews","pills"},{"home","visible","visible"},{"home","appearance_extra_ng","extras"},{"chat","media_extra_nc","media"},{"chat","stickers_extra_nx","stickers"},{"chat","post_appearance","messages"},{"chat","menus","menus"},{"universal","general_network","network"},{"universal","general_notifications","notifications"},{"universal","general_maps","maps"},{"universal","general_behavior","general"},{"universal","general_extra_ng","extras"},{"universal","advanced_extra_nx","advanced"},{"universal","surfaces","effects"},{"navigation","bottom_tabs","tabs"},{"navigation","navigation_extra_ng","extras"},{"navigation","gestures","gestures"},{"ayu","ayu_saving","saving"},{"ayu","ayu_tools","tools"},{"ayu","ayu_maintenance","maintenance"},{"plugins","translation_options","translation"}};
+ String[][] cases={{"home","avatars","avatars"},{"home","folders","folders"},{"home","layout","list"},{"home","smart_previews","pills"},{"home","visible","visible"},{"home","appearance_extra_ng","extras"},{"chat","media_extra_nc","media"},{"chat","stickers_extra_nx","stickers"},{"chat","post_appearance","messages"},{"chat","menus","menus"},{"universal","general_network","network"},{"universal","general_notifications","notifications"},{"universal","general_maps","maps"},{"universal","general_behavior","general"},{"universal","general_extra_ng","extras"},{"universal","advanced_extra_nx","advanced"},{"universal","surfaces","effects"},{"navigation","bottom_tabs","tabs"},{"navigation","navigation_extra_ng","extras"},{"navigation","gestures","gestures"},{"ayu","ayu_saving","saving"},{"ayu","ayu_tools","tools"},{"ayu","ayu_maintenance","maintenance"},{"plugins","translation_options","translation"}};
  for(String[] c:cases)if(!CompactSettingsPlan.segment(c[0],c[1]).equals(c[2]))throw new AssertionError(java.util.Arrays.toString(c));
  for(String category:new String[]{"home","chat","universal","navigation","ayu","plugins"}){
   var icons=new java.util.HashSet<Integer>();for(var p:CompactSettingsPlan.pages(category)){if(!icons.add(p.icon))throw new AssertionError("repeated icon");if(CompactSettingsPlan.page(category,p.id)!=p)throw new AssertionError();}
  }
  try{CompactSettingsPlan.page("home","missing");throw new AssertionError("invalid restore accepted");}catch(IllegalArgumentException expected){}
+ try{CompactSettingsPlan.page("home","motion");throw new AssertionError("retired effect page accepted");}catch(IllegalArgumentException expected){}
 }}'''}
     files['Probe.java']='public class Probe{public static void main(String[]args){app.flexygram.settings.signature.PlanProbe.main(args);}}'
     probe(tmp_path, files, [])
 
 
-def test_only_the_open_section_creates_editors_and_all_old_controls_remain_reachable(tmp_path):
+def test_only_the_open_section_creates_editors_and_retained_controls_remain_reachable(tmp_path):
     text = (S / 'SignatureDirectSettingsActivity.java').read_text()
     body = method(text, 'private void build()')
     # Run the real dispatch with counted editor factories. No native editor is
@@ -66,7 +67,6 @@ public class Probe{
  public static void main(String[]args){Probe p=new Probe();
  for(String cat:new String[]{"home","chat","universal","navigation","ayu","plugins"}){p.open(cat,"");if(p.overviewCalls!=1||!p.rows.isEmpty())throw new AssertionError("eager editors");}
  p.open("home","list");p.expect("HomeListSettingsActivity");p.expect("appearance:chat_list");p.expect("chats:chat_list");if(p.rows.contains("SmartPreviewsSettingsActivity"))throw new AssertionError("eager preview");
- p.open("home","motion");if(!p.rows.equals(List.of("ScrollEffectsSettingsActivity")))throw new AssertionError("scroll controls lost");
  p.open("home","pills");if(!p.rows.equals(List.of("SmartPreviewsSettingsActivity")))throw new AssertionError(p.rows.toString());
  for(String route:new String[]{"avatars","folders"}){p.open("home",route);p.expect("appearance:"+route);}
  p.open("home","visible");p.expect("chats:visible");p.open("home","extras");p.expect("ng:appearance_extra");p.expect("nx:appearance_extra");
@@ -87,6 +87,29 @@ public class Probe{
  }}'''.replace('BODY', body)
     files['Probe.java'] = source
     files['org/telegram/messenger/R.java'] = resources(body)
+    probe(tmp_path, files, [])
+
+
+def test_restoring_removed_effect_section_returns_home_overview(tmp_path):
+    plan = (S / 'CompactSettingsPlan.java').read_text()
+    restore = method((S / 'SignatureDirectSettingsActivity.java').read_text(), 'public void restoreSelfArgs(').replace('@Override ', '')
+    files = {
+        'app/flexygram/settings/signature/CompactSettingsPlan.java': plan,
+        'org/telegram/messenger/R.java': resources(plan),
+        'app/flexygram/settings/signature/RestoreProbe.java': '''package app.flexygram.settings.signature;
+class Bundle{java.util.Map<String,String>values=new java.util.HashMap<>();Object scroll=new Object();String getString(String k,String d){return values.getOrDefault(k,d);}Object getParcelable(String k){return scroll;}}
+class Settings3Registry{static void entry(String value){if(!value.equals("home")&&!value.equals("chat"))throw new IllegalArgumentException();}}
+class NativeScreen{int restores;public void restoreSelfArgs(Bundle b){restores++;}}
+public class RestoreProbe extends NativeScreen{String category,segment;Object scrollState;
+RESTORE
+public static void main(String[]args){RestoreProbe screen=new RestoreProbe();Bundle state=new Bundle();
+state.values.put("settings3Category","home");state.values.put("settings3Segment","motion");screen.restoreSelfArgs(state);
+if(!screen.category.equals("home")||!screen.segment.isEmpty()||screen.scrollState!=state.scroll||screen.restores!=1)throw new AssertionError("retired section was not restored safely");
+for(String[]c:new String[][]{{"home","list"},{"home","pills"},{"chat","animations"}}){state.values.put("settings3Category",c[0]);state.values.put("settings3Segment",c[1]);screen.restoreSelfArgs(state);if(!screen.category.equals(c[0])||!screen.segment.equals(c[1])||screen.scrollState!=state.scroll)throw new AssertionError("retained state changed");}
+}}
+'''.replace('RESTORE', restore),
+        'Probe.java': 'public class Probe{public static void main(String[]args){app.flexygram.settings.signature.RestoreProbe.main(args);}}',
+    }
     probe(tmp_path, files, [])
 
 

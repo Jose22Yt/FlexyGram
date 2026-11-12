@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="FlexyScrollEffects">Efecto 3D fijo</string>
-    <string name="FlexyScrollChats">Lista de chats</string>
-    <string name="FlexyScrollConversation">Dentro de las conversaciones</string>
-    <string name="FlexyScrollCurvature">Curvatura</string>
-    <string name="FlexyScrollInfo" formatted="false">La lista conserva su forma curva al detenerte o tocar. Ambas listas comparten la curvatura: 0% es plano y 100% es la curva máxima.</string>
-</resources>

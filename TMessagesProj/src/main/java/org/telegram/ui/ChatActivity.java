@@ -5422,7 +5422,7 @@ public class ChatActivity extends BaseFragment implements
                 if(action==MotionEvent.ACTION_DOWN && tapCandidate!=null){tapCandidate.cancelSignatureGesture();tapCandidate=null;}
                 if(tapCandidate!=null && (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL)) {
                     MotionEvent local=MotionEvent.obtain(event);
-                    local.offsetLocation(getScrollEffectTouchOffsetX()-tapCandidate.getX(),getScrollEffectTouchOffsetY()-tapCandidate.getY());
+                    local.offsetLocation(-tapCandidate.getX(),-tapCandidate.getY());
                     tapCandidate.signatureTapEvent(local);local.recycle();
                 }
                 boolean handled=super.dispatchTouchEvent(event);
@@ -6349,9 +6349,6 @@ public class ChatActivity extends BaseFragment implements
 
             @Override
             protected void dispatchDraw(Canvas canvas) {
-                // The ring stays fixed. Only a cell owned by a native overlay is exempt below.
-                beginScrollEffectsFrame(Math.max(0, chatListViewPaddingTop - chatListViewPaddingVisibleOffset),
-                        getHeight() - blurredViewBottomOffset);
                 drawLaterRoundProgressCell = null;
                 invalidated = false;
 
@@ -6388,7 +6385,6 @@ public class ChatActivity extends BaseFragment implements
                             continue;
                         }
                         canvas.save();
-                        concatScrollEffect(canvas, cell);
                         canvas.translate(cell.getLeft() + cell.getNonAnimationTranslationX(false), cell.getY() + cell.getPaddingTop());
                         cell.drawTime(canvas, cell.shouldDrawAlphaLayer() ? cell.getAlpha() : 1f, true);
                         canvas.restore();
@@ -6407,7 +6403,6 @@ public class ChatActivity extends BaseFragment implements
                         float alpha = cell.shouldDrawAlphaLayer() ? cell.getAlpha() : 1f;
 
                         canvas.save();
-                        concatScrollEffect(canvas, cell);
                         canvas.translate(canvasOffsetX, canvasOffsetY);
                         cell.setInvalidatesParent(true);
                         cell.drawNamesLayout(canvas, alpha);
@@ -6431,7 +6426,6 @@ public class ChatActivity extends BaseFragment implements
                         float canvasOffsetX = cell.getLeft() + cell.getNonAnimationTranslationX(false);
                         float canvasOffsetY = cell.getY() + cell.getPaddingTop();
                         canvas.save();
-                        concatScrollEffect(canvas, cell);
                         MessageObject.GroupedMessages groupedMessages = cell.getCurrentMessagesGroup();
                         if (groupedMessages != null && groupedMessages.transitionParams.backgroundChangeBounds) {
                             float x = cell.getNonAnimationTranslationX(true);
@@ -6474,7 +6468,6 @@ public class ChatActivity extends BaseFragment implements
                         float canvasOffsetX = cell.getLeft() + cell.getNonAnimationTranslationX(false);
                         float canvasOffsetY = cell.getY() + cell.getPaddingTop();
                         canvas.save();
-                        concatScrollEffect(canvas, cell);
                         MessageObject.GroupedMessages groupedMessages = cell.getCurrentMessagesGroup();
                         if (groupedMessages != null && groupedMessages.transitionParams.backgroundChangeBounds) {
                             float x = cell.getNonAnimationTranslationX(true);
@@ -6514,102 +6507,48 @@ public class ChatActivity extends BaseFragment implements
                     if (child.getVisibility() == View.INVISIBLE || child.getVisibility() == View.GONE || quickRejectChild(child, positionF)) {
                         continue;
                     }
-                    int effectSave = saveScrollEffect(canvas, child);
-                    try {
-                        if (child instanceof ChatMessageUnsupportedCell) {
-                            ChatMessageUnsupportedCell unsupportedCell = (ChatMessageUnsupportedCell) child;
-                            canvas.save();
-                            canvas.translate(child.getX(), child.getY());
-                            unsupportedCell.drawBackground(canvas);
-                            canvas.restore();
-                        } else if (chatAdapter.isBot && child instanceof BotHelpCell) {
-                            BotHelpCell botCell = (BotHelpCell) child;
-                            float top = (getMeasuredHeight() - chatListViewPaddingTop - blurredViewBottomOffset) / 2 - child.getMeasuredHeight() / 2 + chatListViewPaddingTop;
-                            if (!botCell.animating() && !chatListView.fastScrollAnimationRunning) {
-                                if (child.getTop() > top) {
-                                    child.setTranslationY(top - child.getTop());
-                                } else {
-                                    child.setTranslationY(0);
-                                }
+                    if (child instanceof ChatMessageUnsupportedCell) {
+                        ChatMessageUnsupportedCell unsupportedCell = (ChatMessageUnsupportedCell) child;
+                        canvas.save();
+                        canvas.translate(child.getX(), child.getY());
+                        unsupportedCell.drawBackground(canvas);
+                        canvas.restore();
+                    } else if (chatAdapter.isBot && child instanceof BotHelpCell) {
+                        BotHelpCell botCell = (BotHelpCell) child;
+                        float top = (getMeasuredHeight() - chatListViewPaddingTop - blurredViewBottomOffset) / 2 - child.getMeasuredHeight() / 2 + chatListViewPaddingTop;
+                        if (!botCell.animating() && !chatListView.fastScrollAnimationRunning) {
+                            if (child.getTop() > top) {
+                                child.setTranslationY(top - child.getTop());
+                            } else {
+                                child.setTranslationY(0);
                             }
-                            break;
-                        } else if (child instanceof UserInfoCell) {
-                            UserInfoCell cell = (UserInfoCell) child;
-                            float top = (getMeasuredHeight() - chatListViewPaddingTop - blurredViewBottomOffset) / 2 - child.getMeasuredHeight() / 2 + chatListViewPaddingTop;
-                            if (!cell.animating() && !chatListView.fastScrollAnimationRunning) {
-                                if (child.getTop() > top) {
-                                    child.setTranslationY(top - child.getTop());
-                                } else {
-                                    child.setTranslationY(0);
-                                }
+                        }
+                        break;
+                    } else if (child instanceof UserInfoCell) {
+                        UserInfoCell cell = (UserInfoCell) child;
+                        float top = (getMeasuredHeight() - chatListViewPaddingTop - blurredViewBottomOffset) / 2 - child.getMeasuredHeight() / 2 + chatListViewPaddingTop;
+                        if (!cell.animating() && !chatListView.fastScrollAnimationRunning) {
+                            if (child.getTop() > top) {
+                                child.setTranslationY(top - child.getTop());
+                            } else {
+                                child.setTranslationY(0);
                             }
-                        } else if (child instanceof ChatMessageCell) {
-                            ChatMessageCell cell = (ChatMessageCell) child;
-                            MessageObject.GroupedMessages group = cell.getCurrentMessagesGroup();
-                            if (group == null || group != lastDrawnGroup) {
-                                lastDrawnGroup = group;
-                                MessageObject.GroupedMessagePosition position = cell.getCurrentPosition();
-                                MessageBackgroundDrawable backgroundDrawable = cell.getBackgroundDrawable();
-                                if ((backgroundDrawable.isAnimationInProgress() || cell.isDrawingSelectionBackground()) && (position == null || (position.flags & MessageObject.POSITION_FLAG_RIGHT) != 0)) {
-                                    if (cell.isHighlighted() || cell.isHighlightedAnimated()) {
-                                        if (position == null) {
-                                            Paint backgroundPaint = getThemedPaint(Theme.key_paint_chatMessageBackgroundSelected);
-                                            if (themeDelegate != null && themeDelegate.isDark || backgroundPaint == null) {
-                                                backgroundPaint = Theme.chat_replyLinePaint;
-                                                backgroundPaint.setColor(getThemedColor(Theme.key_chat_selectedBackground));
-                                            } else {
-                                                float viewTop = (isKeyboardVisible() ? chatListView.getTop() : actionBar.getMeasuredHeight()) - contentView.getBackgroundTranslationY();
-                                                int backgroundHeight = contentView.getBackgroundSizeY();
-                                                if (themeDelegate != null) {
-                                                    themeDelegate.applyServiceShaderMatrix(getMeasuredWidth(), backgroundHeight, cell.getX(), viewTop);
-                                                } else {
-                                                    Theme.applyServiceShaderMatrix(getMeasuredWidth(), backgroundHeight, cell.getX(), viewTop);
-                                                }
-                                            }
-                                            canvas.save();
-                                            canvas.translate(0, cell.getTranslationY());
-                                            int wasAlpha = backgroundPaint.getAlpha();
-                                            backgroundPaint.setAlpha((int) (wasAlpha * cell.getHighlightAlpha() * cell.getAlpha()));
-                                            canvas.drawRect(0, cell.getTop(), getMeasuredWidth(), cell.getBottom(), backgroundPaint);
-                                            backgroundPaint.setAlpha(wasAlpha);
-                                            canvas.restore();
-                                        }
-                                    } else {
-                                        int y = (int) cell.getY();
-                                        int height;
-                                        canvas.save();
-                                        if (position == null) {
-                                            height = cell.getMeasuredHeight();
+                        }
+                    } else if (child instanceof ChatMessageCell) {
+                        ChatMessageCell cell = (ChatMessageCell) child;
+                        MessageObject.GroupedMessages group = cell.getCurrentMessagesGroup();
+                        if (group == null || group != lastDrawnGroup) {
+                            lastDrawnGroup = group;
+                            MessageObject.GroupedMessagePosition position = cell.getCurrentPosition();
+                            MessageBackgroundDrawable backgroundDrawable = cell.getBackgroundDrawable();
+                            if ((backgroundDrawable.isAnimationInProgress() || cell.isDrawingSelectionBackground()) && (position == null || (position.flags & MessageObject.POSITION_FLAG_RIGHT) != 0)) {
+                                if (cell.isHighlighted() || cell.isHighlightedAnimated()) {
+                                    if (position == null) {
+                                        Paint backgroundPaint = getThemedPaint(Theme.key_paint_chatMessageBackgroundSelected);
+                                        if (themeDelegate != null && themeDelegate.isDark || backgroundPaint == null) {
+                                            backgroundPaint = Theme.chat_replyLinePaint;
+                                            backgroundPaint.setColor(getThemedColor(Theme.key_chat_selectedBackground));
                                         } else {
-                                            height = y + cell.getMeasuredHeight();
-                                            long time = 0;
-                                            float touchX = 0;
-                                            float touchY = 0;
-                                            for (int i = 0; i < count; i++) {
-                                                View inner = getChildAt(i);
-                                                if (inner instanceof ChatMessageCell) {
-                                                    ChatMessageCell innerCell = (ChatMessageCell) inner;
-                                                    MessageObject.GroupedMessages innerGroup = innerCell.getCurrentMessagesGroup();
-                                                    if (innerGroup == group) {
-                                                        MessageBackgroundDrawable drawable = innerCell.getBackgroundDrawable();
-                                                        y = Math.min(y, (int) innerCell.getY());
-                                                        height = Math.max(height, (int) innerCell.getY() + innerCell.getMeasuredHeight());
-                                                        long touchTime = drawable.getLastTouchTime();
-                                                        if (touchTime > time) {
-                                                            touchX = drawable.getTouchX() + innerCell.getX();
-                                                            touchY = drawable.getTouchY() + innerCell.getY();
-                                                            time = touchTime;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            backgroundDrawable.setTouchCoordsOverride(touchX, touchY - y);
-                                            height -= y;
-                                        }
-                                        canvas.clipRect(0, y, getMeasuredWidth(), y + height);
-                                        Paint selectedBackgroundPaint = getThemedPaint(Theme.key_paint_chatMessageBackgroundSelected);
-                                        if (themeDelegate != null && !themeDelegate.isDark && selectedBackgroundPaint != null) {
-                                            backgroundDrawable.setCustomPaint(selectedBackgroundPaint);
                                             float viewTop = (isKeyboardVisible() ? chatListView.getTop() : actionBar.getMeasuredHeight()) - contentView.getBackgroundTranslationY();
                                             int backgroundHeight = contentView.getBackgroundSizeY();
                                             if (themeDelegate != null) {
@@ -6617,41 +6556,92 @@ public class ChatActivity extends BaseFragment implements
                                             } else {
                                                 Theme.applyServiceShaderMatrix(getMeasuredWidth(), backgroundHeight, cell.getX(), viewTop);
                                             }
-                                        } else {
-                                            backgroundDrawable.setCustomPaint(null);
-                                            backgroundDrawable.setColor(getThemedColor(Theme.key_chat_selectedBackground));
                                         }
-                                        backgroundDrawable.setBounds(0, y, getMeasuredWidth(), y + height);
-                                        backgroundDrawable.draw(canvas);
+                                        canvas.save();
+                                        canvas.translate(0, cell.getTranslationY());
+                                        int wasAlpha = backgroundPaint.getAlpha();
+                                        backgroundPaint.setAlpha((int) (wasAlpha * cell.getHighlightAlpha() * cell.getAlpha()));
+                                        canvas.drawRect(0, cell.getTop(), getMeasuredWidth(), cell.getBottom(), backgroundPaint);
+                                        backgroundPaint.setAlpha(wasAlpha);
                                         canvas.restore();
                                     }
+                                } else {
+                                    int y = (int) cell.getY();
+                                    int height;
+                                    canvas.save();
+                                    if (position == null) {
+                                        height = cell.getMeasuredHeight();
+                                    } else {
+                                        height = y + cell.getMeasuredHeight();
+                                        long time = 0;
+                                        float touchX = 0;
+                                        float touchY = 0;
+                                        for (int i = 0; i < count; i++) {
+                                            View inner = getChildAt(i);
+                                            if (inner instanceof ChatMessageCell) {
+                                                ChatMessageCell innerCell = (ChatMessageCell) inner;
+                                                MessageObject.GroupedMessages innerGroup = innerCell.getCurrentMessagesGroup();
+                                                if (innerGroup == group) {
+                                                    MessageBackgroundDrawable drawable = innerCell.getBackgroundDrawable();
+                                                    y = Math.min(y, (int) innerCell.getY());
+                                                    height = Math.max(height, (int) innerCell.getY() + innerCell.getMeasuredHeight());
+                                                    long touchTime = drawable.getLastTouchTime();
+                                                    if (touchTime > time) {
+                                                        touchX = drawable.getTouchX() + innerCell.getX();
+                                                        touchY = drawable.getTouchY() + innerCell.getY();
+                                                        time = touchTime;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        backgroundDrawable.setTouchCoordsOverride(touchX, touchY - y);
+                                        height -= y;
+                                    }
+                                    canvas.clipRect(0, y, getMeasuredWidth(), y + height);
+                                    Paint selectedBackgroundPaint = getThemedPaint(Theme.key_paint_chatMessageBackgroundSelected);
+                                    if (themeDelegate != null && !themeDelegate.isDark && selectedBackgroundPaint != null) {
+                                        backgroundDrawable.setCustomPaint(selectedBackgroundPaint);
+                                        float viewTop = (isKeyboardVisible() ? chatListView.getTop() : actionBar.getMeasuredHeight()) - contentView.getBackgroundTranslationY();
+                                        int backgroundHeight = contentView.getBackgroundSizeY();
+                                        if (themeDelegate != null) {
+                                            themeDelegate.applyServiceShaderMatrix(getMeasuredWidth(), backgroundHeight, cell.getX(), viewTop);
+                                        } else {
+                                            Theme.applyServiceShaderMatrix(getMeasuredWidth(), backgroundHeight, cell.getX(), viewTop);
+                                        }
+                                    } else {
+                                        backgroundDrawable.setCustomPaint(null);
+                                        backgroundDrawable.setColor(getThemedColor(Theme.key_chat_selectedBackground));
+                                    }
+                                    backgroundDrawable.setBounds(0, y, getMeasuredWidth(), y + height);
+                                    backgroundDrawable.draw(canvas);
+                                    canvas.restore();
                                 }
-                            }
-                            if ((scrimView != cell || scrimViewTask != null) && group == null && cell.drawBackgroundInParent()) {
-                                canvas.save();
-                                canvas.translate(cell.getX(), cell.getY() + cell.getPaddingTop());
-                                if (cell.getScaleX() != 1f) {
-                                    canvas.scale(
-                                        cell.getScaleX(), cell.getScaleY(),
-                                        cell.getPivotX(), (cell.getHeight() >> 1)
-                                    );
-                                }
-                                cell.drawBackgroundInternal(canvas, true);
-                                canvas.restore();
-                            }
-                        } else if (child instanceof ChatActionCell) {
-                            ChatActionCell cell = (ChatActionCell) child;
-                            if (cell.hasGradientService()) {
-                                canvas.save();
-                                canvas.translate(cell.getX(), cell.getY() + cell.getPaddingTop());
-                                canvas.scale(cell.getScaleX(), cell.getScaleY(), cell.getMeasuredWidth() / 2f, cell.getMeasuredHeight() / 2f);
-                                canvas.translate(getSideMenuWidth() / 2f, 0);
-                                cell.drawBackground(canvas, true);
-                                cell.drawReactions(canvas, true, null);
-                                canvas.restore();
                             }
                         }
-                    } finally { restoreScrollEffect(canvas, effectSave); }
+                        if ((scrimView != cell || scrimViewTask != null) && group == null && cell.drawBackgroundInParent()) {
+                            canvas.save();
+                            canvas.translate(cell.getX(), cell.getY() + cell.getPaddingTop());
+                            if (cell.getScaleX() != 1f) {
+                                canvas.scale(
+                                    cell.getScaleX(), cell.getScaleY(),
+                                    cell.getPivotX(), (cell.getHeight() >> 1)
+                                );
+                            }
+                            cell.drawBackgroundInternal(canvas, true);
+                            canvas.restore();
+                        }
+                    } else if (child instanceof ChatActionCell) {
+                        ChatActionCell cell = (ChatActionCell) child;
+                        if (cell.hasGradientService()) {
+                            canvas.save();
+                            canvas.translate(cell.getX(), cell.getY() + cell.getPaddingTop());
+                            canvas.scale(cell.getScaleX(), cell.getScaleY(), cell.getMeasuredWidth() / 2f, cell.getMeasuredHeight() / 2f);
+                            canvas.translate(getSideMenuWidth() / 2f, 0);
+                            cell.drawBackground(canvas, true);
+                            cell.drawReactions(canvas, true, null);
+                            canvas.restore();
+                        }
+                    }
                 }
                 MessageObject.GroupedMessages scrimGroup = null;
                 if (scrimView instanceof ChatMessageCell) {
@@ -6753,53 +6743,44 @@ public class ChatActivity extends BaseFragment implements
                             b = chatListView.getMeasuredHeight() + dp(20);
                         }
 
-                        int groupEffectSave = saveScrollEffect(canvas, group.transitionParams.cell);
-                        try {
-                            boolean useScale = group.transitionParams.cell.getScaleX() != 1f || group.transitionParams.cell.getScaleY() != 1f;
-                            if (useScale) {
-                                canvas.save();
-                                canvas.scale(group.transitionParams.cell.getScaleX(), group.transitionParams.cell.getScaleY(), l + (r - l) / 2, t + (b - t) / 2);
+                        boolean useScale = group.transitionParams.cell.getScaleX() != 1f || group.transitionParams.cell.getScaleY() != 1f;
+                        if (useScale) {
+                            canvas.save();
+                            canvas.scale(group.transitionParams.cell.getScaleX(), group.transitionParams.cell.getScaleY(), l + (r - l) / 2, t + (b - t) / 2);
+                        }
+                        boolean selected = true;
+                        for (int a = 0, N = group.messages.size(); a < N; a++) {
+                            MessageObject object = group.messages.get(a);
+                            int index = object.getDialogId() == dialog_id ? 0 : 1;
+                            if (selectedMessagesIds[index].indexOfKey(object.getId()) < 0) {
+                                selected = false;
+                                break;
                             }
-                            boolean selected = true;
-                            for (int a = 0, N = group.messages.size(); a < N; a++) {
-                                MessageObject object = group.messages.get(a);
-                                int index = object.getDialogId() == dialog_id ? 0 : 1;
-                                if (selectedMessagesIds[index].indexOfKey(object.getId()) < 0) {
-                                    selected = false;
-                                    break;
+                        }
+                        group.transitionParams.cell.drawBackground(canvas, (int) l, (int) t, (int) r, (int) b, group.transitionParams.pinnedTop, group.transitionParams.pinnedBotton, selected, 0);
+                        if (group != scrimGroup) {
+                            group.transitionParams.cell = null;
+                        }
+                        group.transitionParams.drawCaptionLayout = group.hasCaption;
+                        if (useScale) {
+                            canvas.restore();
+                            for (int ii = 0; ii < count; ii++) {
+                                View child = chatListView.getChildAt(ii);
+                                if (child instanceof ChatMessageCell && ((ChatMessageCell) child).getCurrentMessagesGroup() == group) {
+                                    ChatMessageCell cell = ((ChatMessageCell) child);
+                                    int left = cell.getLeft();
+                                    int top = cell.getTop();
+                                    child.setPivotX(l - left + (r - l) / 2);
+                                    child.setPivotY(t - top + (b - t) / 2);
                                 }
                             }
-                            group.transitionParams.cell.drawBackground(canvas, (int) l, (int) t, (int) r, (int) b, group.transitionParams.pinnedTop, group.transitionParams.pinnedBotton, selected, 0);
-                            if (group != scrimGroup) {
-                                group.transitionParams.cell = null;
-                            }
-                            group.transitionParams.drawCaptionLayout = group.hasCaption;
-                            if (useScale) {
-                                canvas.restore();
-                                for (int ii = 0; ii < count; ii++) {
-                                    View child = chatListView.getChildAt(ii);
-                                    if (child instanceof ChatMessageCell && ((ChatMessageCell) child).getCurrentMessagesGroup() == group) {
-                                        ChatMessageCell cell = ((ChatMessageCell) child);
-                                        int left = cell.getLeft();
-                                        int top = cell.getTop();
-                                        child.setPivotX(l - left + (r - l) / 2);
-                                        child.setPivotY(t - top + (b - t) / 2);
-                                    }
-                                }
-                            }
-                        } finally { restoreScrollEffect(canvas, groupEffectSave); }
+                        }
                     }
                 }
             }
 
             @Override
             public boolean drawChild(Canvas canvas, View child, long drawingTime) {
-                int effectSave = saveScrollEffect(canvas, child);
-                try { return drawMessageChild(canvas, child, drawingTime); }
-                finally { restoreScrollEffect(canvas, effectSave); }
-            }
-
-            private boolean drawMessageChild(Canvas canvas, View child, long drawingTime) {
                 if (isSkeletonVisible()) {
                     invalidated = false;
                     invalidate();
@@ -19331,9 +19312,6 @@ public class ChatActivity extends BaseFragment implements
             float alpha = cell.shouldDrawAlphaLayer() ? cell.getAlpha() : 1f;
             if (selectedBubbleMotionMessage == null)
                 canvas.clipRect(chatListView.getLeft(), listTop, chatListView.getRight(), chatListView.getY() + chatListView.getMeasuredHeight() - blurredViewBottomOffset - windowInsetsStateHolder.getCurrentMaxBottomInset() - inputIslandHeightCurrent - dp(9));
-            canvas.translate(chatListView.getLeft(), chatListView.getY());
-            chatListView.concatScrollEffect(canvas, cell);
-            canvas.translate(-chatListView.getLeft(), -chatListView.getY());
             canvas.translate(canvasOffsetX, canvasOffsetY);
             cell.setInvalidatesParent(true);
             if (type == 0) {
@@ -52997,98 +52975,9 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private abstract class ChatListRecyclerView extends RecyclerListViewInternal {
-        private MessageObject.GroupedMessages[] scrollEffectGroups;
-        private float[] scrollEffectGroupTops, scrollEffectGroupBottoms;
-        private int scrollEffectGroupCount;
-        private Object scrollEffectVideoSource;
-        private ChatMessageCell scrollEffectVideoCell;
-        private MessageObject.GroupedMessages scrollEffectVideoGroup;
-        private boolean scrollEffectVideoResolved;
-
-        private void clearScrollEffectGroups() {
-            for (int i = 0; i < scrollEffectGroupCount; i++) scrollEffectGroups[i] = null;
-            scrollEffectGroupCount = 0;
-            scrollEffectVideoSource = scrollEffectVideoCell = null;
-            scrollEffectVideoGroup = null; scrollEffectVideoResolved = false;
-        }
-        @Override public void beginScrollEffectsFrame(float top, float bottom) {
-            clearScrollEffectGroups();
-            super.beginScrollEffectsFrame(top, bottom);
-        }
-        @Override public void onScrolled(int dx, int dy) {
-            clearScrollEffectGroups();
-            super.onScrolled(dx, dy);
-        }
-        @Override protected void onLayout(boolean changed, int l, int t, int r, int b) {
-            clearScrollEffectGroups();
-            super.onLayout(changed, l, t, r, b);
-        }
-        @Override protected void onDetachedFromWindow() {
-            clearScrollEffectGroups();
-            super.onDetachedFromWindow();
-        }
 
         public ChatListRecyclerView(Context context, ThemeDelegate themeDelegate) {
             super(context, themeDelegate);
-            setScrollEffectsSurface(app.flexygram.scroll.ScrollEffectsConfig.CONVERSATION);
-        }
-
-        private boolean isNativeScrollEffectOverlay(View child) {
-            if (child == scrimView) return true;
-            if (!(child instanceof ChatMessageCell)) return false;
-            MessageObject.GroupedMessages group = ((ChatMessageCell) child).getCurrentMessagesGroup();
-            if (group != null && scrimView instanceof ChatMessageCell
-                    && ((ChatMessageCell) scrimView).getCurrentMessagesGroup() == group) return true;
-            if (videoPlayerContainer == null || videoPlayerContainer.getParent() != contentView
-                    || videoPlayerContainer.getVisibility() != View.VISIBLE) return false;
-            Object source = videoPlayerContainer.getTag(R.id.parent_tag);
-            if (source == null) return false;
-            if (!scrollEffectVideoResolved || source != scrollEffectVideoSource) {
-                scrollEffectVideoResolved = true; scrollEffectVideoSource = source;
-                scrollEffectVideoCell = null; scrollEffectVideoGroup = null;
-                for (int i = 0, count = getChildCount(); i < count; i++) {
-                    View candidate = getChildAt(i);
-                    if (candidate instanceof ChatMessageCell && ((ChatMessageCell) candidate).getPhotoImage() == source) {
-                        scrollEffectVideoCell = (ChatMessageCell) candidate;
-                        scrollEffectVideoGroup = scrollEffectVideoCell.getCurrentMessagesGroup();
-                        break;
-                    }
-                }
-            }
-            return child == scrollEffectVideoCell || group != null && group == scrollEffectVideoGroup;
-        }
-        @Override protected boolean getScrollEffectBounds(View child, RectF bounds) {
-            if (!(child instanceof ChatMessageCell || child instanceof ChatActionCell || child instanceof ChatMessageUnsupportedCell)
-                    || isNativeScrollEffectOverlay(child)) return false;
-            super.getScrollEffectBounds(child, bounds);
-            if (child instanceof ChatMessageCell) {
-                MessageObject.GroupedMessages group = ((ChatMessageCell) child).getCurrentMessagesGroup();
-                if (group != null) {
-                    for (int i = 0; i < scrollEffectGroupCount; i++) {
-                        if (scrollEffectGroups[i] == group) {
-                            bounds.top = scrollEffectGroupTops[i]; bounds.bottom = scrollEffectGroupBottoms[i];
-                            return true;
-                        }
-                    }
-                    for (int i = 0, count = getChildCount(); i < count; i++) {
-                        View sibling = getChildAt(i);
-                        if (sibling instanceof ChatMessageCell && ((ChatMessageCell) sibling).getCurrentMessagesGroup() == group) {
-                            bounds.top = Math.min(bounds.top, sibling.getY());
-                            bounds.bottom = Math.max(bounds.bottom, sibling.getY() + sibling.getHeight());
-                        }
-                    }
-                    if (scrollEffectGroups == null) {
-                        scrollEffectGroups = new MessageObject.GroupedMessages[32];
-                        scrollEffectGroupTops = new float[32]; scrollEffectGroupBottoms = new float[32];
-                    }
-                    if (scrollEffectGroupCount < scrollEffectGroups.length) {
-                        int index = scrollEffectGroupCount++;
-                        scrollEffectGroups[index] = group;
-                        scrollEffectGroupTops[index] = bounds.top; scrollEffectGroupBottoms[index] = bounds.bottom;
-                    }
-                }
-            }
-            return true;
         }
 
         void drawChatBackgroundElements(Canvas canvas) {

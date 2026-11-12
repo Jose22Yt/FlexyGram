@@ -1,5 +1,12 @@
 # Cambios
 
+## En desarrollo — desplazamiento nativo, sin compilar APK
+
+- Se retira por completo el efecto de desplazamiento de la lista de chats y de las conversaciones: motor 3D, curvatura, proyecciones, cachés y adaptación del toque. Dibujo, inercia, selección y gestos vuelven a sus recorridos nativos.
+- Se elimina su editor y el apartado Movimiento y desplazamiento. Se conserva la nueva organización compacta de ajustes, con seis apartados en Pantalla principal.
+- Se mantienen las optimizaciones de reanudación de beta 54: diferencias grandes fuera de UI, descarte de resultados antiguos, agrupación de actualizaciones y reconexión adelantada. Las claves antiguas solo se conservan para leer copias de seguridad; no pueden activar efectos.
+- No se incrementa la versión de distribución ni se inicia una compilación de APK.
+
 ## 1.0.0-beta.54 — build 1343
 
 - Se conserva únicamente el aro 3D: la proyección depende de la posición de cada fila y de la curvatura, permanece al detenerse o tocar y deja de variar por velocidad o tiempo. Se elimina el motor temporal, incluidos resortes y retirada al tocar.

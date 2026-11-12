@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="FlexyScrollEffects">Fixed 3D effect</string>
-    <string name="FlexyScrollChats">Chat list</string>
-    <string name="FlexyScrollConversation">Inside conversations</string>
-    <string name="FlexyScrollCurvature">Curvature</string>
-    <string name="FlexyScrollInfo" formatted="false">The list keeps its curved shape when you stop or tap. Curvature is shared by both lists: 0% is flat and 100% is the maximum curve.</string>
-</resources>
