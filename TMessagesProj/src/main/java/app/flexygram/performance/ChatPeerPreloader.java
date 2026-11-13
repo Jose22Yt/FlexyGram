@@ -97,27 +97,22 @@ public final class ChatPeerPreloader {
                     // Live updates received during IO take precedence over an older storage snapshot.
                     if (loadedChat != null && controller.getChat(chatId) == null) controller.putChat(loadedChat, true);
                     if (loadedUser != null && controller.getUser(loadedUser.id) == null) controller.putUser(loadedUser, true);
-                    if (loadedEncrypted != null && controller.getEncryptedChat(encryptedId) == null) controller.putEncryptedChat(loadedEncrypted, true);
-                    boolean found = (chatId != 0 && controller.getChat(chatId) != null)
-                            || (userId != 0 && controller.getUser(userId) != null)
-                            || (encryptedId != 0 && cachedEncrypted != null && controller.getUser(cachedEncrypted.user_id) != null);
-                    finish(account, key, request, found);
-                });
-            });
+                    if (loadedEncrypted != null && controller.getEncryptedChat(encryptedId) == null) controller.putEncryptedChat(loadedEncrypted, true)
+boolean found = chatId != 0 ? controller.getChat(chatId) != null : userId != 0 ? controller.getUser(userId) != null : controller.getEncryptedChat(encryptedId) != null && controller.getUser(controller.getEncryptedChat(encryptedId).user_id) != null;
+finish(account, key, request, found);
+});;
             if (!queued) {
-                pending.remove(key, request);
                 finish(account, key, request, false);
             }
         } catch (Exception failed) {
             FileLog.e(failed);
-            pending.remove(key, request);
             finish(account, key, request, false);
         }
         return true;
     }
 
     private static boolean owns(int account, long owner) {
-        return owner != 0 && UserConfig.getInstance(account).getClientUserId() == owner;
+        return owner != 0 && UserConfig.getInstance(account).isClientActivated() && UserConfig.getInstance(account).getClientUserId() == owner; owner != 0 && UserConfig.getInstance(account).getClientUserId() == owner;
     }
 
     private static void releaseObserver(int account) {
