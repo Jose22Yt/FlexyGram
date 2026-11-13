@@ -817,6 +817,7 @@ public class MessagesStorage extends BaseController {
     }
 
     private void cleanupInternal(boolean deleteFiles) {
+        clearWarmHistoryInternal();
         if (deleteFiles) {
             reset();
         } else {
@@ -9002,7 +9003,77 @@ public class MessagesStorage extends BaseController {
         });
     }
 
+    private interface WarmHistoryDelivery { void deliver(int guid, int index, Timer logger); }
+    private interface WarmHistoryReceiver { void accept(WarmHistoryDelivery delivery, int bytes); }
+    private final app.flexygram.performance.WarmHistoryCache<WarmHistoryDelivery> warmHistory = new app.flexygram.performance.WarmHistoryCache<>();
+    private long warmHistorySuspendedUntil;
+    private final Runnable expireWarmHistory = () -> warmHistory.trim(SystemClock.uptimeMillis());
+
+    private app.flexygram.performance.WarmHistoryCache.Revision warmHistoryRevision() {
+        SQLiteCursor cursor = null;
+        try {
+            if (database == null) return null;
+            cursor = database.queryFinalized("SELECT total_changes()");
+            if (!cursor.next()) return null;
+            long changes = cursor.longValue(0);
+            cursor.dispose(); cursor = null;
+            cursor = database.queryFinalized("PRAGMA data_version");
+            if (!cursor.next()) return null;
+            return new app.flexygram.performance.WarmHistoryCache.Revision(database, changes, cursor.longValue(0), getUserConfig().getClientUserId());
+        } catch (Exception error) {
+            FileLog.e(error); return null;
+        } finally {
+            if (cursor != null) cursor.dispose();
+        }
+    }
+
+    private void clearWarmHistoryInternal() {
+        storageQueue.cancelRunnable(expireWarmHistory);
+        warmHistory.clear();
+    }
+
+    private void trimWarmHistoryInternal() {
+        clearWarmHistoryInternal();
+        warmHistorySuspendedUntil = SystemClock.uptimeMillis() + 10_000;
+    }
+
+    public static void trimWarmHistories() {
+        for (MessagesStorage storage : Instance) {
+            if (storage != null) storage.storageQueue.postRunnable(storage::trimWarmHistoryInternal);
+        }
+    }
+
+    /** Read-only, local and cancellable; no controller processing or network requests until consumed. */
+    public Runnable warmChatHistory(long dialogId, int count, Runnable done) {
+        final long owner = getUserConfig().getClientUserId();
+        final java.util.concurrent.atomic.AtomicBoolean cancelled = new java.util.concurrent.atomic.AtomicBoolean();
+        Runnable work = () -> {
+            try {
+                if (cancelled.get() || SystemClock.uptimeMillis() < warmHistorySuspendedUntil || owner == 0 || getUserConfig().getClientUserId() != owner
+                        || !getUserConfig().isClientActivated() || (!DialogObject.isUserDialog(dialogId) && !DialogObject.isChatDialog(dialogId))) return;
+                app.flexygram.performance.WarmHistoryCache.Revision before = warmHistoryRevision();
+                if (before == null || warmHistory.contains(dialogId, count, SystemClock.uptimeMillis(), before)) return;
+                getMessagesInternal(dialogId, 0, count, 0, 0, 0, 0, LOAD_FROM_UNREAD, 0, 0, 0, true, false, null, (delivery, bytes) -> {
+                    if (cancelled.get() || owner != getUserConfig().getClientUserId() || !before.same(warmHistoryRevision())) return;
+                    warmHistory.put(dialogId, count, SystemClock.uptimeMillis(), before, bytes, delivery);
+                    storageQueue.cancelRunnable(expireWarmHistory);
+                    storageQueue.postRunnable(expireWarmHistory, app.flexygram.performance.WarmHistoryCache.TTL_MS);
+                });
+            } catch (Exception error) {
+                FileLog.e(error);
+            } finally {
+                AndroidUtilities.runOnUIThread(done);
+            }
+        };
+        if (!storageQueue.postRunnable(work, 80)) AndroidUtilities.runOnUIThread(done);
+        return () -> { cancelled.set(true); storageQueue.cancelRunnable(work); };
+    }
+
     public Runnable getMessagesInternal(long dialogId, long mergeDialogId, int count, int max_id, int offset_date, int minDate, int classGuid, int load_type, int mode, long threadMessageId, int loadIndex, boolean processMessages, boolean isTopic, Timer loaderLogger) {
+        return getMessagesInternal(dialogId, mergeDialogId, count, max_id, offset_date, minDate, classGuid, load_type, mode, threadMessageId, loadIndex, processMessages, isTopic, loaderLogger, null);
+    }
+
+    private Runnable getMessagesInternal(long dialogId, long mergeDialogId, int count, int max_id, int offset_date, int minDate, int classGuid, int load_type, int mode, long threadMessageId, int loadIndex, boolean processMessages, boolean isTopic, Timer loaderLogger, WarmHistoryReceiver warmReceiver) {
         TLRPC.TL_messages_messages res = new TLRPC.TL_messages_messages();
         long currentUserId = getUserConfig().clientUserId;
         int count_unread = 0;
@@ -9371,6 +9442,7 @@ public class MessagesStorage extends BaseController {
                         if (cursor.next()) {
                             int mid = cursor.intValue(0);
                             if (mid != 0) {
+                                if (warmReceiver != null) return null;
                                 SQLitePreparedStatement state;
                                 if (threadMessageId != 0) {
                                     state = database.executeFast("REPLACE INTO messages_holes_topics VALUES(?, ?, ?, ?)");
@@ -10072,6 +10144,13 @@ public class MessagesStorage extends BaseController {
             };
         } else {*/
         int finalMessagesCount = scheduled ? res.messages.size() : messagesCount;
+        if (warmReceiver != null) {
+            if (!res.messages.isEmpty() && res.messages.size() <= 64) {
+                WarmHistoryDelivery delivery = (guid, index, logger) -> getMessagesController().processLoadedMessages(res, finalMessagesCount, dialogId, mergeDialogId, countQueryFinal, maxIdOverrideFinal, offset_date, true, guid, minUnreadIdFinal, lastMessageIdFinal, countUnreadFinal, maxUnreadDateFinal, load_type, isEndFinal, mode, threadMessageId, index, queryFromServerFinal, mentionsUnreadFinal, processMessages, isTopic, logger);
+                warmReceiver.accept(delivery, res.getObjectSize());
+            }
+            return null;
+        }
         return () -> getMessagesController().processLoadedMessages(res, finalMessagesCount, dialogId, mergeDialogId, countQueryFinal, maxIdOverrideFinal, offset_date, true, classGuid, minUnreadIdFinal, lastMessageIdFinal, countUnreadFinal, maxUnreadDateFinal, load_type, isEndFinal, mode, threadMessageId, loadIndex, queryFromServerFinal, mentionsUnreadFinal, processMessages, isTopic, loaderLogger);
         //}
     }
@@ -10108,7 +10187,16 @@ public class MessagesStorage extends BaseController {
         storageQueue.postRunnable(() -> {
             Timer.done(t1);
             Timer.Task t2 = Timer.start(loaderLogger, "MessagesStorage.getMessages");
-            Runnable processMessagesRunnable = getMessagesInternal(dialogId, mergeDialogId, count, max_id, offset_date, minDate, classGuid, load_type, mode, replyMessageId, loadIndex, processMessages, isTopic, loaderLogger);
+            WarmHistoryDelivery warmed = null;
+            if (mergeDialogId == 0 && max_id == 0 && offset_date == 0 && minDate == 0
+                    && load_type == LOAD_FROM_UNREAD && mode == 0 && replyMessageId == 0 && processMessages && !isTopic
+                    && !warmHistory.isEmpty()) {
+                warmed = warmHistory.take(dialogId, count, SystemClock.uptimeMillis(), warmHistoryRevision());
+            }
+            WarmHistoryDelivery ready = warmed;
+            Runnable processMessagesRunnable = ready == null
+                    ? getMessagesInternal(dialogId, mergeDialogId, count, max_id, offset_date, minDate, classGuid, load_type, mode, replyMessageId, loadIndex, processMessages, isTopic, loaderLogger)
+                    : () -> ready.deliver(classGuid, loadIndex, loaderLogger);
             Timer.done(t2);
             Timer.Task t3 = Timer.start(loaderLogger, "MessagesStorage.getMessages: stageQueue.postRunnable");
             Utilities.stageQueue.postRunnable(() -> {

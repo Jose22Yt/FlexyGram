@@ -3232,6 +3232,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     @Override
     public void onFragmentDestroy() {
+        historyWarmup.cancel();
         chatOpenGeneration++;
         LiteMode.removeOnPowerSaverAppliedListener(nativeGlassPowerListener);
         super.onFragmentDestroy();
@@ -4819,6 +4820,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) historyWarmup.request(); else historyWarmup.cancel();
                     if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
                         wasManualScroll = true;
                         scrollingManually = true;
@@ -4859,6 +4861,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    if (dx == 0 && dy == 0) historyWarmup.request();
                     if (contentView != null && (dx != 0 || dy != 0)) {
                         contentView.updateBlurContent();
                     }
@@ -7430,6 +7433,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onResume() {
         super.onResume();
+        historyWarmup.request();
         refreshNativeGlassPolicy();
         updateSeparateSearchVisibility(mainTabsActivityController != null && app.flexygram.navigation.LiquidNavigationConfig.isEnabled()
                 && app.flexygram.navigation.LiquidNavigationConfig.separateSearch());
@@ -7634,9 +7638,44 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     private long chatOpenGeneration;
+    private final app.flexygram.performance.ChatHistoryWarmup historyWarmup = new app.flexygram.performance.ChatHistoryWarmup(new app.flexygram.performance.ChatHistoryWarmup.Host() {
+        @Override public int account() { return currentAccount; }
+        @Override public boolean canWarm() { return canWarmVisibleHistory(); }
+        @Override public long[] candidates() { return visibleHistoryCandidates(); }
+    });
+
+    private boolean canWarmVisibleHistory() {
+        return !isPaused() && !isFinished && !onlySelect && !searchIsShowed && !dialogsListFrozen
+                && actionBar != null && !actionBar.isActionModeShowed()
+                && communityId == 0 && !LiteMode.isPowerSaverApplied() && fragmentView != null && fragmentView.isShown()
+                && parentLayout != null && !parentLayout.checkTransitionAnimation() && !parentLayout.isInPreviewMode()
+                && viewPages != null && viewPages[0] != null && viewPages[0].isDefaultDialogType()
+                && viewPages[0].listView != null && viewPages[0].listView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE;
+    }
+
+    private long[] visibleHistoryCandidates() {
+        long[] ids = new long[2]; int[] scores = {-1, -1};
+        RecyclerListView list = viewPages[0].listView;
+        for (int i = 0; i < list.getChildCount(); i++) {
+            View child = list.getChildAt(i);
+            if (!(child instanceof DialogCell) || child.getBottom() <= list.getPaddingTop()
+                    || child.getTop() >= list.getHeight() - list.getPaddingBottom()) continue;
+            long did = ((DialogCell) child).getDialogId();
+            if ((!DialogObject.isUserDialog(did) && !DialogObject.isChatDialog(did)) || did == ids[0] || did == ids[1]) continue;
+            TLRPC.Dialog dialog = getMessagesController().dialogs_dict.get(did);
+            if (dialog == null || dialog.top_message == 0 || getMessagesController().isForum(did)
+                    || (did < 0 && ChatObject.isMonoForum(getMessagesController().getChat(-did)))) continue;
+            int score = (getMessagesController().isDialogMuted(did, 0) ? 0 : 2) + (dialog.unread_count > 0 ? 1 : 0);
+            if (score > scores[0]) {
+                ids[1] = ids[0]; scores[1] = scores[0]; ids[0] = did; scores[0] = score;
+            } else if (score > scores[1]) { ids[1] = did; scores[1] = score; }
+        }
+        return scores[0] < 0 ? new long[0] : scores[1] < 0 ? new long[]{ids[0]} : ids;
+    }
 
     @Override
     public boolean presentFragment(BaseFragment fragment) {
+        historyWarmup.cancel();
         final long generation = ++chatOpenGeneration;
         if (fragment instanceof ChatActivity) {
             final int account = fragment.getCurrentAccount();
@@ -7667,6 +7706,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     @Override
     public void onPause() {
+        historyWarmup.cancel();
         chatOpenGeneration++;
         super.onPause();
         if (storiesBulletin != null) {
@@ -7811,6 +7851,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onBecomeFullyVisible() {
         super.onBecomeFullyVisible();
+        historyWarmup.request();
         clearClosedPreviewOverlay();
         if (isArchive()) {
             SharedPreferences preferences = MessagesController.getGlobalMainSettings();
@@ -11028,6 +11069,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     public void didReceivedNotification(int id, int account, Object... args) {
 
         if (id == NotificationCenter.dialogsNeedReload) {
+            historyWarmup.request();
             if (viewPages == null || dialogsListFrozen) {
                 return;
             }
