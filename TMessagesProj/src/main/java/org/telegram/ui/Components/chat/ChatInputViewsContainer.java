@@ -146,7 +146,7 @@ public class ChatInputViewsContainer extends FrameLayout {
     public void setCompactGlassFactory(org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory factory,
             org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProvider colors) {
         for (int i = 0; i < compactGlass.length; i++) {
-            compactGlass[i] = factory.create(this, colors).setIosGlassSurface(app.flexygram.glass.IosGlassConfig.COMPOSER).setPadding(0);
+            compactGlass[i] = factory.create(this, colors).setPadding(0);
             compactGlass[i].setAlpha(0);
         }
     }
@@ -393,9 +393,6 @@ public class ChatInputViewsContainer extends FrameLayout {
                     drawSignatureChannelBackground(canvas);
                 } else {
                     blurredBackgroundDrawable.draw(canvas);
-                    flexyNativeGlassDrawn = canvas.isHardwareAccelerated()
-                            && blurredBackgroundDrawable.isIosGlassSurface(app.flexygram.glass.IosGlassConfig.COMPOSER)
-                            && app.flexygram.glass.IosGlassConfig.active(app.flexygram.glass.IosGlassConfig.COMPOSER);
                 }
             }
 
@@ -450,14 +447,14 @@ public class ChatInputViewsContainer extends FrameLayout {
         // Channels use the same retained native blur/border surfaces as contacts.
         // Do not gate them on the legacy pearl preset or paint an opaque surface over them.
         if (compactGlass[0] != null && canvas.isHardwareAccelerated()
-                && app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.COMPOSER, org.telegram.messenger.SharedConfig.chatBlurEnabled())) {
+                && org.telegram.messenger.SharedConfig.chatBlurEnabled()) {
             drawCompactGlass(canvas, 0, signatureChannelMiddle, radius);
             if (!signatureChannelLeft.isEmpty()) drawCompactGlass(canvas, 1, signatureChannelLeft, radius);
             if (!signatureChannelRight.isEmpty()) drawCompactGlass(canvas, 2, signatureChannelRight, radius);
             return;
         }
         int panel=flexyChannels.getSignatureSurfaceColor();boolean dark=ColorUtils.calculateLuminance(panel)<.4;
-        if(flexyPearlGlass && app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.COMPOSER, org.telegram.messenger.SharedConfig.chatBlurEnabled())){
+        if(flexyPearlGlass && org.telegram.messenger.SharedConfig.chatBlurEnabled()){
             tmpRectF.set(signatureChannelMiddle);if(!signatureChannelLeft.isEmpty())tmpRectF.union(signatureChannelLeft);if(!signatureChannelRight.isEmpty())tmpRectF.union(signatureChannelRight);
             tmpRectF.inset(-dp(7),-dp(7));tmpRectF.round(tmpRect);blurredBackgroundDrawable.setBounds(tmpRect);
             canvas.save();canvas.clipPath(signatureChannelMask);blurredBackgroundDrawable.draw(canvas);canvas.restore();
@@ -467,7 +464,7 @@ public class ChatInputViewsContainer extends FrameLayout {
         canvas.drawRoundRect(signatureChannelMiddle,radius,radius,flexySurface);
         if(!signatureChannelLeft.isEmpty())canvas.drawRoundRect(signatureChannelLeft,radius,radius,flexySurface);
         if(!signatureChannelRight.isEmpty())canvas.drawRoundRect(signatureChannelRight,radius,radius,flexySurface);
-        if(flexyPearlGlass && app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.COMPOSER, org.telegram.messenger.SharedConfig.chatBlurEnabled())){
+        if(flexyPearlGlass && org.telegram.messenger.SharedConfig.chatBlurEnabled()){
             flexyPearl.setColor(ColorUtils.setAlphaComponent(Color.WHITE,(dark?28:76)*blurredBackgroundDrawable.getAlpha()/255));
             flexyPearl.setStyle(Paint.Style.STROKE);flexyPearl.setStrokeWidth(.65f*AndroidUtilities.density);
             canvas.drawRoundRect(signatureChannelMiddle,radius,radius,flexyPearl);
@@ -533,7 +530,7 @@ public class ChatInputViewsContainer extends FrameLayout {
             drawFlexyNativeGlassIslands(canvas, offsetX, offsetY, radius, attach);
             return;
         }
-        if (flexyPearlGlass && app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.COMPOSER, org.telegram.messenger.SharedConfig.chatBlurEnabled())) {
+        if (flexyPearlGlass && org.telegram.messenger.SharedConfig.chatBlurEnabled()) {
             final boolean voice = flexyComposer.getFlexyVoiceBounds(flexyVoice);
             if (voice) flexyVoice.offset(offsetX, offsetY);
             // One native backdrop pass for the pill, attachment and settled microphone.

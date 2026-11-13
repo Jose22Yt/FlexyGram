@@ -39,7 +39,6 @@ public final class Settings3Registry {
         return "chat";
     }
     public static BaseFragment openRoute(String route){
-        if("ios_glass".equals(route))return new app.flexygram.glass.IosGlassSettingsActivity();
         // Shared links to the retired effect return to the current home overview.
         if("motion".equals(route)||"scroll_effects".equals(route))return open("home");
         String category=category(route);

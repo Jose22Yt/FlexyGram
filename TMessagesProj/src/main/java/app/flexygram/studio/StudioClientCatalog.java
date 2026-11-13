@@ -90,7 +90,7 @@ final class StudioClientCatalog {
             case "flexy_bubble_interaction":case "flexy_delete_motion":return "chat";
             case "aiConfig":return "ai";
             case "exteraless_plugins":return "plugins";
-            case "flexygram_motion":case "flexy_ios_glass":return "appearance";
+            case "flexygram_motion":return "appearance";
             default:return "general";
         }
     }
@@ -107,10 +107,12 @@ final class StudioClientCatalog {
         for(ConfigItem item:PillStackConfig.INSTANCE.getStudioItems())item(item,"navigation");
         for(ConfigItem item:UtilsConfig.INSTANCE.getStudioItems())item(item);
         for(ConfigItem item:app.exteraless.glyph.GlyphConfig.INSTANCE.getStudioItems())item(item,"appearance");
-        bool("flexy_ios_glass","enabled",false);
-        integer("flexy_ios_glass","surfaces",15);range("flexy_ios_glass","surfaces",0,15);
         // Legacy backups may contain layout 1 or 2; reload migrates both to the sole default.
         integer("flexygram_home","style",0);range("flexygram_home","style",0,2);
+        // Retired iOS material keys remain portable metadata for existing backups only.
+        // No renderer reads this file or applies its flags.
+        bool("flexy_ios_glass","enabled",false);
+        integer("flexy_ios_glass","surfaces",15);range("flexy_ios_glass","surfaces",0,15);
         // Retired scroll settings are decoded only for compatibility with existing backups.
         // No renderer or settings screen reads them; importing them cannot enable an effect.
         integer("flexygram_scroll_effects","chats",0);range("flexygram_scroll_effects","chats",0,3);

@@ -275,7 +275,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
             @Override public void onDescendantInvalidated(View child, View target) {
                 super.onDescendantInvalidated(child,target);
-                if (child == viewPager && app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.HOME, SharedConfig.chatBlurEnabled()) && app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.HOME, BlurredBackgroundProviderImpl.checkBlurEnabled(resourceProvider))) {
+                if (child == viewPager && SharedConfig.chatBlurEnabled() && BlurredBackgroundProviderImpl.checkBlurEnabled(resourceProvider)) {
                     tabsGlassRevision++;
                     if (iBlur3SourceTabGlass != null) iBlur3SourceTabGlass.invalidateDisplayListForDrawables();
                     if (tabsView != null) tabsView.invalidate();
@@ -518,8 +518,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             BlurredBackgroundDrawableViewFactory dockFactory = new BlurredBackgroundDrawableViewFactory(iBlur3SourceTabGlass);
             dockFactory.setSourceRootView(viewPositionWatcher, tabsViewWrapper);
             dockGlassColors = new org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProviderThemed(resourceProvider, Theme.key_windowBackgroundWhite, .65f);
-            tabsView.setGlassBackground(dockFactory.create(tabsView, dockGlassColors).setIosGlassSurface(app.flexygram.glass.IosGlassConfig.HOME).setPadding(0));
-            separateSearchGlass = dockFactory.create(separateSearchButton, dockGlassColors).setIosGlassSurface(app.flexygram.glass.IosGlassConfig.HOME).setPadding(0).setRadius(dp(28));
+            tabsView.setGlassBackground(dockFactory.create(tabsView, dockGlassColors).setPadding(0));
+            separateSearchGlass = dockFactory.create(separateSearchButton, dockGlassColors).setPadding(0).setRadius(dp(28));
         }
 
         updateLayoutWrapper = new UpdateLayoutWrapper(context);
@@ -1179,8 +1179,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         fallback.setShape(android.graphics.drawable.GradientDrawable.OVAL);
         fallback.setColor(getThemedColor(Theme.key_windowBackgroundWhite));
         android.graphics.drawable.Drawable background = fallback;
-        if (separateSearchGlass != null && app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.HOME, SharedConfig.chatBlurEnabled())
-                && app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.HOME, BlurredBackgroundProviderImpl.checkBlurEnabled(resourceProvider))) {
+        if (separateSearchGlass != null && org.telegram.messenger.SharedConfig.chatBlurEnabled()
+                && BlurredBackgroundProviderImpl.checkBlurEnabled(resourceProvider)) {
             separateSearchGlass.updateColors(); background = separateSearchGlass;
         }
         separateSearchButton.setBackground(new android.graphics.drawable.RippleDrawable(
@@ -1774,7 +1774,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         }
 
         if (tabsViewWrapper == null || tabsViewWrapper.getVisibility() != View.VISIBLE
-                || !app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.HOME, SharedConfig.chatBlurEnabled())) return;
+                || !SharedConfig.chatBlurEnabled()) return;
         final int width = tabsViewWrapper.getMeasuredWidth();
         final int height = tabsViewWrapper.getMeasuredHeight();
         if (width <= 0 || height <= 0) return;

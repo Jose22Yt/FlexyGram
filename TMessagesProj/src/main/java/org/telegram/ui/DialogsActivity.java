@@ -2802,16 +2802,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         iBlur3SourceColor = new BlurredBackgroundSourceColor();
         iBlur3SourceColor.setColor(getThemedColor(Theme.key_windowBackgroundWhite));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            scrollableViewNoiseSuppressor = new DownscaleScrollableNoiseSuppressor(true, false, app.flexygram.glass.IosGlassConfig.homeBackdrop(false));
+            scrollableViewNoiseSuppressor = new DownscaleScrollableNoiseSuppressor();
             iBlur3SourceGlassFrosted = new BlurredBackgroundSourceRenderNode(null);
             iBlur3SourceGlassFrosted.setupRenderer(new RenderNodeWithHash.Renderer() {
                 @Override
                 public void renderNodeCalculateHash(IBlur3Hash hash) {
                     hash.add(getThemedColor(Theme.key_windowBackgroundWhite));
-                    hash.add(app.flexygram.glass.IosGlassConfig.homeBackdrop(SharedConfig.chatBlurEnabled()));
+                    hash.add(SharedConfig.chatBlurEnabled());
                     hash.add(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
 
-                    if (app.flexygram.glass.IosGlassConfig.homeBackdrop(SharedConfig.chatBlurEnabled())) {
+                    if (SharedConfig.chatBlurEnabled()) {
                         TopicsFragment topicsFragment = null;
                         if (rightSlidingDialogContainer != null && rightSlidingDialogContainer.getFragment() instanceof TopicsFragment) {
                             topicsFragment = (TopicsFragment) rightSlidingDialogContainer.getFragment();
@@ -2830,7 +2830,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     final int height = fragmentView.getMeasuredHeight();
 
                     canvas.drawColor(getThemedColor(Theme.key_windowBackgroundWhite));
-                    if (app.flexygram.glass.IosGlassConfig.homeBackdrop(SharedConfig.chatBlurEnabled())) {
+                    if (SharedConfig.chatBlurEnabled()) {
                         TopicsFragment topicsFragment = null;
                         if (rightSlidingDialogContainer != null && rightSlidingDialogContainer.getFragment() instanceof TopicsFragment) {
                             topicsFragment = (TopicsFragment) rightSlidingDialogContainer.getFragment();
@@ -2857,10 +2857,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 @Override
                 public void renderNodeCalculateHash(IBlur3Hash hash) {
                     hash.add(getThemedColor(Theme.key_windowBackgroundWhite));
-                    hash.add(app.flexygram.glass.IosGlassConfig.homeBackdrop(SharedConfig.chatBlurEnabled()));
+                    hash.add(SharedConfig.chatBlurEnabled());
                     hash.add(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
 
-                    if (app.flexygram.glass.IosGlassConfig.homeBackdrop(SharedConfig.chatBlurEnabled())) {
+                    if (SharedConfig.chatBlurEnabled()) {
                         TopicsFragment topicsFragment = null;
                         if (rightSlidingDialogContainer != null && rightSlidingDialogContainer.getFragment() instanceof TopicsFragment) {
                             topicsFragment = (TopicsFragment) rightSlidingDialogContainer.getFragment();
@@ -2879,7 +2879,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     final int height = fragmentView.getMeasuredHeight();
 
                     canvas.drawColor(getThemedColor(Theme.key_windowBackgroundWhite));
-                    if (app.flexygram.glass.IosGlassConfig.homeBackdrop(SharedConfig.chatBlurEnabled())) {
+                    if (SharedConfig.chatBlurEnabled()) {
                         TopicsFragment topicsFragment = null;
                         if (rightSlidingDialogContainer != null && rightSlidingDialogContainer.getFragment() instanceof TopicsFragment) {
                             topicsFragment = (TopicsFragment) rightSlidingDialogContainer.getFragment();
@@ -14945,24 +14945,21 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private final @NonNull BlurredBackgroundDrawableViewFactory iBlur3FactoryLiquidGlass;
     private final @NonNull BlurredBackgroundDrawableViewFactory iBlur3FactoryFade;
 
-    private int appliedIosGlassRevision = -1;
     private boolean appliedGlassPolicyInitialized;
     private boolean appliedLiquidGlassPolicy, appliedBlurPolicy;
     private final Utilities.Callback<Boolean> nativeGlassPowerListener = ignored -> refreshNativeGlassPolicy();
 
     private void refreshNativeGlassPolicy() {
         boolean liquid = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
-        boolean blur = app.flexygram.glass.IosGlassConfig.homeBackdrop(SharedConfig.chatBlurEnabled());
-        int revision = app.flexygram.glass.IosGlassConfig.revision();
-        if (appliedGlassPolicyInitialized && appliedLiquidGlassPolicy == liquid && appliedBlurPolicy == blur && appliedIosGlassRevision == revision) return;
-        appliedIosGlassRevision = revision;
+        boolean blur = SharedConfig.chatBlurEnabled();
+        if (appliedGlassPolicyInitialized && appliedLiquidGlassPolicy == liquid && appliedBlurPolicy == blur) return;
         appliedGlassPolicyInitialized = true;
         appliedLiquidGlassPolicy = liquid;
         appliedBlurPolicy = blur;
         if (Build.VERSION.SDK_INT >= 31 && scrollableViewNoiseSuppressor != null
-                && scrollableViewNoiseSuppressor.isLiquidGlassEnabled != (liquid || app.flexygram.glass.IosGlassConfig.homeBackdrop(false))) {
+                && scrollableViewNoiseSuppressor.isLiquidGlassEnabled != liquid) {
             // The source callbacks read this field; existing tab/search drawables keep their source.
-            scrollableViewNoiseSuppressor = new DownscaleScrollableNoiseSuppressor(true, false, app.flexygram.glass.IosGlassConfig.homeBackdrop(false));
+            scrollableViewNoiseSuppressor = new DownscaleScrollableNoiseSuppressor();
         }
         iBlur3FactoryLiquidGlass.setLiquidGlassEffectAllowed(liquid);
         iBlur3FactoryFrostedLiquidGlass.setLiquidGlassEffectAllowed(liquid);

@@ -57,20 +57,3 @@ La autoría de las contribuciones permanece en el historial Git. Los nuevos comp
 Dibujos importados de [TelegramMessenger/Telegram-iOS](https://github.com/TelegramMessenger/Telegram-iOS/tree/24638bc69bd083981b178dd1e7f921eebbf7fc46), revisión `24638bc69bd083981b178dd1e7f921eebbf7fc46`. Se conservan archivos fuente y metadatos originales con SHA-256 y Git blob, junto al [README original](tools/ios_originals/UPSTREAM-README.md). La conversión a recursos Android conserva las geometrías o rasteriza el archivo original; no procede de Flutter Cupertino, SF Symbols recreados ni generación de imágenes.
 
 El [informe de importación](docs/icons/beta41-original-ios.md) detalla formatos, tamaños, roles y excepciones. Estos recursos no cambian el nombre ni el logotipo de FlexyGram. La revisión original no incluye un archivo LICENSE en la raíz; se mantiene su README y no se atribuye a Telegram una licencia nueva a través de esta conversión.
-
-## Material de cristal para Android
-
-La refracción de borde y la cobertura del contorno de
-`flexy_ios_glass_shader.agsl` adaptan las fórmulas públicas de
-[LiquidGlassShapes.metal](https://github.com/TelegramMessenger/Telegram-iOS/blob/24638bc69bd083981b178dd1e7f921eebbf7fc46/submodules/TelegramUI/Components/LiquidGlassShapes/Metal/LiquidGlassShapes.metal),
-de **TelegramMessenger / Telegram-iOS**, revisión
-`24638bc69bd083981b178dd1e7f921eebbf7fc46`.
-[GlassBackgroundComponent.swift](https://github.com/TelegramMessenger/Telegram-iOS/blob/24638bc69bd083981b178dd1e7f921eebbf7fc46/submodules/TelegramUI/Components/GlassBackgroundComponent/Sources/GlassBackgroundComponent.swift)
-sirve como referencia del tratamiento claro y oscuro. La integración Android usa
-las capturas y RenderNodes existentes de Telegram para Android; no incorpora el
-renderizador UIKit/CoreAnimation de Apple.
-
-La revisión consultada no incluye LICENSE en su raíz: esta atribución registra
-la procedencia y no concede una licencia nueva al código original. Se mantienen
-los avisos y condiciones del proyecto de origen, según su
-[README conservado](tools/ios_originals/UPSTREAM-README.md).

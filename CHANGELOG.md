@@ -1,11 +1,10 @@
 # Cambios
 
-## En desarrollo — cristal adaptable por superficie
+## En desarrollo — renderizado nativo
 
-- Nuevo ajuste Cristal iOS 27 con control independiente de barra inferior principal, entrada y cabecera de conversación y carpetas de chats.
-- El material sustituye el glass y desenfoque anteriores en cada zona seleccionada; conserva sus preferencias para recuperarlas al desactivarlo y respeta el ahorro de batería.
-- Reutiliza las capturas nativas, evita animaciones en reposo y adapta el contraste al tema. Requiere Android 13 y aceleración gráfica; conserva la apariencia compatible en versiones anteriores.
-- Las dos preferencias se incluyen en las copias de FlexyStudio. No se genera una APK con este cambio.
+- Retirados el material Cristal iOS 27, su shader y sus controles de las cuatro superficies.
+- Restaurado el renderizado anterior, conservando las mejoras de arranque, reanudación y scroll.
+- Las claves antiguas de FlexyStudio se aceptan como datos de compatibilidad y no pueden activar el efecto retirado.
 
 ## En desarrollo — prioridad de arranque y reanudación
 

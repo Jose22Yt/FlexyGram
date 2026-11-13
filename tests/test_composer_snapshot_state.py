@@ -6,10 +6,10 @@ from test_composer_layout import method
 def test_software_menu_captures_preserve_live_backgrounds_and_restore_owner_on_failure(tmp_path):
     source=(JAVA/'org/telegram/ui/Components/chat/ChatInputViewsContainer.java').read_text()
     draw=method(source[source.index('    /* Render */'):],'protected void dispatchDraw(@NonNull Canvas canvas)').replace('@NonNull ','')
-    probe(tmp_path, {'app/flexygram/glass/IosGlassConfig.java':'package app.flexygram.glass;public class IosGlassConfig{public static final int COMPOSER=2;public static boolean active(int surface){return false;}}', 'Probe.java': '''
+    probe(tmp_path, {'Probe.java': '''
 class Canvas{boolean hardware,fail;Canvas(boolean h){hardware=h;}boolean isHardwareAccelerated(){return hardware;}}
 class Rect{void set(int l,int t,int r,int b){}void inset(int x,int y){}void offset(int x,int y){}}
-class Drawable{boolean isIosGlassSurface(int surface){return false;}int alpha=255,hides;void setBounds(int a,int b,int c,int d){}void setBounds(Rect r){}void draw(Canvas c){}void setAlpha(int a){alpha=a;hides++;}}
+class Drawable{int alpha=255,hides;void setBounds(int a,int b,int c,int d){}void setBounds(Rect r){}void draw(Canvas c){}void setAlpha(int a){alpha=a;hides++;}}
 class Composer{boolean nativeDrawn,voice,send,compact=true;boolean isFlexyCompactPresentation(){return compact;}
  void setFlexyNativeGlassBackdropDrawn(boolean v){nativeDrawn=v;}void setFlexyVoiceBackdropDrawn(boolean v){voice=v;}void setFlexySendBackdropDrawn(boolean v){send=v;}}
 class Channels{boolean isSignatureCompactPresentation(){return true;}}

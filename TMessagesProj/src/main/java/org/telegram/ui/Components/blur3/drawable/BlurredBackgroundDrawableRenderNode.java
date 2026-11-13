@@ -76,42 +76,15 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
     }
 
     /** Policy changes reuse this native drawable; an OFF transition must clear the old GPU effect. */
-    private boolean nativeLiquidGlassAllowed;
-    private int materialProfile = -1;
-    private static boolean iosShaderUnavailable;
-
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     public void setLiquidGlassEffectAllowed(boolean allowed) {
-        if (nativeLiquidGlassAllowed == allowed) {
-            if (liquidGlassEffect != null) syncMaterialProfile();
-            return;
+        if (allowed == (liquidGlassEffect != null)) return;
+        if (allowed) {
+            liquidGlassEffect = new LiquidGlassEffect(renderNodeFill);
+        } else {
+            liquidGlassEffect = null;
+            renderNodeFill.setRenderEffect(null);
         }
-        nativeLiquidGlassAllowed = allowed;
-        // A newly created surface receives its target tag before allocating a GPU program.
-        if (liquidGlassEffect != null) syncMaterialProfile();
-        invalidateDisplayList();
-        invalidateSelf();
-    }
-
-    private void syncMaterialProfile() {
-        if (Build.VERSION.SDK_INT < 33) return;
-        final boolean requested = app.flexygram.glass.IosGlassConfig.requested(iosGlassSurface);
-        final boolean ios = requested && app.flexygram.glass.IosGlassConfig.active(iosGlassSurface) && !iosShaderUnavailable;
-        final int profile = ios ? 2 : requested ? 0 : nativeLiquidGlassAllowed ? 1 : 0;
-        if (materialProfile == profile) return;
-        materialProfile = profile;
-        liquidGlassEffect = null;
-        renderNodeFill.setRenderEffect(null);
-        if (profile != 0) {
-            try {
-                liquidGlassEffect = ios ? new LiquidGlassEffect(renderNodeFill, true) : new LiquidGlassEffect(renderNodeFill);
-            } catch (RuntimeException unavailable) {
-                if (!ios) throw unavailable;
-                iosShaderUnavailable = true;
-                org.telegram.messenger.FileLog.e(unavailable);
-            }
-        }
-        updateColors();
         invalidateDisplayList();
         invalidateSelf();
     }
@@ -162,7 +135,6 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
 
     @Override
     public void updateDisplayList() {
-        syncMaterialProfile();
         final float offsetX = sourceOffsetX;
         final float offsetY = sourceOffsetY;
 
@@ -181,17 +153,15 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
             c.translate(-sL, -sT);
             if (liquidGlassEffect != null && Build.VERSION.SDK_INT >= 33) {
                 final int thickness = Math.max(Math.min(
-                    materialProfile == 2 ? dp(8) : boundProps.liquidThickness <= 0 ? dp(11) : boundProps.liquidThickness,
+                    boundProps.liquidThickness <= 0 ? dp(11) : boundProps.liquidThickness,
                     Math.min(boundProps.boundsWithPadding.width(), boundProps.boundsWithPadding.height()) / 5), 1);
 
-                if (materialProfile == 2) liquidGlassEffect.setDarkAppearance(
-                        colorProvider != null ? colorProvider.isDarkAppearance() : Theme.isCurrentThemeDark());
                 liquidGlassEffect.update(
                     0, 0, boundProps.boundsWithPadding.width(), boundProps.boundsWithPadding.height(),
                     boundProps.shaderRadii[0], boundProps.shaderRadii[2], boundProps.shaderRadii[4], boundProps.shaderRadii[6],
                     thickness,
-                    materialProfile == 2 ? 0.85f : boundProps.liquidIntensity,
-                    materialProfile == 2 ? 1.6f : boundProps.liquidIndex,
+                    boundProps.liquidIntensity,
+                    boundProps.liquidIndex,
                     backgroundColor
                 );
             }
@@ -233,15 +203,6 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
     @Override
     public void updateColors() {
         super.updateColors();
-        if (!iosShaderUnavailable && app.flexygram.glass.IosGlassConfig.active(iosGlassSurface) && colorProvider != null) {
-            backgroundColor = androidx.core.graphics.ColorUtils.setAlphaComponent(colorProvider.getBackgroundColor(), 38);
-            shadowColor = strokeColorTop = strokeColorBottom = strokeColorFull = 0;
-            if (boundProps.useFullStroke || boundProps.microContour) {
-                boundProps.useFullStroke = boundProps.microContour = false;
-                boundProps.build();
-                onBoundPropsChanged();
-            }
-        }
 
         updateShadowLayer(shadowColor);
         if (boundProps.useFullStroke) {
@@ -265,7 +226,6 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
             return;
         }
 
-        syncMaterialProfile();
         if (!renderNode.hasDisplayList()) {
             source.dispatchOnDrawablesRelativePositionChange();
             updateDisplayList();

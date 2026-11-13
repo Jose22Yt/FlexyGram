@@ -252,7 +252,7 @@ public class FilterTabsView extends FrameLayout {
         private void preparePillGlass() {
             if (signaturePillGlass == null && signatureGlassFactory != null) {
                 signaturePillGlass = signatureGlassFactory.create(this,
-                        org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.topPanel(resourcesProvider)).setIosGlassSurface(app.flexygram.glass.IosGlassConfig.FOLDERS).setPadding(0);
+                        org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.topPanel(resourcesProvider)).setPadding(0);
             }
         }
 
@@ -458,7 +458,7 @@ public class FilterTabsView extends FrameLayout {
                 signatureSelected = app.flexygram.home.SignatureHomeStyle.selection(currentTab.id, id1, id2,
                         animatingIndicator || manualScrollingToId != -1, animatingIndicatorProgress);
                 boolean nativePill = !signatureHomeOpaquePreview && signaturePillGlass != null && canvas.isHardwareAccelerated()
-                        && app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.FOLDERS, org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.checkBlurEnabled(resourcesProvider));
+                        && org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.checkBlurEnabled(resourcesProvider);
                 if (nativePill) {
                     signaturePalette=themed?signatureGlassAccentColors:signatureGlassDefaultColors;
                     float h = app.flexygram.home.SignatureHomeStyle.categoryHeight(getHeight(), AndroidUtilities.density);

@@ -23,7 +23,6 @@ final class Settings3LinksSection extends SignatureMatteSettingsActivity {
         }
         BaseFragment f;
         switch(ids[p]){
-            case "ios_glass":f=new app.flexygram.glass.IosGlassSettingsActivity();break;
             case "composer_style":f=new ConversationStyleSettingsActivity(false);break;
             case "header_style":f=new ConversationStyleSettingsActivity(true);break;
             case "bubble_style":f=new app.flexygram.bubbles.BubbleSettingsActivity();break;

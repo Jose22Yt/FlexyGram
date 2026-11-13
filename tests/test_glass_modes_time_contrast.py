@@ -43,7 +43,7 @@ public class Probe {
 def test_independent_flags_and_retained_chat_sources_switch_without_reopening(tmp_path):
     shared = method((JAVA/'org/telegram/messenger/SharedConfig.java').read_text(), 'public static boolean chatBlurEnabled()')
     refresh = method((JAVA/'org/telegram/ui/ChatActivity.java').read_text(), 'private void refreshSignatureNativeGlassPolicy()')
-    probe(tmp_path, {'app/flexygram/glass/IosGlassConfig.java':'package app.flexygram.glass;public class IosGlassConfig{public static boolean chatBackdrop(boolean legacy){return legacy;}public static int revision(){return 0;}public static boolean anyActive(){return false;}}', 'Probe.java': '''
+    probe(tmp_path, {'Probe.java': '''
 public class Probe {
  static class LiteMode {
   static final int FLAG_CHAT_BLUR=1,FLAG_LIQUID_GLASS=2;static int flags;
@@ -54,14 +54,13 @@ public class Probe {
   static final int DRAW_GLASS=0,DRAW_FROSTED_GLASS=1;static int builds;
   final boolean isLiquidGlassEnabled=LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
   DownscaleScrollableNoiseSuppressor(){builds++;}
-  DownscaleScrollableNoiseSuppressor(boolean simple,boolean noise,boolean force){this();}
  }
  static class Source {int updates;void setScrollableNoiseSuppressor(DownscaleScrollableNoiseSuppressor s,int index){updates++;}}
  static class Factory {boolean liquid;int changes;void setLiquidGlassEffectAllowed(boolean b){liquid=b;changes++;}}
  static class Bar {boolean liquid;void updateSignatureNativeGlassPolicy(boolean b){liquid=b;}}
  static class Input {boolean liquid;void updateNativeLiquidGlassPolicy(boolean b){liquid=b;}}
  static class View {void invalidate(){}}
- int iosGlassRevision=-1;boolean signatureNativeGlassAllowed,signatureLiquidGlassAllowed;
+ boolean signatureNativeGlassAllowed,signatureLiquidGlassAllowed;
  DownscaleScrollableNoiseSuppressor scrollableViewNoiseSuppressor=new DownscaleScrollableNoiseSuppressor();
  Source glassBackgroundSourceRenderNode=new Source(),glassBackgroundSourceFrostedRenderNode=new Source();
  Factory glassBackgroundDrawableFactory=new Factory(),glassBackgroundDrawableFactoryFrosted=new Factory();
@@ -155,11 +154,11 @@ def test_native_tint_tracks_mode_changes_without_overriding_explicit_alpha(tmp_p
         'org/telegram/messenger/AndroidUtilities.java': 'package org.telegram.messenger;public class AndroidUtilities{public static float computePerceivedBrightness(int c){return .9f;}public static float dpf2(float f){return f;}}',
         'org/telegram/messenger/LiteMode.java': 'package org.telegram.messenger;public class LiteMode{public static final int FLAG_LIQUID_GLASS=2;public static boolean liquid;public static boolean isEnabled(int f){return liquid;}}',
         'org/telegram/ui/ActionBar/Theme.java': '''package org.telegram.ui.ActionBar;public class Theme{
- public interface ResourcesProvider{default boolean isDark(){return false;}}public static boolean isCurrentThemeDark(){return false;}public static final int key_windowBackgroundWhiteBlackText=1;
+ public interface ResourcesProvider{}public static final int key_windowBackgroundWhiteBlackText=1;
  public static int getColor(int id,ResourcesProvider r){return -1;}
  public static int multAlpha(int c,float a){return(c&0xffffff)|((int)(255*a)<<24);}}''',
         'org/telegram/ui/Components/blur3/drawable/color/BlurredBackgroundColorProvider.java': '''package org.telegram.ui.Components.blur3.drawable.color;public interface BlurredBackgroundColorProvider{
- default boolean isDarkAppearance(){return false;}int getShadowColor();int getBackgroundColor();int getStrokeColorTop();int getStrokeColorBottom();default int getStrokeColorFull(){return 0;}}''',
+ int getShadowColor();int getBackgroundColor();int getStrokeColorTop();int getStrokeColorBottom();default int getStrokeColorFull(){return 0;}}''',
         'Probe.java': '''import org.telegram.messenger.LiteMode;import org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProviderThemed;
 public class Probe {public static void main(String[] a){
  BlurredBackgroundColorProviderThemed auto=new BlurredBackgroundColorProviderThemed(null,0),manual=new BlurredBackgroundColorProviderThemed(null,0,.4f);

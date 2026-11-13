@@ -201,11 +201,8 @@ def test_opaque_native_material_skips_backdrop_recording_and_transparency_restor
  static class Rect {int left,top,right=200,bottom=60;int width(){return right-left;}int height(){return bottom-top;}}
  static class Props {Rect boundsWithPadding=new Rect();int liquidThickness;float liquidIntensity,liquidIndex,strokeWidthTop,strokeWidthBottom;float[]radii=new float[8],shaderRadii=new float[8];boolean useFullStroke;Object strokePathTop;}
  static class Source {int draws;void draw(Canvas c,float a,float b,float d,float e){draws++;}}
- static class Liquid {int updates;void setDarkAppearance(boolean dark){}void update(Object...args){updates++;}}
+ static class Liquid {int updates;void update(Object...args){updates++;}}
  float sourceOffsetX,sourceOffsetY;Props boundProps=new Props();Node renderNode=new Node(),renderNodeFill=new Node();Source source=new Source();Liquid liquidGlassEffect=new Liquid();int backgroundColor,strokeColorTop,strokeColorBottom,strokeColorFull;Object paintStrokeTop,paintStrokeBottom,paintStrokeFull;
- static class Colors{boolean isDarkAppearance(){return false;}}Colors colorProvider=new Colors();
- static class Theme{static boolean isCurrentThemeDark(){return false;}}
- int materialProfile=1;void syncMaterialProfile(){}
  void drawStrokeRaw(Object...args){}
  UPDATE
  public static void main(String[]args){Probe p=new Probe();p.backgroundColor=0xff123456;
@@ -262,7 +259,7 @@ def test_glass_reads_program_once_but_never_shares_mutable_shaders(tmp_path):
         'android/graphics/RenderNode.java': '''package android.graphics;public class RenderNode {
  public RenderEffect effect;public int getWidth(){return 200;}public int getHeight(){return 60;}public void setRenderEffect(RenderEffect e){effect=e;}}''',
         'org/telegram/messenger/AndroidUtilities.java': 'package org.telegram.messenger;public class AndroidUtilities {public static int reads;public static String readRes(int id){reads++;return "program";}}',
-        'org/telegram/messenger/R.java': 'package org.telegram.messenger;public class R {public static class raw{public static int liquid_glass_shader=1,flexy_ios_glass_shader=2;}}',
+        'org/telegram/messenger/R.java': 'package org.telegram.messenger;public class R {public static class raw{public static int liquid_glass_shader;}}',
         'Probe.java': '''import android.graphics.*;import org.telegram.ui.Components.blur3.LiquidGlassEffect;import org.telegram.messenger.AndroidUtilities;
 public class Probe {public static void main(String[]args){java.util.Set<RuntimeShader>shaders=new java.util.HashSet<>();
  for(int i=0;i<1000;i++){RenderNode n=new RenderNode();LiquidGlassEffect glass=new LiquidGlassEffect(n);shaders.add(n.effect.shader);
@@ -272,7 +269,5 @@ public class Probe {public static void main(String[]args){java.util.Set<RuntimeS
  glass.update(0,0,200,60,20,20,20,20,10,1,1,0x80334455);if(RenderEffect.creates!=effects+1)throw new AssertionError();
  }
  if(AndroidUtilities.reads!=1||shaders.size()!=1000||RuntimeShader.instances!=1000)throw new AssertionError();
- for(int i=0;i<1000;i++){RenderNode n=new RenderNode();LiquidGlassEffect glass=new LiquidGlassEffect(n,true);shaders.add(n.effect.shader);}
- if(AndroidUtilities.reads!=2||shaders.size()!=2000||RuntimeShader.instances!=2000)throw new AssertionError("profile programs are shared, mutable shaders are not");
  }}'''
     }, [JAVA/'org/telegram/ui/Components/blur3/LiquidGlassEffect.java'])
