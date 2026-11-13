@@ -19,7 +19,7 @@ import org.telegram.utils.glass.positions.GlassPositionsArray;
 import org.telegram.utils.glass.positions.GlassPositionsMerger;
 
 import java.util.ArrayList;
-
+import java.util.WeakHashMap;
 public class GlassEngine {
     public static final int FLAG_INVALIDATED_SCROLL = 1;
     public static final int FLAG_INVALIDATED_SCROLL_EDGES = 1 << 1;
@@ -30,7 +30,7 @@ public class GlassEngine {
 
 
     private GlassInvalidationListener glassInvalidationListener;
-
+private final WeakHashMap<View, View.OnAttachStateChangeListener> registeredScrolledViews = new WeakHashMap<>();
     public interface GlassInvalidationListener {
         void onGlassInvalidated(int flags);
     }
@@ -84,25 +84,41 @@ public class GlassEngine {
     }
 
     public void addScrolledView(ViewPager viewPager) {
-        if (viewPager == null) {
+        if (viewPager == null || registeredScrolledViews.containsKey(viewPager)) {
             return;
         }
 
-        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        ViewPager.SimpleOnPageChangeListener listener = new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 scrollGenerationId++;
             }
         });
+        viewPager.addOnPageChangeListener(listener);
+
+        View.OnAttachStateChangeListener attachListener = new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                viewPager.removeOnPageChangeListener(listener);
+                viewPager.removeOnAttachStateChangeListener(this);
+                registeredScrolledViews.remove(viewPager);
+            }
+        };
+        registeredScrolledViews.put(viewPager, attachListener);
+        viewPager.addOnAttachStateChangeListener(attachListener);
     }
 
     public void addScrolledView(RecyclerListView recyclerListView) {
-        if (recyclerListView == null) {
+        if (recyclerListView == null || registeredScrolledViews.containsKey(recyclerListView)) {
             return;
         }
 
         recyclerListView.addEdgeEffectListener((direction, isVisible) -> scrollEdgesGenerationId++);
-        recyclerListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 scrollGenerationId++;
@@ -113,6 +129,22 @@ public class GlassEngine {
                 scrollGenerationId++;
             }
         });
+        recyclerListView.addOnScrollListener(scrollListener);
+
+        View.OnAttachStateChangeListener attachListener = new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                recyclerListView.removeOnScrollListener(scrollListener);
+                recyclerListView.removeOnAttachStateChangeListener(this);
+                registeredScrolledViews.remove(recyclerListView);
+            }
+        };
+        registeredScrolledViews.put(recyclerListView, attachListener);
+        recyclerListView.addOnAttachStateChangeListener(attachListener);
     }
 
     public void addAdditionalInvalidationCondition(InvalidationCondition condition) {
@@ -197,6 +229,8 @@ public class GlassEngine {
     private final GlassPositionsArray output = new GlassPositionsArray();
 
     private boolean checkDrawablePositionsIfNeeded() {
+        if (rootView == null) return false;
+                                                      
         boolean hasInvalidatedPositionsOrVisibility = false;
 
         final int W = rootView.getWidth();
