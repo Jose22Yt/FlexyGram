@@ -30,7 +30,8 @@ public class GlassEngine {
 
 
     private GlassInvalidationListener glassInvalidationListener;
-private final WeakHashMap<View, View.OnAttachStateChangeListener> registeredScrolledViews = new WeakHashMap<>();
+    // Values must not capture the weak keys. Listeners live with their view, including reattachment.
+    private final WeakHashMap<View, Boolean> registeredScrolledViews = new WeakHashMap<>();
     public interface GlassInvalidationListener {
         void onGlassInvalidated(int flags);
     }
@@ -84,41 +85,19 @@ private final WeakHashMap<View, View.OnAttachStateChangeListener> registeredScro
     }
 
     public void addScrolledView(ViewPager viewPager) {
-        if (viewPager == null || registeredScrolledViews.containsKey(viewPager)) {
-            return;
-        }
-
-        ViewPager.SimpleOnPageChangeListener listener = new ViewPager.SimpleOnPageChangeListener() {
+        if (viewPager == null || registeredScrolledViews.put(viewPager, Boolean.TRUE) != null) return;
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 scrollGenerationId++;
             }
         });
-        viewPager.addOnPageChangeListener(listener);
-
-        View.OnAttachStateChangeListener attachListener = new View.OnAttachStateChangeListener() {
-            @Override
-            public void onViewAttachedToWindow(View v) {
-            }
-
-            @Override
-            public void onViewDetachedFromWindow(View v) {
-                viewPager.removeOnPageChangeListener(listener);
-                viewPager.removeOnAttachStateChangeListener(this);
-                registeredScrolledViews.remove(viewPager);
-            }
-        };
-        registeredScrolledViews.put(viewPager, attachListener);
-        viewPager.addOnAttachStateChangeListener(attachListener);
     }
 
     public void addScrolledView(RecyclerListView recyclerListView) {
-        if (recyclerListView == null || registeredScrolledViews.containsKey(recyclerListView)) {
-            return;
-        }
-
+        if (recyclerListView == null || registeredScrolledViews.put(recyclerListView, Boolean.TRUE) != null) return;
         recyclerListView.addEdgeEffectListener((direction, isVisible) -> scrollEdgesGenerationId++);
-        RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
+        recyclerListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 scrollGenerationId++;
@@ -129,22 +108,6 @@ private final WeakHashMap<View, View.OnAttachStateChangeListener> registeredScro
                 scrollGenerationId++;
             }
         });
-        recyclerListView.addOnScrollListener(scrollListener);
-
-        View.OnAttachStateChangeListener attachListener = new View.OnAttachStateChangeListener() {
-            @Override
-            public void onViewAttachedToWindow(View v) {
-            }
-
-            @Override
-            public void onViewDetachedFromWindow(View v) {
-                recyclerListView.removeOnScrollListener(scrollListener);
-                recyclerListView.removeOnAttachStateChangeListener(this);
-                registeredScrolledViews.remove(recyclerListView);
-            }
-        };
-        registeredScrolledViews.put(recyclerListView, attachListener);
-        recyclerListView.addOnAttachStateChangeListener(attachListener);
     }
 
     public void addAdditionalInvalidationCondition(InvalidationCondition condition) {
@@ -230,7 +193,7 @@ private final WeakHashMap<View, View.OnAttachStateChangeListener> registeredScro
 
     private boolean checkDrawablePositionsIfNeeded() {
         if (rootView == null) return false;
-                                                      
+
         boolean hasInvalidatedPositionsOrVisibility = false;
 
         final int W = rootView.getWidth();

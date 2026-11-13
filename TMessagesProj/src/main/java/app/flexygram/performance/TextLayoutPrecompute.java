@@ -43,7 +43,7 @@ public final class TextLayoutPrecompute {
             final String text; final PrecomputedText.Params params;
             Key(String text,TextPaint paint) {
                 this.text=text;
-                params=new PrecomputedText.Params.Builder(paint)
+                params=new PrecomputedText.Params.Builder(new TextPaint(paint))
                         .setBreakStrategy(Layout.BREAK_STRATEGY_HIGH_QUALITY)
                         .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NONE)
                         .setTextDirection(TextDirectionHeuristics.FIRSTSTRONG_LTR).build();
@@ -76,6 +76,6 @@ public final class TextLayoutPrecompute {
             });}catch(RejectedExecutionException full){synchronized(ready){pending.remove(key,token);}}
             return original;
         }
-        static void clear(){synchronized(ready){generation++;ready.clear();characters = 0;pending.clear();worker.getQueue().clear();characters=0;}}
+        static void clear(){synchronized(ready){generation++;ready.clear();pending.clear();worker.getQueue().clear();characters=0;}}
     }
 }
