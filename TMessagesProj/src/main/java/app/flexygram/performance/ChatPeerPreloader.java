@@ -112,7 +112,7 @@ finish(account, key, request, found);
     }
 
     private static boolean owns(int account, long owner) {
-        return owner != 0 && UserConfig.getInstance(account).isClientActivated() && UserConfig.getInstance(account).getClientUserId() == owner; owner != 0 && UserConfig.getInstance(account).getClientUserId() == owner;
+        return owner != 0 && UserConfig.getInstance(account).isClientActivated() && UserConfig.getInstance(account).getClientUserId() == owner;
     }
 
     private static void releaseObserver(int account) {
