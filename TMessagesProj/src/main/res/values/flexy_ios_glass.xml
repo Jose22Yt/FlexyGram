@@ -1,0 +1,10 @@
+<resources>
+    <string name="FlexyIosGlassTitle">iOS 27 glass</string>
+    <string name="FlexyIosGlassEnable">Use iOS 27 glass</string>
+    <string name="FlexyIosGlassHome">Home bottom bar</string>
+    <string name="FlexyIosGlassComposer">Conversation input</string>
+    <string name="FlexyIosGlassHeader">Conversation header</string>
+    <string name="FlexyIosGlassFolders">Chat folders</string>
+    <string name="FlexyIosGlassInfo">Uses one glass material in the selected areas, replacing their previous glass and frosted effects. Your previous choices return when disabled. Battery saving temporarily reduces the effect.</string>
+    <string name="FlexyIosGlassUnsupported">This effect requires Android 13 or later and hardware acceleration. Your current appearance is retained on this device.</string>
+</resources>

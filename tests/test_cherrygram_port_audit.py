@@ -56,7 +56,7 @@ def test_native_glass_source_can_survive_explicit_setting_changes():
     assert 'previous != flags' in setter and 'dispatchPowerPolicyListeners' in setter
     assert 'onPowerSaverAppliedListeners.contains(callback)' in lite
     bar=src('org/telegram/ui/ActionBar/ActionBar.java')
-    assert '!canvas.isHardwareAccelerated()' in bar and '!org.telegram.messenger.SharedConfig.chatBlurEnabled()' in bar
+    assert '!canvas.isHardwareAccelerated()' in bar and '!app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.HEADER, org.telegram.messenger.SharedConfig.chatBlurEnabled())' in bar
     assert 'signatureGlassUnread.draw(canvas)' in bar
     assert 'if (signatureUnreadGlassRadius == radius) return;' in bar
     assert 'if (glassRadius != radius)' in src('org/telegram/ui/MainTabsLayout.java')
@@ -87,7 +87,7 @@ def test_dock_is_a_clipped_native_rendernode_not_a_translucency_simulation():
     assert 'tabsViewWrapper.getMeasuredHeight()' in host
     assert 'canvas.clipRect(0, 0, width, height)' in host
     assert 'viewPager.draw(canvas)' not in host
-    assert 'child == viewPager && SharedConfig.chatBlurEnabled()' in host
+    assert 'child == viewPager && app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.HOME, SharedConfig.chatBlurEnabled())' in host
     assert 'hash.add(tabsGlassRevision)' in host
     assert 'Bitmap.createBitmap' not in host
     assert 'postInvalidateOnAnimation' not in host

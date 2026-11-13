@@ -30,6 +30,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
     public SignatureDirectSettingsActivity(String category,String segment){this(category);CompactSettingsPlan.page(category,segment);this.segment=segment;}
     private boolean include(String id){return segment.equals(id);}
     private void overview(){
+        if(category.equals("home"))links(new String[]{"ios_glass"},new int[]{R.string.FlexyIosGlassTitle},new int[]{R.drawable.fg_dm_bordes_reflejos});
         if(category.equals("chat"))links(new String[]{"composer_style","header_style","bubble_style","context"},new int[]{R.string.FlexyInterfaceLower,R.string.FlexyInterfaceUpper,R.string.FlexyBubblesTitle,R.string.FlexyMenuTitle},new int[]{R.drawable.fg_dm_interfaz_inferior,R.drawable.fg_dm_interfaz_superior,R.drawable.fg_dm_burbujas,R.drawable.fg_dm_menu_mensajes});
         if(category.equals("universal"))links(new String[]{"icon_packs","emoji","cloud","passcode"},new int[]{R.string.Settings2_icon_packs,R.string.Settings2_emoji,R.string.Settings2_cloud,R.string.Settings2_passcode},new int[]{R.drawable.fg_dm_packs_iconos,R.drawable.fg_dm_emoji,R.drawable.fg_dm_nube,R.drawable.fg_dm_codigo_acceso});
         if(category.equals("navigation"))links(new String[]{"navigationEditor"},new int[]{R.string.Settings2_app_navigation},new int[]{R.drawable.fg_dm_editor_navegacion});

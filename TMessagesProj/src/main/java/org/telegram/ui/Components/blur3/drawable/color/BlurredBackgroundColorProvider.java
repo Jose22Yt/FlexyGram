@@ -5,6 +5,7 @@ import androidx.annotation.ColorInt;
 import org.telegram.ui.ActionBar.Theme;
 
 public interface BlurredBackgroundColorProvider {
+    default boolean isDarkAppearance() { return Theme.isCurrentThemeDark(); }
     @ColorInt int getShadowColor();
     @ColorInt int getBackgroundColor();
     @ColorInt int getStrokeColorTop();

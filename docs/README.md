@@ -18,6 +18,7 @@
 - [Copias de configuración de FlexyStudio](flexystudio/CONFIGURATION_BACKUP.md)
 - [Reproductor de música](player/beta37-queue-and-orbit.md)
 - [Diseño del reproductor](design/music/README.md)
+- [Cristal adaptable por superficie](appearance/IOS_GLASS.md)
 - [Desplazamiento nativo](scroll/NATIVE_SCROLL.md)
 - [Rendimiento del desplazamiento](performance/SCROLL_WORK_REDUCTION.md)
 - [Cargas de chats y traducción al pausar](performance/CHAT_LOAD_AND_TRANSLATION_LIFECYCLE.md)

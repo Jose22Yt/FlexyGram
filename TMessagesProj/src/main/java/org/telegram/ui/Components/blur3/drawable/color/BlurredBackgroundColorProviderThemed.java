@@ -26,6 +26,10 @@ public class BlurredBackgroundColorProviderThemed implements BlurredBackgroundCo
         updateColors();
     }
 
+    @Override public boolean isDarkAppearance() {
+        return resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
+    }
+
     public void setAlpha(float alpha) {
         automaticAlpha = false;
         this.alpha = alpha;

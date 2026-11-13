@@ -56,6 +56,17 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         shadowLayerDy = dpf2(1 / 3f);
     }
 
+    protected int iosGlassSurface;
+    public BlurredBackgroundDrawable setIosGlassSurface(int surface) {
+        iosGlassSurface = surface;
+        if (surface != 0) app.flexygram.glass.IosGlassConfig.track(this);
+        updateColors();
+        invalidateSelf();
+        return this;
+    }
+
+    public boolean isIosGlassSurface(int surface) { return iosGlassSurface == surface; }
+
     protected float sourceOffsetX;
     protected float sourceOffsetY;
 

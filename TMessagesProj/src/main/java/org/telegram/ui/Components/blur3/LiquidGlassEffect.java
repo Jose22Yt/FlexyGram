@@ -18,14 +18,33 @@ public class LiquidGlassEffect {
         static final String CODE = AndroidUtilities.readRes(R.raw.liquid_glass_shader);
     }
 
+    private static final class IosShaderSource {
+        static final String CODE = AndroidUtilities.readRes(R.raw.flexy_ios_glass_shader);
+    }
+
+    private final boolean iosProfile;
+    private boolean appearanceInitialized, darkAppearance, parametersDirty;
     private final RenderNode node;
     private final RuntimeShader shader;
     private RenderEffect effect;
 
     public LiquidGlassEffect(RenderNode node) {
+        this(node, false);
+    }
+
+    public LiquidGlassEffect(RenderNode node, boolean iosProfile) {
         this.node = node;
-        shader = new RuntimeShader(ShaderSource.CODE);
+        this.iosProfile = iosProfile;
+        shader = new RuntimeShader(iosProfile ? IosShaderSource.CODE : ShaderSource.CODE);
         node.setRenderEffect(effect = RenderEffect.createRuntimeShaderEffect(shader, "img"));
+    }
+
+    public void setDarkAppearance(boolean dark) {
+        if (!iosProfile || appearanceInitialized && darkAppearance == dark) return;
+        appearanceInitialized = true;
+        darkAppearance = dark;
+        shader.setFloatUniform("appearance_dark", dark ? 1f : 0f);
+        parametersDirty = true;
     }
 
     private float resolutionX, resolutionY;
@@ -69,7 +88,7 @@ public class LiquidGlassEffect {
         }
 
         if (
-            Math.abs(this.resolutionX - resolutionX) > 0.1f ||
+            parametersDirty || Math.abs(this.resolutionX - resolutionX) > 0.1f ||
             Math.abs(this.resolutionY - resolutionY) > 0.1f ||
             Math.abs(this.centerX - centerX) > 0.1f ||
             Math.abs(this.centerY - centerY) > 0.1f ||
@@ -84,6 +103,7 @@ public class LiquidGlassEffect {
             Math.abs(this.index - index) > 0.1f ||
             this.foregroundColor != foregroundColor
         ) {
+            parametersDirty = false;
             this.foregroundColor = foregroundColor;
 
             final float a = Color.alpha(foregroundColor) / 255f;

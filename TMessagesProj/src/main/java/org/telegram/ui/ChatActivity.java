@@ -547,19 +547,22 @@ public class ChatActivity extends BaseFragment implements
     private BlurredBackgroundColorProviderThemed blurredBackgroundColorProviderTop;
 
     private int performanceOpenTransitionCookie, performanceCloseTransitionCookie;
+    private int iosGlassRevision = -1;
     private boolean signatureNativeGlassAllowed;
     private boolean signatureLiquidGlassAllowed;
     private final Utilities.Callback<Boolean> signatureGlassPowerListener = ignored -> refreshSignatureNativeGlassPolicy();
     private void refreshSignatureNativeGlassPolicy() {
-        boolean allowed = SharedConfig.chatBlurEnabled();
+        boolean allowed = app.flexygram.glass.IosGlassConfig.chatBackdrop(SharedConfig.chatBlurEnabled());
         boolean liquidPolicy = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
-        if (signatureNativeGlassAllowed == allowed && signatureLiquidGlassAllowed == liquidPolicy) return;
+        int materialRevision = app.flexygram.glass.IosGlassConfig.revision();
+        if (signatureNativeGlassAllowed == allowed && signatureLiquidGlassAllowed == liquidPolicy && iosGlassRevision == materialRevision) return;
+        iosGlassRevision = materialRevision;
         signatureNativeGlassAllowed = allowed;
         signatureLiquidGlassAllowed = liquidPolicy;
         // The native suppressor snapshots Liquid Glass in its constructor. Refresh only on a
         // policy transition, otherwise a source created with Glass off remains frosted forever.
-        if (scrollableViewNoiseSuppressor != null && scrollableViewNoiseSuppressor.isLiquidGlassEnabled != liquidPolicy) {
-            scrollableViewNoiseSuppressor = new DownscaleScrollableNoiseSuppressor();
+        if (scrollableViewNoiseSuppressor != null && scrollableViewNoiseSuppressor.isLiquidGlassEnabled != (liquidPolicy || app.flexygram.glass.IosGlassConfig.chatBackdrop(false))) {
+            scrollableViewNoiseSuppressor = new DownscaleScrollableNoiseSuppressor(true, false, app.flexygram.glass.IosGlassConfig.chatBackdrop(false));
             if (glassBackgroundSourceRenderNode != null) glassBackgroundSourceRenderNode.setScrollableNoiseSuppressor(
                     scrollableViewNoiseSuppressor, DownscaleScrollableNoiseSuppressor.DRAW_GLASS);
             if (glassBackgroundSourceFrostedRenderNode != null) glassBackgroundSourceFrostedRenderNode.setScrollableNoiseSuppressor(
@@ -3064,13 +3067,13 @@ public class ChatActivity extends BaseFragment implements
 
     public ChatActivity(Bundle args) {
         super(args);
-        signatureNativeGlassAllowed = SharedConfig.chatBlurEnabled();
+        signatureNativeGlassAllowed = app.flexygram.glass.IosGlassConfig.chatBackdrop(SharedConfig.chatBlurEnabled());
         signatureLiquidGlassAllowed = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
 
         navbarContentSourceWallpaper = new BlurredBackgroundSourceWrapped();
         // Retain the source while the master switch is off, so enabling it does not need a new chat.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && SharedConfig.canBlurChat()) {
-            scrollableViewNoiseSuppressor = new DownscaleScrollableNoiseSuppressor();
+            scrollableViewNoiseSuppressor = new DownscaleScrollableNoiseSuppressor(true, false, app.flexygram.glass.IosGlassConfig.chatBackdrop(false));
 
             recommendedAdditionalSizeY = Math.max(0, dp(48) - Math.min(AndroidUtilities.navigationBarHeight, AndroidUtilities.statusBarHeight));
 
@@ -5381,7 +5384,8 @@ public class ChatActivity extends BaseFragment implements
         chatInputViewsContainer.drawInputBackground = !isFeedSearch();
         chatInputViewsContainer.setWindowInsetsProvider(windowInsetsStateHolder);
         chatInputViewsContainer.setInputIslandBubbleDrawable(
-            glassBackgroundDrawableFactory.create(chatInputViewsContainer, blurredBackgroundColorProvider));
+            glassBackgroundDrawableFactory.create(chatInputViewsContainer, blurredBackgroundColorProvider)
+                    .setIosGlassSurface(app.flexygram.glass.IosGlassConfig.COMPOSER));
         chatInputViewsContainer.setCompactGlassFactory(glassBackgroundDrawableFactory, blurredBackgroundColorProvider);
         chatInputViewsContainer.setUnderKeyboardBackgroundDrawable(
             glassBackgroundDrawableFactoryFrosted.create(chatInputViewsContainer, blurredBackgroundColorProvider));
@@ -17503,7 +17507,7 @@ public class ChatActivity extends BaseFragment implements
         int maxAdapterPosition = -1;
         int minAdapterPosition = -1;
 
-        boolean blurEnabled = SharedConfig.chatBlurEnabled();
+        boolean blurEnabled = app.flexygram.glass.IosGlassConfig.chatBackdrop(SharedConfig.chatBlurEnabled());
 
         MessageObject messageStarter = isTopic ? topicStarterMessageObject : threadMessageObject;
 
@@ -20086,7 +20090,7 @@ public class ChatActivity extends BaseFragment implements
 
             blurredViewTopOffset = 0;
             blurredViewBottomOffset = 0;
-            if (SharedConfig.chatBlurEnabled() && !isInsideContainer) {
+            if (app.flexygram.glass.IosGlassConfig.chatBackdrop(SharedConfig.chatBlurEnabled()) && !isInsideContainer) {
                 if (scrollableViewNoiseSuppressor != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     blurredViewTopOffset = recommendedAdditionalSizeY;
                     blurredViewBottomOffset = recommendedAdditionalSizeY;
@@ -39759,7 +39763,7 @@ public class ChatActivity extends BaseFragment implements
     }
 
     public BlurredBackgroundSourceRenderNode getGlassSource() {
-        return SharedConfig.chatBlurEnabled() && glassBackgroundSourceRenderNode!=null
+        return app.flexygram.glass.IosGlassConfig.chatBackdrop(SharedConfig.chatBlurEnabled()) && glassBackgroundSourceRenderNode!=null
                 ? glassBackgroundSourceRenderNode : glassBackgroundSourceFrostedRenderNode;
     }
 

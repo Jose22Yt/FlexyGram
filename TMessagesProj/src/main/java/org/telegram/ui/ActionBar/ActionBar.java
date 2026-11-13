@@ -242,7 +242,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         signatureGlassRadius=-1;
         signatureUnreadGlassRadius=-1;
 
-        glassDrawable = factory.create(this)
+        glassDrawable = factory.create(this).setIosGlassSurface(app.flexygram.glass.IosGlassConfig.HEADER)
             .setColorProvider(colorProvider)
             .setPadding(dp(6));
         final int glassAvatarSizeDp = app.exteraless.appearance.ChatHeaderUiHelper.getChatAvatarSizeDp();
@@ -256,12 +256,12 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         glassDrawable.setRadius(glassDrawableLeftRadius, dp(23), dp(23), glassDrawableLeftRadius);
 
 
-        glassDrawableBack = factory.create(this)
+        glassDrawableBack = factory.create(this).setIosGlassSurface(app.flexygram.glass.IosGlassConfig.HEADER)
             .setColorProvider(colorProvider)
             .setRadius(dp(23))
             .setPadding(dp(6));
 
-        glassDrawableMenu = factory.create(this)
+        glassDrawableMenu = factory.create(this).setIosGlassSurface(app.flexygram.glass.IosGlassConfig.HEADER)
             .setColorProvider(colorProvider)
             .setRadius(dp(23))
             .setPadding(dp(6));
@@ -1547,21 +1547,21 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     }
     public void prepareSignatureUnreadGlass(boolean separate) {
         if (separate && signatureGlassUnread == null && signatureGlassFactory != null) {
-            signatureGlassUnread = signatureGlassFactory.create(this).setColorProvider(signatureGlassColorProvider)
+            signatureGlassUnread = signatureGlassFactory.create(this).setIosGlassSurface(app.flexygram.glass.IosGlassConfig.HEADER).setColorProvider(signatureGlassColorProvider)
                     .setPadding(0);
         }
     }
     public void prepareSignatureNativeGlass(boolean separateCall) {
         if (separateCall && signatureGlassCall==null && signatureGlassFactory!=null
-                && org.telegram.messenger.SharedConfig.chatBlurEnabled()) {
+                && app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.HEADER, org.telegram.messenger.SharedConfig.chatBlurEnabled())) {
             // Each painted island needs its own retained RenderNode/transform, sharing the same native source.
-            signatureGlassCall=signatureGlassFactory.create(this).setColorProvider(signatureGlassColorProvider)
+            signatureGlassCall=signatureGlassFactory.create(this).setIosGlassSurface(app.flexygram.glass.IosGlassConfig.HEADER).setColorProvider(signatureGlassColorProvider)
                     .setRadius(dp(23)).setPadding(0);
         }
     }
 
     public void updateSignatureNativeGlassPolicy(boolean allowed) {
-        if (org.telegram.messenger.SharedConfig.chatBlurEnabled() && signatureHeader!=null && signatureHeader.fusionActive()) {
+        if (app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.HEADER, org.telegram.messenger.SharedConfig.chatBlurEnabled()) && signatureHeader!=null && signatureHeader.fusionActive()) {
             var g=signatureHeader.fusionGeometry();
             prepareSignatureNativeGlass(g!=null && g.mattePortrait && g.callAvailable);
         }
@@ -1585,7 +1585,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     public boolean drawSignatureNativeGlass(Canvas canvas,
             app.flexygram.header.SignatureChatHeader header) {
         if (header == null || !header.active() || !glassMode || !canvas.isHardwareAccelerated()
-                || !org.telegram.messenger.SharedConfig.chatBlurEnabled()
+                || !app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.HEADER, org.telegram.messenger.SharedConfig.chatBlurEnabled())
                 || glassDrawable == null || glassDrawableBack == null || glassDrawableMenu == null) return false;
         glassDrawable.setAlpha(255);
         glassDrawableBack.setAlpha(255);

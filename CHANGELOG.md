@@ -1,5 +1,12 @@
 # Cambios
 
+## En desarrollo — cristal adaptable por superficie
+
+- Nuevo ajuste Cristal iOS 27 con control independiente de barra inferior principal, entrada y cabecera de conversación y carpetas de chats.
+- El material sustituye el glass y desenfoque anteriores en cada zona seleccionada; conserva sus preferencias para recuperarlas al desactivarlo y respeta el ahorro de batería.
+- Reutiliza las capturas nativas, evita animaciones en reposo y adapta el contraste al tema. Requiere Android 13 y aceleración gráfica; conserva la apariencia compatible en versiones anteriores.
+- Las dos preferencias se incluyen en las copias de FlexyStudio. No se genera una APK con este cambio.
+
 ## En desarrollo — prioridad de arranque y reanudación
 
 - La carga local de chats se solicita antes de iniciar el motor de plugins y la preparación de mensajes pendientes en UI.

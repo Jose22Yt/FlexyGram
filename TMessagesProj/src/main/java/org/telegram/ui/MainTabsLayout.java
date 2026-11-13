@@ -46,8 +46,8 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     @Override protected boolean verifyDrawable(android.graphics.drawable.Drawable who) { return who == glassBackground || super.verifyDrawable(who); }
     @Override protected void onDraw(Canvas canvas) {
         if (glassBackground != null && canvas.isHardwareAccelerated()
-                && org.telegram.messenger.SharedConfig.chatBlurEnabled()
-                && org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.checkBlurEnabled(resourcesProvider)) {
+                && app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.HOME, org.telegram.messenger.SharedConfig.chatBlurEnabled())
+                && app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.HOME, org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.checkBlurEnabled(resourcesProvider))) {
             float radius = dp(LiquidNavigationConfig.radiusDp());
             if (glassRadius != radius) { glassRadius = radius; glassBackground.setRadius(radius); }
             glassBackground.setBounds(0,0,getWidth(),getHeight());

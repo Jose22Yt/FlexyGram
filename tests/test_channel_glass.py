@@ -45,7 +45,7 @@ public class ChannelGlassRegression {
     static class LiteMode {static final int FLAG_CHAT_BLUR=1;static boolean enabled=true;static boolean isEnabled(int flag){return enabled;}}
     static class SharedConfig {static boolean enabled=true;static boolean chatBlurEnabled(){return enabled;}}
     static class app {
-        static class flexygram {static class composer {static class ComposerStyle {static int surface(boolean dark,boolean glass){return -1;}}}}
+        static class flexygram {static class glass {static class IosGlassConfig {static final int COMPOSER=2;static boolean backdrop(int surface,boolean legacy){return legacy;}}}static class composer {static class ComposerStyle {static int surface(boolean dark,boolean glass){return -1;}}}}
     }
     static class Drawable {int getAlpha(){return 255;}void setBounds(Rect r){}void draw(Canvas c){c.draws.add("legacy");}}
     static class View {float getX(){return 0;}float getY(){return 0;}}

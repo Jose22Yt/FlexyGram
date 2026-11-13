@@ -4935,7 +4935,7 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
 
     public boolean flexyNativeGlassIslandsAvailable() {
-        return SharedConfig.chatBlurEnabled()
+        return app.flexygram.glass.IosGlassConfig.backdrop(app.flexygram.glass.IosGlassConfig.COMPOSER, SharedConfig.chatBlurEnabled())
                 && isHardwareAccelerated()
                 && isFlexyCompactPresentation();
     }
@@ -4956,7 +4956,8 @@ public class ChatActivityEnterView extends FrameLayout implements
         }
         int bottom = top + Theme.chat_composeShadowDrawable.getIntrinsicHeight();
 
-        final boolean flexyIslands = flexyNativeGlassBackdropDrawn && flexyNativeGlassIslandsAvailable();
+        final boolean flexyIslands = flexyNativeGlassBackdropDrawn && (flexyNativeGlassIslandsAvailable()
+                || app.flexygram.glass.IosGlassConfig.active(app.flexygram.glass.IosGlassConfig.COMPOSER));
         // Do not first paint an opaque full-width native bar behind translucent islands;
         // otherwise even a real native blur still looks solid on screen.
         if (withComposeShadowDrawable && !flexyIslands) {

@@ -1,0 +1,57 @@
+// Android adaptation of Telegram-iOS LiquidGlassShapes.metal, revision
+// 24638bc69bd083981b178dd1e7f921eebbf7fc46: rounded-edge displacement and rim coverage.
+// One rounded surface samples the existing native backdrop. No time uniform or extra capture.
+uniform shader img;
+uniform float2 resolution;
+uniform float2 center;
+uniform float2 size;
+uniform float4 radius;
+uniform float thickness;
+uniform float refract_index;
+uniform float refract_intensity;
+uniform float4 foreground_color_premultiplied;
+uniform float appearance_dark;
+
+float distanceToShape(float2 p) {
+    float4 r = radius;
+    r.xy = p.x > 0.0 ? r.xy : r.zw;
+    float corner = p.y > 0.0 ? r.x : r.y;
+    float2 q = abs(p) - size + corner;
+    return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - corner;
+}
+
+half4 main(float2 coordinate) {
+    float2 p = coordinate - center;
+    float sd = distanceToShape(p);
+    float distance = -sd;
+    float coverage = clamp(distance + 0.5, 0.0, 1.0);
+    float2 gradient = float2(distanceToShape(p + float2(0.5, 0.0)) - sd,
+                             distanceToShape(p + float2(0.0, 0.5)) - sd);
+    float2 inward = -gradient / max(length(gradient), 0.0001);
+    float band = max(thickness, 1.0);
+    // The same squared inward falloff used by Telegram's displacement fragment.
+    float falloff = 1.0 - clamp(max(distance, 0.0) / band, 0.0, 1.0);
+    float shift = band * clamp(refract_intensity, 0.0, 1.0) * clamp(refract_index - 1.0, 0.0, 1.0);
+    float2 samplePoint = clamp(coordinate + inward * shift * falloff * falloff * coverage,
+                               float2(0.5), max(resolution - 0.5, float2(0.5)));
+    half4 backdrop = img.eval(samplePoint);
+    half4 tint = half4(foreground_color_premultiplied);
+    half4 material = tint + backdrop * (1.0 - tint.a);
+    // Keep native foreground controls legible over arbitrary wallpapers, preserving the hue.
+    float3 rgb = float3(material.rgb) / max(float(material.a), 0.0001);
+    if (appearance_dark > 0.5) {
+        float peak = max(rgb.r, max(rgb.g, rgb.b));
+        rgb *= min(1.0, 0.44 / max(peak, 0.0001));
+    } else {
+        float luma = dot(rgb, float3(0.2126, 0.7152, 0.0722));
+        float lift = clamp((0.68 - luma) / max(1.0 - luma, 0.0001), 0.0, 1.0);
+        rgb = mix(rgb, float3(1.0), lift);
+    }
+    material.rgb = half3(rgb * float(material.a));
+    // A direction-weighted, antialiased rim above the tint, like the upstream composite.
+    float line = clamp(1.0 - abs(distance), 0.0, 1.0) * coverage;
+    float light = 0.10 + 0.24 * abs(inward.y);
+    float rim = line * light;
+    material.rgb = material.rgb * (1.0 - rim) + half3(material.a * rim);
+    return material;
+}
