@@ -97,7 +97,7 @@ public final class ChatPeerPreloader {
                     // Live updates received during IO take precedence over an older storage snapshot.
                     if (loadedChat != null && controller.getChat(chatId) == null) controller.putChat(loadedChat, true);
                     if (loadedUser != null && controller.getUser(loadedUser.id) == null) controller.putUser(loadedUser, true);
-                    if (loadedEncrypted != null && controller.getEncryptedChat(encryptedId) == null) controller.putEncryptedChat(loadedEncrypted), true;
+                    if (loadedEncrypted != null && controller.getEncryptedChat(encryptedId) == null) controller.putEncryptedChat(loadedEncrypted, true);
                     boolean found = (chatId != 0 && controller.getChat(chatId) != null)
                             || (userId != 0 && controller.getUser(userId) != null)
                             || (encryptedId != 0 && cachedEncrypted != null && controller.getUser(cachedEncrypted.user_id) != null);
