@@ -9,6 +9,9 @@ import org.telegram.ui.ActionBar.Theme;
 public final class HeaderSurface {
     private final RectF backSurface = new RectF();
     private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG), stroke = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private int lastBaseColor, lastDividerColor, lastOpacity = -1;
+    private boolean lastEffects, hasCachedState;
+    private float lastDensity = -1f;
 
     public HeaderSurface() {
         stroke.setStyle(Paint.Style.STROKE);
@@ -17,10 +20,24 @@ public final class HeaderSurface {
     public void draw(Canvas canvas, HeaderGeometry g, float density, Theme.ResourcesProvider provider) {
         int color = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
         boolean effects = org.telegram.messenger.SharedConfig.chatBlurEnabled();
-        fill.setColor(effects ? (color & 0xffffff) | (Math.round(HeaderConfig.opacity() * 2.55f) << 24) : color | 0xFF000000);
-        float strokeWidth = Math.max(1, density * .65f);
-        if (stroke.getStrokeWidth() != strokeWidth) stroke.setStrokeWidth(strokeWidth);
-        stroke.setColor(effects ? (Theme.getColor(Theme.key_divider, provider) & 0xffffff) | 0x66000000 : 0);
+        int opacity = HeaderConfig.opacity();
+        int dividerColor = effects ? Theme.getColor(Theme.key_divider, provider) : 0;
+
+        if (!hasCachedState || color != lastBaseColor || effects != lastEffects || opacity != lastOpacity || dividerColor != lastDividerColor) {
+            fill.setColor(effects ? (color & 0xffffff) | (Math.round(opacity * 2.55f) << 24) : color | 0xff000000);
+            stroke.setColor(effects ? (dividerColor & 0xffffff) | 0x66000000 : 0);
+            lastBaseColor = color;
+            lastEffects = effects;
+            lastOpacity = opacity;
+            lastDividerColor = dividerColor;
+            hasCachedState = true;
+        }
+
+        if (density != lastDensity) {
+            stroke.setStrokeWidth(Math.max(1, density * .65f));
+            lastDensity = density;
+        }
+
         if (g.separateCount) {
             backSurface.set(g.back);
             if (org.telegram.messenger.LocaleController.isRTL) backSurface.left = backSurface.right - g.back.height();
@@ -29,5 +46,11 @@ public final class HeaderSurface {
         } else piece(canvas, g.back);
         piece(canvas, g.title); piece(canvas, g.avatar);
     }
-    private void piece(Canvas c, RectF r) { float radius = r.height() / 2; c.drawRoundRect(r, radius, radius, fill); c.drawRoundRect(r, radius, radius, stroke); }
+
+    private void piece(Canvas c, RectF r) {
+        if (r.width() <= 0 || r.height() <= 0) return;
+        float radius = r.height() / 2;
+        c.drawRoundRect(r, radius, radius, fill);
+        if (lastEffects) c.drawRoundRect(r, radius, radius, stroke);
+    }
 }
