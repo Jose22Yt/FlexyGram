@@ -43,7 +43,7 @@ public final class IosGlassSettingsActivity extends SignatureMatteSettingsActivi
                         IosGlassConfig.supported() ? R.string.FlexyIosGlassInfo : R.string.FlexyIosGlassUnsupported));
             }
             @Override public boolean isEnabled(RecyclerView.ViewHolder holder) {
-                int position = holder.getBindingAdapterPosition();
+                int position = holder.getAdapterPosition();
                 return position >= 0 && position < TITLES.length && (position != 0 || IosGlassConfig.supported() || IosGlassConfig.enabled());
             }
         };

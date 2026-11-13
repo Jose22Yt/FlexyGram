@@ -178,3 +178,44 @@ def test_only_conversation_header_opts_into_the_material_not_shared_action_bars(
   p.setupGlass(f,colors,true);check(p.scope==0&&p.forum&&p.calls==4);
  }
 }'''.replace('TWO',two).replace('THREE',three)})
+
+
+def test_complete_settings_screen_compiles_with_bundled_recycler_api(tmp_path):
+    import re
+    recycler=(JAVA/'androidx/recyclerview/widget/RecyclerView.java').read_text()
+    assert re.search(r'public final int getAdapterPosition\s*\(',recycler)
+    assert 'getBindingAdapterPosition(' not in recycler
+    files=hosts()
+    files.update({
+        'android/view/View.java':'package android.view;public class View{public void setAlpha(float a){}}',
+        'androidx/recyclerview/widget/RecyclerView.java':'''package androidx.recyclerview.widget;public class RecyclerView{
+public static class ViewHolder{public android.view.View itemView;public int position;public ViewHolder(android.view.View v,int p){itemView=v;position=p;}public final int getAdapterPosition(){return position;}}}''',
+        'org/telegram/messenger/LocaleController.java':'package org.telegram.messenger;public class LocaleController{public static String getString(int id){return "row"+id;}}',
+        'org/telegram/ui/Cells/TextCheckCell.java':'package org.telegram.ui.Cells;public class TextCheckCell extends android.view.View{public boolean checked;public void setTextAndCheck(String text,boolean checked,boolean divider){this.checked=checked;}}',
+        'org/telegram/ui/Cells/TextInfoPrivacyCell.java':'package org.telegram.ui.Cells;public class TextInfoPrivacyCell extends android.view.View{public void setText(String text){}}',
+        'app/flexygram/settings/SignatureMatteSettingsActivity.java':'''package app.flexygram.settings;
+import android.content.Context;import android.view.View;import androidx.recyclerview.widget.RecyclerView;
+public abstract class SignatureMatteSettingsActivity{
+ public static final int TYPE_CHECK=3,TYPE_INFO_PRIVACY=7;public int rowCount;
+ public BaseListAdapter listAdapter;
+ protected abstract String getActionBarTitle();protected void updateRows(){rowCount=0;}protected void addRow(String key){rowCount++;}
+ protected abstract void onItemClick(View view,int position,float x,float y);protected abstract BaseListAdapter createAdapter(Context c);
+ public abstract class BaseListAdapter{public abstract int getItemViewType(int p);public abstract void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial);public abstract boolean isEnabled(RecyclerView.ViewHolder h);public void notifyItemChanged(int p){}}
+ public abstract class MatteListAdapter extends BaseListAdapter{public MatteListAdapter(Context context){}}
+}''',
+    })
+    names=[x.attrib['name'] for x in ET.parse(ROOT/'TMessagesProj/src/main/res/values/flexy_ios_glass.xml').getroot().findall('string')]
+    files['org/telegram/messenger/R.java']='package org.telegram.messenger;public class R{public static class string{'+''.join('public static int '+name+'='+str(i+1)+';'for i,name in enumerate(names))+'}}'
+    files['app/flexygram/glass/Probe.java']='''package app.flexygram.glass;
+import android.os.Build;import android.content.Context;import androidx.recyclerview.widget.RecyclerView;import org.telegram.ui.Cells.*;
+public class Probe{static void check(boolean b){if(!b)throw new AssertionError();}public static void main(String[]args){
+ IosGlassSettingsActivity screen=new IosGlassSettingsActivity();screen.updateRows();check(screen.rowCount==6);
+ var adapter=screen.createAdapter(new Context());screen.listAdapter=adapter;TextCheckCell cell=new TextCheckCell();var holder=new RecyclerView.ViewHolder(cell,-1);
+ check(!adapter.isEnabled(holder));holder.position=0;check(adapter.isEnabled(holder));
+ screen.onItemClick(cell,0,0,0);adapter.onBindViewHolder(holder,0,false);check(cell.checked&&IosGlassConfig.enabled());
+ holder.position=5;check(!adapter.isEnabled(holder));adapter.onBindViewHolder(new RecyclerView.ViewHolder(new TextInfoPrivacyCell(),5),5,false);
+ Build.VERSION.SDK_INT=32;holder.position=0;check(adapter.isEnabled(holder));screen.onItemClick(cell,0,0,0);check(!IosGlassConfig.enabled()&&!adapter.isEnabled(holder));
+ }}'''
+    # The probe helper invokes an unqualified main class; use a launcher for this packaged screen test.
+    files['Probe.java']='public class Probe{public static void main(String[]args){app.flexygram.glass.Probe.main(args);}}'
+    probe(tmp_path,files,ACTUAL+[JAVA/'app/flexygram/glass/IosGlassSettingsActivity.java'])
