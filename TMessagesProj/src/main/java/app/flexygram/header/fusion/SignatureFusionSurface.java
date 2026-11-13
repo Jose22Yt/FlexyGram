@@ -65,9 +65,9 @@ public final class SignatureFusionSurface {
     public void drawStatus(Canvas canvas, SignatureFusionGeometry.Layout g,
                            int color, int edge, float density) {
         if (!org.telegram.messenger.SharedConfig.chatBlurEnabled()) color |= 0xff000000;
-        fill.setColor(color);
-        border.setColor(edge);
-        border.setStrokeWidth(.7f * density);
+        if (fill.getColor() != color) fill.setColor(color);
+        if (border.getColor() != edge) border.setColor(edge);
+        float stroke = .7f * density; if (border.getStrokeWidth() != stroke) border.setStrokeWidth(stroke);
         drawPill(canvas, g.status);
     }
     private void drawActions(Canvas canvas, SignatureFusionGeometry.Layout g) {
@@ -87,10 +87,10 @@ public final class SignatureFusionSurface {
         var r=g.center;work.set(r.left,r.top,r.right,r.bottom);work.inset(border.getStrokeWidth()*.5f,border.getStrokeWidth()*.5f);
         canvas.drawRoundRect(work,r.height()*.5f,r.height()*.5f,border);
     }
-    private void drawPill(Canvas canvas, SignatureFusionGeometry.Rect r) {
+    private void drawPill(Canvas canvas, SignatureFusionGeometry.Rect r) { if (r.width() <= 0f || r.height() <= 0f) return;
         work.set(r.left,r.top,r.right,r.bottom);
         float radius = Math.max(0f,r.height()*.5f);
         canvas.drawRoundRect(work,radius,radius,fill);
-        canvas.drawRoundRect(work,radius,radius,border);
+        if (border.getColor() != 0) canvas.drawRoundRect(work,radius,radius,border);
     }
 }
