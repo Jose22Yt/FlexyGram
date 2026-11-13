@@ -44,7 +44,7 @@ def test_bubble_measure_reuses_layouts_and_invalidates_width_density_theme(tmp_p
  static class Bubble {int l,t,r,b;void setBounds(int l,int t,int r,int b){this.l=l;this.t=t;this.r=r;this.b=b;}void setTop(int t,int w,int h,boolean a,boolean b){}}
  static class Paint {float getFontSpacing(){return 12;}}
  Bubble[] bubbles={new Bubble(),new Bubble()};StaticLayout[] labels=new StaticLayout[2];String[] samples={"Entrada","Salida"};int[] tops=new int[2];Paint time=new Paint();
- int measuredWidth=-1,measuredHeight,width,height,builds;float measuredDensity=-1;
+ int contentTop,contentBottom;int measuredWidth=-1,measuredHeight,width,height,builds;float measuredDensity=-1;
  StaticLayout layout(String s,int w){builds++;return new StaticLayout(w);}void setMeasuredDimension(int w,int h){width=w;height=h;}
  MEASURE
  static void check(boolean b){if(!b)throw new AssertionError();}

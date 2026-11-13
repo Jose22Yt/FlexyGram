@@ -29,8 +29,8 @@ No se deben sustituir licencias ausentes por una licencia supuesta. Antes de dis
 
 Las mallas, curvas y fórmulas de renderizado de fractura, caída, vórtice y TNT se
 adaptan de **Bubble Fracture v1.0**, de [@larrat23](https://t.me/larrat23), a partir
-del archivo proporcionado para esta integración. Se conservan los valores
-predeterminados del efecto. La integración nativa, el ciclo de vida y el selector
+del archivo proporcionado para esta integración. FlexyGram ajusta la duración
+y las curvas de salida para hacer más legibles las animaciones. La integración nativa, el ciclo de vida y el selector
 son propios de FlexyGram; no se incorpora el cargador DEX ni los hooks del plugin.
 El archivo recibido no declara una licencia específica: esta atribución no
 sustituye los derechos ni supone una licencia nueva para sus fuentes originales.
@@ -57,3 +57,11 @@ La autoría de las contribuciones permanece en el historial Git. Los nuevos comp
 Dibujos importados de [TelegramMessenger/Telegram-iOS](https://github.com/TelegramMessenger/Telegram-iOS/tree/24638bc69bd083981b178dd1e7f921eebbf7fc46), revisión `24638bc69bd083981b178dd1e7f921eebbf7fc46`. Se conservan archivos fuente y metadatos originales con SHA-256 y Git blob, junto al [README original](tools/ios_originals/UPSTREAM-README.md). La conversión a recursos Android conserva las geometrías o rasteriza el archivo original; no procede de Flutter Cupertino, SF Symbols recreados ni generación de imágenes.
 
 El [informe de importación](docs/icons/beta41-original-ios.md) detalla formatos, tamaños, roles y excepciones. Estos recursos no cambian el nombre ni el logotipo de FlexyGram. La revisión original no incluye un archivo LICENSE en la raíz; se mantiene su README y no se atribuye a Telegram una licencia nueva a través de esta conversión.
+
+## Indicadores de mensajes de Telegram para iOS
+
+Los trazos de confirmación proceden de `generateCheckImage` y
+`ChatListStatusChecksNode` de Telegram-iOS, revisión
+`24638bc69bd083981b178dd1e7f921eebbf7fc46`. Las proporciones y el solapamiento
+se adaptan al renderizado nativo de Android sin cambiar el estado real de envío
+o lectura. Fuentes originales y hashes: [procedencia de los indicadores](tools/ios_bubbles/status-provenance.json).

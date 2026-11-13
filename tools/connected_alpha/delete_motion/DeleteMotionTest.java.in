@@ -71,29 +71,32 @@ public class DeleteMotionTest{
    assertFalse(original.isRecycled());frame.recycle();original.recycle();}
  }
  static Bitmap art(){Bitmap b=Bitmap.createBitmap(220,74,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);Paint p=new Paint(3);p.setColor(0xff64a0b8);c.drawRoundRect(0,0,220,74,18,18,p);p.setColor(0xffe7ff93);c.drawCircle(34,35,18,p);p.setColor(0xff263b24);p.setTextSize(20);c.drawText("FlexyGram",66,43,p);return b;}
- @Test public void originalPluginFramesMatchTheNativePort()throws Exception{
-  Class<?> reference=null;try{reference=Class.forName("com.larrat.fracture.BubbleFracture");}catch(ClassNotFoundException absent){}
-  java.nio.file.Path file=Paths.get(System.getProperty("probe.root"),"golden.json");JSONObject golden=Files.isRegularFile(file)?new JSONObject(Files.readString(file)):new JSONObject();
-  Assume.assumeTrue("Original-source oracle or its recorded golden frames required",reference!=null||golden.length()>0);
+ @Test public void tunedRendererHasStableGeometryAcrossFrameRatesAndEndsTransparent()throws Exception{
   for(int style=1;style<=4;style++){
-   Bitmap image=art();BubbleFractureRenderer port=new BubbleFractureRenderer(image,220,74,1,style,2000,9911);Object original=null;Method draw=null;
-   if(reference!=null){reference.getMethod("configure",int.class,int.class,int.class,int.class,int.class,int.class,int.class).invoke(null,style-1,100,100,100,15,100,100);
-    Class<?> layer=Class.forName("com.larrat.fracture.BubbleFracture$Layer");Constructor<?> ctor=layer.getDeclaredConstructors()[0];ctor.setAccessible(true);
-    original=ctor.newInstance(root,sample(),new Object(),new Object(),image,220,74,0,0,1f,new ArrayList<>(),null,null,null,2000,20,100);
-    ((Rect)field(original,"clip")).set(0,0,640,420);set(original,"fallDistance",650f);
-    if(style==1||style==4){Class<?> mesh=Class.forName("com.larrat.fracture."+(style==1?"FractureMesh":"TntMesh"));List<Object> seeded=(List<Object>)mesh.getMethod("make",float.class,float.class,int.class,long.class).invoke(null,220f,74f,style==1?20:32,9911L);
-     List<Object> pieces=(List<Object>)field(original,"pieces");pieces.clear();pieces.addAll(seeded);List<Path> paths=(List<Path>)field(original,"paths");paths.clear();
-     for(Object piece:pieces){float[] xy=(float[])field(piece,"xy");Path path=new Path();path.moveTo(xy[0],xy[1]);for(int j=2;j<xy.length;j+=2)path.lineTo(xy[j],xy[j+1]);path.close();paths.add(path);}
-    }draw=layer.getDeclaredMethod("onDraw",Canvas.class);draw.setAccessible(true);
+   long duration=DeleteMotionMath.durationMs(style);assertTrue(duration>=1050&&duration<=1250);
+   Bitmap source=art();BubbleFractureRenderer direct=new BubbleFractureRenderer(source,220,74,1,style,(int)duration,9911);
+   Bitmap expected=Bitmap.createBitmap(640,840,Bitmap.Config.ARGB_8888);direct.draw(new Canvas(expected),.63f,650);
+   for(int hz:new int[]{30,60,90,120,144}){
+    BubbleFractureRenderer renderer=new BubbleFractureRenderer(source,220,74,1,style,(int)duration,9911);
+    Bitmap frame=Bitmap.createBitmap(640,840,Bitmap.Config.ARGB_8888);
+    int steps=(int)Math.ceil(.63*duration*hz/1000d);
+    for(int n=0;n<=steps;n++){frame.eraseColor(0);float time=Math.min(.63f,n*1000f/(hz*duration));renderer.draw(new Canvas(frame),time,650);}
+    assertTrue("Frame-rate dependence in style "+style,expected.sameAs(frame));
+    frame.eraseColor(0);renderer.draw(new Canvas(frame),1f,650);
+    for(int y=0;y<frame.getHeight();y+=2)for(int x=0;x<frame.getWidth();x+=2)assertEquals(0,Color.alpha(frame.getPixel(x,y)));
+    frame.recycle();
    }
-   for(int ms:new int[]{0,120,400,800,1200,1600,1960,2000}){
-    Bitmap actual=Bitmap.createBitmap(640,420,Bitmap.Config.ARGB_8888);port.draw(new Canvas(actual),ms/2000f,650);
-    String key=style+":"+ms,digest=digest(actual);
-    if(original!=null){set(original,"began",SystemClock.uptimeMillis()-ms);Bitmap expected=Bitmap.createBitmap(640,420,Bitmap.Config.ARGB_8888);draw.invoke(original,new Canvas(expected));assertTrue("Plugin differs: "+key,actual.sameAs(expected));golden.put(key,digest(expected));expected.recycle();}
-    else assertEquals("Golden plugin frame differs: "+key,golden.getString(key),digest);
-    actual.recycle();
-   }image.recycle();
-  }Files.writeString(file,golden.toString(2));
+   assertFalse(source.isRecycled());source.recycle();expected.recycle();
+  }
+ }
+ @Test public void longerEffectsDoNotCompleteOrReleaseNativeHolderEarly()throws Exception{
+  for(int style=1;style<=4;style++){
+   TextView view=sample();int[] calls={0,0};
+   assertEquals(1,DeleteMotionOverlay.runNativeDelete(root,Collections.singletonList(target(view)),style,()->calls[0]++,()->calls[1]++));
+   DeleteMotionOverlay overlay=overlays().get(0);overlay.doFrame(0);overlay.doFrame(850_000_000L);
+   assertArrayEquals(new int[]{1,0},calls);overlay.doFrame(DeleteMotionMath.durationMs(style)*1_000_000L);
+   assertArrayEquals(new int[]{1,1},calls);assertTrue(overlays().isEmpty());
+  }
  }
  static String digest(Bitmap b)throws Exception{int[] pixels=new int[b.getWidth()*b.getHeight()];b.getPixels(pixels,0,b.getWidth(),0,0,b.getWidth(),b.getHeight());java.nio.ByteBuffer data=java.nio.ByteBuffer.allocate(pixels.length*4);for(int pixel:pixels)data.putInt(pixel);return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(data.array()));}
 }

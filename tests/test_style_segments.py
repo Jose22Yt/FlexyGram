@@ -38,6 +38,6 @@ def test_gallery_has_one_live_preview_and_compact_native_style_choices():
     assert 'fontScale' in picker and 'LocaleController.isRTL' in picker
     for path in ['header/HeaderPreviewView.java','composer/FlexyComposerSettingsActivity.java']:
         preview=(JAVA/'app/flexygram'/path).read_text()
-        assert 'if(miniature)return;' in preview
+        assert 'if(miniature||conversationStage)return;' in preview
         assert 'NotificationCenter.didSetNewWallpapper' in preview
         assert 'wallpaperPreview.refresh()' in preview and 'wallpaperPreview.close()' in preview

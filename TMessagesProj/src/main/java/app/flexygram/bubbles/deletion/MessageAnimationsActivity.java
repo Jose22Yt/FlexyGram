@@ -22,7 +22,7 @@ public final class MessageAnimationsActivity extends SignatureMatteSettingsActiv
     @Override protected void onItemClick(View view,int position,float x,float y) {
         if (position != row || getParentActivity() == null) return;
         if (messages) presentFragment(new DeleteMotionSettingsActivity());
-        else presentFragment(new MessageAnimationsActivity(true));
+        else presentFragment(new DeleteMotionSettingsActivity());
     }
     @Override public void onResume() { super.onResume(); if (listAdapter != null) listAdapter.notifyDataSetChanged(); }
     private final class Adapter extends MatteListAdapter {

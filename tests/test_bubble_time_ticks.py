@@ -43,16 +43,16 @@ def test_ios_tick_native_factory_dimensions_and_build_fallback(tmp_path):
  signature=enabled;p.init();
  CHECKS
  }}
-}'''.replace('FIELDS',declarations).replace('BLOCK',block.replace('app.flexygram.bubbles.BubbleStyle.signature()','signature')).replace('CHECKS','\n'.join(
+}'''.replace('FIELDS',declarations).replace('BLOCK',block.replace('BuildConfig.CONNECTED_ALPHA','signature')).replace('CHECKS','\n'.join(
         f'if(p.{f}.resource != (enabled ? {2 if "Half" in f else 1} : {5 if "Half" in f and ("Media" in f or "Sticker" in f) else 4 if "Half" in f else 3}))throw new AssertionError("{f}");'
         for f in fields))})
     ns='{http://schemas.android.com/apk/res/android}'
     for name in ['flexy_check_ios27','flexy_halfcheck_ios27']:
         vector=ET.parse(ROOT/f'TMessagesProj/src/main/res/drawable/{name}.xml').getroot()
-        assert vector.get(ns+'width')==vector.get(ns+'height')=='12dp'
-        assert vector.get(ns+'viewportWidth')==vector.get(ns+'viewportHeight')=='12'
+        assert vector.get(ns+'width')=='11dp' and vector.get(ns+'height')=='9dp'
+        assert vector.get(ns+'viewportWidth')=='11' and vector.get(ns+'viewportHeight')=='9'
         path=vector.find('path')
         assert path.get(ns+'strokeLineCap')==path.get(ns+'strokeLineJoin')=='round'
-        assert path.get(ns+'strokeWidth')=='1.25'
+        assert path.get(ns+'strokeWidth')=='0.99'
     preview=(JAVA/'app/flexygram/bubbles/BubblePreviewView.java').read_text()
     assert 'R.drawable.flexy_check_ios27' in preview and 'R.drawable.flexy_halfcheck_ios27' in preview

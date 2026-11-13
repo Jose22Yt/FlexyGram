@@ -25,6 +25,7 @@ final class Settings3LinksSection extends SignatureMatteSettingsActivity {
         switch(ids[p]){
             case "composer_style":f=new ConversationStyleSettingsActivity(false);break;
             case "header_style":f=new ConversationStyleSettingsActivity(true);break;
+            case "delete_motion":f=new app.flexygram.bubbles.deletion.DeleteMotionSettingsActivity();break;
             case "bubble_style":f=new app.flexygram.bubbles.BubbleSettingsActivity();break;
             case "plugins":f=new app.exteraless.plugins.ui.PluginsActivity();break;
             case "ai":f=new app.exteraless.ai.ui.AiSettingsActivity();break;

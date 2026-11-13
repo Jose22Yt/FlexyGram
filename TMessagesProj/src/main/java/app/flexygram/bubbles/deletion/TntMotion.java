@@ -16,7 +16,7 @@ public final class TntMotion {
 
     public static float travel(float progress) {
         float t = FractureMotionMath.unit(progress);
-        return (float) ((1d - Math.exp(-5d * t)) / (1d - Math.exp(-5d)));
+        return 1f - (1f-t)*(1f-t)*(1f-t);
     }
 
     public static float fade(float progress) {
@@ -24,6 +24,6 @@ public final class TntMotion {
     }
 
     public static int fuseDuration(int requested, int duration) {
-        return Math.max(180, Math.min(requested, duration - 350));
+        return Math.max(180, Math.min(requested, Math.round(duration * .40f)));
     }
 }

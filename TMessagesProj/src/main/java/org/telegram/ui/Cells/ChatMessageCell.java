@@ -102,6 +102,7 @@ import androidx.core.math.MathUtils;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BotForumHelper;
 import org.telegram.messenger.BotInlineKeyboard;
@@ -25837,6 +25838,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     private void drawStatusDrawable(Canvas canvas, boolean drawCheck1, boolean drawCheck2, boolean drawClock, boolean drawError, float alpha, boolean bigRadius, float timeYOffset, float layoutHeight, float progress, boolean moveCheck, boolean drawSelectionBackground) {
+        final float readGap = BuildConfig.CONNECTED_ALPHA ? 6f : 4f;
+        final float mediaReadGap = BuildConfig.CONNECTED_ALPHA ? 6f : 4.8f;
+        final float mediaCheckInset = bigRadius ? 23.5f : 21.5f;
         final boolean useScale = progress != 1f && !moveCheck;
         float scale = 0.5f + 0.5f * progress;
         if (useScale) {
@@ -25892,9 +25896,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     drawable = getThemedDrawable(Theme.key_drawable_msgStickerCheck);
                     if (drawCheck1) {
                         if (moveCheck) {
-                            canvas.translate(dp(4.8f) * (1f - progress), 0);
+                            canvas.translate(dp(mediaReadGap) * (1f - progress), 0);
                         }
-                        setDrawableBounds(drawable, layoutWidth - dp(bigRadius ? 28.3f : 26.3f) - drawable.getIntrinsicWidth() + offsetX, timeY - drawable.getIntrinsicHeight() + timeYOffset);
+                        setDrawableBounds(drawable, layoutWidth - dp(mediaCheckInset + mediaReadGap) - drawable.getIntrinsicWidth() + offsetX, timeY - drawable.getIntrinsicHeight() + timeYOffset);
                     } else {
                         setDrawableBounds(drawable, layoutWidth - dp(bigRadius ? 23.5f : 21.5f) - drawable.getIntrinsicWidth() + offsetX, timeY - drawable.getIntrinsicHeight() + timeYOffset);
                     }
@@ -25902,9 +25906,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 } else {
                     if (drawCheck1) {
                         if (moveCheck) {
-                            canvas.translate(dp(4.8f) * (1f - progress), 0);
+                            canvas.translate(dp(mediaReadGap) * (1f - progress), 0);
                         }
-                        setDrawableBounds(Theme.chat_msgMediaCheckDrawable, layoutWidth - dp(bigRadius ? 28.3f : 26.3f) - Theme.chat_msgMediaCheckDrawable.getIntrinsicWidth(), timeY - Theme.chat_msgMediaCheckDrawable.getIntrinsicHeight() + timeYOffset);
+                        setDrawableBounds(Theme.chat_msgMediaCheckDrawable, layoutWidth - dp(mediaCheckInset + mediaReadGap) - Theme.chat_msgMediaCheckDrawable.getIntrinsicWidth(), timeY - Theme.chat_msgMediaCheckDrawable.getIntrinsicHeight() + timeYOffset);
                     } else {
                         setDrawableBounds(Theme.chat_msgMediaCheckDrawable, layoutWidth - dp(bigRadius ? 23.5f : 21.5f) - Theme.chat_msgMediaCheckDrawable.getIntrinsicWidth(), timeY - Theme.chat_msgMediaCheckDrawable.getIntrinsicHeight() + timeYOffset);
                     }
@@ -25930,13 +25934,13 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 }
                 if (drawCheck1) {
                     if (moveCheck) {
-                        canvas.translate(dp(4) * (1f - progress), 0);
+                        canvas.translate(dp(readGap) * (1f - progress), 0);
                     }
                     drawable = getThemedDrawable(drawSelectionBackground ? Theme.key_drawable_msgOutCheckReadSelected : Theme.key_drawable_msgOutCheckRead);
-                    setDrawableBounds(drawable, layoutWidth - dp(22.5f) - drawable.getIntrinsicWidth() + offsetX, layoutHeight - dp(pinnedBottom || pinnedTop ? 9 : 8) - drawable.getIntrinsicHeight() + timeYOffset);
+                    setDrawableBounds(drawable, layoutWidth - dp(BuildConfig.CONNECTED_ALPHA ? 24f : 22.5f) - drawable.getIntrinsicWidth() + offsetX, layoutHeight - dp(pinnedBottom || pinnedTop ? 9 : 8) - drawable.getIntrinsicHeight() + timeYOffset);
                 } else {
                     drawable = getThemedDrawable(drawSelectionBackground ? Theme.key_drawable_msgOutCheckSelected : Theme.key_drawable_msgOutCheck);
-                    setDrawableBounds(drawable, layoutWidth - dp(18.5f) - drawable.getIntrinsicWidth() + offsetX, layoutHeight - dp(pinnedBottom || pinnedTop ? 9 : 8) - drawable.getIntrinsicHeight() + timeYOffset);
+                    setDrawableBounds(drawable, layoutWidth - dp(BuildConfig.CONNECTED_ALPHA ? 18f : 18.5f) - drawable.getIntrinsicWidth() + offsetX, layoutHeight - dp(pinnedBottom || pinnedTop ? 9 : 8) - drawable.getIntrinsicHeight() + timeYOffset);
                 }
                 drawable.setAlpha((int) (255 * alpha));
                 if (useScale) {
@@ -25969,7 +25973,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 drawable.setAlpha(255);
             } else {
                 Drawable drawable = getThemedDrawable(drawSelectionBackground ? Theme.key_drawable_msgOutHalfCheckSelected : Theme.key_drawable_msgOutHalfCheck);
-                setDrawableBounds(drawable, layoutWidth - dp(18) - drawable.getIntrinsicWidth(), layoutHeight - dp(pinnedBottom || pinnedTop ? 9 : 8) - drawable.getIntrinsicHeight() + timeYOffset);
+                setDrawableBounds(drawable, layoutWidth - dp(18) - drawable.getIntrinsicWidth() + offsetX, layoutHeight - dp(pinnedBottom || pinnedTop ? 9 : 8) - drawable.getIntrinsicHeight() + timeYOffset);
                 drawable.setAlpha((int) (255 * alpha));
                 if (useScale || moveCheck) {
                     canvas.save();

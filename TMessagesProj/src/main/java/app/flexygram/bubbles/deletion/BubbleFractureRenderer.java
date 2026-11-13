@@ -1,5 +1,5 @@
 /* Animation rendering adapted from Bubble Fracture v1.0 by @larrat23.
- * Equations, defaults and meshes retain their original behavior. See CREDITS.md. */
+ * Meshes retain their original construction; timing and release curves are tuned for FlexyGram. See CREDITS.md. */
 package app.flexygram.bubbles.deletion;
 import android.graphics.*;
 import java.util.*;
@@ -54,7 +54,7 @@ final class BubbleFractureRenderer {
         void draw(Canvas c, float progress, float fallDistance) {
             this.fallDistance = fallDistance;
             progress=FractureMotionMath.unit(progress);
-            float total=duration/1000f;
+            float total=.85f; // Duration changes playback, not the physical travel distance.
             int viewportSave=c.save();
             if(settings.style==3) {
                 drawTnt(c,progress);
@@ -67,7 +67,7 @@ final class BubbleFractureRenderer {
                 int saved=c.save();
                 c.translate(pos[0]+x,pos[1]+y);
                 c.rotate(settings.spin*.18f*eased,width*.5f,height*.5f);
-                paint.setAlpha(255);
+                paint.setAlpha((int)(255*DeleteMotionMath.fade(progress,.80f)));
                 c.drawBitmap(image,src,dst,paint);
                 c.restoreToCount(saved);
                 c.restoreToCount(viewportSave);
@@ -90,7 +90,7 @@ final class BubbleFractureRenderer {
             for(int i=0;i<pieces.size();i++) {
                 FractureMesh.Piece p=pieces.get(i);
                 float phase=FractureMesh.phase(progress,p.delay);
-                float seconds=phase*total;
+                float seconds=DeleteMotionMath.smooth(phase)*total;
                 float x=p.vx*density*seconds*.38f*settings.spread*.01f,y=p.vy*density*seconds*.28f+gravity*seconds*seconds*.5f,rotation=p.spin*phase*phase*settings.spin*.01f;
                 int save=c.save();
                 c.translate(pos[0]+x,pos[1]+y);

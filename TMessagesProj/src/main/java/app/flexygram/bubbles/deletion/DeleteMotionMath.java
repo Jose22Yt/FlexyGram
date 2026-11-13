@@ -4,6 +4,15 @@ package app.flexygram.bubbles.deletion;
 /** Pure, deterministic motion functions. No Android frame rate or animator scales involved. */
 public final class DeleteMotionMath {
     private DeleteMotionMath() {}
+    public static long durationMs(int style) {
+        switch(style) {
+            case 1: return 1100L; // Time to read the cracks before release.
+            case 2: return 1050L;
+            case 3: return 1100L;
+            case 4: return 1250L; // Separate fuse and fragment travel.
+            default: return 850L;
+        }
+    }
     public static float clamp(float v) { return Math.max(0f, Math.min(1f, v)); }
     public static float smooth(float v) { float x = clamp(v); return x * x * (3f - 2f * x); }
     public static float outCubic(float v) { float x = 1f - clamp(v); return 1f - x*x*x; }

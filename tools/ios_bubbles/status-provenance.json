@@ -1,0 +1,25 @@
+{
+  "repository": "TelegramMessenger/Telegram-iOS",
+  "commit": "24638bc69bd083981b178dd1e7f921eebbf7fc46",
+  "files": {
+    "PresentationThemeEssentialGraphics.swift": {
+      "path": "submodules/TelegramPresentationData/Sources/PresentationThemeEssentialGraphics.swift",
+      "sha256": "b7fb3aefbbd47c4cd9a51108f86df52f7cd005e75011b2a896bbb31346e18ed9"
+    },
+    "ChatListStatusNode.swift": {
+      "path": "submodules/ChatListUI/Sources/Node/ChatListStatusNode.swift",
+      "sha256": "ced4abeb11788ce93b60347ca2406fc260123bbf941ee8a00032d2617ba759e8"
+    },
+    "ChatMessageDateAndStatusNode.swift": {
+      "path": "submodules/TelegramUI/Components/Chat/ChatMessageDateAndStatusNode/Sources/ChatMessageDateAndStatusNode.swift",
+      "sha256": "8363612a65fc470ba54f787894518733fd1544a9a0aaf7f5211a3c3a1169e75d"
+    }
+  },
+  "message_check_size": [
+    11,
+    9
+  ],
+  "message_check_offset": 6,
+  "list_check_offset": 4,
+  "note": "Native geometry from pinned upstream; Android retains its own delivery/read state and transition ownership."
+}

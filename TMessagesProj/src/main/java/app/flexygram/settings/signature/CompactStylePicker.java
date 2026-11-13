@@ -25,7 +25,7 @@ public final class CompactStylePicker extends LinearLayout implements Theme.Colo
     private final ArrayList<Tile> choices = new ArrayList<>();
     public CompactStylePicker(Context context, Theme.ResourcesProvider provider, View preview, int columns) {
         super(context); this.provider = provider; livePreview=preview;
-        setOrientation(VERTICAL); setPadding(dp(12), dp(8), dp(12), dp(8));
+        setOrientation(VERTICAL); setPadding(dp(12), dp(8), dp(12), dp(6));
         setTag(org.telegram.ui.Components.RecyclerListView.TAG_NOT_SECTION);
         FrameLayout stage = new FrameLayout(context);
         GradientDrawable background = new GradientDrawable(); background.setCornerRadius(dp(20));
@@ -37,7 +37,7 @@ public final class CompactStylePicker extends LinearLayout implements Theme.Colo
         LayoutParams layout = new LayoutParams(-1, -2); layout.topMargin = dp(10);
         addView(grid, layout);
     }
-    private static int dp(int value) { return AndroidUtilities.dp(value); }
+    private static int dp(float value) { return AndroidUtilities.dp(value); }
     public void addChoice(int id, String name, View miniature, Runnable choose) {
         Tile tile = new Tile(getContext(), id, name, miniature, choose);
         choices.add(tile); grid.addView(tile, new ViewGroup.LayoutParams(-1, -2));
@@ -59,15 +59,17 @@ public final class CompactStylePicker extends LinearLayout implements Theme.Colo
         boolean lastSelected;
         Tile(Context context, int id, String name, View preview, Runnable choose) {
             super(context); this.id = id; this.name = name; this.preview = preview;
-            setOrientation(VERTICAL); setGravity(Gravity.CENTER); setPadding(dp(4), dp(4), dp(4), dp(6));
-            background.setCornerRadius(dp(20));
+            setOrientation(VERTICAL); setGravity(Gravity.CENTER); setPadding(dp(2), dp(2), dp(2), dp(4));
+            background.setCornerRadius(dp(16));
             setFocusable(true); setClickable(true); setContentDescription(name);
             preview.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
             Miniature pill=new Miniature(context,preview);
             pill.setBackground(background);pill.setClipToOutline(true);
-            addView(pill,new LayoutParams(-1,dp(56)));
+            addView(pill,new LayoutParams(-1,dp(34)));
             label = new TextView(context); label.setText(name); label.setTextSize(12);
-            label.setGravity(Gravity.CENTER); label.setMinHeight(dp(32));
+            label.setGravity(Gravity.CENTER); label.setMinHeight(dp(24));
+            label.setMaxLines(3); label.setIncludeFontPadding(false);
+            setMinimumHeight(dp(48));
             label.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
             LayoutParams caption=new LayoutParams(-1,-2);caption.topMargin=dp(4);
             addView(label, caption);
@@ -81,7 +83,7 @@ public final class CompactStylePicker extends LinearLayout implements Theme.Colo
             if (surface != lastSurface || ink != lastInk || stroke != lastStroke || lastSelected != isSelected()) {
                 lastSurface = surface; lastInk = ink; lastStroke = stroke;
                 lastSelected=isSelected();
-                background.setColor(surface); background.setStroke(dp(isSelected() ? 2 : 1), stroke);
+                background.setColor(surface); background.setStroke(isSelected() ? dp(1.5f) : 0, stroke);
                 label.setTextColor(ink);
             }
         }

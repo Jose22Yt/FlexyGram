@@ -74,7 +74,10 @@ public final class ConversationStyleSettingsActivity extends SignatureMatteSetti
             super(context);setOrientation(VERTICAL);
             setTag(RecyclerListView.TAG_NOT_SECTION);setLayoutParams(new RecyclerView.LayoutParams(-1,-2));
             FlexyComposerSettingsActivity composer=new FlexyComposerSettingsActivity();
-            livePreview=header?new HeaderPreviewView(context):composer.createStylePreview(context,-1);
+            View control;
+            if(header){HeaderPreviewView view=new HeaderPreviewView(context);view.useConversationStage();control=view;}
+            else control=composer.createConversationControl(context);
+            livePreview=new ConversationPreviewStage(context,control,header);
             picker=new CompactStylePicker(context,resourcesProvider,livePreview,2);
             addView(picker,new LayoutParams(-1,-2));
             int[] styles=header?new int[]{1,0,2,3,4}:new int[]{0,1};
@@ -91,11 +94,10 @@ public final class ConversationStyleSettingsActivity extends SignatureMatteSetti
         }
         void bind(){
             picker.select(header?HeaderConfig.style():FlexyComposerConfig.compact()?1:0);
-            if(livePreview instanceof HeaderPreviewView)((HeaderPreviewView)livePreview).settingsChanged();
-            else livePreview.invalidate();
+            ((ConversationPreviewStage)livePreview).settingsChanged();
             picker.refreshMiniatures();
         }
-        void invalidatePreviews(){livePreview.invalidate();picker.refreshMiniatures();}
+        void invalidatePreviews(){((ConversationPreviewStage)livePreview).settingsChanged();picker.refreshMiniatures();}
     }
     private final class PositionCell extends LinearLayout implements Theme.Colorable {
         private final TextView title,value;

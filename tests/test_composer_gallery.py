@@ -42,7 +42,7 @@ public class Probe {
  static class Resources{Metrics getDisplayMetrics(){return new Metrics();}}
  static class Metrics{float scaledDensity=density;}
  static class MeasureSpec{static int getSize(int w){return w;}}
- int forcedStyle,measuredHeight;final Paint paint=new Paint();
+ boolean miniature,conversationStage;int forcedStyle,measuredHeight;final Paint paint=new Paint();
  final Drawable plus=new Drawable(),clip=new Drawable(),smile=new Drawable(),folded=new Drawable(),voice=new Drawable();
  int getThemedColor(int key){return 0;}String getString(int key){return "Mensaje";}
  Resources getResources(){return new Resources();}
@@ -63,6 +63,14 @@ public class Probe {
      if(style==1){check(Math.abs(c.firstY-(height/2-dp(position)))<.01);check(c.firstRadius==dp(ComposerStyle.diameter(level))/2f);}
     }
    view.forcedStyle=-1;view.onMeasure(dp(360),0);check(view.measuredHeight==dp(96));
+   view.conversationStage=true;FlexyComposerConfig.compact=true;
+   for(int level=0;level<3;level++)for(int position=ComposerStyle.MIN_POSITION;position<=ComposerStyle.MAX_POSITION;position++){
+    FlexyComposerConfig.level=level;FlexyComposerConfig.position=position;view.onMeasure(dp(360),0);
+    check(view.measuredHeight==dp(80));Canvas c=new Canvas(dp(360),view.measuredHeight);view.drawComposer(c,c.width,c.height);
+   }
+   view.conversationStage=false;view.miniature=true;view.forcedStyle=1;
+   view.onMeasure(dp(360),0);Canvas small=new Canvas(dp(360),view.measuredHeight);view.drawComposer(small,small.width,small.height);
+   check(small.firstY==small.height/2);view.miniature=false;FlexyComposerConfig.compact=false;
   }
  }
 }'''.replace('DRAW',draw).replace('MEASURE',measure)}, [

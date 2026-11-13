@@ -23,7 +23,7 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
     private final WeakReference<View> source;
     private final float left,top,contentWidth,contentHeight;
     private final float boundsLeft,boundsTop;
-    private final long durationMs = 850L;
+    private final long durationMs;
     private final int imagePixels;
     private Bitmap image;
     private BubbleFractureRenderer renderer;
@@ -111,7 +111,7 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
         finally{if(cell!=null)cell.drawingToBitmap=drawing;}
     }
     private DeleteMotionOverlay(ViewGroup host,View source,Bitmap image,float left,float top,float boundsLeft,float boundsTop,float width,float height,int style){
-        super(host.getContext());this.host=host;this.source=new WeakReference<>(source);this.image=image;
+        super(host.getContext());durationMs=DeleteMotionMath.durationMs(style);this.host=host;this.source=new WeakReference<>(source);this.image=image;
         this.left=left;this.top=top;this.boundsLeft=boundsLeft;this.boundsTop=boundsTop;contentWidth=width;contentHeight=height;imagePixels=image.getWidth()*image.getHeight();
         renderer=new BubbleFractureRenderer(image,width,height,getResources().getDisplayMetrics().density,style,(int)durationMs,System.nanoTime());
         setWillNotDraw(false);setClickable(false);setFocusable(false);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);

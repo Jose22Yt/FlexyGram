@@ -14,6 +14,7 @@ import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.Cells.TextSettingsCell;
+import org.telegram.ui.Cells.TextDetailSettingsCell;
 import org.telegram.ui.Cells.TextCheckCell;
 import tw.nekomimi.nekogram.ui.cells.HeaderCell;
 import org.telegram.ui.Components.RecyclerListView;
@@ -177,7 +178,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         Adapter(Context context) { super(context); }
         @Override public int getItemViewType(int position) {
             if (position == appearanceHeaderRow || position == borderHeaderRow || position == fusionHeaderRow) return TYPE_HEADER;
-            return position == previewRow ? PREVIEW : position == timestampRow || position == blurRow || position == fusionAdaptRow || position == enabledRow ? TYPE_CHECK : position == personalizationRow || position == effectRow || position == styleRow || position == fuseRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == fusionIntensityRow ? SLIDER : TYPE_INFO_PRIVACY;
+            return position == personalizationRow ? TYPE_DETAIL_SETTINGS : position == previewRow ? PREVIEW : position == timestampRow || position == blurRow || position == fusionAdaptRow || position == enabledRow ? TYPE_CHECK : position == personalizationRow || position == effectRow || position == styleRow || position == fuseRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == fusionIntensityRow ? SLIDER : TYPE_INFO_PRIVACY;
         }
         @Override protected boolean isSectionContent(int type) {
             // Wallpaper and section labels separate the three compact control groups.
@@ -211,7 +212,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
                 picker.select(BubbleConfig.shape());picker.refreshMiniatures();holder.itemView.invalidate();return;
             }
             if(position==personalizationRow) {
-                ((TextSettingsCell)holder.itemView).setTextAndValue(getString(R.string.FlexyBubblePersonalization),
+                ((TextDetailSettingsCell)holder.itemView).setTextAndValue(getString(R.string.FlexyBubblePersonalization),
                         getString(personalizationExpanded?R.string.FlexyBubblePersonalizationHide:R.string.FlexyBubblePersonalizationShow),false);
                 return;
             }

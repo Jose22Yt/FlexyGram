@@ -27,4 +27,71 @@ public class NativeStylesTest{
   assertTrue("reference mask mismatch: "+difference,difference<32);
  }
 }
+@Test public void compactChoicesAdaptToRtlLargeFontsAndChangingAccent() throws Exception {
+ android.app.Activity activity=Robolectric.buildActivity(android.app.Activity.class).setup().get();
+ final int[] accent={0xffa6c87a};Theme.ResourcesProvider provider=key->key==Theme.key_windowBackgroundWhite?0xff252525:key==Theme.key_windowBackgroundWhiteBlueText?accent[0]:0xffffffff;
+ for(float font:new float[]{1f,1.5f,2f})for(boolean rtl:new boolean[]{false,true}){
+  android.content.res.Configuration config=new android.content.res.Configuration(activity.getResources().getConfiguration());config.fontScale=font;
+  android.content.Context context=activity.createConfigurationContext(config);LocaleController.isRTL=rtl;
+  app.flexygram.settings.signature.CompactStylePicker picker=new app.flexygram.settings.signature.CompactStylePicker(context,provider,new BubbleShapeMiniature(context,1),2);
+  for(int n=0;n<5;n++){final int id=n;picker.addChoice(n,new String[]{"Predeterminada","Signature Adaptive","Signature Fusion","Signature Matte Portrait","Signature Floating"}[n],new BubbleShapeMiniature(context,n%3),()->picker.select(id));}
+  picker.select(3);picker.measure(android.view.View.MeasureSpec.makeMeasureSpec(360,1073741824),0);picker.layout(0,0,360,picker.getMeasuredHeight());
+  android.view.ViewGroup grid=(android.view.ViewGroup)picker.getChildAt(1);
+  for(int n=0;n<5;n++){
+   android.view.ViewGroup tile=(android.view.ViewGroup)grid.getChildAt(n);
+   assertTrue(tile.getLeft()>=0&&tile.getRight()<=grid.getWidth());assertTrue(tile.getHeight()>=48);
+   android.view.View pill=tile.getChildAt(0);assertEquals(34,pill.getHeight());
+   android.widget.TextView label=(android.widget.TextView)tile.getChildAt(1);
+   assertTrue(label.getTop()>=pill.getBottom());assertTrue(label.getBottom()<=tile.getHeight());
+  }
+  android.graphics.drawable.GradientDrawable selected=(android.graphics.drawable.GradientDrawable)((android.view.ViewGroup)grid.getChildAt(3)).getChildAt(0).getBackground();
+  accent[0]=0xff639deb;picker.updateColors();assertTrue(grid.getChildAt(3).isSelected());assertNotNull(selected);
+ }
+ LocaleController.isRTL=false;
+}
+@Test public void conversationStageReservesSpaceForItsControlWithoutOverlappingMessages() throws Exception {
+ android.app.Activity activity=Robolectric.buildActivity(android.app.Activity.class).setup().get();
+ Class<?> type=Class.forName("app.flexygram.settings.signature.ConversationPreviewStage");
+ java.lang.reflect.Constructor<?> constructor=type.getDeclaredConstructor(android.content.Context.class,android.view.View.class,boolean.class);constructor.setAccessible(true);
+ for(boolean header:new boolean[]{false,true})for(int width:new int[]{240,360,600}){
+  android.view.View control=new android.view.View(activity){@Override protected void onMeasure(int w,int h){setMeasuredDimension(MeasureSpec.getSize(w),80);}};
+  android.view.ViewGroup stage=(android.view.ViewGroup)constructor.newInstance(activity,control,header);
+  stage.measure(android.view.View.MeasureSpec.makeMeasureSpec(width,1073741824),0);stage.layout(0,0,width,stage.getMeasuredHeight());
+  BubblePreviewView preview=(BubblePreviewView)stage.getChildAt(0);
+  java.lang.reflect.Field field=BubblePreviewView.class.getDeclaredField("bubbles");field.setAccessible(true);
+  MessageDrawable[] messages=(MessageDrawable[])field.get(preview);
+  if(header)assertTrue(control.getBottom()<=messages[0].getBounds().top);
+  else assertTrue(messages[1].getBounds().bottom<=control.getTop());
+  assertEquals(stage.getHeight(),preview.getHeight());
+ }
+}
+@Test public void officialStatusVectorPathsPreserveNativeAspectAndRoundedGeometry() throws Exception {
+ for(boolean partial:new boolean[]{false,true}){
+  String file=System.getProperty("probe.root")+"/flexy_"+(partial?"halfcheck":"check")+"_ios27.xml";
+  String xml=java.nio.file.Files.readString(java.nio.file.Path.of(file)).replace("@android:color/transparent","#00000000");
+  javax.xml.parsers.DocumentBuilderFactory factory=javax.xml.parsers.DocumentBuilderFactory.newInstance();factory.setNamespaceAware(true);
+  org.w3c.dom.Element element=(org.w3c.dom.Element)factory.newDocumentBuilder().parse(new org.xml.sax.InputSource(new java.io.StringReader(xml))).getElementsByTagName("path").item(0);
+  String namespace="http://schemas.android.com/apk/res/android";
+  Path geometry=(Path)Class.forName("android.util.PathParser").getMethod("createPathFromPathData",String.class).invoke(null,element.getAttributeNS(namespace,"pathData"));
+  Bitmap image=Bitmap.createBitmap(110,90,Bitmap.Config.ARGB_8888);Canvas actual=new Canvas(image);actual.scale(10,10);
+  Paint ink=new Paint(3);ink.setColor(Color.WHITE);ink.setStyle(Paint.Style.STROKE);ink.setStrokeWidth(Float.parseFloat(element.getAttributeNS(namespace,"strokeWidth")));ink.setStrokeCap(Paint.Cap.ROUND);ink.setStrokeJoin(Paint.Join.ROUND);actual.drawPath(geometry,ink);
+  Bitmap reference=Bitmap.createBitmap(110,90,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(reference);c.scale(10,10);c.translate(1,1);
+  Path path=new Path();if(partial){path.moveTo(.5f,7);path.lineTo(7,0);}else{path.moveTo(0,4);path.lineTo(2.95157047f,6.95157047f);path.lineTo(2.95157047f,6.95157047f);path.cubicTo(2.97734507f,6.97734507f,3.01913396f,6.97734507f,3.04490857f,6.95157047f);path.cubicTo(3.04548448f,6.95099456f,3.04604969f,6.95040803f,3.04660389f,6.9498112f);path.lineTo(9.5f,0);}
+  Paint p=new Paint(3);p.setColor(Color.WHITE);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(.99f);p.setStrokeCap(Paint.Cap.ROUND);p.setStrokeJoin(Paint.Join.ROUND);c.drawPath(path,p);
+  int mismatch=0;for(int y=0;y<90;y++)for(int x=0;x<110;x++)if((Color.alpha(image.getPixel(x,y))>127)!=(Color.alpha(reference.getPixel(x,y))>127))mismatch++;
+  assertTrue("Original check path mask differs: "+mismatch,mismatch<12);
+ }
+}
+@Test public void listStatusPathsRemainSharpAtEveryDensityAndRespectTintAndAlpha() {
+ for(float density:new float[]{1f,2f,3f,4f})for(boolean partial:new boolean[]{false,true}){
+  AndroidUtilities.density=density;app.flexygram.icons.IosListCheckDrawable tick=new app.flexygram.icons.IosListCheckDrawable(partial);
+  int size=Math.round(18*density);assertEquals(size,tick.getIntrinsicWidth());assertEquals(size,tick.getIntrinsicHeight());
+  Bitmap image=Bitmap.createBitmap(size,size,Bitmap.Config.ARGB_8888);tick.setBounds(0,0,size,size);
+  tick.setColorFilter(new PorterDuffColorFilter(0xff42aedd,PorterDuff.Mode.MULTIPLY));tick.setAlpha(128);tick.draw(new Canvas(image));
+  int count=0;for(int y=0;y<size;y++)for(int x=0;x<size;x++){int pixel=image.getPixel(x,y);assertTrue(Color.alpha(pixel)<=128);if(Color.alpha(pixel)>64){count++;assertTrue(Color.blue(pixel)>Color.red(pixel));}}
+  assertTrue(count>0);tick.setAlpha(255);assertEquals(255,tick.getAlpha());
+ }
+ AndroidUtilities.density=1;
+}
+
 }

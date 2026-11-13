@@ -57,7 +57,7 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         }
     };
     public void settingsChanged() {
-        boolean useSignatureTicks=BubbleStyle.signature();
+        boolean useSignatureTicks=org.telegram.messenger.BuildConfig.CONNECTED_ALPHA;
         if(check==null||signatureTicks!=useSignatureTicks) {
             signatureTicks=useSignatureTicks;
             check=getResources().getDrawable(useSignatureTicks?R.drawable.flexy_check_ios27:R.drawable.msg_check_s).mutate();
@@ -78,6 +78,11 @@ public final class BubblePreviewView extends View implements NotificationCenter.
     }
     private int checkColor;
     private int measuredWidth = -1, measuredHeight;
+    private int contentTop, contentBottom;
+    public void setContentInsets(int top, int bottom) {
+        if(contentTop==top && contentBottom==bottom)return;
+        contentTop=top;contentBottom=bottom;measuredWidth=-1;requestLayout();
+    }
     private float measuredDensity = -1;
     private static final String TIME = "09:41";
 
@@ -91,9 +96,9 @@ public final class BubblePreviewView extends View implements NotificationCenter.
             bubbles[i] = new MessageDrawable(MessageDrawable.TYPE_TEXT, i == 1, false);
             caches[i] = new MessageDrawable.PathDrawParams();
         }
-        check = context.getResources().getDrawable(BubbleStyle.signature() ? R.drawable.flexy_check_ios27 : R.drawable.msg_check_s).mutate();
-        halfCheck = context.getResources().getDrawable(BubbleStyle.signature() ? R.drawable.flexy_halfcheck_ios27 : R.drawable.msg_halfcheck).mutate();
-        signatureTicks=BubbleStyle.signature();
+        check = context.getResources().getDrawable(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.drawable.flexy_check_ios27 : R.drawable.msg_check_s).mutate();
+        halfCheck = context.getResources().getDrawable(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.drawable.flexy_halfcheck_ios27 : R.drawable.msg_halfcheck).mutate();
+        signatureTicks=org.telegram.messenger.BuildConfig.CONNECTED_ALPHA;
         setContentDescription(String.join("\n", samples));
         refreshTheme();
     }
@@ -158,7 +163,7 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         }
         int side = AndroidUtilities.dp(16);
         int maximum = Math.max(1, Math.min(width - side * 2, Math.round(width * .78f)));
-        int y = AndroidUtilities.dp(12), inset = AndroidUtilities.dp(14);
+        int y = contentTop + AndroidUtilities.dp(12), inset = AndroidUtilities.dp(14);
         int metadata = Math.round(time.getFontSpacing()) + AndroidUtilities.dp(10);
         for (int i = 0; i < bubbles.length; i++) {
             StaticLayout measured = layout(samples[i], maximum - inset * 2);
@@ -172,7 +177,7 @@ public final class BubblePreviewView extends View implements NotificationCenter.
             bubbles[i].setBounds(left, y, left + bubbleWidth, y + height);
             y += height + AndroidUtilities.dp(6);
         }
-        int height = y + AndroidUtilities.dp(12);
+        int height = y + AndroidUtilities.dp(12) + contentBottom;
         for (int i = 0; i < bubbles.length; i++) bubbles[i].setTop(tops[i], width, height, false, false);
         measuredWidth = width; measuredHeight = height; measuredDensity = AndroidUtilities.density;
         setMeasuredDimension(width, height);
@@ -182,7 +187,7 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         refreshTheme();
     }
     private void updateWallpaperBounds(int width, int height) {
-        frameBounds.set(AndroidUtilities.dp(8), 0, Math.max(AndroidUtilities.dp(8), width - AndroidUtilities.dp(8)), height);
+        frameBounds.set(0, 0, width, height);
         frame.rewind();frame.addRoundRect(frameBounds, AndroidUtilities.dp(16), AndroidUtilities.dp(16), Path.Direction.CW);
         wallpaperPreview.resize(width, height);
     }
@@ -208,9 +213,9 @@ public final class BubblePreviewView extends View implements NotificationCenter.
             canvas.drawText(TIME, x, baseline, time);
             if (out) {
                 int right = bounds.right - AndroidUtilities.dp(11), top = Math.round(baseline - AndroidUtilities.dp(10));
-                int h = AndroidUtilities.dp(11), w = AndroidUtilities.dp(10);
-                halfCheck.setBounds(right - w - AndroidUtilities.dp(5), top, right - AndroidUtilities.dp(5), top + h);halfCheck.draw(canvas);
-                check.setBounds(right - w, top, right, top + h);check.draw(canvas);
+                int h = check.getIntrinsicHeight(), w = check.getIntrinsicWidth();
+                check.setBounds(right - w - AndroidUtilities.dp(6), top, right - AndroidUtilities.dp(6), top + h);check.draw(canvas);
+                halfCheck.setBounds(right - w, top, right, top + h);halfCheck.draw(canvas);
             }
         }
         canvas.restoreToCount(save);

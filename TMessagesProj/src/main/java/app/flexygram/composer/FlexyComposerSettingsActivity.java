@@ -139,6 +139,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
     }
     public View createStylePreview(Context context, int style) { return new Preview(context, style); }
     public View createStyleMiniature(Context context, int style) { return new Preview(context, style, true); }
+    public View createConversationControl(Context context) { Preview view=new Preview(context,-1);view.conversationStage=true;return view; }
 
     /** Component preview uses the same geometry and icon assets as the chat. */
     private final class Preview extends View implements org.telegram.messenger.NotificationCenter.NotificationCenterDelegate {
@@ -147,6 +148,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
         final Drawable plus, clip, smile, folded, voice;
         final int forcedStyle;
         final boolean miniature;
+        boolean conversationStage;
         Preview(Context c) { this(c, -1); }
         Preview(Context c, int style) { this(c, style, false); }
         Preview(Context c, int style, boolean miniature) {
@@ -160,7 +162,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
         }
         @Override protected void onAttachedToWindow() {
             super.onAttachedToWindow();
-            if(miniature)return;
+            if(miniature||conversationStage)return;
             var center = org.telegram.messenger.NotificationCenter.getGlobalInstance();
             center.addObserver(this, org.telegram.messenger.NotificationCenter.didSetNewTheme);
             center.addObserver(this, org.telegram.messenger.NotificationCenter.didApplyNewTheme);
@@ -182,12 +184,14 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             icon.setBounds(Math.round(x)-half, Math.round(y)-half, Math.round(x)+half, Math.round(y)+half);
             icon.draw(canvas);
         }
-        @Override protected void onMeasure(int w, int h) { setMeasuredDimension(MeasureSpec.getSize(w), dp(forcedStyle>=0?64:96)); }
+        @Override protected void onMeasure(int w, int h) { setMeasuredDimension(MeasureSpec.getSize(w), dp(conversationStage?80:forcedStyle>=0?64:96)); }
         @Override protected void onDraw(Canvas c) {
-            c.drawColor(getThemedColor(Theme.key_windowBackgroundGray));
-            wallpaperPreview.draw(c);
+            if(!miniature&&!conversationStage){
+                c.drawColor(getThemedColor(Theme.key_windowBackgroundGray));
+                wallpaperPreview.draw(c);
+            }
             int save=c.save();
-            float scale=forcedStyle>=0?.8f:1f;
+            float scale=forcedStyle>=0&&!miniature?.8f:1f;
             c.scale(scale,scale);
             drawComposer(c,getWidth()/scale,getHeight()/scale);
             c.restoreToCount(save);
@@ -206,7 +210,8 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
                 c.drawText(getString(R.string.TypeMessage),dp(53),y-(paint.ascent()+paint.descent())/2,paint);c.restoreToCount(save);return;
             }
             int level = FlexyComposerConfig.level(); float radius = dp(ComposerStyle.diameter(level)) / 2f;
-            float y = forcedStyle>=0 ? height/2-dp(FlexyComposerConfig.position()) : dp(54 - ComposerStyle.offset(FlexyComposerConfig.position()));
+            float y = miniature ? height/2 : forcedStyle>=0||conversationStage ? height/2-dp(FlexyComposerConfig.position()) : dp(54 - ComposerStyle.offset(FlexyComposerConfig.position()));
+            if(conversationStage)y=Math.max(radius+dp(4),Math.min(height-radius-dp(4),y));
             float gap = dp(FlexyComposerConfig.gap());
             boolean dark = ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4;
             int surface = ComposerStyle.surface(dark, FlexyComposerConfig.glass()), ink = ComposerStyle.icon(dark);

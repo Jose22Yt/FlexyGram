@@ -36,6 +36,8 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
     private String displayName = "", displayStatus = "";
     private final int forcedStyle;
     private final boolean miniature;
+    private boolean conversationStage;
+    public void useConversationStage() { conversationStage=true;requestLayout(); }
     private final app.flexygram.preview.SignatureWallpaperPreview wallpaperPreview;
     public HeaderPreviewView(Context context) { this(context, -1); }
     public HeaderPreviewView(Context context, int style) { this(context, style, false); }
@@ -52,7 +54,7 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
     private boolean previewFusion(){return previewStyle()==2||previewStyle()==3||previewStyle()==4;}
     private boolean previewFloating(){return previewStyle()==4;}
     private boolean previewPortrait(){return previewStyle()==3;}
-    @Override protected void onAttachedToWindow(){super.onAttachedToWindow();if(miniature)return;wallpaperPreview.attach();var center=org.telegram.messenger.NotificationCenter.getGlobalInstance();center.addObserver(this,org.telegram.messenger.NotificationCenter.didSetNewTheme);center.addObserver(this,org.telegram.messenger.NotificationCenter.didApplyNewTheme);center.addObserver(this,org.telegram.messenger.NotificationCenter.didSetNewWallpapper);}
+    @Override protected void onAttachedToWindow(){super.onAttachedToWindow();if(miniature||conversationStage)return;wallpaperPreview.attach();var center=org.telegram.messenger.NotificationCenter.getGlobalInstance();center.addObserver(this,org.telegram.messenger.NotificationCenter.didSetNewTheme);center.addObserver(this,org.telegram.messenger.NotificationCenter.didApplyNewTheme);center.addObserver(this,org.telegram.messenger.NotificationCenter.didSetNewWallpapper);}
     @Override protected void onDetachedFromWindow(){var center=org.telegram.messenger.NotificationCenter.getGlobalInstance();center.removeObserver(this,org.telegram.messenger.NotificationCenter.didSetNewTheme);center.removeObserver(this,org.telegram.messenger.NotificationCenter.didApplyNewTheme);center.removeObserver(this,org.telegram.messenger.NotificationCenter.didSetNewWallpapper);wallpaperPreview.close();super.onDetachedFromWindow();}
     @Override public void didReceivedNotification(int id,int account,Object... args){wallpaperPreview.refresh();settingsChanged();}
     public void settingsChanged() { requestLayout(); invalidate(); }
@@ -70,7 +72,7 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
             var g=previewFloating() ? app.flexygram.header.fusion.SignatureFusionGeometry.updateFloating(fusion.geometry,width/previewScale,AndroidUtilities.density,LocaleController.isRTL,true,0) : previewPortrait() ? app.flexygram.header.fusion.SignatureFusionGeometry.updatePortrait(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true) : app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true);
             if(g.fits&&(titleLine+subtitleLine+AndroidUtilities.dp(2))<=g.height-AndroidUtilities.dp(8)){
                 fusionMode=true;previewHeight=g.height;
-                int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0?80:12);setMeasuredDimension(width,Math.round(h*previewScale));fusionTop=(h-previewHeight)/2;
+                int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0&&!conversationStage?80:12);setMeasuredDimension(width,Math.round(h*previewScale));fusionTop=(h-previewHeight)/2;
                 text.setTextSize(titlePx); scratchPaint.set(text); displayName=android.text.TextUtils.ellipsize(name,scratchPaint,g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
                 fusionTitleX=app.flexygram.header.fusion.SignatureFusionGeometry.titleCenterX(
                         g, text.measureText(displayName));
@@ -89,7 +91,7 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         previewHeight=HeaderGeometry.height(width,titleLine,subtitleLine,AndroidUtilities.density,HeaderConfig.compact());
         float fit=Math.min(1f,(previewHeight-AndroidUtilities.dp(8))/(titleLine+subtitleLine));titlePx*=fit;subtitlePx*=fit;
         titlePx=Math.min(titlePx,previewHeight-AndroidUtilities.dp(8));
-        int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0?80:12);setMeasuredDimension(width,h);
+        int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0&&!conversationStage?80:12);setMeasuredDimension(width,h);
         if(previewStyle()==1){prepareClassicText(width);return;}
         text.setTextSize(titlePx); float preferred = text.measureText(name);
         text.setTextSize(subtitlePx); preferred = Math.max(preferred, text.measureText(status)) + AndroidUtilities.dp(24);
@@ -105,8 +107,10 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
     @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) { super.onSizeChanged(w,h,oldw,oldh); }
     @Override protected void onDraw(Canvas canvas) {
         float d = AndroidUtilities.density, height = previewHeight;
-        canvas.drawColor(Theme.getColor(Theme.key_chat_wallpaper));
-        wallpaperPreview.resize(getWidth(),getHeight());wallpaperPreview.draw(canvas);
+        if(!miniature&&!conversationStage){
+            canvas.drawColor(Theme.getColor(Theme.key_chat_wallpaper));
+            wallpaperPreview.resize(getWidth(),getHeight());wallpaperPreview.draw(canvas);
+        }
         if(previewStyle()==1){drawClassic(canvas);return;}
         if (fusionMode && previewFusion()) { int save=canvas.save();canvas.scale(previewScale,previewScale);drawFusion(canvas);canvas.restoreToCount(save);return; }
         surface.draw(canvas, geometry, d, null);

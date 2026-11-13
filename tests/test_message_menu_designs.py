@@ -50,7 +50,7 @@ def test_live_popup_preserves_reactions_message_menu_order_and_revalidates_click
     assert listener.index('if(!freshAllowed.contains(action))return;')<listener.index('FlexyStickerSheet.show')
     assert listener.index('fillMessageMenu(')<listener.index('case SAVE:processSelectedOption')
     assert 'new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT)' in chat
-    assert '"bubble_style","context"' in (JAVA/'app/flexygram/settings/signature/SignatureDirectSettingsActivity.java').read_text()
+    assert '"bubble_style","delete_motion","context"' in (JAVA/'app/flexygram/settings/signature/SignatureDirectSettingsActivity.java').read_text()
 
 
 def test_menu_translation_keys_and_all_labels_are_present():

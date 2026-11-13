@@ -2422,10 +2422,10 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 nameWidth -= Theme.dialogs_halfCheckDrawable.getIntrinsicWidth() - dp(8);
                 if (!LocaleController.isRTL) {
                     halfCheckDrawLeft = timeLeft - timeLeftOffset - w;
-                    checkDrawLeft = halfCheckDrawLeft - dp(5.5f);
+                    checkDrawLeft = halfCheckDrawLeft - dp(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? 4f : 5.5f);
                 } else {
                     checkDrawLeft = timeLeft + timeWidth + dp(5);
-                    halfCheckDrawLeft = checkDrawLeft + dp(5.5f);
+                    halfCheckDrawLeft = checkDrawLeft + dp(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? 4f : 5.5f);
                     nameLeft += w + Theme.dialogs_halfCheckDrawable.getIntrinsicWidth() - dp(8);
                 }
             } else {
