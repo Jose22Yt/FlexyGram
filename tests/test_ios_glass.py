@@ -153,3 +153,28 @@ def test_actual_skia_shader_compiles_refracts_edges_and_is_stable_without_animat
     light=render(0.85,solid=skia.ColorBLACK)
     assert dark[40,128,:3].max() <= 113  # White foreground retains >4.5:1 contrast in the content area.
     assert light[40,128,:3].min() >= 172
+
+
+def test_only_conversation_header_opts_into_the_material_not_shared_action_bars(tmp_path):
+    source=(JAVA/'org/telegram/ui/ActionBar/ActionBar.java').read_text()
+    two=method(source,'public void setupGlass(BlurredBackgroundDrawableViewFactory factory, BlurredBackgroundColorProvider colorProvider)')
+    three=method(source,'public void setupGlass(BlurredBackgroundDrawableViewFactory factory,\n                           BlurredBackgroundColorProvider colorProvider,\n                           boolean isForum)')
+    tagged=method(source,'public void setupGlass(BlurredBackgroundDrawableViewFactory factory,\n                           BlurredBackgroundColorProvider colorProvider,\n                           boolean isForum, int surface)')
+    assert 'signatureGlassSurface = surface;' in tagged
+    assert source.count('.setIosGlassSurface(signatureGlassSurface)')==5
+    assert '.setIosGlassSurface(app.flexygram.glass.IosGlassConfig.HEADER)' not in source
+    chat=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
+    assert 'ChatObject.isForum(currentChat), app.flexygram.glass.IosGlassConfig.HEADER);' in chat
+    probe(tmp_path,{'Probe.java':'''public class Probe{
+ static class BlurredBackgroundDrawableViewFactory{}static class BlurredBackgroundColorProvider{}
+ int scope=-1,calls;boolean forum;
+ TWO THREE
+ public void setupGlass(BlurredBackgroundDrawableViewFactory f,BlurredBackgroundColorProvider p,boolean forum,int scope){this.scope=scope;this.forum=forum;calls++;}
+ static void check(boolean ok){if(!ok)throw new AssertionError();}
+ public static void main(String[]args){Probe p=new Probe();var f=new BlurredBackgroundDrawableViewFactory();var colors=new BlurredBackgroundColorProvider();
+  p.setupGlass(f,colors);check(p.scope==0&&!p.forum);
+  p.setupGlass(f,colors,true);check(p.scope==0&&p.forum);
+  p.setupGlass(f,colors,false,4);check(p.scope==4&&!p.forum);
+  p.setupGlass(f,colors,true);check(p.scope==0&&p.forum&&p.calls==4);
+ }
+}'''.replace('TWO',two).replace('THREE',three)})

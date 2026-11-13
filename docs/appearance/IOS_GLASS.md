@@ -4,7 +4,9 @@ En **FlexyGram → Pantalla principal → Cristal iOS 27**, el interruptor princ
 activa un material con refracción y contorno luminoso. Está apagado de fábrica.
 Se puede elegir independientemente la barra inferior principal, la entrada de
 conversación, la cabecera y las carpetas de chats. Se conserva la geometría del
-estilo de interfaz elegido y sus controles táctiles.
+estilo de interfaz elegido y sus controles táctiles. Solo la cabecera de
+conversación registra ese ámbito; las barras compartidas de ajustes, adjuntos
+y administración mantienen su material nativo.
 
 ## Prioridad y compatibilidad
 

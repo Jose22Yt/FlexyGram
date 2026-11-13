@@ -5360,7 +5360,7 @@ public class ChatActivity extends BaseFragment implements
         actionBar.setupGlass(
             glassBackgroundDrawableFactory,
             blurredBackgroundColorProviderTop,
-            ChatObject.isForum(currentChat));
+            ChatObject.isForum(currentChat), app.flexygram.glass.IosGlassConfig.HEADER);
         app.exteraless.appearance.ChatHeaderUiHelper.applyChatHeaderGlassStyle(actionBar);
         //actionBar.setChatAvatarContainer(avatarContainer);
         //avatarContainer.setActionBar(actionBar);
