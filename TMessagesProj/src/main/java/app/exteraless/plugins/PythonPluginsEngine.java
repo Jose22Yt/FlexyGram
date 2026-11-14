@@ -570,6 +570,10 @@ public class PythonPluginsEngine extends com.exteragram.messenger.plugins.Python
         PluginsWatchdog watchdog = PluginsController.getInstance().getWatchdog();
         watchdog.notePluginEnter(pluginId);
         String previousRuntime = PluginRuntime.enter(pluginId);
+        if (org.telegram.messenger.BuildConfig.FLEXY_SYSTEM_TRACE) {
+            String section = "Flexy.plugin." + pluginId + "." + method;
+            android.os.Trace.beginSection(section.length() > 127 ? section.substring(0, 127) : section);
+        }
         try {
             Object[] callArgs = new Object[args.length + 1];
             callArgs[0] = pluginId;
@@ -579,6 +583,7 @@ public class PythonPluginsEngine extends com.exteragram.messenger.plugins.Python
             watchdog.handlePluginError(pluginId, t);
             return null;
         } finally {
+            if (org.telegram.messenger.BuildConfig.FLEXY_SYSTEM_TRACE) android.os.Trace.endSection();
             PluginRuntime.exit(previousRuntime);
             watchdog.notePluginExit(pluginId);
         }

@@ -101,3 +101,14 @@ public class MotionAsmProbe {
     assert r.returncode==0,r.stderr
     r=subprocess.run(['java','-cp',str(tmp_path)+os.pathsep+jar,'MotionAsmProbe',str(tmp_path/'Fixture.class')],capture_output=True,text=True)
     assert r.returncode==0,r.stderr
+
+
+def test_reduced_motion_preserves_short_timings_and_rejects_resume_physics_spikes(tmp_path):
+    probe(tmp_path, {'Probe.java': '''import app.flexygram.animation.FastMotionTiming;
+public class Probe {public static void main(String[]args){
+ FastMotionTiming.setEnabled(true);
+ if(FastMotionTiming.duration(300)!=3)throw new AssertionError("reduced timing changed");
+ for(float value:new float[]{-1,0,Float.NaN})if(FastMotionTiming.frameDelta(value)!=0)throw new AssertionError("invalid delta");
+ for(float value:new float[]{2,Float.POSITIVE_INFINITY})if(FastMotionTiming.frameDelta(value)>.064f)throw new AssertionError("resume jump");
+ if(FastMotionTiming.frameDelta(.008f)!=.008f)throw new AssertionError("normal frame changed");
+}}'''}, [JAVA/'app/flexygram/animation/FastMotionTiming.java'])

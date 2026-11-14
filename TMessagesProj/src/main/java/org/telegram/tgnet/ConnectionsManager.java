@@ -175,7 +175,7 @@ public class ConnectionsManager extends BaseController {
     public void setForceTryIpV6(boolean forceTryIpV6) {
         if (this.forceTryIpV6 != forceTryIpV6) {
             this.forceTryIpV6 = forceTryIpV6;
-            checkConnection();
+            scheduleConnectionCheck();
         }
     }
 
@@ -797,7 +797,7 @@ public class ConnectionsManager extends BaseController {
 
         pushConnectionEnabled = enablePushConnection;
         native_init(currentAccount, version, layer, apiId, deviceModel, systemVersion, appVersion, langCode, systemLangCode, configPath, logPath, regId, cFingerprint, installer, packageId, timezoneOffset, userId, userPremium, enablePushConnection, ApplicationLoader.isNetworkOnline(), ApplicationLoader.getCurrentNetworkType(), SharedConfig.measureDevicePerformanceClass());
-        checkConnection();
+        scheduleConnectionCheck();
     }
 
     public static void setLangCode(String langCode) {

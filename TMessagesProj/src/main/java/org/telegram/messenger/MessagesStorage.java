@@ -9044,6 +9044,23 @@ public class MessagesStorage extends BaseController {
     }
 
     /** Read-only, local and cancellable; no controller processing or network requests until consumed. */
+    private boolean warmHistoryReadIsBounded(long dialogId, java.util.concurrent.atomic.AtomicBoolean cancelled) {
+        SQLiteCursor cursor = null;
+        try {
+            // LIMIT applies before any aggregate/filter scan in the full reader.
+            // Large histories stay demand-loaded so speculative work cannot scan
+            // thousands of rows ahead of a foreground chat/storage operation.
+            cursor = database.queryFinalized("SELECT mid FROM messages_v2 WHERE uid = " + dialogId + " LIMIT 257");
+            int rows = 0;
+            while (cursor.next()) {
+                if (cancelled.get() || ++rows > 256) return false;
+            }
+            return !cancelled.get();
+        } finally {
+            if (cursor != null) cursor.dispose();
+        }
+    }
+
     public Runnable warmChatHistory(long dialogId, int count, Runnable done) {
         final long owner = getUserConfig().getClientUserId();
         final java.util.concurrent.atomic.AtomicBoolean cancelled = new java.util.concurrent.atomic.AtomicBoolean();
@@ -9053,6 +9070,7 @@ public class MessagesStorage extends BaseController {
                         || !getUserConfig().isClientActivated() || (!DialogObject.isUserDialog(dialogId) && !DialogObject.isChatDialog(dialogId))) return;
                 app.flexygram.performance.WarmHistoryCache.Revision before = warmHistoryRevision();
                 if (before == null || warmHistory.contains(dialogId, count, SystemClock.uptimeMillis(), before)) return;
+                if (!warmHistoryReadIsBounded(dialogId, cancelled)) return;
                 getMessagesInternal(dialogId, 0, count, 0, 0, 0, 0, LOAD_FROM_UNREAD, 0, 0, 0, true, false, null, (delivery, bytes) -> {
                     if (cancelled.get() || owner != getUserConfig().getClientUserId() || !before.same(warmHistoryRevision())) return;
                     warmHistory.put(dialogId, count, SystemClock.uptimeMillis(), before, bytes, delivery);

@@ -751,6 +751,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     }
 
     public static void notifyNetworkChanged() {
+        tw.nekomimi.nekogram.utils.DnsFactory.invalidateNetworkState();
         AndroidUtilities.runOnUIThread(() -> {
             boolean isSlow = isConnectionSlow();
             for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {

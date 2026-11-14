@@ -15,6 +15,10 @@ public final class FastMotionTiming {
     public static long animatorDuration(long nominal, float systemScale) { return enabled ? scale(nominal, systemScale, true) : nominal; }
     public static long animatorDelay(long nominal, float systemScale) { return enabled ? scale(nominal, systemScale, false) : nominal; }
     public static float frameDelta(float elapsedSeconds) {
+        // Resume and delayed frames must not feed a large/invalid step into UI physics.
+        // Keep the reduced timing policy; this only bounds presentation integration.
+        if (!(elapsedSeconds > 0)) return 0f;
+        elapsedSeconds = Math.min(.064f, elapsedSeconds);
         if (enabled) return elapsedSeconds;
         double multiplier = nativeMultiplier();
         return multiplier > 0 ? (float)Math.min(.064d, elapsedSeconds / multiplier) : 0f;

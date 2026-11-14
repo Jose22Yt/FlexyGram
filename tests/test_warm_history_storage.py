@@ -28,8 +28,8 @@ public class Probe {
  static class FileLog{static void e(Exception e){}}
  static class Timer{static class Task{}static Task start(Timer t,String name){return new Task();}static void done(Task t){}}
  static class DialogObject{static boolean isUserDialog(long id){return id>0;}static boolean isChatDialog(long id){return id<0;}}
- static class SQLiteCursor{long value;SQLiteCursor(long v){value=v;}boolean next(){return true;}long longValue(int col){return value;}void dispose(){}}
- static class Database{long changes=10,external=1;SQLiteCursor queryFinalized(String sql){return new SQLiteCursor(sql.contains("total_changes")?changes:external);}}
+ static class SQLiteCursor{long value;int remaining=1;SQLiteCursor(long v){value=v;}boolean next(){return remaining-->0;}long longValue(int col){return value;}void dispose(){}}
+ static class Database{long changes=10,external=1;int warmRows=25,scans;SQLiteCursor queryFinalized(String sql){SQLiteCursor c=new SQLiteCursor(sql.contains("total_changes")?changes:external);if(sql.contains("LIMIT 257")){c.remaining=Math.min(warmRows,257);scans++;}return c;}}
  static class Config{long owner=50;boolean active=true;long getClientUserId(){return owner;}boolean isClientActivated(){return active;}}
  static class Res{List<Integer>messages=new ArrayList<>(List.of(5,6));int getObjectSize(){return 100;}}
  static class Controller{int deliveries;Object[] last;void processLoadedMessages(Object...args){deliveries++;last=args;}}
@@ -104,3 +104,12 @@ def test_sqlite_stamp_changes_for_local_and_external_writes(tmp_path):
     hole=reader[reader.index('if (mid != 0) {'):]
     assert hole.index('if (warmReceiver != null) return null;') < hole.index('database.executeFast(')
     assert 'clearWarmHistoryInternal();' in method(source,'private void cleanupInternal(')
+
+
+def test_large_history_skips_speculative_reader_but_foreground_still_loads(tmp_path):
+    storage_probe(tmp_path,'''Probe p=new Probe();int[]done={0};p.database.warmRows=100000;
+ p.warmChatHistory(100,25,()->done[0]++);p.storageQueue.fire();AndroidUtilities.ui.fire();
+ check(p.database.scans==1&&p.sqlReads==0&&p.warmHistory.isEmpty()&&done[0]==1);
+ p.open(100,25,0,0);check(p.sqlReads==1&&p.controller.deliveries==1);
+ p.database.warmRows=256;p.warmChatHistory(100,25,()->{});p.storageQueue.fire();AndroidUtilities.ui.fire();check(p.sqlReads==2);
+ ''')

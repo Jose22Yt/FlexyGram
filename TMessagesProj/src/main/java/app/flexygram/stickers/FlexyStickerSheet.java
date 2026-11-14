@@ -5,8 +5,6 @@ import static org.telegram.messenger.AndroidUtilities.dp;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,13 +27,24 @@ import org.telegram.ui.Components.LayoutHelper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Signature FlexyGram bottom sheet for previewing, sending directly, or saving
  * converted message bubbles as native Telegram static stickers.
  */
 public final class FlexyStickerSheet extends BottomSheet {
+    // One bounded encoder for all sheets. Idle threads expire instead of accumulating.
+    private static final ThreadPoolExecutor ENCODER = new ThreadPoolExecutor(0, 1, 30,
+            TimeUnit.SECONDS, new ArrayBlockingQueue<>(4), runnable -> new Thread(runnable, "FlexyStickerEncoder"));
+    private FutureTask<Void> encodingTask;
+    private boolean dismissed;
+
 
     private final BaseFragment fragment;
     private final long dialogId;
@@ -181,15 +190,21 @@ public final class FlexyStickerSheet extends BottomSheet {
     }
 
     private void startEncoding() {
-        if (capturedBitmap == null) return;
-        final Bitmap bmpToEncode = capturedBitmap.copy(capturedBitmap.getConfig(), false);
-        Executors.newSingleThreadExecutor().execute(() -> {
+        if (capturedBitmap == null || dismissed || encodingTask != null) return;
+        final AtomicReference<Bitmap> pendingBitmap = new AtomicReference<>(capturedBitmap.copy(Bitmap.Config.ARGB_8888, false));
+        final File cacheDir = getContext().getCacheDir();
+        encodingTask = new FutureTask<>(() -> {
+            Bitmap bitmap = pendingBitmap.getAndSet(null);
+            if (bitmap == null) return;
             try {
-                FlexyStickerEncoder.StickerBytes encoded = FlexyStickerEncoder.encodeAndRecycle(bmpToEncode);
-                File file = FlexyStickerEncoder.writeToCache(getContext().getCacheDir(), encoded);
+                FlexyStickerEncoder.StickerBytes encoded = FlexyStickerEncoder.encodeAndRecycle(bitmap);
+                if (Thread.currentThread().isInterrupted()) return;
+                File file = FlexyStickerEncoder.writeToCache(cacheDir, encoded);
                 TLRPC.TL_document doc = FlexyStickerMetadata.create(encoded.width, encoded.height, encoded.bytes.length, "💬");
 
-                new Handler(Looper.getMainLooper()).post(() -> {
+                AndroidUtilities.runOnUIThread(() -> {
+                    if (dismissed) return;
+                    encodingTask = null;
                     stickerBytes = encoded;
                     stickerFile = file;
                     stickerDoc = doc;
@@ -210,7 +225,20 @@ public final class FlexyStickerSheet extends BottomSheet {
             } catch (Throwable t) {
                 FileLog.e(t);
             }
-        });
+        }, null) {
+            @Override protected void done() {
+                // A cancelled queued task never enters the encoder's finally block.
+                Bitmap unused = pendingBitmap.getAndSet(null);
+                if (unused != null && !unused.isRecycled()) unused.recycle();
+            }
+        };
+        try {
+            ENCODER.execute(encodingTask);
+        } catch (RejectedExecutionException full) {
+            encodingTask.cancel(false);
+            encodingTask = null;
+            FileLog.e(full);
+        }
     }
 
     private void onSendClicked(boolean toFavorites) {
@@ -240,30 +268,39 @@ public final class FlexyStickerSheet extends BottomSheet {
         AndroidUtilities.vibrateCursor(exportButton);
         dismiss();
 
+        final File source = stickerFile;
         try {
-            File downloadDir = new File("/sdcard/Download");
-            if (!downloadDir.exists()) downloadDir.mkdirs();
-            File dest = new File(downloadDir, "FlexySticker_" + System.currentTimeMillis() + ".webp");
-            try (FileInputStream in = new FileInputStream(stickerFile);
-                 FileOutputStream out = new FileOutputStream(dest)) {
-                byte[] buffer = new byte[8192];
-                int read;
-                while ((read = in.read(buffer)) > 0) {
-                    out.write(buffer, 0, read);
-                }
-                out.flush();
-            }
-            if (BulletinFactory.canShowBulletin(fragment)) {
-                BulletinFactory.of(fragment).createSimpleBulletin(R.drawable.msg_sticker_remix,
-                        LocaleController.getString(R.string.FlexyStickerExported)).show();
-            }
-        } catch (Throwable t) {
-            FileLog.e(t);
-        }
+            ENCODER.execute(() -> {
+                try {
+                    File downloadDir = new File("/sdcard/Download");
+                    if (!downloadDir.exists()) downloadDir.mkdirs();
+                    File dest = new File(downloadDir, "FlexySticker_" + System.currentTimeMillis() + ".webp");
+                    try (FileInputStream in = new FileInputStream(source);
+                         FileOutputStream out = new FileOutputStream(dest)) {
+                        byte[] buffer = new byte[8192];
+                        int read;
+                        while ((read = in.read(buffer)) > 0) out.write(buffer, 0, read);
+                        out.flush();
+                    }
+                    AndroidUtilities.runOnUIThread(() -> {
+                        if (BulletinFactory.canShowBulletin(fragment)) {
+                            BulletinFactory.of(fragment).createSimpleBulletin(R.drawable.msg_sticker_remix,
+                                    LocaleController.getString(R.string.FlexyStickerExported)).show();
+                        }
+                    });
+                } catch (Throwable t) { FileLog.e(t); }
+            });
+        } catch (RejectedExecutionException full) { FileLog.e(full); }
     }
 
     @Override
     public void dismiss() {
+        dismissed = true;
+        if (encodingTask != null) {
+            encodingTask.cancel(true);
+            ENCODER.remove(encodingTask);
+            encodingTask = null;
+        }
         super.dismiss();
         if (capturedBitmap != null && !capturedBitmap.isRecycled()) {
             capturedBitmap.recycle();

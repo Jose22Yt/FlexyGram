@@ -21,7 +21,7 @@ public final class FastMotion {
     private static final WeakHashMap<Object, Timing> timings = new WeakHashMap<>();
     private static final class Timing {
         long duration, delay, appliedDuration, appliedDelay;
-        boolean hasDuration, hasDelay, listenerAdded;
+        boolean hasDuration, hasDelay;
         long duration(long current, float scale) {
             if (!hasDuration || current != appliedDuration) duration = current;
             hasDuration = true;
@@ -120,11 +120,9 @@ public final class FastMotion {
             animator.setDuration(state.duration(duration, scale));
         }
         animator.setStartDelay(state.delay(animator.getStartDelay(), scale));
-        if (!state.listenerAdded) {
-            if (animator.getListeners() == null || !animator.getListeners().contains(restoreOnEnd)) {
-                animator.addListener(restoreOnEnd);
-            }
-            state.listenerAdded = true;
+        // Reused animators may have had removeAllListeners() called by their owner.
+        if (animator.getListeners() == null || !animator.getListeners().contains(restoreOnEnd)) {
+            animator.addListener(restoreOnEnd);
         }
         if (animator instanceof AnimatorSet) {
             long nominal = state.hasDuration ? state.duration : -1L;

@@ -4,6 +4,9 @@ import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.webkit.RenderProcessGoneDetail;
@@ -68,6 +71,9 @@ public final class WebProxyTransport implements ForegroundDetector.Listener {
     private static final int MAX_STREAMS = 64;
     private static final int MAX_OUTBOUND_ITEMS = 8192;
     private static final int MAX_OUTBOUND_BYTES = 64 * 1024 * 1024;
+    private static final int DRAIN_BATCH_BYTES = 256 * 1024;
+    private static final int DRAIN_BATCH_FRAMES = 16;
+    private static final long DRAIN_BUDGET_MS = 4;
     private static final String BRIDGE_OBJECT = "TelegramWebProxy";
 
     private static final String BASE64_PREFIX = "tproxy-base64:";
@@ -142,6 +148,9 @@ public final class WebProxyTransport implements ForegroundDetector.Listener {
     private boolean stopped;
     private boolean restartScheduled;
     private int outboundBytes;
+    private boolean outboundDrainScheduled;
+    private final Handler outboundHandler = new Handler(Looper.getMainLooper());
+    private final Runnable outboundDrain = this::drainOutbound;
 
     public static int start(String address, String secret) {
         Address normalized = normalizeAddress(address);
@@ -347,6 +356,7 @@ public final class WebProxyTransport implements ForegroundDetector.Listener {
             outboundBytes = 0;
             lock.notifyAll();
         }
+        outboundHandler.removeCallbacks(outboundDrain);
         try {
             serverSocket.close();
         } catch (Exception ignore) {
@@ -850,17 +860,23 @@ public final class WebProxyTransport implements ForegroundDetector.Listener {
             }
             outbound.add(frame);
             outboundBytes += frame.length;
+            if (outboundDrainScheduled) return;
+            outboundDrainScheduled = true;
         }
-        AndroidUtilities.runOnUIThread(this::drainOutbound);
+        // Handler.post always yields, including sends originating on the UI thread.
+        outboundHandler.post(outboundDrain);
     }
 
     private void drainOutbound() {
-        while (true) {
+        long started = SystemClock.uptimeMillis();
+        int bytes = 0;
+        for (int sent = 0; sent < DRAIN_BATCH_FRAMES; sent++) {
             byte[] frame;
             JavaScriptReplyProxy target;
             synchronized (lock) {
                 target = replyProxy;
                 if (stopped || target == null || !bridgeReady || outbound.isEmpty()) {
+                    outboundDrainScheduled = false;
                     return;
                 }
                 frame = outbound.removeFirst();
@@ -875,9 +891,19 @@ public final class WebProxyTransport implements ForegroundDetector.Listener {
             } catch (Exception e) {
                 FileLog.e(e);
                 failCarrier();
+                synchronized (lock) { outboundDrainScheduled = false; }
+                return;
+            }
+            bytes += frame.length;
+            if (bytes >= DRAIN_BATCH_BYTES || SystemClock.uptimeMillis() - started >= DRAIN_BUDGET_MS) break;
+        }
+        synchronized (lock) {
+            if (stopped || replyProxy == null || !bridgeReady || outbound.isEmpty()) {
+                outboundDrainScheduled = false;
                 return;
             }
         }
+        outboundHandler.post(outboundDrain);
     }
 
     private void failCarrier() {
