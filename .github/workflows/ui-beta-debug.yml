@@ -169,7 +169,7 @@ jobs:
           export GRADLE_OPTS="-Dorg.gradle.internal.http.socketTimeout=120000 -Dorg.gradle.internal.http.connectionTimeout=120000 -Dorg.gradle.wrapper.networkTimeout=120000"
           ./gradlew --no-daemon --max-workers=2 --console=plain \
             --init-script "$RUNNER_TEMP/flexy-native-pools.gradle" \
-            -PflexyPerformanceBuild=true :TMessagesProj:assembleDebug 2>&1 | tee build/reports/ui-beta/assemble.log
+            -PflexyPerformanceBuild=true -PflexyReleaseReduction=true :TMessagesProj:assembleDebug 2>&1 | tee build/reports/ui-beta/assemble.log
       - name: Verify APK signature and native ABI
         id: verify_apk
         shell: bash
@@ -248,5 +248,6 @@ jobs:
           path: |
             build/reports/ui-beta/
             build/reports/problems/
+            TMessagesProj/build/outputs/mapping/debug/
           if-no-files-found: warn
           retention-days: 7

@@ -1,6 +1,10 @@
-// Device-only diagnostics and an isolated optimizer experiment. No build runs automatically.
+// Opt-in release-style reduction, device diagnostics and isolated optimizer experiments.
 def performanceBuild = project.findProperty('flexyPerformanceBuild') == 'true'
 def optimizeExperiment = project.findProperty('flexyR8Optimization') == 'true'
+def releaseReduction = project.findProperty('flexyReleaseReduction') == 'true'
+if (releaseReduction && !performanceBuild) {
+    throw new GradleException('flexyReleaseReduction requires flexyPerformanceBuild; retain the non-debuggable native Release configuration.')
+}
 if (optimizeExperiment && !performanceBuild) {
     throw new GradleException('flexyR8Optimization requires flexyPerformanceBuild on the isolated connectedAlpha test variant.')
 }
@@ -11,6 +15,16 @@ android.defaultConfig {
 if (performanceBuild) {
     android.sourceSets.debug.manifest.srcFile('src/performance/AndroidManifest.xml')
     android.sourceSets.connectedAlpha.manifest.srcFile('src/performance/AndroidManifest.xml')
+}
+// Use the existing installable variant and signing key, with release-style shrinking.
+// Keep global optimization/name policy and JNI/plugin compatibility rules intact.
+if (releaseReduction) {
+    android.buildTypes.debug {
+        minifyEnabled = true
+        shrinkResources = true
+        proguardFiles android.getDefaultProguardFile('proguard-android-optimize.txt'),
+                'proguard-rules.pro', 'performance-shrink.pro'
+    }
 }
 if (optimizeExperiment) {
     def rules = layout.buildDirectory.file('generated/performance/optimized-rules.pro')

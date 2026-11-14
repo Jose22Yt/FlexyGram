@@ -14,7 +14,8 @@ public final class CupertinoResources extends Resources {
     @Override public Drawable getDrawableForDensity(int id, int density, Theme theme) {
         Drawable exact = ExactIcons.create(this, id, density, theme);
         if (exact != null) return exact;
-        Drawable icon = CupertinoIcons.create(this, id);
-        return icon != null ? icon : super.getDrawableForDensity(id, density, theme);
+        // ExactIcons already covers both Default and Cupertino. A second lookup
+        // only repeats map/config work for resources which have no replacement.
+        return super.getDrawableForDensity(id, density, theme);
     }
 }

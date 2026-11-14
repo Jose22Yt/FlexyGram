@@ -392,16 +392,12 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabs[INDEX_CALLS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.CALLS, R.string.MainTabsCalls);
         tabs[INDEX_PROFILE] = GlassTabView.createAvatar(context, resourceProvider, currentAccount, R.string.MainTabsProfile);
         tabs[INDEX_FEED] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.FEED, R.string.Feed);
-        for (int id = 6; id < tabs.length; id++) {
-            tabs[id] = app.flexygram.navigation.LiquidNavigationTabs.create(context, resourceProvider, currentAccount, id);
-            tabsView.addTabToIgnoreClick(tabs[id]);
-        }
         tabs[INDEX_CHATS].setOnLongClickListener(this::openFoldersSelector);
         tabs[INDEX_CONTACTS].setOnLongClickListener(this::openContactsSelector);
         tabs[INDEX_CALLS].setOnLongClickListener(this::openCallsSelector);
         tabs[INDEX_PROFILE].setOnLongClickListener(this::openAccountSelector);
         for (GlassTabView tab : tabs) {
-            tab.setMainTabsCompact(compact);
+            if (tab != null) tab.setMainTabsCompact(compact);
         }
 
         tabsView.addTabToIgnoreClick(tabs[INDEX_CHATS]);
@@ -411,60 +407,11 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsView.addTabToIgnoreClick(tabs[INDEX_CALLS]);
         tabsView.addTabToIgnoreClick(tabs[INDEX_FEED]);
 
-        final int[] displayOrder = {INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE, 6, 7, 8, 9, 10};
+        final int[] displayOrder = {INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE};
         for (int index : displayOrder) {
             final GlassTabView view = tabs[index];
             final int tabIndex = index;
-            tabs[index].setOnLongClickListener(v -> processLongClick(v, tabIndex));
-            tabs[index].setOnClickListener(v -> {
-                if (viewPager.isManualScrolling() || viewPager.isTouch()) {
-                    return;
-                }
-                long now = android.os.SystemClock.elapsedRealtime();
-                boolean isDoubleTap = (now - lastTabClickTime < 350) && (lastTabClickIndex == tabIndex);
-                lastTabClickTime = now;
-                lastTabClickIndex = tabIndex;
-
-                if (isDoubleTap) {
-                    if (tabIndex == INDEX_CHATS && app.flexygram.navigation.LiquidNavigationConfig.doubleTapChats()) {
-                        Bundle args = new Bundle();
-                        args.putLong("user_id", getUserConfig().getClientUserId());
-                        presentFragment(new ChatActivity(args));
-                        lastTabClickTime = 0;
-                        lastTabClickIndex = -1;
-                        return;
-                    }
-                    if ((tabIndex == INDEX_PROFILE || (tabIndex == INDEX_SETTINGS && !isProfileTabShownInBottomBar()))
-                            && app.flexygram.navigation.LiquidNavigationConfig.doubleTapProfile()) {
-                        openAccountSelector(v);
-                        lastTabClickTime = 0;
-                        lastTabClickIndex = -1;
-                        return;
-                    }
-                }
-
-                if (app.flexygram.navigation.LiquidNavigationConfig.configured()
-                        && openFlexyShortcut(tabIndex, view)) return;
-                if (tabIndex == INDEX_FEED && isFeedTabEnabled() && AndroidUtilities.isTablet()) {
-                    FeedActivity.presentFeed(this);
-                    return;
-                }
-                final int position = indexToPosition(tabIndex);
-                if (position < 0) {
-                    return;
-                }
-
-                if (viewPager.getCurrentPosition() == position) {
-                    final BaseFragment fragment = getCurrentVisibleFragment();
-                    if (fragment instanceof MainTabsActivity.TabFragmentDelegate) {
-                        ((MainTabsActivity.TabFragmentDelegate) fragment).onParentScrollToTop();
-                    }
-                    return;
-                }
-
-                selectTab(position, true);
-                viewPager.scrollToPosition(position);
-            });
+            bindTabClicks(view, tabIndex);
 
             tabsView.addView(tabs[index]);
             tabsView.setViewVisible(view, index < 6, false);
@@ -1092,6 +1039,72 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         separateSearchButton.setTranslationY(tabsView.getBottom() - separateSearchButton.getBottom());
     }
 
+    /** Create optional destinations only when the current width/order actually shows them. */
+    private void ensureFlexyTab(int id) {
+        if (id < 6 || id >= tabs.length || tabs[id] != null) return;
+        GlassTabView tab = app.flexygram.navigation.LiquidNavigationTabs.create(tabsView.getContext(), resourceProvider, currentAccount, id);
+        tabs[id] = tab;
+        tab.setMainTabsCompact(MainTabsHelper.isMainTabsHideTitleStyle());
+        bindTabClicks(tab, id);
+        tabsView.addTabToIgnoreClick(tab);
+        tabsView.addView(tab);
+        tabsView.setViewVisible(tab, false, false);
+    }
+
+    private void bindTabClicks(final GlassTabView view, final int tabIndex) {
+        view.setOnLongClickListener(v -> processLongClick(v, tabIndex));
+        view.setOnClickListener(v -> {
+            if (viewPager.isManualScrolling() || viewPager.isTouch()) {
+                return;
+            }
+            long now = android.os.SystemClock.elapsedRealtime();
+            boolean isDoubleTap = (now - lastTabClickTime < 350) && (lastTabClickIndex == tabIndex);
+            lastTabClickTime = now;
+            lastTabClickIndex = tabIndex;
+
+            if (isDoubleTap) {
+                if (tabIndex == INDEX_CHATS && app.flexygram.navigation.LiquidNavigationConfig.doubleTapChats()) {
+                    Bundle args = new Bundle();
+                    args.putLong("user_id", getUserConfig().getClientUserId());
+                    presentFragment(new ChatActivity(args));
+                    lastTabClickTime = 0;
+                    lastTabClickIndex = -1;
+                    return;
+                }
+                if ((tabIndex == INDEX_PROFILE || (tabIndex == INDEX_SETTINGS && !isProfileTabShownInBottomBar()))
+                        && app.flexygram.navigation.LiquidNavigationConfig.doubleTapProfile()) {
+                    openAccountSelector(v);
+                    lastTabClickTime = 0;
+                    lastTabClickIndex = -1;
+                    return;
+                }
+            }
+
+            if (app.flexygram.navigation.LiquidNavigationConfig.configured()
+                    && openFlexyShortcut(tabIndex, view)) return;
+            if (tabIndex == INDEX_FEED && isFeedTabEnabled() && AndroidUtilities.isTablet()) {
+                FeedActivity.presentFeed(this);
+                return;
+            }
+            final int position = indexToPosition(tabIndex);
+            if (position < 0) {
+                return;
+            }
+
+            if (viewPager.getCurrentPosition() == position) {
+                final BaseFragment fragment = getCurrentVisibleFragment();
+                if (fragment instanceof MainTabsActivity.TabFragmentDelegate) {
+                    ((MainTabsActivity.TabFragmentDelegate) fragment).onParentScrollToTop();
+                }
+                return;
+            }
+
+            selectTab(position, true);
+            viewPager.scrollToPosition(position);
+        });
+    }
+
+
     private void applyFlexyTabs() {
         if (tabsView == null || tabs == null) return;
         boolean enabled = app.flexygram.navigation.LiquidNavigationConfig.isVisible();
@@ -1122,7 +1135,9 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         flexyConfiguredDestinations = app.flexygram.navigation.LiquidNavigationConfig.order();
         int[] shown = app.flexygram.navigation.LiquidNavigationConfig.shown(slots);
         boolean orderChanged = !java.util.Arrays.equals(shown, flexyShownDestinations);
+        for (int id : shown) ensureFlexyTab(id);
         for (int id = 0; id < tabs.length; id++) {
+            if (tabs[id] == null) continue;
             tabsView.setViewVisible(tabs[id], app.flexygram.navigation.LiquidNavigationDestinations.contains(shown,id), false);
             tabs[id].setMainTabsAppearance(app.flexygram.navigation.LiquidNavigationConfig.hideLabels(shown.length,(int)(width/AndroidUtilities.density)),
                     app.flexygram.navigation.LiquidNavigationConfig.iconDp());
@@ -1265,6 +1280,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         }
         for (int a = 0; a < tabs.length; a++) {
             GlassTabView tab = tabs[a];
+            if (tab == null) continue;
             tab.setSelected(a==9 ? overflowSelected : indexToPosition(a)==position, animated);
         }
         if(tabsView!=null)tabsView.revealSelectedDestination();
@@ -1272,6 +1288,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     public void setGestureSelectedOverride(float animatedPosition, boolean allow) {
         for (int index = 0; index < tabs.length; index++) {
+            if (tabs[index] == null) continue;
             final int position = indexToPosition(index);
             float visibility = position < 0 ? 0f : Math.max(0, 1f - Math.abs(position - animatedPosition));
             if (index==9 && app.flexygram.navigation.LiquidNavigationConfig.configured()) {
@@ -1806,7 +1823,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         }
         if (tabs != null) {
             for (GlassTabView tabView : tabs) {
-                tabView.updateColorsLottie();
+                if (tabView != null) tabView.updateColorsLottie();
             }
         }
     }

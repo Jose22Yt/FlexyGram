@@ -36,5 +36,18 @@ proporciona su configuración Firebase en `src/debug` y verifica firma y ABI ant
 de guardar el APK como artefacto. La instalación y las mediciones en dispositivo
 son verificaciones posteriores.
 
+El workflow activa `flexyPerformanceBuild=true` y `flexyReleaseReduction=true`:
+deshabilita depuración, usa C++ Release y reduce código y recursos con R8. Conserva
+las reglas de reflexión, plugins y puentes JNI, los recursos de uso dinámico y los
+nombres de temas de arranque persistidos por Android. No cambia la firma de la
+variante ni activa el experimento `flexyR8Optimization`. Los informes de R8 se
+guardan junto con los diagnósticos de compilación.
+
+Con la configuración local de servicios y herramientas preparada:
+
+```sh
+./gradlew -PflexyPerformanceBuild=true -PflexyReleaseReduction=true :TMessagesProj:assembleDebug
+```
+
 Herramientas de esta rama: JDK 21, Gradle 9.7.1, AGP 9.3.1, Build Tools 36.0.0,
 SDK de compilación 37, NDK 27.2.12479018, CMake 3.31.6 y Python 3.11.
