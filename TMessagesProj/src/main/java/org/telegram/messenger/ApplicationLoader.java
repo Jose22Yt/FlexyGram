@@ -476,7 +476,9 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         if (controller.dialogsLoaded || !controller.allDialogs.isEmpty() || !controller.getDialogs(0).isEmpty()) return;
         android.os.Trace.beginSection("Flexy.startup.request_local_dialogs");
         try {
-            controller.loadDialogs(0, 0, 100, true);
+            // Hydrate a useful first page before the remaining history. Telegram's
+            // existing cache offsets and scrolling continue subsequent pages.
+            controller.loadDialogs(0, 0, 32, true);
         } finally {
             android.os.Trace.endSection();
         }

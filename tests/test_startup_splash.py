@@ -28,96 +28,57 @@ def run_java(tmp_path, sources, actual=()):
     assert result.returncode == 0, result.stderr
 
 
-def test_actual_splash_coalesces_changes_and_never_delays_or_holds_the_content(tmp_path):
-    source = (JAVA / 'app/flexygram/performance/StartupSplash.java').read_text()
-    names = re.findall(r'case (\w+): return R.style.(\w+);', source)
-    sources = {
-        'android/os/Build.java': 'package android.os; public class Build {public static class VERSION {public static int SDK_INT=31;}}',
-        'android/view/View.java': '''package android.view; import java.util.*;
-public class View {
- public static List<Runnable> frame=new ArrayList<>(),main=new ArrayList<>();
- public void postOnAnimation(Runnable r){frame.add(r);} public boolean post(Runnable r){main.add(r);return true;}
- public static void tick(){for(Runnable r:new ArrayList<>(frame)){frame.remove(r);r.run();}for(Runnable r:new ArrayList<>(main)){main.remove(r);r.run();}}
-}''',
+def test_actual_splash_exits_immediately_without_icon_sync_or_content_gate(tmp_path):
+    run_java(tmp_path, {
+        'android/os/Build.java': 'package android.os;public class Build{public static class VERSION{public static int SDK_INT=31;}}',
         'android/app/Activity.java': '''package android.app;
 public class Activity {
- public boolean finishing,destroyed; public int calls,theme,reads;
- public boolean isFinishing(){return finishing;}public boolean isDestroyed(){return destroyed;}
- public class Splash {public java.util.function.Consumer<SplashView> exit;
-  public void setOnExitAnimationListener(java.util.function.Consumer<SplashView> l){exit=l;}
-  public void setSplashScreenTheme(int t){theme=t;calls++;}}
- public static class SplashView {public boolean removed;public void remove(){removed=true;}}
- public class Window {public android.view.View getDecorView(){return new android.view.View();}}
- public final Splash splash=new Splash();public Splash getSplashScreen(){reads++;return splash;}
- public Window getWindow(){return new Window();}
+ public int reads;public final Splash splash=new Splash();
+ public Splash getSplashScreen(){reads++;return splash;}
+ public static class Splash{public java.util.function.Consumer<SplashView> exit;
+ public void setOnExitAnimationListener(java.util.function.Consumer<SplashView> listener){exit=listener;}}
+ public static class SplashView{public boolean removed;public void remove(){removed=true;}}
 }''',
-        'org/telegram/messenger/AndroidUtilities.java': 'package org.telegram.messenger; public class AndroidUtilities {public static void runOnUIThread(Runnable r){r.run();}}',
-        'org/telegram/messenger/FileLog.java': 'package org.telegram.messenger; public class FileLog {public static void e(Throwable t){throw new AssertionError(t);}}',
-        'org/telegram/messenger/R.java': 'package org.telegram.messenger; public class R {public static class style {' +
-             ''.join(f'public static final int {style}={i+1};' for i, (_, style) in enumerate(names)) + '}}',
-        'org/telegram/ui/LauncherIconController.java': '''package org.telegram.ui; public class LauncherIconController {
- public enum LauncherIcon {''' + ','.join(n for n, _ in names) + '''}
- public static LauncherIcon selected=LauncherIcon.FLEX_NEON;
- public static LauncherIcon getRememberedIcon(){return selected;}}
-''',
-        'Probe.java': '''import app.flexygram.performance.StartupSplash;
-import org.telegram.ui.LauncherIconController;
-import org.telegram.ui.LauncherIconController.LauncherIcon;
-import android.app.Activity;import android.view.View;
-public class Probe {
- static void check(boolean b){if(!b)throw new AssertionError();}
- public static void main(String[] args){
-  Activity a=new Activity();StartupSplash.install(a);
-  check(a.calls==0);check(a.splash.exit!=null);
-  Activity.SplashView splash=new Activity.SplashView();a.splash.exit.accept(splash);check(splash.removed);
-  StartupSplash.refreshAfterFirstFrame(a);StartupSplash.refreshAfterFirstFrame(a);
-  check(a.calls==0&&View.frame.size()==1);
-  LauncherIconController.selected=LauncherIcon.FLEX_GLOSSY;
-  StartupSplash.iconChanged();check(View.frame.size()==1);
-  View.tick();check(a.calls==1&&a.theme==StartupSplash.themeFor(LauncherIcon.FLEX_GLOSSY));
-  StartupSplash.refreshAfterFirstFrame(a);View.tick();check(a.calls==1);
-  LauncherIconController.selected=LauncherIcon.FLEX_GREEN;StartupSplash.iconChanged();View.tick();check(a.calls==2);
-  a.finishing=true;LauncherIconController.selected=LauncherIcon.FLEX_CORAL;
-  StartupSplash.iconChanged();View.tick();check(a.calls==2);
-  a.finishing=false;StartupSplash.refreshAfterFirstFrame(a);View.tick();check(a.calls==3);
-  java.util.Set<Integer> themes=new java.util.HashSet<>();
-  for(LauncherIcon i:LauncherIcon.values())check(themes.add(StartupSplash.themeFor(i)));
-  android.os.Build.VERSION.SDK_INT=30;Activity old=new Activity();StartupSplash.install(old);
-  StartupSplash.refreshAfterFirstFrame(old);StartupSplash.iconChanged();View.tick();check(old.reads==0);
+        'Probe.java': '''import app.flexygram.performance.StartupSplash;import android.app.Activity;
+public class Probe{public static void main(String[]args){
+ for(int api:new int[]{31,33,35}){
+  android.os.Build.VERSION.SDK_INT=api;Activity activity=new Activity();StartupSplash.install(activity);
+  if(activity.reads!=1||activity.splash.exit==null)throw new AssertionError("missing framework handoff");
+  Activity.SplashView view=new Activity.SplashView();activity.splash.exit.accept(view);
+  if(!view.removed)throw new AssertionError("content held");
  }
-}''',
-    }
-    run_java(tmp_path, sources, [JAVA / 'app/flexygram/performance/StartupSplash.java'])
+ android.os.Build.VERSION.SDK_INT=30;Activity legacy=new Activity();StartupSplash.install(legacy);
+ if(legacy.reads!=0)throw new AssertionError("unsupported API");
+}}''',
+    }, [JAVA / 'app/flexygram/performance/StartupSplash.java'])
 
 
-def test_every_selectable_icon_has_a_stable_native_theme_and_new_icons_have_circular_art():
+def test_starting_window_is_icon_free_including_persisted_per_icon_themes():
     controller = (JAVA / 'org/telegram/ui/LauncherIconController.java').read_text()
-    icons = re.findall(r'^        (\w+)\("(\w+)", R\.(?:drawable|mipmap)\.', controller, re.M)
-    styles = {s.get('name'): s for s in ET.parse(RES / 'values-v31/flexygram_startup.xml').getroot()}
-    aliases = {a.get(A+'name').split('.')[-1]: a for a in
-               ET.parse(ROOT / 'TMessagesProj/src/main/AndroidManifest.xml').findall('./application/activity-alias')}
-    source = (JAVA / 'app/flexygram/performance/StartupSplash.java').read_text()
-    for name, key in icons:
-        style = styles['Theme.FlexyGram.Start.'+name]
+    icons = re.findall(r'^        (\w+)\("\w+", R\.(?:drawable|mipmap)\.', controller, re.M)
+    styles = {style.get('name'): style for style in ET.parse(RES / 'values-v31/flexygram_startup.xml').getroot()}
+    for icon in icons:
+        style = styles['Theme.FlexyGram.Start.' + icon]
         assert style.get('parent') == 'Theme.FlexyGram.Start'
-        assert f'case {name}: return R.style.Theme_FlexyGram_Start_{name};' in source
-        resource = style.find('item').text
-        if name.startswith('FLEX_') or name == 'EXTERALESS':
-            vector = ET.parse(RES / 'drawable-v24' / (resource.split('/')[-1]+'.xml')).getroot()
-            assert vector.get(A+'viewportWidth') == '162'
-            assert vector.find('./group/clip-path').get(A+'pathData') == 'M54,0 A54,54 0,1 1,54,108 A54,54 0,1 1,54,0 Z'
-            assert vector.find('group').get(A+'translateX') == '27'
-        else:
-            assert resource == aliases[key].get(A+'roundIcon')
+        assert not list(style)  # Persisted theme names inherit the empty icon after an update.
     for qualifier in ['values-v31', 'values-v33']:
         base = ET.parse(RES / qualifier / 'flexygram_startup.xml').find('style')
         items = {item.get('name'): item.text for item in base}
+        assert items['android:windowSplashScreenAnimatedIcon'] == '@drawable/flexy_startup_empty'
+        assert items['android:windowDisablePreview'] == 'true'
         assert items['android:windowSplashScreenAnimationDuration'] == '0'
+        assert items['android:windowSplashScreenIconBackgroundColor'] == '@android:color/transparent'
         assert items['android:windowSplashScreenBackground'] == '@color/SplashBackground'
+        if qualifier == 'values-v33':
+            assert items['android:windowSplashScreenBehavior'] == 'default'
+    blank = ET.parse(RES / 'drawable/flexy_startup_empty.xml').getroot()
+    assert blank.find('solid').get(A + 'color') == '@android:color/transparent'
     manifest = ET.parse(ROOT / 'TMessagesProj/src/main/AndroidManifest.xml')
-    activity = next(a for a in manifest.findall('./application/activity') if a.get(A+'name') == 'org.telegram.ui.LaunchActivity')
-    assert activity.get(A+'theme') == '@style/Theme.FlexyGram.Start'
-    assert activity.get(A+'launchMode') == 'singleTask'
+    activity = next(a for a in manifest.findall('./application/activity') if a.get(A + 'name') == 'org.telegram.ui.LaunchActivity')
+    assert activity.get(A + 'theme') == '@style/Theme.FlexyGram.Start'
+    assert activity.get(A + 'launchMode') == 'singleTask'
+    assert 'StartupSplash.iconChanged()' not in controller
+    assert 'StartupSplash.refreshAfterFirstFrame' not in (JAVA / 'org/telegram/ui/LaunchActivity.java').read_text()
 
 
 def test_actual_service_dispatch_keeps_background_entry_immediate_and_ui_work_after_frame(tmp_path):

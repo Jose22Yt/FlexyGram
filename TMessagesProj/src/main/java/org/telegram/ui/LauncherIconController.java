@@ -32,7 +32,6 @@ public class LauncherIconController {
         catch (IllegalArgumentException ignored) { }
         if (count == 1 && !legacyEnabled && (remembered == null || active == remembered)) {
             resolvedIcon = active;
-            app.flexygram.performance.StartupSplash.iconChanged();
             return;
         }
         if (remembered != null) active = remembered;
@@ -83,7 +82,6 @@ public class LauncherIconController {
         if (explicit) editor.putString("selected", icon.name());
         editor.apply();
         resolvedIcon = icon;
-        app.flexygram.performance.StartupSplash.iconChanged();
     }
 
     public enum LauncherIcon {

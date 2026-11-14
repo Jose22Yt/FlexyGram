@@ -7270,7 +7270,6 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         ApplicationLoader.mainInterfacePaused = false;
         ConnectionsManager cm = ConnectionsManager.getInstance(currentAccount);
         cm.setAppPaused(false, false);
-        app.flexygram.performance.StartupSplash.refreshAfterFirstFrame(this);
         refreshRateMonitor.start();
         if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) {
             frameDiagnostics = app.flexygram.performance.FrameDiagnostics.resume(this, frameDiagnostics);

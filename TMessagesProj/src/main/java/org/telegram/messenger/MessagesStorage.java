@@ -9087,6 +9087,28 @@ public class MessagesStorage extends BaseController {
         return () -> { cancelled.set(true); storageQueue.cancelRunnable(work); };
     }
 
+    /** Exact equality check: stop counting as soon as the expected value is exceeded.
+     * The common zero-unread case uses the existing read-state index instead of
+     * scanning every message ID in a large, already-read conversation.
+     */
+    private boolean matchesLocalUnreadCount(long dialogId, long threadMessageId, int expected, boolean positiveOnly) throws SQLiteException {
+        if (expected < 0) return false;
+        String table = threadMessageId == 0 ? "messages_v2" : "messages_topics";
+        String filter = " WHERE uid = " + dialogId
+                + (threadMessageId == 0 ? "" : " AND topic_id = " + threadMessageId)
+                + " AND out = 0 AND read_state IN(0,2) AND mid " + (positiveOnly ? "> 0" : "!= 0");
+        String sql = expected == 0
+                ? "SELECT EXISTS(SELECT 1 FROM " + table + " INDEXED BY task_idx_" + table + filter + " LIMIT 1)"
+                : "SELECT COUNT(*) FROM (SELECT 1 FROM " + table + filter + " LIMIT " + ((long) expected + 1) + ")";
+        SQLiteCursor cursor = null;
+        try {
+            cursor = database.queryFinalized(sql);
+            return cursor.next() && cursor.longValue(0) == expected;
+        } finally {
+            if (cursor != null) cursor.dispose();
+        }
+    }
+
     public Runnable getMessagesInternal(long dialogId, long mergeDialogId, int count, int max_id, int offset_date, int minDate, int classGuid, int load_type, int mode, long threadMessageId, int loadIndex, boolean processMessages, boolean isTopic, Timer loaderLogger) {
         return getMessagesInternal(dialogId, mergeDialogId, count, max_id, offset_date, minDate, classGuid, load_type, mode, threadMessageId, loadIndex, processMessages, isTopic, loaderLogger, null);
     }
@@ -9377,18 +9399,8 @@ public class MessagesStorage extends BaseController {
                                     cursor = null;
                                 }
                             } else if (max_id_query == 0) {
-                                int existingUnreadCount = 0;
-                                if (threadMessageId != 0) {
-                                    cursor = database.queryFinalized(String.format(Locale.US, "SELECT COUNT(*) FROM messages_topics WHERE uid = %d AND topic_id = %d AND mid > 0 AND out = 0 AND read_state IN(0,2)", dialogId, threadMessageId));
-                                } else {
-                                    cursor = database.queryFinalized(String.format(Locale.US, "SELECT COUNT(*) FROM messages_v2 WHERE uid = %d AND mid > 0 AND out = 0 AND read_state IN(0,2)", dialogId));
-                                }
-                                if (cursor.next()) {
-                                    existingUnreadCount = cursor.intValue(0);
-                                }
-                                cursor.dispose();
-                                cursor = null;
-                                if (existingUnreadCount == count_unread) {
+                                // No unread anchor is needed when the dialog's unread count is zero.
+                                if (count_unread > 0 && matchesLocalUnreadCount(dialogId, threadMessageId, count_unread, true)) {
                                     if (threadMessageId != 0) {
                                         cursor = database.queryFinalized(String.format(Locale.US, "SELECT min(mid) FROM messages_topics WHERE uid = %d AND topic_id = %d AND out = 0 AND read_state IN(0,2) AND mid > 0", dialogId, threadMessageId));
                                     } else {
@@ -9618,18 +9630,7 @@ public class MessagesStorage extends BaseController {
                             }
                         } else {
                             if (load_type == LOAD_FROM_UNREAD) {
-                                int existingUnreadCount = 0;
-                                if (threadMessageId != 0) {
-                                    cursor = database.queryFinalized(String.format(Locale.US, "SELECT COUNT(*) FROM messages_topics WHERE uid = %d AND topic_id = %d AND mid != 0 AND out = 0 AND read_state IN(0,2)", dialogId, threadMessageId));
-                                } else {
-                                    cursor = database.queryFinalized(String.format(Locale.US, "SELECT COUNT(*) FROM messages_v2 WHERE uid = %d AND mid != 0 AND out = 0 AND read_state IN(0,2)", dialogId));
-                                }
-                                if (cursor.next()) {
-                                    existingUnreadCount = cursor.intValue(0);
-                                }
-                                cursor.dispose();
-                                cursor = null;
-                                if (existingUnreadCount == count_unread) {
+                                if (matchesLocalUnreadCount(dialogId, threadMessageId, count_unread, false)) {
                                     unreadCountIsLocal = true;
                                     if (threadMessageId != 0) {
                                         cursor = database.queryFinalized(String.format(Locale.US, "SELECT * FROM (" + messageSelect + " WHERE m.uid = %d AND m.topic_id = %d AND m.mid <= %d ORDER BY m.date DESC, m.mid DESC LIMIT %d) UNION " +
