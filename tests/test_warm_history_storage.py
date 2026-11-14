@@ -13,7 +13,7 @@ def storage_probe(tmp_path, body):
     get=method(source,'public void getMessages(long dialogId, long mergeDialogId, boolean loadInfo, int count,')
     files={
         'android/os/SystemClock.java':'package android.os;public class SystemClock{public static long now=1000;public static long uptimeMillis(){return now;}}',
-        'Probe.java':'''import java.util.*;import android.os.SystemClock;
+        'Probe.java':'''import java.util.*;import android.os.SystemClock;import org.telegram.SQLite.SQLiteException;
 public class Probe {
  static final int LOAD_FROM_UNREAD=2;
  static class Queue {
@@ -25,11 +25,11 @@ public class Probe {
  }
  static class AndroidUtilities {static Queue ui=new Queue();static void runOnUIThread(Runnable r){ui.postRunnable(r);}}
  static class Utilities{static Queue stageQueue=new Queue();}
- static class FileLog{static void e(Exception e){}}
+ static class FileLog{static int errors;static void e(Exception e){errors++;}}
  static class Timer{static class Task{}static Task start(Timer t,String name){return new Task();}static void done(Task t){}}
  static class DialogObject{static boolean isUserDialog(long id){return id>0;}static boolean isChatDialog(long id){return id<0;}}
- static class SQLiteCursor{long value;int remaining=1;SQLiteCursor(long v){value=v;}boolean next(){return remaining-->0;}long longValue(int col){return value;}void dispose(){}}
- static class Database{long changes=10,external=1;int warmRows=25,scans;SQLiteCursor queryFinalized(String sql){SQLiteCursor c=new SQLiteCursor(sql.contains("total_changes")?changes:external);if(sql.contains("LIMIT 257")){c.remaining=Math.min(warmRows,257);scans++;}return c;}}
+ static class SQLiteCursor{static int disposed;long value;int remaining=1;boolean failStep;SQLiteCursor(long v){value=v;}boolean next() throws SQLiteException{if(failStep)throw new SQLiteException("step failed");return remaining-->0;}long longValue(int col){return value;}void dispose(){disposed++;}}
+ static class Database{long changes=10,external=1;int warmRows=25,scans;boolean failWarmQuery,failWarmStep;SQLiteCursor queryFinalized(String sql) throws SQLiteException{SQLiteCursor c=new SQLiteCursor(sql.contains("total_changes")?changes:external);if(sql.contains("LIMIT 257")){if(failWarmQuery)throw new SQLiteException("prepare failed");c.remaining=Math.min(warmRows,257);c.failStep=failWarmStep;scans++;}return c;}}
  static class Config{long owner=50;boolean active=true;long getClientUserId(){return owner;}boolean isClientActivated(){return active;}}
  static class Res{List<Integer>messages=new ArrayList<>(List.of(5,6));int getObjectSize(){return 100;}}
  static class Controller{int deliveries;Object[] last;void processLoadedMessages(Object...args){deliveries++;last=args;}}
@@ -49,7 +49,7 @@ public class Probe {
  public static void main(String[]args){BODY}
 }'''.replace('FIELDS',fields).replace('WRAPPER',wrapper).replace('SUFFIX',suffix).replace('GET',get).replace('BODY',body)
     }
-    probe(tmp_path,files,[JAVA/'app/flexygram/performance/WarmHistoryCache.java'])
+    probe(tmp_path,files,[JAVA/'app/flexygram/performance/WarmHistoryCache.java', JAVA/'org/telegram/SQLite/SQLiteException.java'])
 
 
 def test_prepared_history_uses_native_delivery_once_with_the_opening_guid_and_index(tmp_path):
@@ -112,4 +112,16 @@ def test_large_history_skips_speculative_reader_but_foreground_still_loads(tmp_p
  check(p.database.scans==1&&p.sqlReads==0&&p.warmHistory.isEmpty()&&done[0]==1);
  p.open(100,25,0,0);check(p.sqlReads==1&&p.controller.deliveries==1);
  p.database.warmRows=256;p.warmChatHistory(100,25,()->{});p.storageQueue.fire();AndroidUtilities.ui.fire();check(p.sqlReads==2);
+ ''')
+
+
+def test_sqlite_prepare_and_step_failures_complete_warmup_and_release_cursor(tmp_path):
+    storage_probe(tmp_path,'''Probe p=new Probe();int[]done={0};
+ p.database.failWarmQuery=true;p.warmChatHistory(100,25,()->done[0]++);p.storageQueue.fire();AndroidUtilities.ui.fire();
+ check(FileLog.errors==1&&done[0]==1&&p.sqlReads==0&&p.warmHistory.isEmpty());
+ p.database.failWarmQuery=false;p.database.failWarmStep=true;int disposed=SQLiteCursor.disposed;
+ p.warmChatHistory(100,25,()->done[0]++);p.storageQueue.fire();AndroidUtilities.ui.fire();
+ check(FileLog.errors==2&&done[0]==2&&p.sqlReads==0&&p.warmHistory.isEmpty());
+ check(SQLiteCursor.disposed==disposed+3);
+ p.database.failWarmStep=false;p.open(100,25,0,0);check(p.sqlReads==1&&p.controller.deliveries==1);
  ''')

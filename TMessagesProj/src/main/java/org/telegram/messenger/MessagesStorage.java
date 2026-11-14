@@ -9044,7 +9044,7 @@ public class MessagesStorage extends BaseController {
     }
 
     /** Read-only, local and cancellable; no controller processing or network requests until consumed. */
-    private boolean warmHistoryReadIsBounded(long dialogId, java.util.concurrent.atomic.AtomicBoolean cancelled) {
+    private boolean warmHistoryReadIsBounded(long dialogId, java.util.concurrent.atomic.AtomicBoolean cancelled) throws SQLiteException {
         SQLiteCursor cursor = null;
         try {
             // LIMIT applies before any aggregate/filter scan in the full reader.
