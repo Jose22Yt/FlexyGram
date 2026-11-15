@@ -15035,38 +15035,41 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             return;
         }
 
-        final int additionalList = dp(48);
+        // Opaque sources still update below, but disabled blur needs no list capture.
+        if (SharedConfig.chatBlurEnabled()) {
+            final int additionalList = dp(48);
 
-        final int actionBarHeight = actionBar.getMeasuredHeight()
-            + getIdleSearchFieldHeight()
-            + dp(hasStories ? DialogStoriesCell.HEIGHT_IN_DP : 0)
-            + (filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE ? filterTabsView.getMeasuredHeight() : 0)
-            + (topPanelLayout != null && topPanelLayout.getVisibility() == View.VISIBLE ? topPanelLayout.getSumHeightOfAllVisibleChild() : 0)
-            + ((int) scrollYOffset);
+            final int actionBarHeight = actionBar.getMeasuredHeight()
+                + getIdleSearchFieldHeight()
+                + dp(hasStories ? DialogStoriesCell.HEIGHT_IN_DP : 0)
+                + (filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE ? filterTabsView.getMeasuredHeight() : 0)
+                + (topPanelLayout != null && topPanelLayout.getVisibility() == View.VISIBLE ? topPanelLayout.getSumHeightOfAllVisibleChild() : 0)
+                + ((int) scrollYOffset);
 
-        final int actionBarHeightSearch = actionBar.getMeasuredHeight()
-            + (searchTabsAndFiltersLayout != null ? searchTabsAndFiltersLayout.getMeasuredHeight() : 0)
-            + dp(30);
+            final int actionBarHeightSearch = actionBar.getMeasuredHeight()
+                + (searchTabsAndFiltersLayout != null ? searchTabsAndFiltersLayout.getMeasuredHeight() : 0)
+                + dp(30);
 
-        iBlur3PositionActionBar.set(0, -additionalList, fragmentView.getMeasuredWidth(), lerp(actionBarHeight, actionBarHeightSearch, animatorSearchVisible.getFloatValue()) + additionalList );
+            iBlur3PositionActionBar.set(0, -additionalList, fragmentView.getMeasuredWidth(), lerp(actionBarHeight, actionBarHeightSearch, animatorSearchVisible.getFloatValue()) + additionalList );
 
-        boolean hasBottomBlur = false;
-        if (hasMainTabs && MainTabsLayout.isBottomNavigationVisible()) {
-            app.exteraless.appearance.MainTabsUiHelper.setBlurBounds(iBlur3PositionMainTabs, fragmentView, navigationBarHeight);
-            iBlur3PositionMainTabs.inset(0, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0 : -dp(48));
+            boolean hasBottomBlur = false;
+            if (hasMainTabs && MainTabsLayout.isBottomNavigationVisible()) {
+                app.exteraless.appearance.MainTabsUiHelper.setBlurBounds(iBlur3PositionMainTabs, fragmentView, navigationBarHeight);
+                iBlur3PositionMainTabs.inset(0, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0 : -dp(48));
 
-            hasBottomBlur = true;
-        } else if (commentView != null && chatInputViewsContainer != null) {
-            iBlur3PositionMainTabs.set(0,
-                fragmentView.getMeasuredHeight() - calculateListViewPaddingBottom(),
-                fragmentView.getMeasuredWidth(), fragmentView.getMeasuredHeight());
-            iBlur3PositionMainTabs.inset(0, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0 : -dp(48));
+                hasBottomBlur = true;
+            } else if (commentView != null && chatInputViewsContainer != null) {
+                iBlur3PositionMainTabs.set(0,
+                    fragmentView.getMeasuredHeight() - calculateListViewPaddingBottom(),
+                    fragmentView.getMeasuredWidth(), fragmentView.getMeasuredHeight());
+                iBlur3PositionMainTabs.inset(0, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0 : -dp(48));
 
-            hasBottomBlur = true;
+                hasBottomBlur = true;
+            }
+
+            scrollableViewNoiseSuppressor.setupRenderNodes(iBlur3Positions, hasBottomBlur ? 2 : 1);
+            scrollableViewNoiseSuppressor.invalidateResultRenderNodes(iBlur3Capture, fragmentView.getMeasuredWidth(), fragmentView.getMeasuredHeight());
         }
-
-        scrollableViewNoiseSuppressor.setupRenderNodes(iBlur3Positions, hasBottomBlur ? 2 : 1);
-        scrollableViewNoiseSuppressor.invalidateResultRenderNodes(iBlur3Capture, fragmentView.getMeasuredWidth(), fragmentView.getMeasuredHeight());
 
         if (iBlur3SourceGlassFrosted != null) {
             iBlur3SourceGlassFrosted.setSize(fragmentView.getMeasuredWidth(), fragmentView.getMeasuredHeight());

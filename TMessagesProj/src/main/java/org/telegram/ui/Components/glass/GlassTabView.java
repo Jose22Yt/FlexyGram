@@ -888,10 +888,17 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
         invalidate();
     }
 
+    private String accessibilityTitle, accessibilityCount;
+
     public void updateContentDescription() {
         CharSequence title = textView != null ? textView.getText() : null;
         if (TextUtils.isEmpty(title)) return;
         CharSequence count = counter != null ? counter.getText() : null;
+        if (TextUtils.equals(accessibilityTitle, title) && TextUtils.equals(accessibilityCount, count)) return;
+        // Layout can refresh appearance on every measure. Snapshot mutable labels only
+        // when content changes instead of rebuilding an accessibility string each time.
+        accessibilityTitle = title.toString();
+        accessibilityCount = count == null ? null : count.toString();
         if (!TextUtils.isEmpty(count)) {
             setContentDescription(title + ", " + count);
         } else {

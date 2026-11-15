@@ -21,7 +21,6 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import app.exteraless.ai.AiConfig;
 import app.exteraless.ai.data.Message;
@@ -41,6 +40,7 @@ public class Client {
 
     private static final MediaType JSON = MediaType.parse("application/json");
     private static final int STREAM_SYMBOLS_LIMIT = 16384;
+    private static final long MAX_STREAM_LINE_BYTES = 256 * 1024;
     private static final int MAX_IMAGE_BYTES = 4 * 1024 * 1024;
     private static final int MAX_IMAGE_SIDE = 2048;
     private static final int MAX_HISTORY_MESSAGES = 32;
@@ -54,9 +54,43 @@ public class Client {
     private final Service serviceOverride;
     private final Role roleOverride;
     private final ToolHandler toolHandler;
-    private final java.util.Set<String> cancelled = ConcurrentHashMap.newKeySet();
-    private final AtomicBoolean generating = new AtomicBoolean();
-    private final ConcurrentHashMap<String, Call> activeCalls = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, GenerationTask> requests = new ConcurrentHashMap<>();
+
+    /** Cancellation survives queueing, tool rounds and already-posted UI callbacks. */
+    private static final class GenerationTask implements GenerationCallback {
+        private final GenerationCallback target;
+        private volatile boolean cancelled;
+        private volatile Call call;
+        // Callback delivery belongs to the UI thread, including terminal delivery.
+        private boolean completed;
+
+        GenerationTask(GenerationCallback target) { this.target = target; }
+        @Override public void onChunk(String text) { if (!cancelled && !completed) target.onChunk(text); }
+        @Override public void onThinking() { if (!cancelled && !completed) target.onThinking(); }
+        @Override public void onReasoning(String text) { if (!cancelled && !completed) target.onReasoning(text); }
+        @Override public void onResponse(String text) {
+            if (!cancelled && !completed) { completed = true; target.onResponse(text); }
+        }
+        @Override public void onError(int code, String text) {
+            if (!cancelled && !completed) { completed = true; target.onError(code, text); }
+        }
+    }
+
+    private GenerationTask begin(String requestId, GenerationCallback callback) {
+        GenerationTask task = new GenerationTask(callback);
+        if (requests.putIfAbsent(requestId, task) != null) throw new IllegalArgumentException("Request already active");
+        return task;
+    }
+
+    private boolean attachCall(String requestId, GenerationTask task, Call call) {
+        task.call = call;
+        if (task.cancelled || requests.get(requestId) != task) {
+            call.cancel();
+            finish(requestId, task);
+            return false;
+        }
+        return true;
+    }
 
     public static class Builder {
 
@@ -171,28 +205,23 @@ public class Client {
     }
 
     public boolean isGenerating() {
-        return generating.get();
+        return !requests.isEmpty();
     }
 
     public void cancel(String requestId) {
-        if (requestId != null) {
-            cancelled.add(requestId);
-        }
-        Call call = requestId == null ? null : activeCalls.remove(requestId);
-        if (call != null) {
-            call.cancel();
-        }
-        if (activeCalls.isEmpty()) {
-            generating.set(false);
-        }
+        GenerationTask task = requestId == null ? null : requests.get(requestId);
+        if (task != null) cancelTask(requestId, task);
     }
 
     public void cancelAll() {
-        for (Call call : activeCalls.values()) {
-            call.cancel();
-        }
-        activeCalls.clear();
-        generating.set(false);
+        requests.forEach(this::cancelTask);
+    }
+
+    private void cancelTask(String requestId, GenerationTask task) {
+        task.cancelled = true;
+        requests.remove(requestId, task);
+        Call call = task.call;
+        if (call != null) call.cancel();
     }
 
     private Service service() {
@@ -224,12 +253,20 @@ public class Client {
 
     public String getResponse(String prompt, boolean useHistory, boolean streaming, String imagePath, GenerationCallback callback) {
         final String requestId = UUID.randomUUID().toString();
-        Utilities.globalQueue.postRunnable(() -> {
-            final ImagePayload image = loadImage(imagePath);
-            final ArrayList<Message> messages = useHistory ? trimHistory(AiConfig.getConversationHistory()) : new ArrayList<>();
-            messages.add(image == null ? new Message("user", prompt) : new Message("user", prompt, image.data, image.mimeType));
-            generate(requestId, messages, streaming, useHistory ? new HistoryCallback(prompt, callback) : callback);
+        GenerationTask task = begin(requestId, useHistory ? new HistoryCallback(prompt, callback) : callback);
+        boolean accepted = Utilities.globalQueue.postRunnable(() -> {
+            if (task.cancelled) return;
+            try {
+                final ImagePayload image = loadImage(imagePath);
+                if (task.cancelled) return;
+                final ArrayList<Message> messages = useHistory ? trimHistory(AiConfig.getConversationHistory()) : new ArrayList<>();
+                messages.add(image == null ? new Message("user", prompt) : new Message("user", prompt, image.data, image.mimeType));
+                startGeneration(requestId, messages, streaming, task);
+            } catch (Exception failure) {
+                notifyError(requestId, task, 0, failure.getMessage());
+            }
         });
+        if (!accepted) notifyError(requestId, task, 0, "generation queue unavailable");
         return requestId;
     }
 
@@ -242,14 +279,24 @@ public class Client {
     }
 
     public void generate(String requestId, List<Message> messages, boolean streaming, GenerationCallback callback) {
-        if (toolHandler != null) {
-            generateWithTools(requestId, messages, streaming, callback);
-            return;
-        }
-        generatePlain(requestId, messages, streaming, callback);
+        startGeneration(requestId, messages, streaming, begin(requestId, callback));
     }
 
-    private void generatePlain(String requestId, List<Message> messages, boolean streaming, GenerationCallback callback) {
+    private void startGeneration(String requestId, List<Message> messages, boolean streaming, GenerationTask callback) {
+        if (callback.cancelled) return;
+        try {
+            if (toolHandler != null) {
+                generateWithTools(requestId, messages, streaming, callback);
+                return;
+            }
+            generatePlain(requestId, messages, streaming, callback);
+        } catch (RuntimeException failure) {
+            notifyError(requestId, callback, 0, failure.getMessage());
+        }
+    }
+
+    private void generatePlain(String requestId, List<Message> messages, boolean streaming, GenerationTask callback) {
+        if (callback.cancelled) return;
         final Service service = service();
         if (service == null || TextUtils.isEmpty(service.getUrl())
                 || TextUtils.isEmpty(service.getModel())) {
@@ -267,14 +314,13 @@ public class Client {
             notifyError(requestId, callback, 0, e.getMessage());
             return;
         }
-        generating.set(true);
         Call call = httpClient.newCall(request);
-        activeCalls.put(requestId, call);
+        if (!attachCall(requestId, callback, call)) return;
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 if (call.isCanceled()) {
-                    finish(requestId);
+                    finish(requestId, callback);
                     return;
                 }
                 notifyError(requestId, callback, 0, e.getMessage());
@@ -302,7 +348,7 @@ public class Client {
                     if (!call.isCanceled()) {
                         notifyError(requestId, callback, 0, e.getMessage());
                     } else {
-                        finish(requestId);
+                        finish(requestId, callback);
                     }
                 }
             }
@@ -354,7 +400,7 @@ public class Client {
                 .build();
     }
 
-    private void generateWithTools(String requestId, List<Message> messages, boolean streaming, GenerationCallback callback) {
+    private void generateWithTools(String requestId, List<Message> messages, boolean streaming, GenerationTask callback) {
         final Service service = service();
         if (service == null || TextUtils.isEmpty(service.getUrl())
                 || TextUtils.isEmpty(service.getModel())) {
@@ -365,27 +411,26 @@ public class Client {
             notifyError(requestId, callback, 0, "api key is not set");
             return;
         }
-        cancelled.remove(requestId);
-        generating.set(true);
         final ArrayList<Message> copy = new ArrayList<>(messages);
         new Thread(() -> runTools(requestId, service, copy, streaming, callback), "ai-tools").start();
     }
 
     private void runTools(String requestId, Service service, List<Message> messages, boolean streaming,
-                          GenerationCallback callback) {
+                          GenerationTask callback) {
         boolean thinkingReported = false;
         try {
+            if (callback.cancelled) return;
             JSONArray payload = basePayload(messages);
             for (int round = 0; round < MAX_TOOL_ROUNDS; round++) {
-                if (cancelled.remove(requestId)) {
-                    finish(requestId);
+                if (callback.cancelled) {
+                    finish(requestId, callback);
                     return;
                 }
                 JSONObject body = requestBody(service, payload, false);
                 body.put("tools", toolHandler.definitions());
                 body.put("tool_choice", round == MAX_TOOL_ROUNDS - 1 ? "none" : "auto");
                 Call call = httpClient.newCall(request(service, body));
-                activeCalls.put(requestId, call);
+                if (!attachCall(requestId, callback, call)) return;
                 JSONObject message;
                 try (Response response = call.execute()) {
                     ResponseBody responseBody = response.body();
@@ -396,7 +441,7 @@ public class Client {
                             List<Message> fallback = toolHandler.fallback();
                             if (fallback != null && !fallback.isEmpty()) {
                                 FileLog.e("AiClient: tools rejected (" + code + ", " + detail + "), falling back");
-                                activeCalls.remove(requestId);
+                                callback.call = null;
                                 generatePlain(requestId, fallback, streaming, callback);
                                 return;
                             }
@@ -412,6 +457,7 @@ public class Client {
                     message = choices == null || choices.length() == 0 ? null
                             : choices.getJSONObject(0).optJSONObject("message");
                 }
+                if (callback.cancelled) { finish(requestId, callback); return; }
                 if (message == null) {
                     notifyError(requestId, callback, 0, "empty response");
                     return;
@@ -445,6 +491,7 @@ public class Client {
                         .put("tool_calls", calls);
                 payload.put(assistant);
                 for (int i = 0; i < calls.length(); i++) {
+                    if (callback.cancelled) { finish(requestId, callback); return; }
                     JSONObject toolCall = calls.optJSONObject(i);
                     if (toolCall == null) {
                         continue;
@@ -476,8 +523,8 @@ public class Client {
             }
             notifyError(requestId, callback, 0, "too many tool calls");
         } catch (Exception e) {
-            if (cancelled.remove(requestId)) {
-                finish(requestId);
+            if (callback.cancelled) {
+                finish(requestId, callback);
             } else {
                 notifyError(requestId, callback, 0, e.getMessage());
             }
@@ -504,14 +551,14 @@ public class Client {
         return encoded;
     }
 
-    private void readStream(String requestId, ResponseBody body, GenerationCallback callback)
+    private void readStream(String requestId, ResponseBody body, GenerationTask callback)
             throws IOException {
         ReasoningFilter filter = new ReasoningFilter();
         StringBuilder full = new StringBuilder();
         boolean reasoningReported = false;
         BufferedSource source = body.source();
-        while (!source.exhausted()) {
-            String line = source.readUtf8LineStrict();
+        while (!callback.cancelled && !source.exhausted()) {
+            String line = source.readUtf8LineStrict(MAX_STREAM_LINE_BYTES);
             if (line == null || !line.startsWith("data:")) {
                 continue;
             }
@@ -532,7 +579,6 @@ public class Client {
                     notifyThinking(callback);
                 }
                 notifyReasoning(callback, delta[1]);
-                continue;
             }
             String visible = filter.filter(delta[0]);
             if (filter.consumeReasoningSignal() && !reasoningReported) {
@@ -546,21 +592,33 @@ public class Client {
             if (visible.isEmpty()) {
                 continue;
             }
-            full.append(visible);
-            notifyChunk(callback, visible);
-            if (full.length() >= STREAM_SYMBOLS_LIMIT) {
-                break;
-            }
+            if (appendStreamContent(full, visible, callback)) break;
         }
+        if (callback.cancelled) { finish(requestId, callback); return; }
         String tail = filter.flush();
         if (!tail.isEmpty()) {
-            full.append(tail);
-            notifyChunk(callback, tail);
+            appendStreamContent(full, tail, callback);
         }
         notifyResponse(requestId, callback, full.toString());
     }
 
-    private void readSingle(String requestId, ResponseBody body, GenerationCallback callback)
+    private boolean appendStreamContent(StringBuilder full, String text, GenerationTask callback) {
+        int available = Math.max(0, STREAM_SYMBOLS_LIMIT - full.length());
+        int length = Math.min(available, text.length());
+        if (length > 0 && Character.isHighSurrogate(text.charAt(length - 1))
+                && (full.length() + length == STREAM_SYMBOLS_LIMIT
+                || length < text.length() && Character.isLowSurrogate(text.charAt(length)))) {
+            length--;
+        }
+        if (length > 0) {
+            String visible = length == text.length() ? text : text.substring(0, length);
+            full.append(visible);
+            notifyChunk(callback, visible);
+        }
+        return length < text.length() || full.length() >= STREAM_SYMBOLS_LIMIT;
+    }
+
+    private void readSingle(String requestId, ResponseBody body, GenerationTask callback)
             throws Exception {
         JSONObject parsed = new JSONObject(body.string());
         JSONArray choices = parsed.optJSONArray("choices");
@@ -599,12 +657,9 @@ public class Client {
                 return null;
             }
             String content = text(delta, "content");
-            if (!TextUtils.isEmpty(content)) {
-                return new String[]{content, null};
-            }
             String reasoning = reasoningOf(delta);
-            if (reasoning != null) {
-                return new String[]{null, reasoning};
+            if (content != null || reasoning != null) {
+                return new String[]{content, reasoning};
             }
             return null;
         } catch (Exception e) {
@@ -800,12 +855,9 @@ public class Client {
         }
     }
 
-    private void finish(String requestId) {
-        activeCalls.remove(requestId);
-        cancelled.remove(requestId);
-        if (activeCalls.isEmpty()) {
-            generating.set(false);
-        }
+    private void finish(String requestId, GenerationTask task) {
+        requests.remove(requestId, task);
+        task.call = null;
     }
 
     private void notifyChunk(GenerationCallback callback, String chunk) {
@@ -820,15 +872,20 @@ public class Client {
         AndroidUtilities.runOnUIThread(() -> callback.onReasoning(chunk));
     }
 
-    private void notifyResponse(String requestId, GenerationCallback callback, String response) {
-        finish(requestId);
-        AndroidUtilities.runOnUIThread(() -> callback.onResponse(response));
+    private void notifyResponse(String requestId, GenerationTask callback, String response) {
+        AndroidUtilities.runOnUIThread(() -> {
+            try { callback.onResponse(response); }
+            finally { finish(requestId, callback); }
+        });
     }
 
-    private void notifyError(String requestId, GenerationCallback callback, int code,
+    private void notifyError(String requestId, GenerationTask callback, int code,
                              String message) {
-        finish(requestId);
+        if (callback.cancelled) { finish(requestId, callback); return; }
         FileLog.e("AiClient: request failed, code " + code + ", " + message);
-        AndroidUtilities.runOnUIThread(() -> callback.onError(code, message));
+        AndroidUtilities.runOnUIThread(() -> {
+            try { callback.onError(code, message); }
+            finally { finish(requestId, callback); }
+        });
     }
 }

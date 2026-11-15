@@ -45,7 +45,8 @@ public final class Message {
         if (other == null || Message.class != other.getClass()) {
             return false;
         }
-        return Objects.equals(content, ((Message) other).content);
+        Message message = (Message) other;
+        return Objects.equals(role, message.role) && Objects.equals(content, message.content);
     }
 
     @Override

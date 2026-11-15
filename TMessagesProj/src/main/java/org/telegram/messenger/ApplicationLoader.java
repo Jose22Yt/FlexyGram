@@ -343,7 +343,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                 deferredStartupAccounts[a] = true;
                 deferredStartupAccountCount++;
             } else {
-                initializeStartupAccount(a, prepareDialogs && a == startupAccount);
+                initializeStartupAccount(a, prepareDialogs && a == startupAccount, uiStartup);
             }
         }
 
@@ -375,6 +375,10 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
 
     /** Selected/zero accounts initialize before content; other active sessions get a later frame. */
     private static void initializeStartupAccount(int a, boolean prepareDialogs) {
+        initializeStartupAccount(a, prepareDialogs, false);
+    }
+
+    private static void initializeStartupAccount(int a, boolean prepareDialogs, boolean uiStartup) {
         android.os.Trace.beginSection("Flexy.startup.account_core");
         try {
             MessagesController.getInstance(a);
@@ -389,15 +393,24 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                 // Enqueue the selected account's native SQLite read before ancillary accounts/services.
                 // Native loading/reset guards, notifications, validation and network sync stay intact.
                 if (prepareDialogs) prepareSelectedDialogs();
-                if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
-                    // Constructing the sender can initialize media controllers and scan pending files.
-                    // Keep it on main, but let the selected account enqueue its local list first.
-                    AndroidUtilities.runOnUIThread(() -> checkStartupUnsentMessages(a));
-                } else {
-                    checkStartupUnsentMessages(a);
-                }
+                scheduleStartupUnsentMessages(a, uiStartup);
             }
         } finally { android.os.Trace.endSection(); }
+    }
+
+    private static void scheduleStartupUnsentMessages(int account, boolean uiStartup) {
+        if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+            Runnable check = () -> checkStartupUnsentMessages(account);
+            if (uiStartup) {
+                // Posting during Activity.onCreate can run before the first traversal.
+                // Keep sender/media initialization behind that frame, not the local dialog read.
+                android.view.Choreographer.getInstance().postFrameCallback(frameTimeNanos -> applicationHandler.post(check));
+            } else {
+                AndroidUtilities.runOnUIThread(check);
+            }
+        } else {
+            checkStartupUnsentMessages(account);
+        }
     }
 
     private static void checkStartupUnsentMessages(int account) {

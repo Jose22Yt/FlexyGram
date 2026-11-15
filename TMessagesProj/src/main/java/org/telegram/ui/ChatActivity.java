@@ -3820,6 +3820,8 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onFragmentDestroy() {
+        flexyStickerExport.cancel();
+        cancelFolderUnreadBadgeUpdate();
         LiteMode.removeOnPowerSaverAppliedListener(signatureGlassPowerListener);
         selectedBubbleMotion.reset();
         selectedBubbleMotionMessage = null;
@@ -22155,6 +22157,7 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
+        if (flexyStickerExport.onActivityResult(this, requestCode, resultCode, data)) return;
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 0 || requestCode == 2) {
                 createChatAttachView();
@@ -26343,7 +26346,7 @@ public class ChatActivity extends BaseFragment implements
             }
         } else if (id == NotificationCenter.dialogsUnreadCounterChanged || id == NotificationCenter.dialogFiltersUpdated
                 || id == NotificationCenter.dialogsNeedReload) {
-            updateFolderUnreadBadge();
+            scheduleFolderUnreadBadgeUpdate();
         } else if (id == NotificationCenter.dialogTranslate) {
             final long dialogId = (long) args[0];
             if (getDialogId() != dialogId) {
@@ -32190,9 +32193,32 @@ public class ChatActivity extends BaseFragment implements
         return (int) Math.min(Integer.MAX_VALUE, total);
     }
 
+    private boolean folderUnreadBadgeUpdatePending;
+    private final Runnable folderUnreadBadgeUpdate = () -> {
+        folderUnreadBadgeUpdatePending = false;
+        if (!paused && !isFinished) updateFolderUnreadBadge();
+    };
+
+    private void scheduleFolderUnreadBadgeUpdate() {
+        if (folderUnreadBadgeUpdatePending || paused || isFinished || actionBar == null) return;
+        // Several controller notifications can describe the same batch of dialog changes.
+        // Read the final folder state once on the next UI queue turn.
+        folderUnreadBadgeUpdatePending = true;
+        AndroidUtilities.runOnUIThread(folderUnreadBadgeUpdate);
+    }
+
+    private void cancelFolderUnreadBadgeUpdate() {
+        if (!folderUnreadBadgeUpdatePending) return;
+        AndroidUtilities.cancelRunOnUIThread(folderUnreadBadgeUpdate);
+        folderUnreadBadgeUpdatePending = false;
+    }
+
     private void updateFolderUnreadBadge() {
+        cancelFolderUnreadBadgeUpdate();
         if (actionBar != null) {
-            actionBar.unreadBadgeSetCount(getCurrentFolderUnreadMessageCount());
+            boolean needsCount = app.flexygram.header.HeaderConfig.counter()
+                    || !usesSignatureHeader() && NekoConfig.unreadBadgeOnBackButton.Bool();
+            actionBar.unreadBadgeSetCount(needsCount ? getCurrentFolderUnreadMessageCount() : 0);
         }
     }
 
@@ -32207,7 +32233,7 @@ public class ChatActivity extends BaseFragment implements
             params.leftMargin = usesSignatureHeader() ? 0 : AndroidUtilities.dp(!inPreviewMode ? 52 : 0);
             params.rightMargin = usesSignatureHeader() || isTitleCentered() ? 0 : AndroidUtilities.dp(52);
             avatarContainer.setLayoutParams(params);
-            updateSignatureHeaderCounter(); signatureChatHeader.changed();
+            signatureChatHeader.changed();
             if (audioCallIconItem != null && usesSignatureHeader()) audioCallIconItem.setVisibility(View.GONE);
         }
         app.flexygram.bubbles.BubbleConfig.load();
@@ -32432,6 +32458,7 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onPause() {
+        cancelFolderUnreadBadgeUpdate();
         cancelScrollHintChecks();
         AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
         // Refresh the visible translations once on return, rather than scanning a hidden chat.
@@ -51907,6 +51934,11 @@ public class ChatActivity extends BaseFragment implements
 
     private boolean showWelcomeMessageRevertOption(MessageObject messageObject) {
         return chatMode == MODE_DEFAULT && messageObject != null && messageObject.isWelcomeAnchored();
+    }
+
+    private final app.flexygram.stickers.FlexyStickerExport flexyStickerExport = new app.flexygram.stickers.FlexyStickerExport();
+    public boolean exportFlexySticker(java.io.File source) {
+        return flexyStickerExport.begin(this, source);
     }
 
     private app.flexygram.header.SignatureChatHeader signatureChatHeader;

@@ -6,9 +6,9 @@ from test_render_work_reuse import JAVA, probe
 def test_local_dialog_request_precedes_plugin_start_and_no_new_frame_gate():
     source = (JAVA/'org/telegram/messenger/ApplicationLoader.java').read_text()
     init = method(source, 'public static void postInitApplication(boolean prepareDialogs)')
-    assert init.index('initializeStartupAccount(a, prepareDialogs && a == startupAccount)') < init.index('PluginsController.getInstance().init(applicationContext)')
-    core = method(source, 'private static void initializeStartupAccount(int a, boolean prepareDialogs)')
-    assert core.index('prepareSelectedDialogs();') < core.index('checkStartupUnsentMessages(a)')
+    assert init.index('initializeStartupAccount(a, prepareDialogs && a == startupAccount, uiStartup)') < init.index('PluginsController.getInstance().init(applicationContext)')
+    core = method(source, 'private static void initializeStartupAccount(int a, boolean prepareDialogs, boolean uiStartup)')
+    assert core.index('prepareSelectedDialogs();') < core.index('scheduleStartupUnsentMessages(a, uiStartup)')
     assert 'postFrameCallback' not in core and 'Thread.sleep' not in core
     sender = method(source, 'private static void checkStartupUnsentMessages(int account)')
     assert sender.index('getCurrentUser() != null') < sender.index('checkUnsentMessages()')

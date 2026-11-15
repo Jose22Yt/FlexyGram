@@ -14,7 +14,9 @@ public final class InlineConversionScanner {
     private static final Pattern MONEY=Pattern.compile(B+"(?:([$€£¥]?)("+N+")\\s+([A-Z]{3})|([A-Z]{3})\\s+("+N+"))"+E,Pattern.CASE_INSENSITIVE);
     private static final Pattern UNITS=Pattern.compile(B+"("+N+")\\s*(miles?|millas?|kilometers?|kilómetros?|kilometros?|km|pounds?|lbs?|libras?|kilograms?|kilogramos?|kg|feet|foot|pies|ft|meters?|metros?|inches|inch|pulgadas?|centimeters?|centímetros?|cm|°\\s*[CF]|celsius|fahrenheit)"+E,Pattern.CASE_INSENSITIVE);
     private static final Pattern TIME=Pattern.compile(B+"(\\d{1,2})(?::([0-5]\\d))?\\s*(AM|PM)?\\s+(UTC|GMT|EST|EDT|PST|PDT|CST|IST|[A-Za-z_]+/[A-Za-z_]+(?:/[A-Za-z_]+)?)(?![+\\-\\p{L}\\p{N}_/])",Pattern.CASE_INSENSITIVE);
-    private static final Pattern RESERVED=Pattern.compile("(?i)(?:https?://|www\\.)\\S+|[\\p{L}\\p{N}._%+-]+@[\\p{L}\\p{N}.-]+\\.[\\p{L}]{2,}|(?:@|#)[\\p{L}\\p{N}_]+|`[^`]*`");
+    // Start an email only at the beginning of its local-part run. Without this
+    // boundary, find() rescans every suffix of long words that contain no '@'.
+    private static final Pattern RESERVED=Pattern.compile("(?i)(?:https?://|www\\.)\\S+|(?<![\\p{L}\\p{N}._%+-])[\\p{L}\\p{N}._%+-]++@[\\p{L}\\p{N}.-]+\\.[\\p{L}]{2,}|(?:@|#)[\\p{L}\\p{N}_]+|`[^`]*`");
     private InlineConversionScanner(){}
     public static BigDecimal number(String raw,Locale locale){
         if(raw==null||raw.length()>40||locale==null)throw new IllegalArgumentException("Number/locale required");

@@ -18,15 +18,14 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
-import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.ChatActivity;
 import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.ChatMessageCell;
 import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.LayoutHelper;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.InterruptedIOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RejectedExecutionException;
@@ -46,9 +45,7 @@ public final class FlexyStickerSheet extends BottomSheet {
     private boolean dismissed;
 
 
-    private final BaseFragment fragment;
-    private final long dialogId;
-    private final int currentAccount;
+    private final ChatActivity fragment;
 
     private Bitmap capturedBitmap;
     private FlexyStickerEncoder.StickerBytes stickerBytes;
@@ -59,23 +56,22 @@ public final class FlexyStickerSheet extends BottomSheet {
     private TextView favoriteButton;
     private TextView exportButton;
 
-    public static void show(BaseFragment fragment, ChatMessageCell cell, MessageObject message) {
+    public static void show(ChatActivity fragment, ChatMessageCell cell, MessageObject message) {
         if (fragment == null || fragment.getParentActivity() == null || cell == null || message == null) {
             return;
         }
         try {
             FlexyStickerSheet sheet = new FlexyStickerSheet(fragment, cell, message);
-            sheet.show();
+            // Let fragment pause/navigation dismiss the preview and release its resources.
+            if (fragment.showDialog(sheet) == null) sheet.dismiss();
         } catch (Throwable t) {
             FileLog.e(t);
         }
     }
 
-    private FlexyStickerSheet(BaseFragment fragment, ChatMessageCell cell, MessageObject message) {
+    private FlexyStickerSheet(ChatActivity fragment, ChatMessageCell cell, MessageObject message) {
         super(fragment.getParentActivity(), false);
         this.fragment = fragment;
-        this.currentAccount = fragment.getCurrentAccount();
-        this.dialogId = message.getDialogId();
 
         final Context context = fragment.getParentActivity();
         setApplyTopPadding(false);
@@ -196,14 +192,17 @@ public final class FlexyStickerSheet extends BottomSheet {
         encodingTask = new FutureTask<>(() -> {
             Bitmap bitmap = pendingBitmap.getAndSet(null);
             if (bitmap == null) return;
+            File prepared = null;
             try {
                 FlexyStickerEncoder.StickerBytes encoded = FlexyStickerEncoder.encodeAndRecycle(bitmap);
                 if (Thread.currentThread().isInterrupted()) return;
-                File file = FlexyStickerEncoder.writeToCache(cacheDir, encoded);
+                prepared = FlexyStickerEncoder.writeToCache(cacheDir, encoded);
                 TLRPC.TL_document doc = FlexyStickerMetadata.create(encoded.width, encoded.height, encoded.bytes.length, "💬");
+                if (Thread.currentThread().isInterrupted()) return;
+                final File file = prepared;
 
                 AndroidUtilities.runOnUIThread(() -> {
-                    if (dismissed) return;
+                    if (dismissed) { file.delete(); return; }
                     encodingTask = null;
                     stickerBytes = encoded;
                     stickerFile = file;
@@ -222,8 +221,11 @@ public final class FlexyStickerSheet extends BottomSheet {
                         exportButton.setAlpha(1.0f);
                     }
                 });
+                prepared = null; // The queued UI callback now owns the file.
             } catch (Throwable t) {
-                FileLog.e(t);
+                if (!(t instanceof InterruptedIOException)) FileLog.e(t);
+            } finally {
+                if (prepared != null) prepared.delete();
             }
         }, null) {
             @Override protected void done() {
@@ -243,10 +245,12 @@ public final class FlexyStickerSheet extends BottomSheet {
 
     private void onSendClicked(boolean toFavorites) {
         if (stickerFile == null || stickerDoc == null) return;
+        File source = stickerFile;
+        stickerFile = null; // Transfer before dismiss() releases preview resources.
         AndroidUtilities.vibrateCursor(sendButton);
         dismiss();
 
-        FlexyStickerSender.send(currentAccount, dialogId, stickerFile, stickerDoc, toFavorites, new FlexyStickerSender.Callback() {
+        FlexyStickerSender.send(fragment, source, stickerDoc, toFavorites, new FlexyStickerSender.Callback() {
             @Override
             public void onSuccess(TLRPC.Document serverDoc) {
                 int resId = toFavorites ? R.string.FlexyStickerSavedFavorite : R.string.FlexyStickerSent;
@@ -258,39 +262,22 @@ public final class FlexyStickerSheet extends BottomSheet {
 
             @Override
             public void onError(Throwable error) {
+                if (error instanceof InterruptedIOException) return;
                 FileLog.e(error);
+                if (BulletinFactory.canShowBulletin(fragment)) {
+                    BulletinFactory.of(fragment).createErrorBulletin(LocaleController.getString(R.string.ErrorOccurred)).show();
+                }
             }
         });
     }
 
     private void onExportClicked() {
         if (stickerFile == null || !stickerFile.exists()) return;
+        // The fragment retains the source while Android's document picker is open.
+        if (!fragment.exportFlexySticker(stickerFile)) return;
+        stickerFile = null;
         AndroidUtilities.vibrateCursor(exportButton);
         dismiss();
-
-        final File source = stickerFile;
-        try {
-            ENCODER.execute(() -> {
-                try {
-                    File downloadDir = new File("/sdcard/Download");
-                    if (!downloadDir.exists()) downloadDir.mkdirs();
-                    File dest = new File(downloadDir, "FlexySticker_" + System.currentTimeMillis() + ".webp");
-                    try (FileInputStream in = new FileInputStream(source);
-                         FileOutputStream out = new FileOutputStream(dest)) {
-                        byte[] buffer = new byte[8192];
-                        int read;
-                        while ((read = in.read(buffer)) > 0) out.write(buffer, 0, read);
-                        out.flush();
-                    }
-                    AndroidUtilities.runOnUIThread(() -> {
-                        if (BulletinFactory.canShowBulletin(fragment)) {
-                            BulletinFactory.of(fragment).createSimpleBulletin(R.drawable.msg_sticker_remix,
-                                    LocaleController.getString(R.string.FlexyStickerExported)).show();
-                        }
-                    });
-                } catch (Throwable t) { FileLog.e(t); }
-            });
-        } catch (RejectedExecutionException full) { FileLog.e(full); }
     }
 
     @Override
@@ -300,6 +287,10 @@ public final class FlexyStickerSheet extends BottomSheet {
             encodingTask.cancel(true);
             ENCODER.remove(encodingTask);
             encodingTask = null;
+        }
+        if (stickerFile != null) {
+            stickerFile.delete();
+            stickerFile = null;
         }
         super.dismiss();
         if (capturedBitmap != null && !capturedBitmap.isRecycled()) {

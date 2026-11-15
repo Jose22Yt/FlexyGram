@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.0.0-beta.55 — correcciones y trabajo de interfaz
+
+- Agrupadas las actualizaciones del contador de chats; se evitan recorridos de carpetas ocultas y publicaciones de accesibilidad sin cambios.
+- La preparación de mensajes pendientes en el arranque de interfaz espera al primer dibujo; se omiten capturas de listas cuando el blur está desactivado.
+- Los stickers conservan el tema y la respuesta, se exportan mediante el selector de documentos de Android y liberan los temporales descartados.
+- Corregidas la cancelación de peticiones de IA, la entrega de fragmentos de streaming mixtos y los límites de respuesta sin dividir emojis.
+- Corregida la comparación de mensajes por rol y eliminado el recorrido repetido de textos largos al buscar correos en el conversor.
+
 ## En desarrollo — renderizado nativo
 
 - Retirados el material Cristal iOS 27, su shader y sus controles de las cuatro superficies.

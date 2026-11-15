@@ -2,14 +2,18 @@
 package app.flexygram.stickers;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.MediaDataController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.ChatActivity;
+import org.telegram.ui.Components.AlertsCreator;
 import java.io.File;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
 
 /**
@@ -30,6 +34,8 @@ public final class FlexyStickerSender implements NotificationCenter.Notification
     private final Callback callback;
     private int localMsgId;
     private boolean completed;
+    private boolean transportStarted;
+    private final long ownerId;
 
     private final Runnable timeoutRunnable = () -> finish(null, new IOException("Timeout awaiting server confirmation"));
 
@@ -39,35 +45,83 @@ public final class FlexyStickerSender implements NotificationCenter.Notification
         this.file = file;
         this.addToFavorites = addToFavorites;
         this.callback = callback;
+        this.ownerId = UserConfig.getInstance(account).getClientUserId();
     }
 
     /**
      * Sends a WebP sticker document to the given dialog (or Saved Messages if toFavorites is true).
      */
-    public static void send(int account, long dialogId, File file, TLRPC.TL_document document,
+    public static void send(ChatActivity owner, File file, TLRPC.TL_document document,
                             boolean addToFavorites, Callback callback) {
         if (file == null || !file.exists() || document == null) {
+            if (file != null) file.delete();
             if (callback != null) callback.onError(new IllegalArgumentException("Invalid file or document"));
             return;
         }
 
-        long targetDialog = addToFavorites ? UserConfig.getInstance(account).getClientUserId() : dialogId;
+        int account = owner.getCurrentAccount();
+        long targetDialog = addToFavorites ? UserConfig.getInstance(account).getClientUserId() : owner.getDialogId();
         FlexyStickerSender sender = new FlexyStickerSender(account, targetDialog, file, addToFavorites, callback);
+        if (owner.isFinished || owner.getParentActivity() == null) {
+            sender.finish(null, new IOException("Destination unavailable"));
+            return;
+        }
+
+        MessageObject top = addToFavorites ? null : owner.getThreadMessage();
+        MessageObject reply = addToFavorites ? null : owner.getReplyMessage();
+        long topicId = owner.getTopicId();
+        if (!addToFavorites && topicId > 1 && ChatObject.isForum(owner.getCurrentChat())
+                && (top == null || top.getId() != topicId)) {
+            sender.finish(null, new IOException("Forum topic unavailable"));
+            return;
+        }
+        SendMessagesHelper.SendMessageParams params = SendMessagesHelper.SendMessageParams.of(
+                document, null, file.getAbsolutePath(), targetDialog,
+                reply != null ? reply : top, top, null, null, null, null, true, 0, 0, 0, null, null, false);
+        if (!addToFavorites) {
+            params.replyQuote = owner.getReplyQuote();
+            params.sendMessageChatArguments = owner.getMessageChatSendParams();
+            params.monoForumPeer = owner.getSendMonoForumPeerId();
+            params.suggestionParams = owner.getSendMessageSuggestionParams();
+        }
+        if (!addToFavorites && owner.isInScheduleMode()) {
+            try {
+                AlertsCreator.createScheduleDatePickerDialog(owner.getParentActivity(), targetDialog,
+                        (notify, date, repeat) -> {
+                            params.notify = notify;
+                            params.scheduleDate = date;
+                            params.scheduleRepeatPeriod = repeat;
+                            sender.enqueue(params);
+                        }, () -> sender.finish(null, new InterruptedIOException("Sticker scheduling cancelled")), null);
+            } catch (RuntimeException unavailable) {
+                sender.finish(null, unavailable);
+            }
+        } else {
+            sender.enqueue(params);
+        }
+    }
+
+    private void enqueue(SendMessagesHelper.SendMessageParams params) {
+        if (completed || transportStarted) return;
+        UserConfig config = UserConfig.getInstance(account);
+        if (ownerId == 0 || !config.isClientActivated() || config.getClientUserId() != ownerId) {
+            finish(null, new IOException("Account changed"));
+            return;
+        }
 
         NotificationCenter center = NotificationCenter.getInstance(account);
-        center.addObserver(sender, NotificationCenter.didReceiveNewMessages);
-        center.addObserver(sender, NotificationCenter.messageReceivedByServer);
-        center.addObserver(sender, NotificationCenter.messageSendError);
+        center.addObserver(this, NotificationCenter.didReceiveNewMessages);
+        center.addObserver(this, NotificationCenter.messageReceivedByServer);
+        center.addObserver(this, NotificationCenter.messageSendError);
 
-        AndroidUtilities.runOnUIThread(sender.timeoutRunnable, 120_000);
+        AndroidUtilities.runOnUIThread(timeoutRunnable, 120_000);
 
         try {
-            SendMessagesHelper.SendMessageParams params = SendMessagesHelper.SendMessageParams.of(
-                    document, null, file.getAbsolutePath(), targetDialog,
-                    null, null, null, null, null, null, true, 0, 0, 0, null, null, false);
+            // From here Telegram can retain attachPath for uploads and retries.
+            transportStarted = true;
             SendMessagesHelper.getInstance(account).sendMessage(params);
         } catch (Throwable t) {
-            sender.finish(null, t);
+            finish(null, t);
         }
     }
 
@@ -122,7 +176,8 @@ public final class FlexyStickerSender implements NotificationCenter.Notification
         center.removeObserver(this, NotificationCenter.messageReceivedByServer);
         center.removeObserver(this, NotificationCenter.messageSendError);
 
-        if (error == null && file.exists()) {
+        // A failed/in-flight native upload may still need its source for retry.
+        if ((!transportStarted || error == null) && file.exists()) {
             file.delete();
         }
 

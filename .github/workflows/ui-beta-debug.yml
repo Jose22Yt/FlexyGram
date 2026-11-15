@@ -3,7 +3,7 @@ run-name: UI beta debug ARM64 · ${{ github.sha }}
 
 on:
   push:
-    branches: [codex/flexygram-beta-glass]
+    branches: [codex/flexygram-beta-glass, codex/flexygram-beta55-audit]
   workflow_dispatch:
 
 permissions:
@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/codex/flexygram-beta-glass'
+    if: github.repository == 'Jose22Yt/FlexyGram' && (github.ref == 'refs/heads/codex/flexygram-beta-glass' || github.ref == 'refs/heads/codex/flexygram-beta55-audit')
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     env:
@@ -32,6 +32,23 @@ jobs:
           ref: ${{ github.sha }}
           submodules: recursive
           persist-credentials: false
+      - name: Validate Telegram build credentials
+        shell: bash
+        run: |
+          python3 - <<'PYCODE'
+          import os
+          import re
+          app_id = os.environ.get('TELEGRAM_APP_ID', '')
+          app_hash = os.environ.get('TELEGRAM_APP_HASH', '')
+          invalid = []
+          if not app_id.isdecimal() or int(app_id) <= 0:
+              invalid.append('TELEGRAM_APP_ID')
+          if not re.fullmatch(r'[0-9a-fA-F]{32}', app_hash):
+              invalid.append('TELEGRAM_APP_HASH')
+          if invalid:
+              raise SystemExit('Missing or invalid repository secrets: ' + ', '.join(invalid))
+          print('Telegram build credentials: format validated; values remain private.')
+          PYCODE
       - name: Set up Java 21
         uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:

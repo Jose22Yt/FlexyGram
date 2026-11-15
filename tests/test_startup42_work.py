@@ -11,6 +11,8 @@ def test_selected_account_precedes_deferred_sessions_and_headless_never_waits_fo
     loop=source[start:end]
     helpers='\n'.join(method(source,s)for s in [
         'private static void initializeStartupAccount(int a, boolean prepareDialogs)',
+        'private static void initializeStartupAccount(int a, boolean prepareDialogs, boolean uiStartup)',
+        'private static void scheduleStartupUnsentMessages(int account, boolean uiStartup)',
         'private static void checkStartupUnsentMessages(int account)',
         'private static void initializeDeferredStartupAccount(int account)',
         'private static void initializePendingStartupAccounts()',
@@ -42,17 +44,19 @@ def test_selected_account_precedes_deferred_sessions_and_headless_never_waits_fo
  static void check(boolean b){if(!b)throw new AssertionError("core="+core+" unsent="+unsent+" pending="+deferredStartupAccountCount);}
  static void reset(int selected){core.clear();unsent.clear();loaded.clear();dialogs=contacts=billing=deferredStartupAccountCount=0;Arrays.fill(deferredStartupAccounts,false);Arrays.fill(MessagesController.ready,false);android.view.Choreographer.frames.clear();applicationHandler.tasks.clear();UserConfig.selectedAccount=selected;for(int i=0;i<10;i++){UserConfig c=new UserConfig();c.id=i;c.active=i==0||i==1||i==3||i==8;UserConfig.values[i]=c;}}
  public static void main(String[]args){
-  reset(3);launch(true,true);check(core.equals(List.of(0,3))&&unsent.isEmpty()&&dialogs==1&&deferredStartupAccountCount==2);applicationHandler.run();check(unsent.equals(List.of(0,3)));check(loaded.size()==9&&loaded.get(0)==3);
+  reset(3);launch(true,true);check(core.equals(List.of(0,3))&&unsent.isEmpty()&&dialogs==1&&deferredStartupAccountCount==2);applicationHandler.run();check(unsent.isEmpty());check(loaded.size()==9&&loaded.get(0)==3);
+  check(android.view.Choreographer.frames.size()==2);android.view.Choreographer.tick();check(unsent.isEmpty());applicationHandler.run();check(unsent.equals(List.of(0)));
+  android.view.Choreographer.tick();applicationHandler.run();check(unsent.equals(List.of(0,3)));
   initializeDeferredStartupAccount(1);check(core.equals(List.of(0,3,1))&&deferredStartupAccountCount==1);initializeDeferredStartupAccount(1);applicationHandler.run();check(unsent.size()==3);
   UserConfig.values[8].active=false;initializePendingStartupAccounts();check(deferredStartupAccountCount==0&&!core.contains(8));
-  reset(3);launch(false,false);check(core.equals(List.of(0,3,1,8))&&deferredStartupAccountCount==0&&dialogs==0);
+  reset(3);launch(false,false);check(core.equals(List.of(0,3,1,8))&&deferredStartupAccountCount==0&&dialogs==0&&unsent.equals(List.of(0,3,1,8))&&android.view.Choreographer.frames.isEmpty());
   reset(3);launch(true,false);check(core.equals(List.of(0,3,1,8))&&deferredStartupAccountCount==0&&dialogs==1);
   reset(7);launch(true,true);check(core.equals(List.of(0,7))&&deferredStartupAccountCount==3&&dialogs==0);
   initializePendingStartupAccounts();check(core.containsAll(List.of(1,3,8))&&deferredStartupAccountCount==0);
   reset(3);launch(true,true);UserConfig.values[1].active=false;initializeAccountServices(true);
   while(!android.view.Choreographer.frames.isEmpty()){android.view.Choreographer.tick();applicationHandler.run();}
   check(deferredStartupAccountCount==0&&!core.contains(1)&&core.contains(8)&&contacts==3&&billing==1);
-  reset(3);launch(true,true);UserConfig.values[3].active=false;applicationHandler.run();check(unsent.equals(List.of(0)));
+  reset(3);launch(true,true);UserConfig.values[3].active=false;while(!android.view.Choreographer.frames.isEmpty()){android.view.Choreographer.tick();applicationHandler.run();}check(unsent.equals(List.of(0)));
 
  }
 }'''.replace('LOOP',loop).replace('HELPERS',helpers)

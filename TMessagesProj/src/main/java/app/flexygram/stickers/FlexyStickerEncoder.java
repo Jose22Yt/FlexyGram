@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 
 /**
  * Handles capturing native ChatMessageCell bubble drawing and encoding to Telegram-compliant WebP.
@@ -109,12 +110,15 @@ public final class FlexyStickerEncoder {
             throw new IOException("Missing or recycled bitmap");
         }
         try {
+            checkEncodingCancelled();
             int w = bitmap.getWidth();
             int h = bitmap.getHeight();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
 
             if (Build.VERSION.SDK_INT >= 30) {
-                if (bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, out)) {
+                boolean compressed = bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, out);
+                checkEncodingCancelled();
+                if (compressed) {
                     byte[] bytes = out.toByteArray();
                     if (bytes.length <= FlexyStickerSpec.MAX_BYTES && FlexyStickerSpec.isWebp(bytes)) {
                         return new StickerBytes(bytes, w, h);
@@ -125,8 +129,11 @@ public final class FlexyStickerEncoder {
             Bitmap.CompressFormat fmt = Build.VERSION.SDK_INT >= 30
                     ? Bitmap.CompressFormat.WEBP_LOSSY : Bitmap.CompressFormat.WEBP;
             for (int quality = 95; quality >= 40; quality -= 10) {
+                checkEncodingCancelled();
                 out.reset();
-                if (bitmap.compress(fmt, quality, out)) {
+                boolean compressed = bitmap.compress(fmt, quality, out);
+                checkEncodingCancelled();
+                if (compressed) {
                     byte[] bytes = out.toByteArray();
                     if (bytes.length <= FlexyStickerSpec.MAX_BYTES && FlexyStickerSpec.isWebp(bytes)) {
                         return new StickerBytes(bytes, w, h);
@@ -143,6 +150,12 @@ public final class FlexyStickerEncoder {
             if (!bitmap.isRecycled()) {
                 bitmap.recycle();
             }
+        }
+    }
+
+    private static void checkEncodingCancelled() throws InterruptedIOException {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedIOException("Sticker encoding cancelled");
         }
     }
 
