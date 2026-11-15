@@ -5120,9 +5120,14 @@ public class SelectAnimatedEmojiDialog extends FrameLayout implements Notificati
                 }
             });
 
+            final ValueAnimator preparedAnimator = showAnimator;
             HwEmojis.prepare(this, () -> {
                 HwEmojis.enableHw(SelectAnimatedEmojiDialog.this);
-                AndroidUtilities.runOnUIThread(() -> showAnimator.start(), 0);
+                AndroidUtilities.runOnUIThread(() -> {
+                    if (showAnimator == preparedAnimator && isAttached && HwEmojis.isOwner(SelectAnimatedEmojiDialog.this)) {
+                        preparedAnimator.start();
+                    }
+                }, 0);
             }, true);
 
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.stopAllHeavyOperations, 512);

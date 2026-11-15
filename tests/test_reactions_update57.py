@@ -177,3 +177,20 @@ def test_detached_chat_does_not_remove_another_fragments_reaction_overlay():
     detach=method(view,'protected void onDetachedFromWindow()')
     assert 'ReactionsEffectOverlay.dismissByFragment(ChatActivity.this)' in detach
     assert 'ReactionsEffectOverlay.removeCurrent(true)' not in detach
+
+
+def test_queued_emoji_animation_start_ignores_detached_or_replaced_owner(tmp_path):
+    s=(JAVA/'org/telegram/ui/SelectAnimatedEmojiDialog.java').read_text()
+    guard=method(s,'if (showAnimator == preparedAnimator && isAttached')
+    probe(tmp_path,{'Probe.java':'''public class Probe{
+ static class ValueAnimator{int starts;void start(){starts++;}}
+ static class HwEmojis{static Object owner;static boolean isOwner(Object o){return owner==o;}}
+ static class SelectAnimatedEmojiDialog{
+  boolean isAttached=true;ValueAnimator showAnimator;void fire(ValueAnimator preparedAnimator){GUARD}
+ }
+ static void check(boolean b){if(!b)throw new AssertionError();}
+ public static void main(String[]args){var p=new SelectAnimatedEmojiDialog();var expected=new ValueAnimator();p.showAnimator=expected;HwEmojis.owner=p;p.fire(expected);check(expected.starts==1);
+ p.showAnimator=null;p.fire(expected);check(expected.starts==1);p.showAnimator=new ValueAnimator();p.fire(expected);check(expected.starts==1);
+ p.showAnimator=expected;p.isAttached=false;p.fire(expected);check(expected.starts==1);p.isAttached=true;HwEmojis.owner=new Object();p.fire(expected);check(expected.starts==1);
+ }
+}'''.replace('GUARD',guard)})
