@@ -19092,7 +19092,7 @@ public class ChatActivity extends BaseFragment implements
             }
             emojiAnimationsOverlay.onDetachedFromWindow();
             AndroidUtilities.runOnUIThread(() -> {
-                ReactionsEffectOverlay.removeCurrent(true);
+                ReactionsEffectOverlay.dismissByFragment(ChatActivity.this);
             });
         }
 

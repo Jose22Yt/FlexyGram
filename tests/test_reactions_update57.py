@@ -169,3 +169,11 @@ public class Probe{
  }
 }'''.replace('PREPARE',prepare)
     })
+
+
+def test_detached_chat_does_not_remove_another_fragments_reaction_overlay():
+    s=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
+    view=s[s.index('public class ChatActivityFragmentView extends SizeNotifierFrameLayout'):]
+    detach=method(view,'protected void onDetachedFromWindow()')
+    assert 'ReactionsEffectOverlay.dismissByFragment(ChatActivity.this)' in detach
+    assert 'ReactionsEffectOverlay.removeCurrent(true)' not in detach
