@@ -2422,10 +2422,10 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 nameWidth -= Theme.dialogs_halfCheckDrawable.getIntrinsicWidth() - dp(8);
                 if (!LocaleController.isRTL) {
                     halfCheckDrawLeft = timeLeft - timeLeftOffset - w;
-                    checkDrawLeft = halfCheckDrawLeft - dp(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? 4f : 5.5f);
+                    checkDrawLeft = halfCheckDrawLeft - dp((org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) ? 4f : 5.5f);
                 } else {
                     checkDrawLeft = timeLeft + timeWidth + dp(5);
-                    halfCheckDrawLeft = checkDrawLeft + dp(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? 4f : 5.5f);
+                    halfCheckDrawLeft = checkDrawLeft + dp((org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) ? 4f : 5.5f);
                     nameLeft += w + Theme.dialogs_halfCheckDrawable.getIntrinsicWidth() - dp(8);
                 }
             } else {
@@ -4612,7 +4612,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 }
 
                 if (lastTopicMessageUnread && topMessageTopicEndIndex != topMessageTopicStartIndex && (dialogsType == DialogsActivity.DIALOGS_TYPE_DEFAULT || dialogsType == DialogsActivity.DIALOGS_TYPE_FOLDER1 || dialogsType == DialogsActivity.DIALOGS_TYPE_FOLDER2)) {
-                    int topicSurfaceColor = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+                    int topicSurfaceColor = (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)
                             ? Theme.getColor(Theme.key_actionBarTabLine, resourcesProvider) : currentMessagePaint.getColor();
                     canvasButton.setColor(app.flexygram.home.SignatureTopicAccent.overlay(topicSurfaceColor, Theme.isCurrentThemeDark()));
                     if (!buttonCreated) {

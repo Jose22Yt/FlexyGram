@@ -29,8 +29,9 @@ public final class FlexyStyleInstallHelper {
     private static Uri externalUri;
     private static WeakReference<Activity> externalOwner;
     private FlexyStyleInstallHelper(){}
-    public static boolean recognized(String name){return StudioSchema.filename(name);}
+    public static boolean recognized(String name){if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return false;return StudioSchema.filename(name);}
     public static boolean isStudioIntent(Intent intent) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return false;
         if(intent==null||!Intent.ACTION_VIEW.equals(intent.getAction()))return false;
         Uri uri=intent.getData();if(uri==null||uri.getAuthority()==null||!"content".equals(uri.getScheme()))return false;
         return StudioSchema.MIME.equals(intent.getType())||recognized(uri.getLastPathSegment());
@@ -79,6 +80,7 @@ public final class FlexyStyleInstallHelper {
         if(source instanceof SharedDocumentCell)((SharedDocumentCell)source).updateFileExistIcon(true);
     }
     public static void openUri(BaseFragment fragment,Uri uri) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         if(uri==null||uri.getAuthority()==null||!"content".equals(uri.getScheme())){error(fragment,R.string.FlexyStudioInvalid);return;}
         cancel(fragment);Request request=new Request(fragment,fragment.getFragmentView());request.uri=uri;pending.put(fragment,request);request.read();
     }

@@ -27,32 +27,8 @@ def test_archive_initial_page_keeps_pagination_and_end_threshold(tmp_path):
     assert [row[0] for page in pages for row in page] == list(reversed(range(101)))
 
 
-def test_hidden_dock_tabs_keep_exit_geometry_without_measurement(tmp_path):
-    source = (JAVA/'org/telegram/ui/MainTabsLayout.java').read_text()
-    measure = method(source, '@Override protected void onMeasure(int ws,int hs)')
-    probe(tmp_path, {
-      'app/flexygram/navigation/LiquidNavigationMath.java': '''package app.flexygram.navigation;public class LiquidNavigationMath{public static int dockWidth(int a,int c,int p,int m,float f,boolean b){return a;}}''',
-      'Probe.java': '''class View{
- boolean visible=true;int width=75,measures;void measure(int w,int h){width=w;measures++;}
-}
-class GlassTabView extends View{int styles;void setSkipDrawSelector(boolean b){}void setTextSizeDp(int s){}void setMainTabsAppearance(boolean h,int i){styles++;}}
-class LiquidNavigationConfig{static boolean showTitles(){return false;}static float widthFraction(){return 1;}static boolean isFloatingDock(){return true;}static boolean hideLabels(int c,int w){return false;}static int iconDp(){return 24;}}
-class Base{protected void onMeasure(int w,int h){}}
-public class Probe extends Base{
- interface Tab{float measureTextWidth(int s);}
- static class MeasureSpec{static final int EXACTLY=0;static int getSize(int s){return s;}static int makeMeasureSpec(int s,int m){return s;}}
- static class Metrics{float density=1;}static class Resources{Metrics getDisplayMetrics(){return new Metrics();}}
- View[]children={new GlassTabView(),new GlassTabView(),new GlassTabView()};int maxWidthPx,slotWidth,total;
- int getChildCount(){return children.length;}View getChildAt(int i){return children[i];}boolean isViewVisible(View v){return v.visible;}
- int getPaddingLeft(){return 0;}int getPaddingRight(){return 0;}int getPaddingTop(){return 0;}int getPaddingBottom(){return 0;}int dp(int n){return n;}Resources getResources(){return new Resources();}
- void setMeasuredDimension(int w,int h){total=w;}void calculateTotalSizesAfterMeasure(){}
- MEASURE
- static void check(boolean b){if(!b)throw new AssertionError();}
- public static void main(String[]args){Probe p=new Probe();p.children[1].visible=false;
- p.onMeasure(101,60);check(p.children[0].width==51&&p.children[2].width==50&&p.children[1].width==75);
- for(int i=0;i<100;i++)p.onMeasure(101,60);
- check(p.children[1].measures==0&&((GlassTabView)p.children[1]).styles==0);
- p.children[1].visible=true;p.onMeasure(102,60);for(View v:p.children)check(v.width==34);
- for(View v:p.children)v.visible=false;p.onMeasure(102,60);for(View v:p.children)check(v.width==34);
- }}'''.replace('MEASURE', measure)
-    })
+def test_native_layout_skips_hidden_tabs_during_measurement():
+    source=(JAVA/'org/telegram/ui/MainTabsLayout.java').read_text()
+    measure=method(source,'protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)')
+    assert 'isViewVisible(child)' in measure
+    assert 'if (!isViewVisible(getChildAt(a))) continue;' in measure

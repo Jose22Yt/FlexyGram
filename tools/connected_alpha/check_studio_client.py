@@ -9,7 +9,7 @@ SDK=Path(os.environ.get('ANDROID_HOME',str(ROOT.parent/'.flexygram/android-sdk')
 with tempfile.TemporaryDirectory(prefix='studio-client-') as tmp:
  src=Path(tmp)/'src';src.mkdir();write_stubs(src,ROOT)
  # Keep production client logic and declared native API doubles, not Android UI classes.
- keep={'HomeStyleConfig.java','StudioImportPlan.java','StudioClientBackup.java','StudioClientCatalog.java','StudioCodec.java','StudioSchema.java','StudioTransaction.java','ConfigItem.java','NekoConfig.java','NaConfig.java','OpenExteraConfig.java','AppearanceConfig.java','ChatsConfig.java','GeneralConfig.java','IconPacksConfig.java','PillStackConfig.java','UtilsConfig.java','SharedConfig.java','LiteMode.java','LauncherIconController.java','BubbleInteractionSettings.java','InlineConversionConfig.java','LiquidNavigationConfig.java','SignatureSmartPreviews.java','BubbleConfig.java','HeaderConfig.java','GlyphConfig.java','IconPackManager.java'}
+ keep={'BuildConfig.java','HomeStyleConfig.java','StudioImportPlan.java','StudioClientBackup.java','StudioClientCatalog.java','StudioCodec.java','StudioSchema.java','StudioTransaction.java','ConfigItem.java','NekoConfig.java','NaConfig.java','OpenExteraConfig.java','AppearanceConfig.java','ChatsConfig.java','GeneralConfig.java','IconPacksConfig.java','PillStackConfig.java','UtilsConfig.java','SharedConfig.java','LiteMode.java','LauncherIconController.java','BubbleInteractionSettings.java','InlineConversionConfig.java','LiquidNavigationConfig.java','SignatureSmartPreviews.java','BubbleConfig.java','HeaderConfig.java','GlyphConfig.java','IconPackManager.java'}
  for p in src.rglob('*.java'):
   if p.name not in keep:p.unlink()
  def put(path,data):

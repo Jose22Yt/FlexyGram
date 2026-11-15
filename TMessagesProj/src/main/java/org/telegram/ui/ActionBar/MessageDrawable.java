@@ -47,7 +47,7 @@ public class MessageDrawable extends Drawable {
     private int previewBubbleShape = -1;
     public void setFlexyBubbleShapePreview(int shape) { previewBubbleShape = app.flexygram.bubbles.BubbleConfig.normalizeShape(shape); }
     private int bubbleShape() {
-        return previewBubbleShape >= 0 ? previewBubbleShape : org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+        return previewBubbleShape >= 0 ? previewBubbleShape : (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)
                 ? app.flexygram.bubbles.BubbleConfig.shape() : app.flexygram.bubbles.BubbleConfig.TELEGRAM;
     }
     /** Kept for old preview callers; skins no longer alter the native geometry or finish. */

@@ -20,9 +20,16 @@ public final class Settings3Registry {
         new Entry("universal",R.string.Settings3Group_system,R.string.Settings3_universal,R.string.Settings3Desc_universal,R.drawable.fg_dm_sistema),
         new Entry("studio",R.string.Settings3Group_system,R.string.Settings3_studio,R.string.Settings3Desc_studio,R.drawable.fg_dm_flexystudio),
         new Entry("about",R.string.Settings3Group_information,R.string.Settings3_about,R.string.Settings3Desc_about,R.drawable.fg_dm_acerca_de)));
-    public static List<Entry> all(){return ENTRIES;}
+    private static final List<Entry> NATIVE_ENTRIES = nativeEntries();
+    private static List<Entry> nativeEntries() {
+        List<Entry> result = new ArrayList<>();
+        for (Entry entry : ENTRIES) if (!"studio".equals(entry.id) && !"flexyfiles".equals(entry.id)) result.add(entry);
+        return Collections.unmodifiableList(result);
+    }
+    public static List<Entry> all(){return org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? NATIVE_ENTRIES : ENTRIES;}
     public static Entry entry(String id){for(Entry e:ENTRIES)if(e.id.equals(id))return e;throw new IllegalArgumentException("Unknown Settings3 category");}
     public static BaseFragment open(String id){
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && ("studio".equals(id)||"flexyfiles".equals(id))) return new app.exteraless.settings.OpenExteraGeneralActivity();
         if("studio".equals(id))return new app.flexygram.studio.FlexyStudioActivity();
         if("flexyfiles".equals(id))return new SignatureFlexyFilesActivity();
         if("files".equals(id)){app.exteraless.settings.OpenExteraGeneralActivity f=new app.exteraless.settings.OpenExteraGeneralActivity();f.useSignatureSettingsPage("general","files",R.string.Settings3_files);return f;}

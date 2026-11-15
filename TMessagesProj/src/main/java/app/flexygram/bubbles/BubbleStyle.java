@@ -3,12 +3,12 @@ package app.flexygram.bubbles;
 /** Pure bounded presentation policy. Native message layout/selection/media are unchanged. */
 public final class BubbleStyle {
     public static boolean signature() {
-        return org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && (BubbleConfig.shape() != BubbleConfig.TELEGRAM
+        return (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) && (BubbleConfig.shape() != BubbleConfig.TELEGRAM
                 || BubbleConfig.surfaceEffect() != BubbleConfig.DEFAULT || BubbleConfig.outlineEnabled()
                 || BubbleConfig.backgroundBlur() || BubbleConfig.transparency() != 0);
     }
-    public static boolean flexyShape() { return org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && BubbleConfig.shape() == BubbleConfig.FLEXYGRAM; }
-    public static boolean customShape() { return org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && BubbleConfig.shape() != BubbleConfig.TELEGRAM; }
+    public static boolean flexyShape() { return (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) && BubbleConfig.shape() == BubbleConfig.FLEXYGRAM; }
+    public static boolean customShape() { return (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) && BubbleConfig.shape() != BubbleConfig.TELEGRAM; }
     private BubbleStyle() { }
     public static int transparency(int percent) { return Math.max(0, Math.min(100, percent)); }
     // Only fill alpha changes. Text, media, selection and contour keep their own alpha.

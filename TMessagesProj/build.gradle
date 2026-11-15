@@ -7,7 +7,7 @@ plugins {
     id 'com.google.firebase.crashlytics'
     id 'com.chaquo.python'
     id 'org.telegram.lottie-meta'
-    id 'app.flexygram.fast-motion'
+    // Native baseline: do not rewrite Android animation entry points.
     id 'idea'
 }
 
@@ -194,6 +194,7 @@ android {
         manifestPlaceholders += [MAPS_API_KEY: mapsKey, GLYPH_API_KEY: glyphKey]
 
         buildConfigField 'boolean', 'CONNECTED_ALPHA', 'true'
+        buildConfigField 'boolean', 'NATIVE_BASELINE_TEST', 'true'
         buildConfigField 'String', 'ALPHA_GOOGLE_AUTH_CLIENT_ID', '"' + (properties?.getProperty('ALPHA_GOOGLE_AUTH_CLIENT_ID') ?: System.getenv('ALPHA_GOOGLE_AUTH_CLIENT_ID') ?: '') + '"'
         buildConfigField 'String', 'BUILD_VERSION_STRING', '"' + APP_VERSION_NAME + '"'
         buildConfigField 'String', 'BUILD_COMMIT_ID', '"' + shortCommit + '"'

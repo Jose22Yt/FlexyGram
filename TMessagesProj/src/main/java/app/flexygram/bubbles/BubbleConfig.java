@@ -28,6 +28,17 @@ public final class BubbleConfig {
         reload();
     }
     public static void reload() {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) {
+            shape = TELEGRAM;
+            customizationEnabled = false;
+            surfaceEffect = DEFAULT;
+            smallTimestamps = glass = border = edges = cachedBlur = false;
+            transparency = 0;
+            outlineEnabled = fuseGlass = false;
+            fusionMode = 0;
+            loaded = true;
+            return;
+        }
         SharedPreferences p = preferences();
         surfaceEffect = normalizeSurfaceEffect(p.getInt(SURFACE_EFFECT, DEFAULT));
         int savedShape = p.getInt(SHAPE, -1);

@@ -164,8 +164,8 @@ public class AnimatedFloat {
     public float getValue() {
         if (transition) {
             final long now = SystemClock.elapsedRealtime();
-            final long delay = app.flexygram.animation.FastMotionTiming.delay(transitionDelay);
-            final long duration = app.flexygram.animation.FastMotionTiming.duration(transitionDuration);
+            final long delay = transitionDelay;
+            final long duration = transitionDuration;
             final float t = MathUtils.clamp((now - transitionStart - delay) / (float) duration, 0, 1);
             if (now - transitionStart >= delay) {
                 if (transitionInterpolator == null) {
@@ -209,8 +209,8 @@ public class AnimatedFloat {
             return 0;
         }
         final long now = SystemClock.elapsedRealtime();
-        return MathUtils.clamp((now - transitionStart - app.flexygram.animation.FastMotionTiming.delay(transitionDelay))
-                / (float) app.flexygram.animation.FastMotionTiming.duration(transitionDuration), 0, 1);
+        return MathUtils.clamp((now - transitionStart - transitionDelay)
+                / (float) transitionDuration, 0, 1);
     }
 
     public float getTransitionProgressInterpolated() {

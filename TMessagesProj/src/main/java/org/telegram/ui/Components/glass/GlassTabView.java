@@ -345,6 +345,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
 
     /** Original glyph endpoints; tab selection retains the existing FlexyGram timing. */
     private static int originalTabAsset(TabAnimation animation) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return 0;
         switch (animation) {
             case CONTACTS: return app.flexygram.icons.IosOriginalAssets.TAB_CONTACTS;
             case CALLS: return app.flexygram.icons.IosOriginalAssets.TAB_CALLS;

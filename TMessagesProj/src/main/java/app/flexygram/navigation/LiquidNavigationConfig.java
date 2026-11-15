@@ -34,6 +34,7 @@ public final class LiquidNavigationConfig {
 
     public static void reload() { load(); notifyChanged(); }
     public static void load() {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) { loaded = true; enabled = false; activeOrder = LiquidNavigationDestinations.defaults(); return; }
         if (ApplicationLoader.applicationContext == null) return;
         SharedPreferences p = prefs();
         if (!p.getBoolean("home_defaults_v2", false)) {
@@ -76,11 +77,13 @@ public final class LiquidNavigationConfig {
     }
 
     public static boolean configured() {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return false;
         ensure();
         return enabled;
     }
 
     public static boolean isEnabled() {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return false;
         ensure();
         return enabled;
     }
@@ -185,6 +188,7 @@ public final class LiquidNavigationConfig {
     }
 
     public static boolean isVisible() {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return false;
         ensure();
         return enabled && order().length > 0;
     }

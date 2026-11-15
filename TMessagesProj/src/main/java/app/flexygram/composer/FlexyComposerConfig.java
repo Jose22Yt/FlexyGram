@@ -30,7 +30,7 @@ public final class FlexyComposerConfig {
         return p.getInt(ICONS,0)!=1;
     }
     public static void setReferenceIcons(boolean reference) { preferences().edit().putInt(ICONS, reference ? 0 : 1).putBoolean("reference_icons_restored_v1",true).apply(); }
-    public static boolean glass() { return preferences().getBoolean(GLASS, false); }
+    public static boolean glass() { if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return false; return preferences().getBoolean(GLASS, false); }
     public static int position() { return ComposerStyle.position(preferences().getInt(POSITION, 0)); }
     public static int level() { return ComposerStyle.level(preferences().getInt(LEVEL, 0)); }
     public static int gap() { return ComposerStyle.gap(level(), preferences().getInt(GAP, 0)); }

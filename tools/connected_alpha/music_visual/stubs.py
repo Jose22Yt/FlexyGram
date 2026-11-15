@@ -37,7 +37,7 @@ public static int getColor(int k,ResourcesProvider r){if(r!=null)return r.getCol
 public static Drawable getSelectorDrawable(boolean v){return new ColorDrawable(0);}
 public static Drawable createSelectorDrawable(int c,int mask){android.graphics.drawable.GradientDrawable shape=new android.graphics.drawable.GradientDrawable();shape.setColor(0xffffffff);if(mask==RIPPLE_MASK_CIRCLE_20DP)shape.setShape(1);return new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(c),null,shape);}
 }''')
-    put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger; public class BuildConfig {public static boolean CONNECTED_ALPHA=true;}')
+    put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger; public class BuildConfig {public static final boolean NATIVE_BASELINE_TEST=false;public static boolean CONNECTED_ALPHA=true;}')
     put('org/telegram/messenger/AndroidUtilities.java','''package org.telegram.messenger; public class AndroidUtilities {
 public static int dp2(float v){return dp(v);}public static float density=1;public static int dp(float v){return (int)Math.ceil(density*v);} public static float dpf2(float v){return density*v;}
 public static android.graphics.Point displaySize=new android.graphics.Point(400,800);

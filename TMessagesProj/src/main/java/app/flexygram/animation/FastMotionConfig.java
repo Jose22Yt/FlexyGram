@@ -13,6 +13,11 @@ public final class FastMotionConfig {
     };
     private FastMotionConfig() {}
     public static synchronized void load() {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) {
+            FastMotionTiming.setSystemScaleProvider(FastMotion::systemScale);
+            FastMotion.setEnabled(false);
+            return;
+        }
         Context context = ApplicationLoader.applicationContext;
         if (context == null) return;
         SharedPreferences next = context.getApplicationContext().getSharedPreferences(FILE, Context.MODE_PRIVATE);
@@ -26,6 +31,7 @@ public final class FastMotionConfig {
     }
     public static boolean isEnabled() { load(); return FastMotionTiming.isEnabled(); }
     public static synchronized void setEnabled(boolean value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) { FastMotion.setEnabled(false); return; }
         load();
         FastMotion.setEnabled(value);
         if (preferences != null) preferences.edit().putBoolean(KEY, value).apply();

@@ -423,7 +423,7 @@ public class ReactionsEffectOverlay {
                 if (animationType == ONLY_MOVE_ANIMATION || (wasScrolled && animationType == LONG_ANIMATION) || (animationType != SHORT_ANIMATION && (emojiImageView.wasPlaying && emojiImageView.getImageReceiver().getLottieAnimation() != null && !emojiImageView.getImageReceiver().getLottieAnimation().isRunning()) || (visibleReaction.documentId != 0 && System.currentTimeMillis() - startTime > 2000)) ||
                         (animationType == SHORT_ANIMATION && (effectImageView.wasPlaying && (effectImageView.getImageReceiver().getLottieAnimation() != null && !effectImageView.getImageReceiver().getLottieAnimation().isRunning())) || (visibleReaction.documentId != 0 && System.currentTimeMillis() - startTime > 2000))) {
                     if(animationType==SHORT_ANIMATION)ReactionsEffectOverlay.this.animateOutProgress=1f;
-                    else if(isStories||emojiImageView.hasDrawnFrame||emojiStaticImageView.hasDrawnFrame)ReactionsEffectOverlay.this.animateOutProgress=ReactionMotion.advance(ReactionsEffectOverlay.this.animateOutProgress,frameMs,isStories?(animationType==ONLY_MOVE_ANIMATION?350f:220f):(animationType==ONLY_MOVE_ANIMATION?ReactionMotion.FLY_DURATION_MS:ReactionMotion.LAND_DURATION_MS));
+                    else if(isStories||emojiImageView.hasDrawnFrame||emojiStaticImageView.hasDrawnFrame)ReactionsEffectOverlay.this.animateOutProgress=ReactionMotion.advance(ReactionsEffectOverlay.this.animateOutProgress,frameMs,isStories?(animationType==ONLY_MOVE_ANIMATION?350f:220f):(animationType==ONLY_MOVE_ANIMATION?(org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST?350f:ReactionMotion.FLY_DURATION_MS):(org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST?220f:ReactionMotion.LAND_DURATION_MS)));
                 }
 
                 float animateInProgressX, animateInProgressY;
@@ -438,7 +438,7 @@ public class ReactionsEffectOverlay {
                     animateInProgressX = animateInProgressY = animateInProgress;
                 }
 
-                if(!isStories){
+                if(!isStories && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST){
                     float progress=animationType==ONLY_MOVE_ANIMATION?ReactionsEffectOverlay.this.animateOutProgress:animateInProgress;
                     animateInProgressX=animateInProgressY=ReactionMotion.ease(progress);
                     animateOutProgress=ReactionMotion.ease(ReactionsEffectOverlay.this.animateOutProgress);
@@ -469,10 +469,10 @@ public class ReactionsEffectOverlay {
                     scale = fromScale * (1f - animateInProgressX) + toScale * animateInProgressX;
                     x = flightFromX * (1f - animateInProgressX) + toX * animateInProgressX;
                     y = flightFromY * (1f - animateInProgressY) + toY * animateInProgressY;
-                    if(!isStories)y-=ReactionMotion.lift(ReactionsEffectOverlay.this.animateOutProgress,Math.min(AndroidUtilities.dp(20),Math.abs(toX-flightFromX)*.08f));
+                    if(!isStories && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)y-=ReactionMotion.lift(ReactionsEffectOverlay.this.animateOutProgress,Math.min(AndroidUtilities.dp(20),Math.abs(toX-flightFromX)*.08f));
                 } else {
                     if (animateOutProgress != 0) {
-                        if(!isStories){
+                        if(!isStories && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST){
                             if(!landingStarted){landingStarted=true;landingX=x;landingY=y;landingScale=scale;}
                             x=landingX;y=landingY;scale=landingScale;
                         }

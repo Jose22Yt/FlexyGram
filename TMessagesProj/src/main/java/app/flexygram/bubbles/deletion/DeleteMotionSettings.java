@@ -21,6 +21,7 @@ public final class DeleteMotionSettings {
     }
 
     public static int get(Context context) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return DEFAULT;
         return sanitize(context.getApplicationContext()
                 .getSharedPreferences(FILE, Context.MODE_PRIVATE).getInt(KEY, DEFAULT));
     }
@@ -32,6 +33,7 @@ public final class DeleteMotionSettings {
     }
 
     public static boolean effectsAllowed() {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return false;
         // The native preference, accessibility and battery saver remain authoritative.
         return org.telegram.messenger.SharedConfig.animationsEnabled()
                 && !org.telegram.messenger.AndroidUtilities.isAccessibilityScreenReaderEnabled()

@@ -46,20 +46,11 @@ public class UnreadGeometryProbe {
         result=subprocess.check_output(['java','-cp',tmp,'UnreadGeometryProbe'],text=True)
         assert 'PASS 1920' in result
 
-def test_native_glass_source_can_survive_explicit_setting_changes():
-    chat=src('org/telegram/ui/ChatActivity.java')
-    constructor=chat[chat.index('public ChatActivity(Bundle args)'):chat.index('navbarContentDrawableFactory = new',chat.index('public ChatActivity(Bundle args)'))]
-    assert 'if (LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS))' not in constructor
-    assert 'SharedConfig.chatBlurEnabled()' in constructor  # keep master blur/capability gate
-    lite=src('org/telegram/messenger/LiteMode.java')
-    setter=lite[lite.index('public static void setAllFlags'):lite.index('public static void updatePresets')]
-    assert 'previous != flags' in setter and 'dispatchPowerPolicyListeners' in setter
-    assert 'onPowerSaverAppliedListeners.contains(callback)' in lite
-    bar=src('org/telegram/ui/ActionBar/ActionBar.java')
-    assert '!canvas.isHardwareAccelerated()' in bar and '!org.telegram.messenger.SharedConfig.chatBlurEnabled()' in bar
-    assert 'signatureGlassUnread.draw(canvas)' in bar
-    assert 'if (signatureUnreadGlassRadius == radius) return;' in bar
-    assert 'if (glassRadius != radius)' in src('org/telegram/ui/MainTabsLayout.java')
+def test_native_dock_retains_original_background_and_visibility_policy():
+    host=src('org/telegram/ui/MainTabsActivity.java');dock=src('org/telegram/ui/MainTabsLayout.java')
+    assert 'MainTabsUiHelper.applyTabsLayoutStyle' in host
+    assert 'setBottomNavigationMode' in dock and 'isBottomNavigationHidden' in dock
+    assert 'applyFlexyTabs' not in host
 
 def test_launcher_nested_selector_remains_touch_enabled_and_errors_do_not_select():
     assert 'isEnabled(RecyclerView.ViewHolder h){return true;}' in src('app/flexygram/settings/signature/SignatureLauncherSettingsActivity.java')
@@ -79,55 +70,21 @@ def test_launcher_nested_selector_remains_touch_enabled_and_errors_do_not_select
     enabled=[k for k,a in aliases.items() if a.get(ns+'enabled')=='true']
     assert enabled==['org.telegram.messenger.FlexyGlossyIcon']
 
-def test_dock_is_a_clipped_native_rendernode_not_a_translucency_simulation():
+def test_trial_dock_does_not_allocate_the_flexy_glass_engine():
     host=src('org/telegram/ui/MainTabsActivity.java')
-    assert 'new BlurredBackgroundSourceRenderNode(iBlur3SourceColor)' in host
-    assert 'source.draw(canvas, dockX - fragmentPosition.left' in host
-    assert 'iBlur3SourceTabGlass.setBlur(' not in host
-    assert 'tabsViewWrapper.getMeasuredHeight()' in host
-    assert 'canvas.clipRect(0, 0, width, height)' in host
-    assert 'viewPager.draw(canvas)' not in host
-    assert 'child == viewPager && SharedConfig.chatBlurEnabled()' in host
-    assert 'hash.add(tabsGlassRevision)' in host
-    assert 'Bitmap.createBitmap' not in host
-    assert 'postInvalidateOnAnimation' not in host
-    layout=src('org/telegram/ui/MainTabsLayout.java')
-    assert 'canvas.isHardwareAccelerated()' in layout and 'glassBackground.draw(canvas)' in layout
-    assert 'surface.draw(canvas)' in layout and 'drawable.setCallback(this)' in layout
+    assert 'dockGlassColors' not in host and 'separateSearchGlass' not in host
+    assert 'MainTabsUiHelper' in host and 'new MainTabsLayout' in host
 
-def test_search_is_independent_and_removes_only_the_duplicate_destination():
-    config=src('app/flexygram/navigation/LiquidNavigationConfig.java')
-    assert 'p.getBoolean("separate_search", false)' in config
-    assert '.filter(id -> id != LiquidNavigationDestinations.SEARCH)' in config
+def test_trial_has_no_flexy_search_destination_or_saved_order():
     host=src('org/telegram/ui/MainTabsActivity.java')
-    assert 'tabsViewWrapper.addView(separateSearchButton' in host
-    assert 'separateSearchButton.setOnClickListener(v -> openChatsSearch())' in host
-    assert 'separateSearchButton.setContentDescription' in host
-    assert 'final int rightMargin = LocaleController.isRTL ? 0 : reservedSearch' in host
-    assert 'dockParams.leftMargin != leftMargin || dockParams.rightMargin != rightMargin' in host
-    assert 'separateSearchButton.setVisibility(separate ? View.VISIBLE : View.GONE)' in host
-    dialogs=src('org/telegram/ui/DialogsActivity.java')
-    assert 'actionBar.isSearchFieldVisible()) return' in dialogs
-    assert 'separateSearchHidTopItem' in dialogs
+    assert 'separateSearchButton' not in host and 'flexyConfiguredDestinations' not in host
+    assert 'public void openChatsSearch()' in host
 
-def test_theme_refreshes_retained_tabs_and_original_glare_key_is_preserved():
+def test_trial_uses_upstream_theme_delegates_and_default_contour():
     host=src('org/telegram/ui/MainTabsActivity.java')
-    assert 'AndroidUtilities.cancelRunOnUIThread(refreshTabsTheme)' in host
-    assert 'AndroidUtilities.runOnUIThread(refreshTabsTheme)' in host
-    assert 'dockGlassColors.updateColors()' in host
-    filters=src('org/telegram/ui/Components/FilterTabsView.java')
-    update=filters[filters.index('    public void updateColors()'):filters.index('    protected void onMeasure',filters.index('    public void updateColors()'))]
-    assert 'selectorDrawable.setColor' in update and 'Theme.getColor(selectorColorKey, resourcesProvider)' in update
-    for path in ['TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt','TMessagesProj/src/main/java/app/flexygram/effects/GlareMode.java']:
-        current=(ROOT/path).read_bytes()
-        if path.endswith('AppearanceConfig.kt'):
-            getter=b'\n    /** Native metadata only; account/session preferences are not part of this catalog. */\n    fun getStudioItems(): List<ConfigItem> = configs.toList()\n'
-            assert current.count(getter)==1
-            from test_glare_effects import without_width_extension
-            current=without_width_extension(current.replace(getter,b'').decode()).encode()
-        if path.endswith('GlareMode.java'):
-            current=current.replace(b',MICRO=3',b'').replace(b'case 3:return MICRO;',b'').replace(b'case MICRO:return 3;',b'')
-        assert current==subprocess.check_output(['git','show','bf96667efac14d0cbbf6677471890a366c3ef3c0:'+path],cwd=ROOT)
+    assert 'ThemeDescription' in host and 'blur3_updateColors' in host
+    appearance=(ROOT/'TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt').read_text()
+    assert 'BuildConfig.NATIVE_BASELINE_TEST) return 0' in appearance
 
 def test_transformed_reaction_preview_does_not_use_source_row_clip():
     chat=src('org/telegram/ui/ChatActivity.java')

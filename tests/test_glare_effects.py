@@ -17,7 +17,7 @@ def test_no_preference_migration_or_backend_replacement():
   if p.endswith('AppearanceConfig.kt'):
    getter='\n    /** Native metadata only; account/session preferences are not part of this catalog. */\n    fun getStudioItems(): List<ConfigItem> = configs.toList()\n'
    assert current.count(getter)==1
-   current=without_width_extension(current.replace(getter,''))
+   current=without_width_extension(current.replace(getter,'').replace('        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return 0\n',''))
   if p.endswith('GlassOutlineStyle.java'):
    current=current.replace('    HIDDEN,\n    /** Fine translucent black rim, appended to preserve existing ordinals. */\n    MICRO;', '    HIDDEN;')
   assert current==subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT,text=True)

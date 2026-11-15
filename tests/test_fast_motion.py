@@ -44,10 +44,11 @@ def test_actual_animated_float_finishes_at_its_fixed_deadline_without_idle_redra
       'Probe.java':'''import org.telegram.ui.Components.AnimatedFloat;import android.os.SystemClock;
 public class Probe {public static void main(String[]args){app.flexygram.animation.FastMotionTiming.setEnabled(true);int[] invalid={0};AnimatedFloat a=new AnimatedFloat((Runnable)()->invalid[0]++);a.setDuration(300);a.set(0);a.set(1);
  if(!a.isInProgress()||a.getDuration()!=300)throw new AssertionError("public nominal duration");
- SystemClock.now=3;if(a.getValue()!=1||a.isInProgress())throw new AssertionError("3ms target");int idle=invalid[0];
+ SystemClock.now=3;if(a.getValue()>=1||!a.isInProgress())throw new AssertionError("native animation was shortened");
+ SystemClock.now=300;if(a.getValue()!=1||a.isInProgress())throw new AssertionError("300ms native target");int idle=invalid[0];
  for(int i=0;i<1000;i++)a.getValue();if(invalid[0]!=idle)throw new AssertionError("idle redraws");
- a.setDelay(200);a.set(0);SystemClock.now=4;if(a.getValue()!=1)throw new AssertionError("early delay");
- SystemClock.now=8;if(a.getValue()!=0||a.isInProgress())throw new AssertionError("delay+transition deadline");
+ a.setDelay(200);a.set(0);SystemClock.now=400;if(a.getValue()!=1)throw new AssertionError("early delay");
+ SystemClock.now=800;if(a.getValue()!=0||a.isInProgress())throw new AssertionError("delay+transition deadline");
  a.set(1,true);if(a.getValue()!=1||a.isInProgress())throw new AssertionError("force");
 }}'''}
     probe(tmp_path,files,[JAVA/'org/telegram/ui/Components/AnimatedFloat.java',JAVA/'app/flexygram/animation/FastMotionTiming.java'])

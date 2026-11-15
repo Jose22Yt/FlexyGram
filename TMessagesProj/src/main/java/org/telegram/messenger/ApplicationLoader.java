@@ -307,7 +307,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
             NaConfig.init();
             OpenExteraConfig.init();
             app.exteraless.icons.IconPacksConfig.init();
-            if (BuildConfig.CONNECTED_ALPHA) app.flexygram.studio.FlexyStudioStore.recoverIfNeeded();
+            if (BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) app.flexygram.studio.FlexyStudioStore.recoverIfNeeded();
             app.exteraless.pillstack.PillStackConfig.init();
             app.exteraless.appearance.AppearanceConfig.init();
             app.exteraless.chats.ChatsConfig.init();
@@ -536,7 +536,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         }
 
         super.onCreate();
-        app.flexygram.animation.FastMotionConfig.load();
+        // Native baseline: Android and the original UI own animation timing.
         installCrashReportFilter();
 
         // AndroidUtilities must be initialized before FileLog

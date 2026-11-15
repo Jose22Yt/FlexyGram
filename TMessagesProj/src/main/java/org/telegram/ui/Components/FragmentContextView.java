@@ -1467,7 +1467,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         removeObservers();
-        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !isLocation
+        if ((org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) && !isLocation
                 && (fragment.getArguments() == null || !fragment.getArguments().getBoolean("hasMainTabs", false))) {
             signatureMusicHost = new app.exteraless.player.SignatureMusicHost(fragment, resourcesProvider, () -> checkPlayer(false));
             signatureMusicHost.attach();

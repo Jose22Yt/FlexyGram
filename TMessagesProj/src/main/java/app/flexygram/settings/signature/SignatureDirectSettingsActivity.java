@@ -28,7 +28,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
     public SignatureDirectSettingsActivity(){}
     public SignatureDirectSettingsActivity(String category){Settings3Registry.entry(category);this.category=category;}
     public SignatureDirectSettingsActivity(String category,String segment){this(category);CompactSettingsPlan.page(category,segment);this.segment=segment;}
-    private boolean include(String id){return segment.equals(id);}
+    private boolean include(String id){return (!org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST || !java.util.Arrays.asList("glare","animations","bubbles","context","bottom_tabs","studio","flexyfiles").contains(id)) && segment.equals(id);}
     private void overview(){
         if(category.equals("chat"))links(new String[]{"composer_style","header_style","bubble_style","delete_motion","context"},new int[]{R.string.FlexyInterfaceLower,R.string.FlexyInterfaceUpper,R.string.FlexyBubblesTitle,R.string.FlexyDeleteTitle,R.string.FlexyMenuTitle},new int[]{R.drawable.fg_dm_interfaz_inferior,R.drawable.fg_dm_interfaz_superior,R.drawable.fg_dm_burbujas,R.drawable.fg_dm_borrador,R.drawable.fg_dm_menu_mensajes});
         if(category.equals("universal"))links(new String[]{"icon_packs","emoji","cloud","passcode"},new int[]{R.string.Settings2_icon_packs,R.string.Settings2_emoji,R.string.Settings2_cloud,R.string.Settings2_passcode},new int[]{R.drawable.fg_dm_packs_iconos,R.drawable.fg_dm_emoji,R.drawable.fg_dm_nube,R.drawable.fg_dm_codigo_acceso});
@@ -55,7 +55,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
     }
     private void links(String[] ids,int[] titles,int[] icons){
         java.util.ArrayList<String> names=new java.util.ArrayList<>();java.util.ArrayList<Integer> labels=new java.util.ArrayList<>(),glyphs=new java.util.ArrayList<>();
-        for(int i=0;i<ids.length;i++){if(ids[i].equals("passcode")&&tw.nekomimi.nekogram.helpers.PasscodeHelper.isSettingsHidden())continue;names.add(ids[i]);labels.add(titles[i]);glyphs.add(icons[i]);}
+        for(int i=0;i<ids.length;i++){if(org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && java.util.Arrays.asList("bubble_style","delete_motion","context","navigationEditor").contains(ids[i]))continue;if(ids[i].equals("passcode")&&tw.nekomimi.nekogram.helpers.PasscodeHelper.isSettingsHidden())continue;names.add(ids[i]);labels.add(titles[i]);glyphs.add(icons[i]);}
         int[] t=new int[labels.size()],g=new int[glyphs.size()];for(int i=0;i<t.length;i++){t[i]=labels.get(i);g[i]=glyphs.get(i);}add(new Settings3LinksSection(names.toArray(new String[0]),t,g));
     }
     private void build(){

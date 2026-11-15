@@ -69,7 +69,7 @@ def test_owned_strings_use_flexygram_and_legal_format_attribution_is_retained():
     base={e.get('name'):''.join(e.itertext()) for e in ET.parse(RES/'values/flexygram_settings_info.xml').getroot()}
     assert 'Exteraless' in base['FlexySettingsCreditsBody'] and 'GPL-3.0' in base['FlexySettingsCreditsBody']
     manifest=ET.parse(ROOT/'TMessagesProj/src/main/AndroidManifest.xml')
-    assert manifest.find('application').get('{http://schemas.android.com/apk/res/android}label')=='@string/NagramX'
+    assert manifest.find('application').get('{http://schemas.android.com/apk/res/android}label')=='FlexyGram Native Test'
     locale=(JAVA/'org/telegram/messenger/LocaleController.java').read_text()
     names=method(locale,'private String getStringInternal(String key, String fallback, int fallbackRes, int res)')
     assert names.index('key.equals("NagramX")')<names.index('localeValues.get(key)')

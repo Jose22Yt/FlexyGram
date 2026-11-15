@@ -41,15 +41,10 @@ def test_saf_export_retries_unsupported_or_null_truncate_stream(tmp_path):
  }}'''.replace('BODY',body)})
 
 
-def test_lowercase_file_association_keeps_the_existing_scoped_filter():
+def test_trial_has_no_studio_file_association():
     import xml.etree.ElementTree as ET
     ns='{http://schemas.android.com/apk/res/android}'
     root=ET.parse(ROOT/'TMessagesProj/src/main/AndroidManifest.xml').getroot()
-    activity=next(a for a in root.find('application').findall('activity') if a.get(ns+'name')=='org.telegram.ui.LaunchActivity')
-    filters=[f for f in activity.findall('intent-filter') if any('flexygram' in (d.get(ns+'pathPattern','')).lower() for d in f.findall('data'))]
-    assert len(filters)==1
-    paths={d.get(ns+'pathPattern') for d in filters[0].findall('data') if d.get(ns+'pathPattern')}
-    assert paths=={r'.*\\.flexyGram',r'.*\\.flexygram'}
-    for d in filters[0].findall('data'):
-        if d.get(ns+'pathPattern'):
-            assert d.get(ns+'scheme')=='content' and d.get(ns+'host')=='*'
+    for item in root.iter('data'):
+        assert '.flexygram' not in item.get(ns+'pathPattern','').lower()
+        assert 'application/vnd.flexygram.configuration' not in item.get(ns+'mimeType','')

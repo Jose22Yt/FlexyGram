@@ -23,6 +23,7 @@ public final class BubbleInteractionSettings {
     }
 
     public static int style(Context context) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return STYLE_DEFAULT;
         int value = cachedStyle;
         if (value >= 0) return value;
         SharedPreferences p = prefs(context);

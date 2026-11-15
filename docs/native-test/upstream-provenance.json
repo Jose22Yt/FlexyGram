@@ -1,0 +1,108 @@
+{
+  "repository": "https://github.com/exteraless/exteraless",
+  "commit": "2a308f49b41534a45198c35f5ed98079f102f057",
+  "telegram_version": "13.0.2",
+  "adaptations": [
+    "Player package renamed to app.exteraless.player.baseline to avoid loading the modified player",
+    "MainTabsActivity retains openChatsSearch compatibility, a Settings entry and visible-surface reporting",
+    "MainTabsUiHelper retains a compatibility height alias"
+  ],
+  "files": [
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/appearance/MainTabsUiHelper.java",
+      "upstream_sha256": "a2989fff8c2f50c113b191aeec7ae153bb02b2b18c7493baa1c81b41710ac235"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java",
+      "upstream_sha256": "61bfc5b91777692dd80f7f09f569ef54e310cc0d21a1c68c4762686c1595d3a7"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/CoverImage.java",
+      "upstream_sha256": "93d1c48966ea89824181d84a58ff2929a949e2ca19c31dea10b292f2f94e3416"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/Lyrics.java",
+      "upstream_sha256": "553e9f183c282d6063bc9ecfcdffa7b0b06ccbdf824d83cfcc92520c4d0e9972"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/LyricsView.java",
+      "upstream_sha256": "58a86b6e0ed75ee00990feb0d9842e3a88c37004d55d09886ef2d4dda9168668"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/Md3Player.java",
+      "upstream_sha256": "ddd738f785f8e022192e97fc5d7ee8d80efb987584dafa729339a756695f4a16"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/MorphButton.java",
+      "upstream_sha256": "7e43d6e7dc3d7734a1a1001f2d47b1735ac76ff0744a45166ea3498abf379ce2"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/OnlineLyrics.java",
+      "upstream_sha256": "58224b75bae82e7ac7cfcdefd7183e10c1873645f765829675cad47229052132"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/PlayerActions.java",
+      "upstream_sha256": "86334ed4f2c4a4c989d175f1ce2c8d79d4368ff7e0c3b1cc947a67b177103cd5"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/PlayerArt.java",
+      "upstream_sha256": "2498e0af0a003f36266302e0313ad746b1f6998183837aa49ebc8066d0fe4e19"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/PlayerBarView.java",
+      "upstream_sha256": "0c61cce89f9ccebf4121894bc276c545654251cad5a59f23593d8d28045e9906"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java",
+      "upstream_sha256": "7f041609591936770041a22fdf70646ed8b545670b53f84a3928d98c911ee5bf"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/PlayerIcon.java",
+      "upstream_sha256": "4db67dc02abaab86f9898c15c4e87983119372fcd58875699e08cf11f44148df"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/PlayerMiniView.java",
+      "upstream_sha256": "68b558fec634269b89dcf2c30301de279192dc8704aa6456229630b8c5c2dbfd"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/PlayerQueueSheet.java",
+      "upstream_sha256": "7aa288213f13c8c022d196bbaa1412e80475cd88e8d4d5f385fd828ce6ea46ed"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java",
+      "upstream_sha256": "5af08461e2d58d2e07dac135d0ba0089ab86506afc76482967014a44b107400f"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/PlayerStyle.java",
+      "upstream_sha256": "4aa6590f4191a46e214e790e3a8ca92ee5299da65b49d4b4e355962241fed971"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/PlayerStyleEditor.java",
+      "upstream_sha256": "021e39350ac5dfddde4f48e1575fbef8246ce89c9c07ebddf272fdd8912bc607"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/RingPlayButton.java",
+      "upstream_sha256": "dd81f913e7bab70608aca5276c49d9a2998de50777ef66eb00c3a81591f82169"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/SeekableFragmentsExtractorsFactory.java",
+      "upstream_sha256": "eb0beb732879c5fe6f603b455be72ded3b81c90ce52d32dcdbac8442cb8335fb"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/Spring.java",
+      "upstream_sha256": "2086043766b6feb8a14f2baeb379e45f218bb91106cf757720f21aedfbbeb8e2"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/WavySeekBar.java",
+      "upstream_sha256": "96f30a6298ea2b5d9787fcb2fdb23180a83f6ae0fda5dfb002661d62d8217a44"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/MainTabsActivity.java",
+      "upstream_sha256": "050919caf2067ce3ab5b0761d6eacb5b10f9cb28858527109b435d9d8c7dd1d0"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/MainTabsLayout.java",
+      "upstream_sha256": "2fde86f0682a3c39f33c87b406e7666749c4195b18e9552a8d77351dd9df2d37"
+    }
+  ]
+}

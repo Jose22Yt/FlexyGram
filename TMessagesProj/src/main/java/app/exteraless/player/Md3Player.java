@@ -19,10 +19,12 @@ public final class Md3Player {
     }
 
     public static boolean enabled() {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return app.exteraless.player.baseline.Md3Player.enabled();
         return BuildConfig.CONNECTED_ALPHA || AppearanceConfig.md3Player();
     }
 
     public static boolean miniEnabled() {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return app.exteraless.player.baseline.Md3Player.miniEnabled();
         return false;
     }
 
@@ -31,6 +33,7 @@ public final class Md3Player {
     }
 
     public static BottomSheet create(Context context, Theme.ResourcesProvider resourcesProvider) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return app.exteraless.player.baseline.Md3Player.create(context, resourcesProvider);
         if (handles(MediaController.getInstance().getPlayingMessageObject())) {
             if (PlayerSheet.instance != null) {
                 PlayerSheet.instance.dismissImmediately();
@@ -53,6 +56,7 @@ public final class Md3Player {
     }
 
     public static boolean hidesContextPlayer(BaseFragment fragment, MessageObject messageObject) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return app.exteraless.player.baseline.Md3Player.hidesContextPlayer(fragment, messageObject);
         return false;
     }
 }

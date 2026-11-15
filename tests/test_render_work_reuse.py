@@ -13,6 +13,12 @@ JAVA = ROOT/'TMessagesProj/src/main/java'
 def probe(tmp_path, files, actual=()):
     if not shutil.which('java'):
         pytest.skip('JDK required')
+    files = dict(files)
+    build_config = 'org/telegram/messenger/BuildConfig.java'
+    if build_config not in files:
+        files[build_config] = 'package org.telegram.messenger;public final class BuildConfig{public static final boolean CONNECTED_ALPHA=true,NATIVE_BASELINE_TEST=false;}'
+    elif 'NATIVE_BASELINE_TEST' not in files[build_config]:
+        files[build_config] = files[build_config].replace('class BuildConfig{', 'class BuildConfig{public static final boolean NATIVE_BASELINE_TEST=false;').replace('class BuildConfig {', 'class BuildConfig {public static final boolean NATIVE_BASELINE_TEST=false;')
     paths=[]
     for name,content in files.items():
         path=tmp_path/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(content);paths.append(path)

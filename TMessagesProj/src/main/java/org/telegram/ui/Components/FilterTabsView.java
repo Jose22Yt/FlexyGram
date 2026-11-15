@@ -1389,7 +1389,7 @@ public class FilterTabsView extends FrameLayout {
             }
             return;
         }
-        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && animatingIndicator) {
+        if ((org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) && animatingIndicator) {
             AndroidUtilities.cancelRunOnUIThread(animationRunnable);
             animatingIndicator = false;
             setAnimationIdicatorProgress(1f); // Finish the previous native page before replacing it.
@@ -1408,7 +1408,7 @@ public class FilterTabsView extends FrameLayout {
 
         animationTime = 0;
         animatingIndicatorProgress = 0;
-        animatingIndicator = !org.telegram.messenger.BuildConfig.CONNECTED_ALPHA;
+        animatingIndicator = !(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST);
         if (animatingIndicator) {
             setEnabled(false);
             AndroidUtilities.runOnUIThread(animationRunnable, 16);
@@ -1419,7 +1419,7 @@ public class FilterTabsView extends FrameLayout {
             delegate.onTabSelected(tab, scrollingForward, true);
             oldAnimatedTab = currentPosition;
         }
-        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+        if ((org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)) {
             setAnimationIdicatorProgress(1f);
         }
         scrollToChild(position);

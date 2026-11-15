@@ -11,6 +11,7 @@ if '--reference-dir' in sys.argv:
 def write_stubs(source,root):
  def put(path,text):
   p=source/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
+ put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger;public final class BuildConfig{public static final boolean NATIVE_BASELINE_TEST=false;}')
  java=root/'TMessagesProj/src/main/java';base='app/flexygram/bubbles/deletion/'
  names=['DeleteMotionMath','DeleteMotionSettings','DeleteMotionOverlay','FractureMotionMath','FractureMesh','TntMotion','TntMesh','BubbleFractureRenderer','DeleteMotionPreview','DeleteMotionSettingsActivity']
  for name in names:put(base+name+'.java',(java/base/(name+'.java')).read_text())

@@ -12,9 +12,10 @@ import org.telegram.ui.ActionBar.*;
 public final class FlexyFiles {
     public static final int MENU = 0x464c01;
     private FlexyFiles() {}
-    public static boolean enabled() { return ApplicationLoader.applicationContext.getSharedPreferences("flexyfiles_local",Context.MODE_PRIVATE).getBoolean("enabled",false); }
+    public static boolean enabled() { if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return false; return ApplicationLoader.applicationContext.getSharedPreferences("flexyfiles_local",Context.MODE_PRIVATE).getBoolean("enabled",false); }
     public static void enabled(boolean value) { ApplicationLoader.applicationContext.getSharedPreferences("flexyfiles_local",Context.MODE_PRIVATE).edit().putBoolean("enabled",value).apply(); }
     public static boolean supports(String name) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return false;
         if (name==null) return false;
         int dot=name.lastIndexOf('.');if(dot<0)return false;
         switch(name.substring(dot+1).toLowerCase(Locale.ROOT)) {

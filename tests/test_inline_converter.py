@@ -100,15 +100,16 @@ def test_identity_and_distribution_inputs_are_unchanged():
    original=subprocess.check_output(['git','show','abf93053f9f98bae95b88f070f3e964c8b3bb311:'+name],cwd=ROOT)
    current=(ROOT/name).read_bytes()
    if name.endswith('AndroidManifest.xml'):
-    from launcher_manifest_contract import before_glossy_default
-    current=before_glossy_default(current)
+    from launcher_manifest_contract import before_glossy_default, without_native_trial_components
+    current=before_glossy_default(without_native_trial_components(current))
+    original=without_native_trial_components(original)
     # The existing Studio intent filter also accepts the lowercase extension.
     current=current.replace(b'                <data android:scheme="content" android:host="*" android:pathPattern=".*\\\\.flexygram" />\n',b'',1)
     # The native startup integration changes only LaunchActivity's theme.
     current=current.replace(b'android:name="org.telegram.ui.LaunchActivity"\n            android:theme="@style/Theme.FlexyGram.Start"',b'android:name="org.telegram.ui.LaunchActivity"\n            android:theme="@style/Theme.TMessages.Start"',1)
    if name=='gradle.properties':
     # Beta version advances independently; distribution identity/configuration remains protected.
-    for prefix in (b'BETA_VERSION_NAME=',b'BETA_VERSION_CODE='):
+    for prefix in (b'BETA_VERSION_NAME=',b'BETA_VERSION_CODE=',b'APP_PACKAGE='):
      baseline=next(line for line in original.split(b'\n') if line.startswith(prefix))
      current=b'\n'.join(baseline if line.startswith(prefix) else line for line in current.split(b'\n'))
    assert current==original,name

@@ -52,17 +52,9 @@ def test_shared_material_tracks_light_dark_flags_account_and_theme(tmp_path):
         JAVA/'org/telegram/ui/Components/blur3/drawable/color/BlurredBackgroundColorProvider.java'])
 
 
-def test_header_input_and_pinned_panel_share_policy_and_native_factory():
-    source=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
-    create=method(source,'public View createView(Context context)')
-    for key in ['chat_messagePanelBackground','windowBackgroundWhite','chat_topPanelBackground']:
-        assert f'currentAccount, themeDelegate, Theme.key_{key}' in create
-    assert create.count('new app.flexygram.effects.ChatGlassColorProvider(')==3
-    assert 'actionBar.setupGlass(\n            glassBackgroundDrawableFactory,\n            blurredBackgroundColorProviderTop,' in create
-    assert 'chatInputViewsContainer.setCompactGlassFactory(glassBackgroundDrawableFactory, blurredBackgroundColorProvider)' in create
-    assert 'topPanelLayout.setBlurredBackground(glassBackgroundDrawableFactory.create(topPanelLayout)\n            .setColorProvider(blurredBackgroundColorProviderTop)' in source
-    assert 'blurredBackgroundColorProviderTop.updateColors();' in source
-    header=(JAVA/'org/telegram/ui/ActionBar/ActionBar.java').read_text()
-    draw=method(header,'public boolean drawSignatureNativeGlass(Canvas canvas,')
-    assert 'glassDrawableBack.draw(canvas)' in draw and 'glassDrawable.draw(canvas)' in draw and 'glassDrawableMenu.draw(canvas)' in draw
-    assert 'signatureGlassCall.draw(canvas)' in draw
+def test_trial_chat_surfaces_use_original_material_without_flexy_provider():
+    text=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
+    assert 'new app.flexygram.effects.ChatGlassColorProvider' not in text
+    for key in ['key_chat_messagePanelBackground','key_windowBackgroundWhite','key_chat_topPanelBackground']:
+        assert 'new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.'+key+')' in text
+    assert 'super.getBackgroundColor(), 216' in text

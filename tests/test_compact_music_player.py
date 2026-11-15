@@ -35,7 +35,7 @@ def test_music_routes_to_new_sheet_even_if_old_preference_was_disabled(tmp_path)
     source=(JAVA/'app/exteraless/player/Md3Player.java').read_text()
     enabled=method(source,'public static boolean enabled()')
     create=method(source,'public static BottomSheet create(')
-    probe(tmp_path,{'Probe.java':'''public class Probe{
+    probe(tmp_path,{'app/exteraless/player/baseline/Md3Player.java':'package app.exteraless.player.baseline;public class Md3Player{public static boolean enabled(){return false;}public static <T>T create(Object c,Object p){throw new AssertionError();}}', 'Probe.java':'''public class Probe{
  static class BuildConfig{static boolean CONNECTED_ALPHA=true;}static class AppearanceConfig{static boolean md3Player(){return false;}}
  static class Context{}static class Theme{interface ResourcesProvider{}}
  static class Message{boolean music=true;boolean isMusic(){return music;}}

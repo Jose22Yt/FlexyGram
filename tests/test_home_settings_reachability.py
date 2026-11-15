@@ -21,7 +21,7 @@ public class Probe {
  static class N{boolean bookmark;boolean Bool(){return bookmark;}}static class NaConfig{static NaConfig INSTANCE=new NaConfig();N n=new N();N getShowAddToBookmark(){return n;}}
  static class UserConfig{static UserConfig getInstance(int a){return new UserConfig();}long getClientUserId(){return 1;}}
  int currentAccount;int opens;boolean barVisible;int[] destinations;
- String getString(int id){return "label"+id;}void presentFragment(Object f){}void openFlexySettings(){opens++;}
+ String getString(int id){return "label"+id;}void presentFragment(Object f){if(f instanceof SettingsActivity)opens++;}void openFlexySettings(){opens++;}
  MENU
  public static void main(String[]args){Probe p=new Probe();
  for(boolean bar:new boolean[]{true,false})for(int[] order:new int[][]{{},{0},{0,1,2,4}})for(boolean bookmarks:new boolean[]{false,true}){

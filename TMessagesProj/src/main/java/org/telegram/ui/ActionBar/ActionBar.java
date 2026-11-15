@@ -1584,6 +1584,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
     public boolean drawSignatureNativeGlass(Canvas canvas,
             app.flexygram.header.SignatureChatHeader header) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return false;
         if (header == null || !header.active() || !glassMode || !canvas.isHardwareAccelerated()
                 || !org.telegram.messenger.SharedConfig.chatBlurEnabled()
                 || glassDrawable == null || glassDrawableBack == null || glassDrawableMenu == null) return false;

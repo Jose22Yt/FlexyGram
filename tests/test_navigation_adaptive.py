@@ -3,6 +3,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import pytest
+from test_composer_layout import method
 
 ROOT = Path(__file__).resolve().parents[1]
 JAVA = ROOT / 'TMessagesProj/src/main/java'
@@ -12,6 +13,7 @@ def test_dock_resizes_and_empty_selection_survives_reload(tmp_path):
     if not shutil.which('java'):
         pytest.skip('JDK required')
     sources = {
+        'org/telegram/messenger/BuildConfig.java': 'package org.telegram.messenger;public class BuildConfig{public static final boolean NATIVE_BASELINE_TEST=false;}',
         'android/content/SharedPreferences.java': '''package android.content;
 public class SharedPreferences {
  java.util.Map<String,Object> values=new java.util.HashMap<>();
@@ -102,15 +104,8 @@ public class DockProbe {
     subprocess.run(['java', '-cp', str(tmp_path), 'DockProbe'], check=True, capture_output=True)
 
 
-def test_bottom_search_uses_native_action_and_back_cannot_reopen_keyboard():
-    host = (JAVA / 'org/telegram/ui/MainTabsActivity.java').read_text()
-    search = host[host.index('public void openChatsSearch()'):host.index('private final Runnable flexyTabConfigListener')]
-    assert search.index('viewPager.setPosition(chatsPos)') < search.index('dialogsActivity.searchItem.performClick()')
-    assert 'dialogsActivity.search("", true)' not in search
-    dialogs = (JAVA / 'org/telegram/ui/DialogsActivity.java').read_text()
-    click = dialogs[dialogs.index('searchItem.setOnClickListener(v -> {'):]
-    delayed = click[click.index('AndroidUtilities.runOnUIThread'):click.index('}, 100);')]
-    assert delayed.index('!animatorSearchVisible.getValue()') < delayed.index('AndroidUtilities.showKeyboard')
-    layout = (JAVA / 'org/telegram/ui/MainTabsLayout.java').read_text()
-    draw = layout[layout.index('protected void dispatchDraw'):]
-    assert 'LiquidNavigationConfig.radiusDp()' not in draw  # Attached background may be square; its selection stays round.
+def test_trial_search_opens_the_native_dialogs_action_after_switching_page():
+    source=(JAVA/'org/telegram/ui/MainTabsActivity.java').read_text()
+    search=method(source,'public void openChatsSearch()')
+    assert search.index('viewPager.setPosition(position)') < search.index('searchItem.performClick()')
+    assert 'postDelayed' not in search and 'requestFocus' not in search

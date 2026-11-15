@@ -145,6 +145,7 @@ public class ChatInputViewsContainer extends FrameLayout {
     private final float[] compactGlassRadius = {-1, -1, -1, -1};
     public void setCompactGlassFactory(org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory factory,
             org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProvider colors) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         for (int i = 0; i < compactGlass.length; i++) {
             compactGlass[i] = factory.create(this, colors).setPadding(0);
             compactGlass[i].setAlpha(0);
@@ -524,7 +525,7 @@ public class ChatInputViewsContainer extends FrameLayout {
         final boolean attach = flexyComposer.getFlexyAttachmentBounds(flexyAttach);
         if (attach) flexyAttach.offset(offsetX, offsetY);
         final float radius = flexyComposer.getFlexyActionDiameter() / 2f;
-        final boolean nativeGlass = compactGlass[0] != null && canvas.isHardwareAccelerated()
+        final boolean nativeGlass = !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && compactGlass[0] != null && canvas.isHardwareAccelerated()
                 && flexyComposer.flexyNativeGlassIslandsAvailable();
         if (nativeGlass) {
             drawFlexyNativeGlassIslands(canvas, offsetX, offsetY, radius, attach);

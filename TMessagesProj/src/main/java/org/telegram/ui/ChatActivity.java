@@ -4147,13 +4147,36 @@ public class ChatActivity extends BaseFragment implements
         Timer t = Timer.create("ChatActivity.createView");
         ChatsHelper chatsHelper = ChatsHelper.getInstance(currentAccount);
 
-        // All chat islands use the input's material policy; keep each theme color distinct.
-        blurredBackgroundColorProvider = new app.flexygram.effects.ChatGlassColorProvider(
-                currentAccount, themeDelegate, Theme.key_chat_messagePanelBackground);
-        blurredBackgroundColorProviderWhite = new app.flexygram.effects.ChatGlassColorProvider(
-                currentAccount, themeDelegate, Theme.key_windowBackgroundWhite);
-        blurredBackgroundColorProviderTop = new app.flexygram.effects.ChatGlassColorProvider(
-                currentAccount, themeDelegate, Theme.key_chat_topPanelBackground);
+        blurredBackgroundColorProvider = new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.key_chat_messagePanelBackground) {
+            @Override
+            public int getBackgroundColor() {
+                if (!BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, themeDelegate)) {
+                    return ColorUtils.setAlphaComponent(getThemedColor(Theme.key_chat_messagePanelBackground), 255);
+                }
+
+                final boolean isThemeLight = themeDelegate != null && !themeDelegate.isDark();
+                if (isThemeLight) {
+                    return ColorUtils.setAlphaComponent(super.getBackgroundColor(), 216);
+                }
+                return super.getBackgroundColor();
+            }
+        };
+        blurredBackgroundColorProviderWhite = new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.key_windowBackgroundWhite) {
+            @Override
+            public int getBackgroundColor() {
+                if (!BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, themeDelegate)) {
+                    return ColorUtils.setAlphaComponent(getThemedColor(Theme.key_windowBackgroundWhite), 255);
+                }
+
+                final boolean isThemeLight = themeDelegate != null && !themeDelegate.isDark();
+                if (isThemeLight) {
+                    return ColorUtils.setAlphaComponent(super.getBackgroundColor(), 216);
+                }
+                return super.getBackgroundColor();
+            }
+        };
+
+        blurredBackgroundColorProviderTop = new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.key_chat_topPanelBackground);
 
         if (textSelectionHelper == null) {
             Timer.Task t1 = Timer.start(t, "new ChatActivityTextSelectionHelper");

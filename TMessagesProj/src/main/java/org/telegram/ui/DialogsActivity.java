@@ -5539,7 +5539,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         if (filterTabsView != null) {
-            if (isSignatureHome()) filterTabsView.setSignatureGlassFactory(iBlur3FactoryLiquidGlass);
+            if (!org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && isSignatureHome()) filterTabsView.setSignatureGlassFactory(iBlur3FactoryLiquidGlass);
             // Home paints cheap individual pills; do not even allocate/register
             // a shared blur drawable that this row will never draw.
             if (!isSignatureHome()) {

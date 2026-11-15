@@ -354,7 +354,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
             textPaint.setTextSize(dp(16));
 
-            sizeBar = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+            sizeBar = (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)
                     ? new app.flexygram.settings.FlexySignatureSeekBarView(context) : new SeekBarView(context);
             sizeBar.setReportChanges(true);
             sizeBar.setSeparatorsCount(endFontSize - startFontSize + 1);
@@ -439,7 +439,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
             textPaint.setTextSize(dp(16));
 
-            sizeBar = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+            sizeBar = (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)
                     ? new app.flexygram.settings.FlexySignatureSeekBarView(context) : new SeekBarView(context);
             sizeBar.setReportChanges(true);
             sizeBar.setSeparatorsCount(endRadius - startRadius + 1);
@@ -503,7 +503,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
     protected ThemeActivity(int type, int signatureSection) {
         super();
         currentType = type;
-        signatureChatSection = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+        signatureChatSection = (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)
                 && type == THEME_TYPE_BASIC ? signatureSection : 0;
         updateRows(true);
     }
@@ -741,7 +741,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                 lastShadowRow = rowCount++;
             } else {
 
-            if (!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+            if (!(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)) {
                 bubbleRadiusHeaderRow = rowCount++;
                 bubbleRadiusRow = rowCount++;
                 bubbleRadiusInfoRow = rowCount++;
@@ -752,7 +752,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             chatListInfoRow = rowCount++;
 
             // FlexyGram's custom icon selector has one canonical Appearance route.
-            if (!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+            if (!(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)) {
             appIconHeaderRow = rowCount++;
             appIconSelectorRow = rowCount++;
             appIconShadowRow = rowCount++;

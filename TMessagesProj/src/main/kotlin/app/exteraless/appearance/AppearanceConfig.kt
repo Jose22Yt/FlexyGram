@@ -210,6 +210,7 @@ object AppearanceConfig {
 
     @JvmStatic
     fun glassOutlineStyle(): Int {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return 0
         ensureLoaded()
         return glassOutlineStyle.Int()
     }

@@ -2361,7 +2361,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                     dt = 18;
                 }
                 lastFrameTime = newTime;
-                float duration = app.flexygram.animation.FastMotionTiming.duration(preview && open ? 190 : 150);
+                float duration = (preview && open ? 190 : 150);
                 animationProgress += dt / duration;
                 if (animationProgress > 1.0f) {
                     animationProgress = 1.0f;
