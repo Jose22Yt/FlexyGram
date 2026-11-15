@@ -141,5 +141,10 @@ public static boolean isPlaying(MessageObject m){return true;}public interface C
         while n:
             n+=(context[b]=='{')-(context[b]=='}');b+=1
         return context[a:b]
+    # This probe executes the real context measurement, which now uses the original
+    # Extera bar's compile-time height. Other player drawing fixtures stay isolated.
+    native_bar=(player/'baseline/PlayerBarView.java').read_text()
+    native_height=re.search(r'public static final int HEIGHT_DP\s*=\s*\d+;',native_bar).group(0)
+    put('app/exteraless/player/baseline/PlayerBarView.java','package app.exteraless.player.baseline;public final class PlayerBarView{'+native_height+'}')
     body=method('protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)')+'\n'+method('public int getStyleHeight()')
     put('app/exteraless/player/NativeContextMeasure.java','package app.exteraless.player; import android.content.Context; import android.widget.FrameLayout; import org.telegram.messenger.AndroidUtilities; public class NativeContextMeasure extends FrameLayout { public int currentStyle;public boolean md3Music=true;private static final int STYLE_INACTIVE_GROUP_CALL=2;public NativeContextMeasure(Context c){super(c);}void updateJoinButtonWidth(int width){}'+body+'}')
