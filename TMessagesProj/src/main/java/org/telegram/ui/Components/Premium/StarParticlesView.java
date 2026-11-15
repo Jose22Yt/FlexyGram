@@ -206,7 +206,7 @@ public class StarParticlesView extends View {
         public long minLifeTime = 2000;
         public int randLifeTime = 1000;
         private int lastColor;
-        private final float dt = 1000 / AndroidUtilities.screenRefreshRate;
+        private float dt = 1000 / AndroidUtilities.screenRefreshRate;
         public boolean distributionAlgorithm;
         Matrix[] matrices;
         float[][] points;
@@ -464,6 +464,7 @@ public class StarParticlesView extends View {
                     Utilities.stackBlurBitmap(bitmap, 2);
                 }
             }
+            lastColor = Theme.getColor(colorKey, resourcesProvider);
         }
 
         protected int getPathColor(int i) {
@@ -486,9 +487,16 @@ public class StarParticlesView extends View {
         }
 
         private long prevTime;
+        private static float frameDeltaMillis(long previous, long now, float refreshRate) {
+            if (!Float.isFinite(refreshRate) || refreshRate <= 0) refreshRate = 60f;
+            if (previous <= 0 || now < previous) return 1000f / refreshRate;
+            return Math.min(50, now - previous);
+        }
         public void onDraw(Canvas canvas, float alpha) {
             long time = System.currentTimeMillis();
-            long diff = MathUtils.clamp(time - prevTime, 4, 50);
+            long frameTime = android.os.SystemClock.uptimeMillis();
+            float diff = frameDeltaMillis(prevTime, frameTime, AndroidUtilities.screenRefreshRate);
+            dt = diff;
             if (useRotate) {
                 final float cx = rect.centerX() + centerOffsetX;
                 final float cy = rect.centerY() + centerOffsetY;
@@ -524,7 +532,7 @@ public class StarParticlesView extends View {
                     }
                 }
             }
-            prevTime = time;
+            prevTime = frameTime;
         }
 
         private int lastParticleI = 0;

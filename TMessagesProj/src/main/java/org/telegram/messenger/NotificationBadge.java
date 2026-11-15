@@ -416,24 +416,27 @@ public class NotificationBadge {
 
         @Override
         public void executeBadge(int badgeCount) {
-            try {
-                Class miuiNotificationClass = Class.forName("android.app.MiuiNotification");
-                Object miuiNotification = miuiNotificationClass.newInstance();
-                Field field = miuiNotification.getClass().getDeclaredField("messageCount");
-                field.setAccessible(true);
-                field.set(miuiNotification, String.valueOf(badgeCount == 0 ? "" : badgeCount));
-            } catch (Throwable e) {
-                final Intent localIntent = new Intent(INTENT_ACTION);
-                localIntent.putExtra(EXTRA_UPDATE_APP_COMPONENT_NAME, componentName.getPackageName() + "/" + componentName.getClassName());
-                localIntent.putExtra(EXTRA_UPDATE_APP_MSG_TEXT, String.valueOf(badgeCount == 0 ? "" : badgeCount));
-                if (canResolveBroadcast(localIntent)) {
-                    AndroidUtilities.runOnUIThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ApplicationLoader.applicationContext.sendBroadcast(localIntent);
-                        }
-                    });
+            // Android 14+: keep the supported broadcast path, never probe this hidden MIUI class.
+            if (Build.VERSION.SDK_INT < 34) {
+                try {
+                    Class miuiNotificationClass = Class.forName("android.app.MiuiNotification");
+                    Object miuiNotification = miuiNotificationClass.newInstance();
+                    Field field = miuiNotificationClass.getDeclaredField("messageCount");
+                    field.setAccessible(true);
+                    field.set(miuiNotification, String.valueOf(badgeCount == 0 ? "" : badgeCount));
+                    return;
+                } catch (Throwable unavailable) {
+                    // Older MIUI versions can also lack this implementation.
                 }
+            }
+            final Intent intent = new Intent(INTENT_ACTION);
+            intent.putExtra(EXTRA_UPDATE_APP_COMPONENT_NAME, componentName.getPackageName() + "/" + componentName.getClassName());
+            intent.putExtra(EXTRA_UPDATE_APP_MSG_TEXT, String.valueOf(badgeCount == 0 ? "" : badgeCount));
+            if (canResolveBroadcast(intent)) {
+                AndroidUtilities.runOnUIThread(() -> {
+                    try { ApplicationLoader.applicationContext.sendBroadcast(intent); }
+                    catch (SecurityException unavailable) { FileLog.e(unavailable); }
+                });
             }
         }
 

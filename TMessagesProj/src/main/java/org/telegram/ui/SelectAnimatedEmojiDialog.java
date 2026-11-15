@@ -1162,7 +1162,7 @@ public class SelectAnimatedEmojiDialog extends FrameLayout implements Notificati
         bigReactionImageReceiver.setLayerNum(7);
 
         if (isAnimatedShow()) {
-            HwEmojis.beforePreparing();
+            HwEmojis.beforePreparing(this);
         }
         updateRows(true, false);
     }
@@ -4965,6 +4965,24 @@ public class SelectAnimatedEmojiDialog extends FrameLayout implements Notificati
 
     @Override
     protected void onDetachedFromWindow() {
+        AndroidUtilities.cancelRunOnUIThread(updateRowsDelayed);
+        NotificationCenter.getGlobalInstance().removeDelayed(updateRows);
+        boolean ownedTransition = HwEmojis.isOwner(this);
+        HwEmojis.disableHw(this);
+        if (showAnimator != null) {
+            showAnimator.removeAllListeners();
+            showAnimator.removeAllUpdateListeners();
+            showAnimator.cancel();
+            showAnimator = null;
+            if (ownedTransition) NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 512);
+        }
+        emojiGridView.setLayerType(LAYER_TYPE_NONE, null);
+        searchBox.setLayerType(LAYER_TYPE_NONE, null);
+        emojiTabsShadow.setLayerType(LAYER_TYPE_NONE, null);
+        backgroundView.setLayerType(LAYER_TYPE_NONE, null);
+        if (bubble1View != null) bubble1View.setLayerType(LAYER_TYPE_NONE, null);
+        if (bubble2View != null) bubble2View.setLayerType(LAYER_TYPE_NONE, null);
+        notificationsLocker.unlock();
         super.onDetachedFromWindow();
         setBigReactionAnimatedEmoji(null);
         isAttached = false;
@@ -5068,7 +5086,7 @@ public class SelectAnimatedEmojiDialog extends FrameLayout implements Notificati
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    HwEmojis.disableHw();
+                    HwEmojis.disableHw(SelectAnimatedEmojiDialog.this);
                     emojiGridView.setLayerType(LAYER_TYPE_NONE, null);
                     searchBox.setLayerType(LAYER_TYPE_NONE, null);
                     emojiTabsShadow.setLayerType(LAYER_TYPE_NONE, null);
@@ -5102,8 +5120,8 @@ public class SelectAnimatedEmojiDialog extends FrameLayout implements Notificati
                 }
             });
 
-            HwEmojis.prepare(() -> {
-                HwEmojis.enableHw();
+            HwEmojis.prepare(this, () -> {
+                HwEmojis.enableHw(SelectAnimatedEmojiDialog.this);
                 AndroidUtilities.runOnUIThread(() -> showAnimator.start(), 0);
             }, true);
 
@@ -5822,6 +5840,9 @@ public class SelectAnimatedEmojiDialog extends FrameLayout implements Notificati
         private View parentDialogView;
 
         private int blurBitmapWidth, blurBitmapHeight;
+        private int blurGeneration;
+        private boolean blurInFlight, blurClosed;
+
         private Bitmap blurBitmap;
         private Paint blurBitmapPaint;
 
@@ -5931,6 +5952,7 @@ public class SelectAnimatedEmojiDialog extends FrameLayout implements Notificati
 
             @Override
             protected void onAttachedToWindow() {
+                blurClosed = false;
                 super.onAttachedToWindow();
                 if (imageReceiver != null) {
                     imageReceiver.onAttachedToWindow();
@@ -5939,6 +5961,11 @@ public class SelectAnimatedEmojiDialog extends FrameLayout implements Notificati
 
             @Override
             protected void onDetachedFromWindow() {
+                blurClosed = true;
+                blurGeneration++;
+                blurInFlight = false;
+                blurBitmap = null; // HWUI may still hold a published bitmap: let GC retire it.
+                blurBitmapPaint = null;
                 super.onDetachedFromWindow();
                 if (imageReceiver != null) {
                     imageReceiver.onDetachedFromWindow();
@@ -5954,7 +5981,7 @@ public class SelectAnimatedEmojiDialog extends FrameLayout implements Notificati
                     return;
                 }
                 View parentView = parentActivity.getWindow().getDecorView();
-                if (blurBitmap == null || blurBitmap.getWidth() != parentView.getMeasuredWidth() || blurBitmap.getHeight() != parentView.getMeasuredHeight()) {
+                if (blurBitmap == null || blurBitmapWidth != parentView.getMeasuredWidth() || blurBitmapHeight != parentView.getMeasuredHeight()) {
                     prepareBlurBitmap();
                 }
             }
@@ -6166,12 +6193,13 @@ public class SelectAnimatedEmojiDialog extends FrameLayout implements Notificati
 
         private void prepareBlurBitmap() {
             Activity parentActivity = getParentActivity();
-            if (parentActivity == null) {
-                return;
-            }
+            if (parentActivity == null || blurClosed || blurInFlight) return;
             View parentView = parentActivity.getWindow().getDecorView();
-            int w = (int) (parentView.getMeasuredWidth() / 12.0f);
-            int h = (int) (parentView.getMeasuredHeight() / 12.0f);
+            final int sourceWidth = parentView.getMeasuredWidth(), sourceHeight = parentView.getMeasuredHeight();
+            if (sourceWidth <= 0 || sourceHeight <= 0) return;
+            if (blurBitmap != null && blurBitmapWidth == sourceWidth && blurBitmapHeight == sourceHeight) return;
+            int w = Math.max(1, sourceWidth / 12);
+            int h = Math.max(1, sourceHeight / 12);
             Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
             canvas.scale(1.0f / 12.0f, 1.0f / 12.0f);
@@ -6187,9 +6215,35 @@ public class SelectAnimatedEmojiDialog extends FrameLayout implements Notificati
                 parentDialogView.draw(canvas);
                 canvas.restore();
             }
-            Utilities.stackBlurBitmap(bitmap, Math.max(10, Math.max(w, h) / 180));
-            blurBitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            blurBitmap = bitmap;
+            final int generation = ++blurGeneration;
+            blurInFlight = true;
+            java.lang.ref.WeakReference<SelectStatusDurationDialog> owner = new java.lang.ref.WeakReference<>(this);
+            boolean accepted = app.flexygram.performance.AsyncBitmapBlur.submit(bitmap,
+                    Math.max(10, Math.max(w, h) / 180), result -> {
+                SelectStatusDurationDialog current = owner.get();
+                if (current == null || current.blurClosed || generation != current.blurGeneration) {
+                    if (result != null) result.recycle();
+                    return;
+                }
+                current.blurInFlight = false;
+                if (result == null) return;
+                Activity activity = current.getParentActivity();
+                View decor = activity != null ? activity.getWindow().getDecorView() : null;
+                if (decor == null || decor.getMeasuredWidth() != sourceWidth || decor.getMeasuredHeight() != sourceHeight) {
+                    result.recycle();
+                    current.prepareBlurBitmap();
+                    return;
+                }
+                current.blurBitmapWidth = sourceWidth;
+                current.blurBitmapHeight = sourceHeight;
+                current.blurBitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                current.blurBitmap = result;
+                current.contentView.invalidate();
+            });
+            if (!accepted) {
+                blurInFlight = false;
+                bitmap.recycle();
+            }
         }
 
         private float showT;

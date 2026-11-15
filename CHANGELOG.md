@@ -1,3 +1,12 @@
+## 1.0.0-beta.57 (1346)
+
+- Omite la reflexión a MiuiNotification desde Android 14 y conserva el fallback de badges.
+- Corrige el tamaño de caché del blur del selector de reacciones; desenfoque en un worker acotado, con descarte de resultados obsoletos.
+- Libera capas de hardware y animadores al retirar ventanas de reacciones; la limpieza respeta al propietario de cada transición.
+- Libera adaptador, caché y pool de conversaciones terminadas después de su separación de la ventana.
+- Evita regenerar las partículas inmediatamente después de inicializarlas; su movimiento usa tiempo real entre dibujos.
+- Integra todas las correcciones de beta 55 y beta 56 en codex/flexygram-beta-glass.
+
 ## 1.0.0-beta.56 (1345)
 
 - Evita restaurar el scroll cuando las filas mantienen su posición; conserva los cambios de DiffUtil.

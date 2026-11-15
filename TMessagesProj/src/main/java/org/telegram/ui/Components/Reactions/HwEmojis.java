@@ -8,6 +8,7 @@ import android.view.View;
 import org.telegram.messenger.ImageLoader;
 
 import java.util.Arrays;
+import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +22,18 @@ public class HwEmojis {
     private static boolean isBeforePreparing = false;
     private static Boolean isWeakDevice;
 
+    private static WeakReference<Object> activeOwner = new WeakReference<>(null);
+
     public static void prepare(Runnable runnable, boolean cascade) {
+        prepare(null, runnable, cascade);
+    }
+
+    public static void prepare(Object owner, Runnable runnable, boolean cascade) {
+        if (activeOwner.get() != owner) {
+            hwEnabled = false;
+            clearCapturedViews();
+        }
+        activeOwner = new WeakReference<>(owner);
         isCascade = cascade;
         isPreparing = true;
         isBeforePreparing = false;
@@ -31,7 +43,14 @@ public class HwEmojis {
         task = runnable;
     }
 
-    public static void beforePreparing() {
+    public static void beforePreparing() { beforePreparing(null); }
+
+    public static void beforePreparing(Object owner) {
+        hwEnabled = false;
+        clearCapturedViews();
+        task = null;
+        isPreparing = false;
+        activeOwner = new WeakReference<>(owner);
         ImageLoader.getInstance().getCacheOutQueue().pause();
         isBeforePreparing = true;
     }
@@ -57,10 +76,9 @@ public class HwEmojis {
     }
 
     public static void exec() {
-        if (task != null) {
-            task.run();
-            task = null;
-        }
+        Runnable current = task;
+        task = null;
+        if (current != null) current.run();
     }
 
     public static boolean grab(View view) {
@@ -85,6 +103,18 @@ public class HwEmojis {
         return hwEnabled;
     }
 
+    public static boolean isOwner(Object owner) {
+        return owner != null && activeOwner.get() == owner;
+    }
+
+    public static void enableHw(Object owner) {
+        if (isOwner(owner)) enableHw();
+    }
+
+    public static void disableHw(Object owner) {
+        if (isOwner(owner)) disableHw();
+    }
+
     public static void enableHw() {
         ImageLoader.getInstance().getCacheOutQueue().pause();
         hwEnabled = true;
@@ -98,9 +128,13 @@ public class HwEmojis {
         isPreparing = false;
         isBeforePreparing = false;
         task = null;
-        for (View view : hwViews) {
-            view.invalidate();
-        }
+        activeOwner.clear();
+        clearCapturedViews();
+    }
+
+    private static void clearCapturedViews() {
+        View[] previous = hwViews.toArray(new View[0]);
         hwViews.clear();
+        for (View view : previous) if (view != null) view.invalidate();
     }
 }

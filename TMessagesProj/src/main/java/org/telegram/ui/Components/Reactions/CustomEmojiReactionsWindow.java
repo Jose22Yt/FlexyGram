@@ -159,6 +159,7 @@ public class CustomEmojiReactionsWindow {
 
             @Override
             protected void onDetachedFromWindow() {
+                releaseTransitionResources();
                 super.onDetachedFromWindow();
                 Bulletin.removeDelegate(this);
             }
@@ -380,6 +381,7 @@ public class CustomEmojiReactionsWindow {
     public boolean transition;
 
     private void createTransition(boolean enter) {
+        transitionResourcesReleased = false;
         // Finish the previous transition before initializing the next one's state.
         if (valueAnimator != null) {
             valueAnimator.cancel();
@@ -507,6 +509,7 @@ public class CustomEmojiReactionsWindow {
         containerView.invalidate();
         switchLayerType(true);
         if (!enter) {
+            HwEmojis.prepare(selectAnimatedEmojiDialog, null, false);
             reactionsContainerLayout.isHiddenNextReaction = true;
             reactionsContainerLayout.invalidate();
             valueAnimator.setStartDelay(30);
@@ -514,13 +517,13 @@ public class CustomEmojiReactionsWindow {
         } else {
             reactionsContainerLayout.setCustomEmojiReactionsBackground(false);
             final ValueAnimator finalAnimator = valueAnimator;
-            HwEmojis.prepare(() -> {
+            HwEmojis.prepare(selectAnimatedEmojiDialog, () -> {
                 if (valueAnimator == finalAnimator) {
                     finalAnimator.start();
                 }
             }, cascadeAnimation);
         }
-        HwEmojis.enableHw();
+        HwEmojis.enableHw(selectAnimatedEmojiDialog);
     }
 
     private void updateContainersAlpha() {
@@ -542,19 +545,58 @@ public class CustomEmojiReactionsWindow {
         selectAnimatedEmojiDialog.contentView.setScaleY(containerView.enterTransitionScale);
     }
 
+    private final java.util.IdentityHashMap<View, Integer> transitionLayers = new java.util.IdentityHashMap<>();
+
+    private void promoteTransitionLayer(View view) {
+        if (view == null || transitionLayers.containsKey(view)) return;
+        transitionLayers.put(view, view.getLayerType());
+        view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+    }
+
     private void switchLayerType(boolean hardware) {
-        int layerType = hardware ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_NONE;
-        selectAnimatedEmojiDialog.emojiGridView.setLayerType(layerType, null);
-        selectAnimatedEmojiDialog.searchBox.setLayerType(layerType, null);
-        if (cascadeAnimation) {
-            for (int i = 0; i < Math.min(selectAnimatedEmojiDialog.emojiTabs.contentView.getChildCount(), 16); i++) {
-                View child = selectAnimatedEmojiDialog.emojiTabs.contentView.getChildAt(i);
-                child.setLayerType(layerType, null);
+        if (!hardware) {
+            for (java.util.Map.Entry<View, Integer> entry : transitionLayers.entrySet()) {
+                if (entry.getKey().getLayerType() == View.LAYER_TYPE_HARDWARE)
+                    entry.getKey().setLayerType(entry.getValue(), null);
             }
-        } else {
-            selectAnimatedEmojiDialog.emojiTabsShadow.setLayerType(layerType, null);
-            selectAnimatedEmojiDialog.emojiTabs.setLayerType(layerType, null);
+            transitionLayers.clear();
+            return;
         }
+        promoteTransitionLayer(selectAnimatedEmojiDialog.emojiGridView);
+        promoteTransitionLayer(selectAnimatedEmojiDialog.searchBox);
+        if (cascadeAnimation) {
+            for (int i = 0; i < Math.min(selectAnimatedEmojiDialog.emojiTabs.contentView.getChildCount(), 16); i++)
+                promoteTransitionLayer(selectAnimatedEmojiDialog.emojiTabs.contentView.getChildAt(i));
+        } else {
+            promoteTransitionLayer(selectAnimatedEmojiDialog.emojiTabsShadow);
+            promoteTransitionLayer(selectAnimatedEmojiDialog.emojiTabs);
+        }
+    }
+
+    private boolean transitionResourcesReleased;
+    private void releaseTransitionResources() {
+        if (transitionResourcesReleased) return;
+        transitionResourcesReleased = true;
+        ValueAnimator previous = valueAnimator;
+        valueAnimator = null;
+        if (previous != null) {
+            previous.removeAllListeners();
+            previous.removeAllUpdateListeners();
+            previous.cancel();
+        }
+        ArrayList<ValueAnimator> children = new ArrayList<>(animators);
+        animators.clear();
+        for (ValueAnimator animator : children) {
+            animator.removeAllListeners();
+            animator.removeAllUpdateListeners();
+            animator.cancel();
+        }
+        animatingEnterChild.clear();
+        switchLayerType(false);
+        HwEmojis.disableHw(selectAnimatedEmojiDialog);
+        notificationsLocker.unlock();
+        transition = false;
+        if (selectAnimatedEmojiDialog != null) selectAnimatedEmojiDialog.setEnterAnimationInProgress(false);
     }
 
     HashSet<View> animatingEnterChild = new HashSet<>();
@@ -645,7 +687,7 @@ public class CustomEmojiReactionsWindow {
     private void checkAnimationEnd(boolean enter) {
         if (animators.isEmpty()) {
             switchLayerType(false);
-            HwEmojis.disableHw();
+            HwEmojis.disableHw(selectAnimatedEmojiDialog);
             notificationsLocker.unlock();
             selectAnimatedEmojiDialog.setEnterAnimationInProgress(false);
             if (enter) {
@@ -694,6 +736,7 @@ public class CustomEmojiReactionsWindow {
     }
 
     public void removeView() {
+        releaseTransitionResources();
         if (type != TYPE_MESSAGE_EFFECTS) {
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 7);
         }

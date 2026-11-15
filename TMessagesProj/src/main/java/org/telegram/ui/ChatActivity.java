@@ -3822,6 +3822,25 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
+    private boolean chatRecyclerReleased;
+    private final Runnable releaseChatRecycler = this::releaseFinishedChatRecycler;
+    private void releaseFinishedChatRecycler() {
+        if (chatRecyclerReleased || !isFinished || chatListView == null
+                || contentView != null && contentView.isAttachedToWindow()) return;
+        if (chatListView.isComputingLayout()) {
+            AndroidUtilities.cancelRunOnUIThread(releaseChatRecycler);
+            AndroidUtilities.runOnUIThread(releaseChatRecycler);
+            return;
+        }
+        chatRecyclerReleased = true;
+        chatListView.stopScroll();
+        chatListView.setItemAnimator(null);
+        chatListView.setAdapter(null);
+        chatListView.setItemViewCacheSize(0);
+        RecyclerView.RecycledViewPool pool = chatListView.getRecycledViewPool();
+        if (pool != null) pool.clear();
+    }
+
     @Override
     public void onFragmentDestroy() {
         flexyStickerExport.cancel();
@@ -3836,6 +3855,7 @@ public class ChatActivity extends BaseFragment implements
         app.flexygram.studio.FlexyStyleInstallHelper.cancel(this);
         app.exteraless.plugins.menus.MenuInjector.releaseMessageMenu(this);
         super.onFragmentDestroy();
+        releaseFinishedChatRecycler();
         AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
         cancelScrollHintChecks();
         if (contentView != null && contentView.signatureWallpaperBlur != null) {
@@ -19064,6 +19084,7 @@ public class ChatActivity extends BaseFragment implements
             LiteMode.removeOnPowerSaverAppliedListener(signatureGlassPowerListener);
             if (signatureWallpaperBlur != null) { signatureWallpaperBlur.close(); signatureWallpaperBlur = null; }
             super.onDetachedFromWindow();
+            releaseFinishedChatRecycler();
             adjustPanLayoutHelper.onDetach();
             if (pullingDownDrawable != null) {
                 pullingDownDrawable.onDetach();
