@@ -98,6 +98,9 @@ def test_navigation_and_player_use_the_upstream_routes():
     for p in player.glob('*.java'):
         text=p.read_text()
         assert 'app.flexygram' not in text and 'SignatureMusic' not in text
+    context_bar=(JAVA/'org/telegram/ui/Components/FragmentContextView.java').read_text()
+    assert 'new app.exteraless.player.PlayerBarView(' not in context_bar
+    assert 'new app.exteraless.player.baseline.PlayerBarView(' in context_bar
     native=(player/'Md3Player.java').read_text()
     assert 'return AppearanceConfig.md3Player();' in native
     assert 'return AppearanceConfig.md3MiniPlayer();' in native

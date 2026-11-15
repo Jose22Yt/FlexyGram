@@ -1651,11 +1651,11 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
     float micAmplitude;
 
     public int getStyleHeight() {
-        return currentStyle == STYLE_INACTIVE_GROUP_CALL ? 48 : md3Music ? app.exteraless.player.PlayerBarView.heightDp(getContext()) : 36;
+        return currentStyle == STYLE_INACTIVE_GROUP_CALL ? 48 : md3Music ? app.exteraless.player.baseline.PlayerBarView.HEIGHT_DP : 36;
     }
 
     private app.exteraless.player.SignatureMusicHost signatureMusicHost;
-    private app.exteraless.player.PlayerBarView md3Bar;
+    private app.exteraless.player.baseline.PlayerBarView md3Bar;
     private boolean md3Music;
     public boolean isMd3Music() { return md3Music; }
 
@@ -1669,12 +1669,8 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         boolean changed = value != md3Music;
         md3Music = value;
         if (value && md3Bar == null) {
-            md3Bar = new app.exteraless.player.PlayerBarView(getContext(), resourcesProvider, this::performClick, () -> closeButton.performClick());
-            md3Bar.setOnCompact(() -> {
-                if (signatureMusicHost != null && signatureMusicHost.canCompact())
-                    app.exteraless.player.SignatureMusicPresentation.setCompact(true);
-            });
-            addView(md3Bar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, app.exteraless.player.PlayerBarView.heightDp(getContext()), Gravity.TOP | Gravity.LEFT));
+            md3Bar = new app.exteraless.player.baseline.PlayerBarView(getContext(), resourcesProvider, this::performClick, () -> closeButton.performClick());
+            addView(md3Bar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, app.exteraless.player.baseline.PlayerBarView.HEIGHT_DP, Gravity.TOP | Gravity.LEFT));
         }
         if (md3Bar != null) {
             md3Bar.setVisibility(value ? VISIBLE : GONE);

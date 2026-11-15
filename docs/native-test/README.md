@@ -26,7 +26,8 @@ FlexyGram. Rama: `codex/flexygram-native-performance-test`.
 - **Música:** reproductor y minirreproductor originales de esa misma revisión
   de exteraLess. El conjunto se conserva en `app.exteraless.player.baseline`
   para evitar enlazar sus componentes con los del reproductor modificado.
-  Respeta las opciones nativas de reproductor MD3/minirreproductor y su
+  La barra de reproducción dentro de las conversaciones usa también el componente
+  original. Respeta las opciones nativas de reproductor MD3/minirreproductor y su
   alternativa `AudioPlayerAlert` de Telegram.
 - **Animaciones:** no se aplica el plugin ASM FastMotion. `AnimatedFloat` y
   `ActionBarLayout` usan sus duraciones originales; el inicio de la aplicación
