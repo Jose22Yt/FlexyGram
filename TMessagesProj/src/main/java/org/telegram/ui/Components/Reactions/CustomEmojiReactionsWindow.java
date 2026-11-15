@@ -591,11 +591,17 @@ public class CustomEmojiReactionsWindow {
             animator.removeAllUpdateListeners();
             animator.cancel();
         }
+        for (View child : animatingEnterChild) setScaleForChild(child, 1f);
         animatingEnterChild.clear();
         switchLayerType(false);
         HwEmojis.disableHw(selectAnimatedEmojiDialog);
         notificationsLocker.unlock();
         transition = false;
+        if (reactionsContainerLayout != null) {
+            reactionsContainerLayout.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_AUTO);
+            reactionsContainerLayout.setCustomEmojiEnterProgress(0f);
+            reactionsContainerLayout.setSkipDraw(false);
+        }
         if (selectAnimatedEmojiDialog != null) selectAnimatedEmojiDialog.setEnterAnimationInProgress(false);
     }
 
@@ -736,6 +742,8 @@ public class CustomEmojiReactionsWindow {
     }
 
     public void removeView() {
+        dismissed = true;
+        isShowing = false;
         releaseTransitionResources();
         if (type != TYPE_MESSAGE_EFFECTS) {
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 7);

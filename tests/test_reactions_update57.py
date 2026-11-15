@@ -26,12 +26,14 @@ def test_transition_layers_release_cascade_children_after_mode_changes_and_detac
     methods='\n'.join(method(s,x) for x in ['private void promoteTransitionLayer(','private void switchLayerType(','private void releaseTransitionResources()'])
     probe(tmp_path,{'Probe.java':'''import java.util.*;
 public class Probe{
- static class View{static final int LAYER_TYPE_HARDWARE=2;int layer;int getLayerType(){return layer;}void setLayerType(int n,Object p){layer=n;}}
+ static class View{static final int LAYER_TYPE_HARDWARE=2,IMPORTANT_FOR_ACCESSIBILITY_AUTO=0;int layer;int getLayerType(){return layer;}void setLayerType(int n,Object p){layer=n;}}
  static class Group extends View{Group contentView;ArrayList<View>children=new ArrayList<>();int getChildCount(){return children.size();}View getChildAt(int n){return children.get(n);}}
  static class Dialog{View emojiGridView=new View(),searchBox=new View(),emojiTabsShadow=new View();Group emojiTabs=new Group();int endCalls;void setEnterAnimationInProgress(boolean b){endCalls++;}}
  static class ValueAnimator{boolean cancelled,removed,updatesRemoved;void removeAllListeners(){removed=true;}void removeAllUpdateListeners(){updatesRemoved=true;}void cancel(){if(!removed||!updatesRemoved)throw new AssertionError("reentrant callbacks possible");cancelled=true;}}
  static class HwEmojis{static Object owner;static void disableHw(Object o){if(owner==o)owner=null;}}
  static class Locker{int unlocks;void unlock(){unlocks++;}}
+ static class Reactions{boolean skip=true;float progress=.5f;void setImportantForAccessibility(int n){}void setCustomEmojiEnterProgress(float f){progress=f;}void setSkipDraw(boolean b){skip=b;}}
+ Reactions reactionsContainerLayout=new Reactions();int restoredScales;void setScaleForChild(View v,float s){if(s!=1)throw new AssertionError();restoredScales++;}
  Dialog selectAnimatedEmojiDialog=new Dialog();boolean cascadeAnimation=true,transition,transitionResourcesReleased;ValueAnimator valueAnimator;
  ArrayList<ValueAnimator>animators=new ArrayList<>();HashSet<View>animatingEnterChild=new HashSet<>();Locker notificationsLocker=new Locker();
  final IdentityHashMap<View,Integer>transitionLayers=new IdentityHashMap<>();METHODS
@@ -45,6 +47,7 @@ public class Probe{
  Object newer=new Object();HwEmojis.owner=newer;p.releaseTransitionResources();
  check(parent.cancelled&&child.cancelled&&p.transitionLayers.isEmpty()&&p.animators.isEmpty()&&p.animatingEnterChild.isEmpty()&&p.valueAnimator==null);
  check(p.selectAnimatedEmojiDialog.searchBox.layer==1&&changed.layer==1&&HwEmojis.owner==newer);
+ check(p.restoredScales==1&&!p.reactionsContainerLayout.skip&&p.reactionsContainerLayout.progress==0);
  for(int i=1;i<20;i++)check(p.selectAnimatedEmojiDialog.emojiTabs.contentView.children.get(i).layer==0);
  p.releaseTransitionResources();check(p.notificationsLocker.unlocks==1);
  }}'''.replace('METHODS',methods)})
