@@ -18,6 +18,7 @@ import androidx.core.graphics.drawable.WrappedDrawable;
 
 import org.jspecify.annotations.Nullable;
 import org.telegram.ui.Components.blur3.capture.IBlur3Capture;
+import org.telegram.ui.Components.blur3.capture.IBlur3Hash;
 import org.telegram.ui.Components.blur3.source.BlurredBackgroundSourceBitmap;
 import org.telegram.ui.Components.chat.ViewPositionWatcher;
 
@@ -81,6 +82,24 @@ public class Blur3Utils {
                 canvas.restore();
             }
         }
+    }
+
+    /** Match capture coordinates/opacity. Scratch belongs to the caller, not a global nested capture. */
+    public static void calculateHashRelativeParent(IBlur3Capture capture, IBlur3Hash builder,
+            RectF position, View view, ViewGroup parent, int alpha, RectF scratch) {
+        if (alpha <= 0 || capture == null) return;
+        if (!ViewPositionWatcher.computeRectInParent(view, parent, scratch)) {
+            builder.unsupported();
+            return;
+        }
+        final float x = scratch.left, y = scratch.top;
+        builder.add(view);
+        builder.add(alpha);
+        builder.addF(x);
+        builder.addF(y);
+        scratch.set(position);
+        scratch.offset(-x, -y);
+        capture.captureCalculateHash(builder, scratch);
     }
 
     public static Drawable wrapCenteredDrawable(Drawable drawable, int w, int h) {

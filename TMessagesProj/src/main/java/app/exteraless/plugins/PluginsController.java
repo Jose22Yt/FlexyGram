@@ -131,17 +131,22 @@ public class PluginsController extends com.exteragram.messenger.plugins.PluginsC
         if (!isEngineEnabled()) {
             return;
         }
-        String crashed = watchdog.recoverAfterCrash();
-        if (crashed != null) {
-            FileLog.e("PluginsController: disabled crashed plugin " + crashed);
-        }
-        // Планировщик детекта зависаний живёт столько же, сколько движок.
-        watchdog.start();
-        PythonPluginsEngine.getInstance().ensureStarted(appContext, ok -> {
-            if (ok) {
-                rescanAndLoadEnabled();
-                executeOnAppEvent(PluginsConstants.EVENT_APP_START);
+        // Recovery opens/deletes a marker file. Keep it on the same serial worker
+        // as Python startup, before any plugin can execute, never on Activity.onCreate.
+        PythonPluginsEngine.getInstance().runOnEngine(() -> {
+            if (!isEngineEnabled()) return;
+            String crashed = watchdog.recoverAfterCrash();
+            if (crashed != null) {
+                FileLog.e("PluginsController: disabled crashed plugin " + crashed);
             }
+            // Планировщик детекта зависаний живёт столько же, сколько движок.
+            watchdog.start();
+            PythonPluginsEngine.getInstance().ensureStarted(appContext, ok -> {
+                if (ok && isEngineEnabled()) {
+                    rescanAndLoadEnabled();
+                    executeOnAppEvent(PluginsConstants.EVENT_APP_START);
+                }
+            });
         });
     }
 

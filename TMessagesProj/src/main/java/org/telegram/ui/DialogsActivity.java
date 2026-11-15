@@ -4363,29 +4363,61 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         iBlur3FactoryBlur.setSourceRootView(viewPositionWatcher, contentView);
 
         final PointF tmpPoint = new PointF();
-        iBlur3Capture = (canvas, position) -> {
-            final int searchViewAlpha = searchViewPager != null ? (int) (searchViewPager.getAlpha() * 255) : 0;
+        iBlur3Capture = new IBlur3Capture() {
+            private final RectF hashPosition = new RectF();
 
-            for (ViewPage viewPage : viewPages) {
-                if (viewPage != null && viewPage.getVisibility() == View.VISIBLE && viewPage.getAlpha() > 0f) {
-                    float rp = getRightSlidingProgress();
-                    if (viewPage.animationSupportListView != null && rp > 0) {
-                        if (!ViewPositionWatcher.computeCoordinatesInParent(viewPage.listView, contentView, tmpPoint)) {
-                            return;
+            @Override
+            public void capture(Canvas canvas, RectF position) {
+                final int searchViewAlpha = searchViewPager != null ? (int) (searchViewPager.getAlpha() * 255) : 0;
+
+                for (ViewPage viewPage : viewPages) {
+                    if (viewPage != null && viewPage.getVisibility() == View.VISIBLE && viewPage.getAlpha() > 0f) {
+                        float rp = getRightSlidingProgress();
+                        if (viewPage.animationSupportListView != null && rp > 0) {
+                            if (!ViewPositionWatcher.computeCoordinatesInParent(viewPage.listView, contentView, tmpPoint)) {
+                                return;
+                            }
+
+                            canvas.save();
+                            canvas.clipRect(position);
+                            canvas.translate(tmpPoint.x, tmpPoint.y);
+                            viewPage.listView.dispatchDraw(canvas);
+                            canvas.restore();
+                        } else {
+                            Blur3Utils.captureRelativeParent(viewPage.listView, canvas, position, viewPage.listView, contentView, 255 - searchViewAlpha);
                         }
-
-                        canvas.save();
-                        canvas.clipRect(position);
-                        canvas.translate(tmpPoint.x, tmpPoint.y);
-                        viewPage.listView.dispatchDraw(canvas);
-                        canvas.restore();
-                    } else {
-                        Blur3Utils.captureRelativeParent(viewPage.listView, canvas, position, viewPage.listView, contentView, 255 - searchViewAlpha);
                     }
                 }
+                if (searchViewPager != null && searchViewPager.getVisibility() == View.VISIBLE && searchViewPager.getAlpha() > 0f) {
+                    Blur3Utils.captureRelativeParent(searchViewPager, canvas, position, searchViewPager, contentView, searchViewAlpha);
+                }
             }
-            if (searchViewPager != null && searchViewPager.getVisibility() == View.VISIBLE && searchViewPager.getAlpha() > 0f) {
-                Blur3Utils.captureRelativeParent(searchViewPager, canvas, position, searchViewPager, contentView, searchViewAlpha);
+
+            @Override
+            public void captureCalculateHash(IBlur3Hash builder, RectF position) {
+                final int searchAlpha = searchViewPager != null ? (int) (searchViewPager.getAlpha() * 255) : 0;
+                for (ViewPage page : viewPages) {
+                    if (page == null || page.getVisibility() != View.VISIBLE || page.getAlpha() <= 0f) continue;
+                    if (page.isDirty() || page.isLayoutRequested() || page.listView.isDirty()
+                            || page.listView.isLayoutRequested() || page.listView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE) {
+                        // Known-changing content needs capture, not an extra walk of every child first.
+                        builder.unsupported();
+                        return;
+                    }
+                    if (page.animationSupportListView != null && getRightSlidingProgress() > 0) {
+                        // dispatchDraw includes transition overlays not represented by child hashes.
+                        builder.unsupported();
+                        return;
+                    }
+                    builder.add(page);
+                    Blur3Utils.calculateHashRelativeParent(page.listView, builder, position,
+                            page.listView, contentView, 255 - searchAlpha, hashPosition);
+                }
+                if (searchViewPager != null && searchViewPager.getVisibility() == View.VISIBLE && searchViewPager.getAlpha() > 0f) {
+                    // Search currently has no content hash: its default implementation forces capture.
+                    Blur3Utils.calculateHashRelativeParent(searchViewPager, builder, position,
+                            searchViewPager, contentView, searchAlpha, hashPosition);
+                }
             }
         };
 

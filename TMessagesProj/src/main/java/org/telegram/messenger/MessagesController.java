@@ -40,6 +40,7 @@ import android.util.Pair;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 import android.util.SparseIntArray;
+import android.util.SparseLongArray;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 
@@ -376,6 +377,8 @@ public class MessagesController extends BaseController implements NotificationCe
     public boolean needsDialogsSortOnResume() { return dialogsSortPending || !dialogsLoaded; }
     private SparseIntArray nextDialogsCacheOffset = new SparseIntArray();
     private SparseBooleanArray loadingDialogs = new SparseBooleanArray();
+    private final SparseLongArray dialogsLoadRetryAfter = new SparseLongArray();
+    private int dialogsLoadGeneration;
     private SparseBooleanArray dialogsEndReached = new SparseBooleanArray();
     private SparseBooleanArray serverDialogsEndReached = new SparseBooleanArray();
 
@@ -6686,6 +6689,8 @@ public class MessagesController extends BaseController implements NotificationCe
         dialogsLoaded = false;
         nextDialogsCacheOffset.clear();
         loadingDialogs.clear();
+        dialogsLoadRetryAfter.clear();
+        dialogsLoadGeneration++;
         dialogsEndReached.clear();
         serverDialogsEndReached.clear();
 
@@ -12773,9 +12778,12 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void loadDialogs(final int folderId, int offset, int count, boolean fromCache, Runnable onEmptyCallback) {
-        if (loadingDialogs.get(folderId) || resetingDialogs) {
+        if (loadingDialogs.get(folderId) || resetingDialogs
+                || !fromCache && SystemClock.elapsedRealtime() < dialogsLoadRetryAfter.get(folderId)) {
             return;
         }
+        final int loadGeneration = dialogsLoadGeneration;
+        if (!fromCache) dialogsLoadRetryAfter.delete(folderId);
         loadingDialogs.put(folderId, true);
         getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
         if (BuildVars.LOGS_ENABLED) {
@@ -12864,6 +12872,15 @@ public class MessagesController extends BaseController implements NotificationCe
                     if (onEmptyCallback != null && dialogsRes.dialogs.isEmpty()) {
                         AndroidUtilities.runOnUIThread(onEmptyCallback);
                     }
+                } else {
+                    AndroidUtilities.runOnUIThread(() -> {
+                        if (loadGeneration != dialogsLoadGeneration) return;
+                        loadingDialogs.put(folderId, false);
+                        // Reload observers can request another page immediately. Bound retries,
+                        // while allowing the next scroll/resume to retry after a transient error.
+                        dialogsLoadRetryAfter.put(folderId, SystemClock.elapsedRealtime() + 3_000);
+                        getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
+                    });
                 }
             });
         }
