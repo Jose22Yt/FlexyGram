@@ -30,6 +30,7 @@ def test_selected_account_precedes_deferred_sessions_and_headless_never_waits_fo
  static class AndroidUtilities{static void runOnUIThread(Runnable r){applicationHandler.post(r);}}
  static class TLRPC{static class User{}}
  static class UserConfig{static final int MAX_ACCOUNT_COUNT=10;static int selectedAccount=3;static UserConfig[] values=new UserConfig[10];int id;boolean active;TLRPC.User user=new TLRPC.User();static UserConfig getInstance(int a){return values[a];}void loadConfig(){loaded.add(id);}boolean isClientActivated(){return active;}TLRPC.User getCurrentUser(){return active?user:null;}}
+ static class MessagesStorage{static MessagesStorage getInstanceForUiStartup(int a){return new MessagesStorage();}void completeUiStartup(){}}
  static class MessagesController{static boolean[] ready=new boolean[10];static MessagesController getInstance(int a){if(!ready[a]){ready[a]=true;core.add(a);}return new MessagesController();}void putUser(TLRPC.User u,boolean cache){}}
  static class ConnectionsManager{static ConnectionsManager getInstance(int a){return new ConnectionsManager();}int getCurrentTime(){return 1;}}
  static class SharedConfig{static String pushStringStatus;}

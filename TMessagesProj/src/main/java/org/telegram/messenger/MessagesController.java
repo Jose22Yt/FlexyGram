@@ -13631,7 +13631,9 @@ public class MessagesController extends BaseController implements NotificationCe
     private int DIALOGS_LOAD_TYPE_UNKNOWN = 3;
 
     public void processLoadedDialogs(final TLRPC.messages_Dialogs dialogsRes, ArrayList<TLRPC.EncryptedChat> encChats, ArrayList<TLRPC.UserFull> fullUsers, int folderId, int offset, int count, int loadType, boolean resetEnd, boolean migrate, boolean fromCache) {
+        final int stageTrace = app.flexygram.performance.PerformanceTrace.beginAsync("Flexy.dialogs.stage_queue");
         Utilities.stageQueue.postRunnable(() -> {
+            app.flexygram.performance.PerformanceTrace.endAsync("Flexy.dialogs.stage_queue", stageTrace);
             if (!firstGettingTask) {
                 getNewDeleteTask(null, null);
                 firstGettingTask = true;
@@ -13890,7 +13892,9 @@ public class MessagesController extends BaseController implements NotificationCe
             }
 
             TLRPC.Message lastMessageFinal = lastMessage;
+            final int uiTrace = app.flexygram.performance.PerformanceTrace.beginAsync("Flexy.dialogs.ui_queue");
             AndroidUtilities.runOnUIThread(() -> {
+                app.flexygram.performance.PerformanceTrace.endAsync("Flexy.dialogs.ui_queue", uiTrace);
                 if (lastMessageFinal != null) {
                     dialogsLoadedTillDate = Math.min(dialogsLoadedTillDate, lastMessageFinal.date);
                 } else {
@@ -14068,7 +14072,10 @@ public class MessagesController extends BaseController implements NotificationCe
                     }
                     allDialogs.add(dialog);
                 }
-                sortDialogs(migrate ? chatsDict : null);
+                android.os.Trace.beginSection("Flexy.dialogs.sort");
+                try {
+                    sortDialogs(migrate ? chatsDict : null);
+                } finally { android.os.Trace.endSection(); }
 
                 putAllNeededDraftDialogs();
 
@@ -14092,7 +14099,11 @@ public class MessagesController extends BaseController implements NotificationCe
                 if (!fromCache && !migrate && totalDialogsLoadCount < 400 && dialogsLoadOffset2[UserConfig.i_dialogsLoadOffsetId] != -1 && dialogsLoadOffset2[UserConfig.i_dialogsLoadOffsetId] != Integer.MAX_VALUE) {
                     loadDialogs(folderId, 0, 100, false);
                 }
-                getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
+                android.os.Trace.beginSection(loadType == DIALOGS_LOAD_TYPE_CACHE
+                        ? "Flexy.dialogs.publish_cache" : "Flexy.dialogs.publish_remote");
+                try {
+                    getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
+                } finally { android.os.Trace.endSection(); }
 
                 if (migrate) {
                     getUserConfig().migrateOffsetId = offset;

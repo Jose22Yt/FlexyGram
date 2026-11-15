@@ -1699,6 +1699,12 @@ public class DatabaseMigrationHelper {
             version = 179;
         }
 
+        if (version == 179) {
+            database.executeFast("CREATE INDEX IF NOT EXISTS folder_pinned_date_idx_dialogs ON dialogs(folder_id, pinned DESC, date DESC);").stepThis().dispose();
+            database.executeFast("PRAGMA user_version = 180").stepThis().dispose();
+            version = 180;
+        }
+
         return version;
     }
 

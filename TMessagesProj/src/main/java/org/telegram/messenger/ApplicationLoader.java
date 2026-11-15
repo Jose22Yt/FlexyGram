@@ -380,7 +380,13 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
 
     private static void initializeStartupAccount(int a, boolean prepareDialogs, boolean uiStartup) {
         android.os.Trace.beginSection("Flexy.startup.account_core");
+        MessagesStorage startupStorage = null;
         try {
+            if (prepareDialogs && uiStartup) {
+                // Reserve the initial SQLite page before filters, unread notification
+                // recovery and pending tasks fill this account's serial storage queue.
+                startupStorage = MessagesStorage.getInstanceForUiStartup(a);
+            }
             MessagesController.getInstance(a);
             if (a == 0) {
                 SharedConfig.pushStringStatus = "__FIREBASE_GENERATING_SINCE_" + ConnectionsManager.getInstance(a).getCurrentTime() + "__";
@@ -395,7 +401,10 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                 if (prepareDialogs) prepareSelectedDialogs();
                 scheduleStartupUnsentMessages(a, uiStartup);
             }
-        } finally { android.os.Trace.endSection(); }
+        } finally {
+            if (startupStorage != null) startupStorage.completeUiStartup();
+            android.os.Trace.endSection();
+        }
     }
 
     private static void scheduleStartupUnsentMessages(int account, boolean uiStartup) {

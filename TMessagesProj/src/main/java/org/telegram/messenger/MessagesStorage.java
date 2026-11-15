@@ -124,6 +124,10 @@ public class MessagesStorage extends BaseController {
     private volatile int pendingMainUnreadCount;
     private volatile int pendingArchiveUnreadCount;
     private boolean databaseCreated;
+    // Only the selected account's UI launch defers auxiliary bootstrap work.
+    // Both fields are owned by storageQueue after construction.
+    private boolean startupTasksDeferred;
+    private boolean startupTasksPending;
 
     private final CountDownLatch openSync = new CountDownLatch(1);
 
@@ -135,7 +139,7 @@ public class MessagesStorage extends BaseController {
         }
     }
 
-    public final static int LAST_DB_VERSION = 179;
+    public final static int LAST_DB_VERSION = 180;
     private boolean databaseMigrationInProgress;
     public boolean showClearDatabaseAlert;
 
@@ -148,12 +152,20 @@ public class MessagesStorage extends BaseController {
 
 
     public static MessagesStorage getInstance(int num) {
+        return getInstance(num, false);
+    }
+
+    static MessagesStorage getInstanceForUiStartup(int num) {
+        return getInstance(num, true);
+    }
+
+    private static MessagesStorage getInstance(int num, boolean deferStartupTasks) {
         MessagesStorage localInstance = Instance[num];
         if (localInstance == null) {
             synchronized (lockObjects[num]) {
                 localInstance = Instance[num];
                 if (localInstance == null) {
-                    Instance[num] = localInstance = new MessagesStorage(num);
+                    Instance[num] = localInstance = new MessagesStorage(num, deferStartupTasks);
                 }
             }
         }
@@ -247,10 +259,32 @@ public class MessagesStorage extends BaseController {
     }
 
     public MessagesStorage(int instance) {
+        this(instance, false);
+    }
+
+    private MessagesStorage(int instance, boolean deferStartupTasks) {
         super(instance);
+        startupTasksDeferred = deferStartupTasks;
         storageQueue = new DispatchQueue("storageQueue_" + instance);
         storageQueue.setPriority(8);
         storageQueue.postRunnable(() -> openDatabase(1));
+    }
+
+    /** Queued after the initial local page, including when no page could be requested. */
+    void completeUiStartup() {
+        storageQueue.postRunnable(() -> {
+            startupTasksDeferred = false;
+            if (startupTasksPending) {
+                startupTasksPending = false;
+                loadStartupTasks();
+            }
+        });
+    }
+
+    private void loadStartupTasks() {
+        loadDialogFilters();
+        loadUnreadMessages();
+        loadPendingTasks();
     }
 
     public SQLiteDatabase getDatabase() {
@@ -426,9 +460,11 @@ public class MessagesStorage extends BaseController {
                 NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.onDatabaseMigration, false);
             }
         });
-        loadDialogFilters();
-        loadUnreadMessages();
-        loadPendingTasks();
+        if (startupTasksDeferred) {
+            startupTasksPending = true;
+        } else {
+            loadStartupTasks();
+        }
         try {
             openSync.countDown();
         } catch (Throwable ignore) {
@@ -601,6 +637,7 @@ public class MessagesStorage extends BaseController {
         database.executeFast("CREATE INDEX IF NOT EXISTS last_mid_i_idx_dialogs ON dialogs(last_mid_i);").stepThis().dispose();
         database.executeFast("CREATE INDEX IF NOT EXISTS unread_count_i_idx_dialogs ON dialogs(unread_count_i);").stepThis().dispose();
         database.executeFast("CREATE INDEX IF NOT EXISTS folder_id_idx_4_dialogs ON dialogs(folder_id);").stepThis().dispose();
+        database.executeFast("CREATE INDEX IF NOT EXISTS folder_pinned_date_idx_dialogs ON dialogs(folder_id, pinned DESC, date DESC);").stepThis().dispose();
         database.executeFast("CREATE INDEX IF NOT EXISTS flags_idx_4_dialogs ON dialogs(flags);").stepThis().dispose();
 
         database.executeFast("CREATE TABLE dialog_filter_neko(id INTEGER PRIMARY KEY, ord INTEGER, unread_count INTEGER, flags INTEGER, title TEXT, emoticon TEXT, color INTEGER DEFAULT -1, entities BLOB, noanimate INTEGER)").stepThis().dispose();
@@ -17262,7 +17299,9 @@ public class MessagesStorage extends BaseController {
         } else {
             draftsDialogIds = null;
         }
+        final int storageTrace = PerformanceTrace.beginAsync("Flexy.dialogs.storage_queue");
         storageQueue.postRunnable(() -> {
+            PerformanceTrace.endAsync("Flexy.dialogs.storage_queue", storageTrace);
             TLRPC.messages_Dialogs dialogs = new TLRPC.TL_messages_dialogs();
             ArrayList<TLRPC.EncryptedChat> encryptedChats = new ArrayList<>();
             SQLiteCursor cursor = null;
