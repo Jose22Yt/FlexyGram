@@ -1682,6 +1682,13 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     private class MainTabsActivityControllerImpl implements MainTabsActivityController {
         @Override
+        public boolean hasVisibleTabsSurface() {
+            return tabsView != null && tabsView.getVisibility() == View.VISIBLE && tabsView.getAlpha() > 0f
+                    && tabsViewWrapper != null && tabsViewWrapper.getVisibility() == View.VISIBLE
+                    && tabsViewWrapper.getAlpha() > 0f;
+        }
+
+        @Override
         public void setTabsVisible(boolean visible) {
             animatorTabsVisible.setValue(visible, true);
         }

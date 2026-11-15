@@ -3116,6 +3116,8 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public boolean onFragmentCreate() {
+        android.os.Trace.beginSection("Flexy.chat.fragment_create");
+        try {
         final long chatId = arguments.getLong("chat_id", 0);
         final long userId = arguments.getLong("user_id", 0);
         final int encId = arguments.getInt("enc_id", 0);
@@ -3646,6 +3648,8 @@ public class ChatActivity extends BaseFragment implements
         }
 
         return true;
+
+        } finally { android.os.Trace.endSection(); }
     }
 
     protected void updateSearchingHashtag(String hashtag) {
@@ -4118,6 +4122,8 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public View createView(Context context) {
+        android.os.Trace.beginSection("Flexy.chat.create_view");
+        try {
         Timer t = Timer.create("ChatActivity.createView");
         ChatsHelper chatsHelper = ChatsHelper.getInstance(currentAccount);
 
@@ -9880,6 +9886,8 @@ public class ChatActivity extends BaseFragment implements
         }, 600);
 
         return fragmentView;
+
+        } finally { android.os.Trace.endSection(); }
     }
 
     private void createSearchHashtagViewsIfNeeded() {

@@ -17,7 +17,7 @@ def diff_hosts():
     }
     source = (JAVA / 'org/telegram/ui/Adapters/DialogsAdapter.java').read_text()
     actual = '\n'.join(method(source, signature) for signature in [
-        'private static final class DiffItem', 'private DiffItem[] snapshotDiffItems(',
+        'private static final class DiffItem', 'private DiffItem[] snapshotDiffItems(', 'private static boolean preservesRowPositions(',
         'public void updateList(Runnable saveScrollPosition)', 'private void applyListDiff(', 'public void notifyDataSetChanged()'])
     host = '''import java.util.*;import androidx.recyclerview.widget.*;
 class Queue{ArrayDeque<Runnable>jobs=new ArrayDeque<>();void postRunnable(Runnable r){jobs.add(r);}

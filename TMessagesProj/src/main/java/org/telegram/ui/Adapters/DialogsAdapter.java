@@ -554,6 +554,16 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         return snapshot;
     }
 
+    private static boolean preservesRowPositions(DiffItem[] before, DiffItem[] after) {
+        if (before.length != after.length) return false;
+        for (int i = 0; i < before.length; i++) {
+            // The spacer deliberately receives a native diff refresh, but cannot move rows above it.
+            if (before[i].viewType == VIEW_TYPE_LAST_EMPTY && after[i].viewType == VIEW_TYPE_LAST_EMPTY) continue;
+            if (!before[i].matches(after[i])) return false;
+        }
+        return true;
+    }
+
     public void updateList(Runnable saveScrollPosition) {
         if (isCalculatingDiff) {
             updateListPending = true;
@@ -569,6 +579,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         updateItemList();
         final ArrayList<ItemInternal> newItems = itemInternals;
         final DiffItem[] after = snapshotDiffItems(newItems);
+        final Runnable restoreScroll = preservesRowPositions(before, after) ? null : saveScrollPosition;
         itemInternals = oldItems;
 
         DiffUtil.Callback callback = new DiffUtil.Callback() {
@@ -593,7 +604,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
             }
         };
         if (Math.max(before.length, after.length) < 50) {
-            applyListDiff(generation, newItems, DiffUtil.calculateDiff(callback), saveScrollPosition);
+            applyListDiff(generation, newItems, DiffUtil.calculateDiff(callback), restoreScroll);
         } else {
             Utilities.searchQueue.postRunnable(() -> {
                 DiffUtil.DiffResult result;
@@ -605,7 +616,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
                     });
                     return;
                 }
-                AndroidUtilities.runOnUIThread(() -> applyListDiff(generation, newItems, result, saveScrollPosition));
+                AndroidUtilities.runOnUIThread(() -> applyListDiff(generation, newItems, result, restoreScroll));
             });
         }
     }

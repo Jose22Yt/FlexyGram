@@ -22,6 +22,8 @@ public class Probe {
  static class Suppressor{int setups,captures,regions;void setupRenderNodes(Object p,int n){setups++;regions=n;}void invalidateResultRenderNodes(Object c,int w,int h){captures++;}}
  static class Source{int updates,width,height;void setSize(int w,int h){width=w;height=h;}void updateDisplayListIfNeeded(){updates++;}}
  Suppressor scrollableViewNoiseSuppressor=new Suppressor();View fragmentView=new View(),actionBar=new View(),filterTabsView,topPanelLayout,searchTabsAndFiltersLayout,commentView,chatInputViewsContainer;
+ static class Controller{boolean visible=true;boolean hasVisibleTabsSurface(){return visible;}}
+ Controller mainTabsActivityController;
  boolean hasStories,hasMainTabs;int navigationBarHeight;float scrollYOffset;Object iBlur3Positions=new Object(),iBlur3Capture=new Object();
  Rect iBlur3PositionActionBar=new Rect(),iBlur3PositionMainTabs=new Rect();Animator animatorSearchVisible=new Animator();
  Source iBlur3SourceGlassFrosted=new Source(),iBlur3SourceGlass=new Source();

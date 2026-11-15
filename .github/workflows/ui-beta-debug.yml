@@ -3,7 +3,7 @@ run-name: UI beta debug ARM64 · ${{ github.sha }}
 
 on:
   push:
-    branches: [codex/flexygram-beta-glass, codex/flexygram-beta55-audit]
+    branches: [codex/flexygram-beta-glass, codex/flexygram-beta55-audit, codex/flexygram-update56]
   workflow_dispatch:
 
 permissions:
@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.repository == 'Jose22Yt/FlexyGram' && (github.ref == 'refs/heads/codex/flexygram-beta-glass' || github.ref == 'refs/heads/codex/flexygram-beta55-audit')
+    if: github.repository == 'Jose22Yt/FlexyGram' && (github.ref == 'refs/heads/codex/flexygram-beta-glass' || github.ref == 'refs/heads/codex/flexygram-beta55-audit' || github.ref == 'refs/heads/codex/flexygram-update56')
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     env:

@@ -1603,7 +1603,10 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public static SharedPreferences getGlobalMainSettings() {
-        return getInstance(0).mainPreferences;
+        // Locale/config readers only need this file, not the complete account-zero controller graph.
+        MessagesController controller = Instance[0];
+        if (controller != null && controller.mainPreferences != null) return controller.mainPreferences;
+        return ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
     }
 
     public static SharedPreferences getEmojiSettings(int account) {

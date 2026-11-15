@@ -8336,6 +8336,8 @@ public class Theme {
     }
 
     public static void createChatResources(Context context, boolean fontsOnly) {
+        android.os.Trace.beginSection("Flexy.resources.chat");
+        try {
         createCommonChatResources();
 
         if (!fontsOnly && chat_msgInDrawable == null) {
@@ -8607,6 +8609,8 @@ public class Theme {
             chat_commentTextPaint.setTextSize(dp(14));
             chat_commentTextPaint.setTypeface(AndroidUtilities.bold());
         }
+
+        } finally { android.os.Trace.endSection(); }
     }
 
     public static void applyChatTheme(boolean fontsOnly, boolean bg) {

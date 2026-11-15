@@ -429,6 +429,31 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     private AssetManager iconsAsset;
     private IconsResources customResources;
+    private Runnable cancelIconPreload;
+    private final Runnable startIconPreload = () -> {
+        if (!isResumed || customResources == null || !app.flexygram.icons.ExactIcons.isEnabled()) return;
+        cancelIconPreload = customResources.preloadOriginalIcons(new int[] {
+                R.drawable.fg_ios_original_chat_context_menu_forward,
+                R.drawable.fg_ios_original_chat_context_menu_reply,
+                R.drawable.fg_ios_original_navigation_back,
+                R.drawable.fg_ios_original_navigation_search,
+                R.drawable.fg_ios_original_navigation_close,
+                R.drawable.fg_ios_original_globalmusicplayer_next,
+                R.drawable.fg_ios_original_globalmusicplayer_previous,
+                R.drawable.fg_ios_original_globalmusicplayer_play,
+                R.drawable.fg_ios_original_globalmusicplayer_pause,
+                R.drawable.fg_ios_original_globalmusicplayer_orderrandom,
+                R.drawable.fg_ios_original_globalmusicplayer_repeat
+        });
+    };
+    private final android.view.Choreographer.FrameCallback iconPreloadFrame = time -> AndroidUtilities.runOnUIThread(startIconPreload);
+
+    private void cancelIconPreload() {
+        android.view.Choreographer.getInstance().removeFrameCallback(iconPreloadFrame);
+        AndroidUtilities.cancelRunOnUIThread(startIconPreload);
+        if (cancelIconPreload != null) { cancelIconPreload.run(); cancelIconPreload = null; }
+    }
+
 
     @Override
     public Resources getResources() {
@@ -7004,6 +7029,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onPause() {
+        cancelIconPreload();
         cancelStartupStatusRefresh();
         startupStatus.reset();
         refreshRateMonitor.stop();
@@ -7140,6 +7166,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onDestroy() {
+        cancelIconPreload();
         cancelStartupStatusRefresh();
         refreshRateMonitor.stop();
         if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) app.flexygram.performance.FrameDiagnostics.pause(frameDiagnostics);
@@ -7266,6 +7293,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onResume() {
         super.onResume();
+        android.view.Choreographer.getInstance().postFrameCallback(iconPreloadFrame);
         // Resume once, before plugin/theme work can delay the native connection.
         ApplicationLoader.mainInterfacePaused = false;
         ConnectionsManager cm = ConnectionsManager.getInstance(currentAccount);

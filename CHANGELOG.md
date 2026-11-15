@@ -1,3 +1,12 @@
+## 1.0.0-beta.56 (1345)
+
+- Evita restaurar el scroll cuando las filas mantienen su posición; conserva los cambios de DiffUtil.
+- Prepara 11 iconos estáticos fuera del hilo principal después del primer fotograma, con cancelación y caché invalidada al cambiar configuración.
+- Omite la captura inferior del blur cuando el dock está completamente oculto; conserva la captura durante su animación.
+- Desacopla la lectura de preferencias globales de la creación del controlador de cuenta cero.
+- Incluye la recuperación de carga de chats tras errores y la recuperación del watchdog de plugins fuera del hilo principal.
+- Añade secciones Perfetto para creación de conversaciones y recursos; la mejora de latencia/jank requiere comparación en dispositivo.
+
 # Cambios
 
 ## 1.0.0-beta.55 — correcciones y trabajo de interfaz

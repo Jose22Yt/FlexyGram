@@ -15085,7 +15085,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             iBlur3PositionActionBar.set(0, -additionalList, fragmentView.getMeasuredWidth(), lerp(actionBarHeight, actionBarHeightSearch, animatorSearchVisible.getFloatValue()) + additionalList );
 
             boolean hasBottomBlur = false;
-            if (hasMainTabs && MainTabsLayout.isBottomNavigationVisible()) {
+            if (hasMainTabs && MainTabsLayout.isBottomNavigationVisible()
+                    && (mainTabsActivityController == null || mainTabsActivityController.hasVisibleTabsSurface())) {
                 app.exteraless.appearance.MainTabsUiHelper.setBlurBounds(iBlur3PositionMainTabs, fragmentView, navigationBarHeight);
                 iBlur3PositionMainTabs.inset(0, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0 : -dp(48));
 

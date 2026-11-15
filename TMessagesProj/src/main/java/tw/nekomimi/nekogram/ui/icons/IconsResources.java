@@ -2,6 +2,10 @@ package tw.nekomimi.nekogram.ui.icons;
 
 import android.annotation.SuppressLint;
 import android.content.res.Resources;
+import android.content.res.Configuration;
+import android.util.DisplayMetrics;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import android.graphics.drawable.Drawable;
 import android.util.LruCache;
 
@@ -17,6 +21,83 @@ public class IconsResources extends Resources {
     public static final int ICON_REPLACE_SOLAR = 1;
     private int _iconsType = -1;
     private final LruCache<Long, Drawable.ConstantState> constantStates = new LruCache<>(300);
+    private final Object cacheLock = new Object();
+    private volatile long cacheGeneration;
+    private Configuration warmedConfiguration;
+    private int[] warmedSources;
+    private final AtomicBoolean warming = new AtomicBoolean();
+    private static final ThreadPoolExecutor PRELOADER = new ThreadPoolExecutor(0, 1, 1, TimeUnit.SECONDS,
+            new ArrayBlockingQueue<>(1), task -> {
+                Thread thread = new Thread(() -> {
+                    android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+                    task.run();
+                }, "FlexyIconPreload");
+                thread.setDaemon(true);
+                return thread;
+            }, new ThreadPoolExecutor.AbortPolicy());
+
+    @Override
+    public void updateConfiguration(Configuration config, DisplayMetrics metrics) {
+        super.updateConfiguration(config, metrics);
+        // Resources constructors can call this override before subclass fields exist.
+        if (cacheLock == null) return;
+        synchronized (cacheLock) {
+            cacheGeneration++;
+            warmedConfiguration = null;
+            warmedSources = null;
+            constantStates.evictAll();
+        }
+    }
+
+    /** Only static source PNG IDs; no Theme, Views, icon-pack manager or shared tinted drawables. */
+    public Runnable preloadOriginalIcons(int[] sources) {
+        if (sources == null || sources.length == 0 || sources.length > 32) return null;
+        final int[] ids = sources.clone();
+        final Configuration configuration = new Configuration(getConfiguration());
+        final long generation;
+        synchronized (cacheLock) {
+            if (configuration.equals(warmedConfiguration) && java.util.Arrays.equals(ids, warmedSources)) return null;
+            if (!warming.compareAndSet(false, true)) return null;
+            generation = cacheGeneration;
+        }
+        final AtomicBoolean cancelled = new AtomicBoolean();
+        try {
+            PRELOADER.execute(() -> {
+                boolean completed = false;
+                try {
+                    for (int id : ids) {
+                        if (cancelled.get() || generation != cacheGeneration) return;
+                        long key = ((long) id << 32);
+                        if (constantStates.get(key) != null) continue;
+                        // Bypass replacement/config code; framework decode is thread-safe.
+                        Drawable source = super.getDrawableForDensity(id, 0, null);
+                        Drawable.ConstantState state = source != null ? source.getConstantState() : null;
+                        synchronized (cacheLock) {
+                            if (cancelled.get() || generation != cacheGeneration) return;
+                            if (state != null && !state.canApplyTheme()) constantStates.put(key, state);
+                        }
+                    }
+                    completed = true;
+                } catch (RuntimeException | OutOfMemoryError unavailable) {
+                    // Opportunistic only: a miss still uses the normal synchronous resource path.
+                } finally {
+                    synchronized (cacheLock) {
+                        if (completed && !cancelled.get() && generation == cacheGeneration
+                                && configuration.equals(getConfiguration())) {
+                            warmedConfiguration = configuration;
+                            warmedSources = ids;
+                        }
+                        warming.set(false);
+                    }
+                }
+            });
+        } catch (RejectedExecutionException busy) {
+            warming.set(false);
+            return null;
+        }
+        return () -> cancelled.set(true);
+    }
+
 
     public IconsResources(Resources resources) {
         super(resources.getAssets(), resources.getDisplayMetrics(), resources.getConfiguration());
