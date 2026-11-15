@@ -94,7 +94,10 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         slotWidth=inner/Math.max(1,count);int rank=0;
         boolean hide=LiquidNavigationConfig.hideLabels(count,(int)(inner/getResources().getDisplayMetrics().density));
         for(int i=0;i<getChildCount();i++){
-            View child=getChildAt(i);int w=isViewVisible(child)?slotWidth+(rank++<inner%Math.max(1,count)?1:0):0;
+            View child=getChildAt(i);
+            // Keep the previous geometry while an outgoing tab finishes its exit.
+            if(!isViewVisible(child))continue;
+            int w=slotWidth+(rank++<inner%Math.max(1,count)?1:0);
             if(child instanceof GlassTabView){
                 GlassTabView tab=(GlassTabView)child;tab.setSkipDrawSelector(true);tab.setTextSizeDp(11);
                 tab.setMainTabsAppearance(hide,LiquidNavigationConfig.iconDp());

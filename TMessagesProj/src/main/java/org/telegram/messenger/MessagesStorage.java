@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.os.Trace;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -32,6 +33,7 @@ import androidx.annotation.UiThread;
 import androidx.collection.LongSparseArray;
 
 import app.exteraless.feed.FeedController;
+import app.flexygram.performance.PerformanceTrace;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.SQLite.SQLiteCursor;
@@ -10203,26 +10205,47 @@ public class MessagesStorage extends BaseController {
 
     public void getMessages(long dialogId, long mergeDialogId, boolean loadInfo, int count, int max_id, int offset_date, int minDate, int classGuid, int load_type, int mode, long replyMessageId, int loadIndex, boolean processMessages, boolean isTopic, Timer loaderLogger) {
         Timer.Task t1 = Timer.start(loaderLogger, "MessagesStorage.getMessages: storageQueue.postRunnable");
-        storageQueue.postRunnable(() -> {
+        int storageTrace = PerformanceTrace.beginAsync("Flexy.chat.storage_queue");
+        boolean storageAccepted = storageQueue.postRunnable(() -> {
+            PerformanceTrace.endAsync("Flexy.chat.storage_queue", storageTrace);
             Timer.done(t1);
             Timer.Task t2 = Timer.start(loaderLogger, "MessagesStorage.getMessages");
-            WarmHistoryDelivery warmed = null;
-            if (mergeDialogId == 0 && max_id == 0 && offset_date == 0 && minDate == 0
-                    && load_type == LOAD_FROM_UNREAD && mode == 0 && replyMessageId == 0 && processMessages && !isTopic
-                    && !warmHistory.isEmpty()) {
-                warmed = warmHistory.take(dialogId, count, SystemClock.uptimeMillis(), warmHistoryRevision());
+            final Runnable processMessagesRunnable;
+            Trace.beginSection("Flexy.chat.local_read");
+            try {
+                WarmHistoryDelivery warmed = null;
+                if (mergeDialogId == 0 && max_id == 0 && offset_date == 0 && minDate == 0
+                        && load_type == LOAD_FROM_UNREAD && mode == 0 && replyMessageId == 0 && processMessages && !isTopic
+                        && !warmHistory.isEmpty()) {
+                    warmed = warmHistory.take(dialogId, count, SystemClock.uptimeMillis(), warmHistoryRevision());
+                }
+                WarmHistoryDelivery ready = warmed;
+                processMessagesRunnable = ready == null
+                        ? getMessagesInternal(dialogId, mergeDialogId, count, max_id, offset_date, minDate, classGuid, load_type, mode, replyMessageId, loadIndex, processMessages, isTopic, loaderLogger)
+                        : () -> ready.deliver(classGuid, loadIndex, loaderLogger);
+            } finally {
+                Trace.endSection();
+                Timer.done(t2);
             }
-            WarmHistoryDelivery ready = warmed;
-            Runnable processMessagesRunnable = ready == null
-                    ? getMessagesInternal(dialogId, mergeDialogId, count, max_id, offset_date, minDate, classGuid, load_type, mode, replyMessageId, loadIndex, processMessages, isTopic, loaderLogger)
-                    : () -> ready.deliver(classGuid, loadIndex, loaderLogger);
-            Timer.done(t2);
             Timer.Task t3 = Timer.start(loaderLogger, "MessagesStorage.getMessages: stageQueue.postRunnable");
-            Utilities.stageQueue.postRunnable(() -> {
+            int stageTrace = PerformanceTrace.beginAsync("Flexy.chat.stage_queue");
+            boolean stageAccepted = Utilities.stageQueue.postRunnable(() -> {
+                PerformanceTrace.endAsync("Flexy.chat.stage_queue", stageTrace);
                 Timer.done(t3);
-                processMessagesRunnable.run();
+                Trace.beginSection("Flexy.chat.process_local");
+                try {
+                    processMessagesRunnable.run();
+                } finally {
+                    Trace.endSection();
+                }
             });
+            if (!stageAccepted) {
+                PerformanceTrace.endAsync("Flexy.chat.stage_queue", stageTrace);
+            }
         });
+        if (!storageAccepted) {
+            PerformanceTrace.endAsync("Flexy.chat.storage_queue", storageTrace);
+        }
     }
 
     public void clearSentMedia() {
@@ -17265,7 +17288,9 @@ public class MessagesStorage extends BaseController {
                         cnt = count;
                     } else {
                         off = 0;
-                        cnt = 100;
+                        // Match the initial page budget, keeping the controller's
+                        // archive-end threshold (20) and the existing upper bound.
+                        cnt = Math.max(20, Math.min(100, count));
                     }
 
                     ArrayList<Pair<Long, Long>> dialogsToLoadGroupMessages = new ArrayList<>();

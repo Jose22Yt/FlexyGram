@@ -12,8 +12,15 @@ def storage_probe(tmp_path, body):
     wrapper=method(source,'public Runnable getMessagesInternal(')
     get=method(source,'public void getMessages(long dialogId, long mergeDialogId, boolean loadInfo, int count,')
     files={
+        'android/os/Build.java':'package android.os;public class Build{public static class VERSION{public static int SDK_INT=29;}}',
+        'android/os/Trace.java':'''package android.os;public class Trace{
+ public static boolean enabled;public static int depth;public static java.util.Set<String> active=new java.util.HashSet<>();
+ public static boolean isEnabled(){return enabled;}public static void beginSection(String s){depth++;}public static void endSection(){if(--depth<0)throw new AssertionError();}
+ public static void beginAsyncSection(String s,int c){if(!active.add(s+c))throw new AssertionError();}
+ public static void endAsyncSection(String s,int c){if(!active.remove(s+c))throw new AssertionError();}
+}''',
         'android/os/SystemClock.java':'package android.os;public class SystemClock{public static long now=1000;public static long uptimeMillis(){return now;}}',
-        'Probe.java':'''import java.util.*;import android.os.SystemClock;import org.telegram.SQLite.SQLiteException;
+        'Probe.java':'''import java.util.*;import android.os.SystemClock;import android.os.Trace;import app.flexygram.performance.PerformanceTrace;import org.telegram.SQLite.SQLiteException;
 public class Probe {
  static final int LOAD_FROM_UNREAD=2;
  static class Queue {
@@ -49,7 +56,7 @@ public class Probe {
  public static void main(String[]args){BODY}
 }'''.replace('FIELDS',fields).replace('WRAPPER',wrapper).replace('SUFFIX',suffix).replace('GET',get).replace('BODY',body)
     }
-    probe(tmp_path,files,[JAVA/'app/flexygram/performance/WarmHistoryCache.java', JAVA/'org/telegram/SQLite/SQLiteException.java'])
+    probe(tmp_path,files,[JAVA/'app/flexygram/performance/PerformanceTrace.java', JAVA/'app/flexygram/performance/WarmHistoryCache.java', JAVA/'org/telegram/SQLite/SQLiteException.java'])
 
 
 def test_prepared_history_uses_native_delivery_once_with_the_opening_guid_and_index(tmp_path):
@@ -124,4 +131,18 @@ def test_sqlite_prepare_and_step_failures_complete_warmup_and_release_cursor(tmp
  check(FileLog.errors==2&&done[0]==2&&p.sqlReads==0&&p.warmHistory.isEmpty());
  check(SQLiteCursor.disposed==disposed+3);
  p.database.failWarmStep=false;p.open(100,25,0,0);check(p.sqlReads==1&&p.controller.deliveries==1);
+ ''')
+
+
+def test_message_queue_traces_follow_waits_and_close_on_rejection(tmp_path):
+    storage_probe(tmp_path,'''Trace.enabled=true;Probe p=new Probe();
+ p.getMessages(100,0,false,25,0,0,0,123,2,0,0,77,true,false,null);
+ check(Trace.active.size()==1&&Trace.depth==0&&p.sqlReads==0);
+ p.storageQueue.fire();check(Trace.active.size()==1&&Trace.depth==0&&p.sqlReads==1&&p.controller.deliveries==0);
+ Utilities.stageQueue.fire();check(Trace.active.isEmpty()&&Trace.depth==0&&p.controller.deliveries==1);
+ p.storageQueue.reject=true;p.getMessages(100,0,false,25,0,0,0,123,2,0,0,77,true,false,null);check(Trace.active.isEmpty());
+ p.storageQueue.reject=false;Utilities.stageQueue.reject=true;
+ p.getMessages(100,0,false,25,0,0,0,123,2,0,0,77,true,false,null);p.storageQueue.fire();check(Trace.active.isEmpty()&&Trace.depth==0);
+ Utilities.stageQueue.reject=false;Trace.enabled=false;p.open(100,25,0,0);check(Trace.active.isEmpty());
+ android.os.Build.VERSION.SDK_INT=28;Trace.enabled=true;p.open(100,25,0,0);check(Trace.active.isEmpty()&&Trace.depth==0);
  ''')

@@ -861,7 +861,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
             int textTop=top+size+dp(app.flexygram.navigation.LiquidNavigationConfig.labelGapDp());
             if(text.topMargin!=textTop){text.topMargin=textTop;textView.setLayoutParams(text);}
         }
-        setContentDescription(textView.getText());
+        updateContentDescription();
     }
 
     public void setMainTabsCompact(boolean compact) {
