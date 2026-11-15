@@ -41,7 +41,8 @@ FlexyGram. Rama: `codex/flexygram-native-performance-test`.
   espera de decodificación y avance con tiempo transcurrido.
 - **Glass/blur:** política y colores de superficie de exteraLess, contorno
   original y shader de Telegram 13.0.2. Se desactivan las islas adicionales de
-  glass en cabecera/entrada y el glass de selección de carpetas de FlexyGram.
+  glass en cabecera/entrada, las lentes adicionales de los controles de inicio
+  y el glass de selección de carpetas de FlexyGram.
   Los efectos nativos del cliente y sus controles de ahorro de energía siguen
   disponibles. Las opciones restantes de cabecera/posición del compositor se
   conservan; el compositor no utiliza su efecto de glass propio.

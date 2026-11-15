@@ -3285,7 +3285,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             protected void dispatchDraw(Canvas canvas) {
                 // Only the main screen owns this presentation. Native search,
                 // selection and right-hand chat preview keep their original glass.
-                boolean home = isSignatureHome() && !inPreviewMode
+                boolean home = !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && isSignatureHome() && !inPreviewMode
                         && progressToActionMode == 0 && !isActionModeShowed()
                         && searchAnimationProgress == 0 && getRightSlidingProgress() == 0;
                 setDrawGlassTitle(!home);
@@ -3350,7 +3350,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 if (inPreviewMode && avatarContainer != null && child != avatarContainer) {
                     return false;
                 }
-                if (isSignatureHome() && child == menu && progressToActionMode == 0
+                if (!org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && isSignatureHome() && child == menu && progressToActionMode == 0
                         && !isActionModeShowed() && getRightSlidingProgress() == 0) {
                     drawSignatureHomeControl(canvas, searchItem);
                     drawSignatureHomeControl(canvas, optionsItem);
@@ -4358,7 +4358,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         viewPositionWatcher = new ViewPositionWatcher(contentView);
         iBlur3FactoryFrostedLiquidGlass.setSourceRootView(viewPositionWatcher, contentView);
         iBlur3FactoryLiquidGlass.setSourceRootView(viewPositionWatcher, contentView);
-        signatureHomeGlassFactory = iBlur3FactoryLiquidGlass;
+        signatureHomeGlassFactory = org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? null : iBlur3FactoryLiquidGlass;
         iBlur3FactoryFade.setSourceRootView(viewPositionWatcher, contentView);
         iBlur3FactoryBlur.setSourceRootView(viewPositionWatcher, contentView);
 

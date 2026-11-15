@@ -114,7 +114,7 @@ public final class SignatureSettingsRegistry {
             case "profile":case "archive":case "translation_options":return scope(new OpenExteraGeneralActivity(),"general",id,id);
             case "general_controls":return scope(new OpenExteraGeneralActivity(),"general","general",id);
             case "advanced_controls":return scope(new OpenExteraOtherActivity(),"other","advanced",id);
-            case "files":return new SignatureFilesSettingsActivity();
+            case "files":return org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? new OpenExteraGeneralActivity() : new SignatureFilesSettingsActivity();
             case "studio":return new app.flexygram.studio.FlexyStudioActivity();
             case "bubbles":return new app.flexygram.bubbles.BubbleSettingsActivity();
             case "header":return new app.flexygram.header.HeaderSettingsActivity();
