@@ -48,7 +48,8 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     private var geometryRevision by mutableIntStateOf(0)
     private val geometry = KyantDockGeometry.State()
     private var available by mutableStateOf(false)
-    private var ready = false
+    private var ready by mutableStateOf(false)
+    private var hostInitialized = false
     private var framePending = false
     private var sourceDirty = false
     private var iconsDirty = false
@@ -84,9 +85,17 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         outlineProvider = null
         background = null
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
+        hostInitialized = true
+        // AbstractComposeView owns a final onLayout; observe completed native bounds instead.
+        addOnLayoutChangeListener { _, l, t, r, b, oldL, oldT, oldR, oldB ->
+            if (l != oldL || t != oldT || r != oldR || b != oldB || !ready) {
+                syncFromNative(); if (available) backdropChanged()
+            }
+        }
     }
 
-    fun isRendering(): Boolean = ready && available && isAttachedToWindow && tabs.size >= 2
+    fun isRendering(): Boolean = ready && available && isAttachedToWindow && windowVisibility == VISIBLE && tabs.size >= 2
+    private fun opticalGutter(): Int = (parent as? KyantDockContainer)?.opticalGutterPx() ?: 0
 
     fun sourceInvalidated(target: View) {
         if (available && !source.isRecording && source.contains(target)) { sourceDirty = true; scheduleFrame() }
@@ -113,16 +122,21 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         alpha = dock.alpha
         if (geometry.update(dock.x, dock.y, dock.width, dock.height, dock.paddingTop, dock.paddingBottom,
                 LocaleController.isRTL, Theme.isCurrentThemeDark())) geometryRevision++
-        dock.importantForAccessibility = if (ready && dock.visibility == VISIBLE && dock.alpha > 0f && (KyantDockConfig.enabled() && !LiteMode.isPowerSaverApplied())) View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS else View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
         available = isShown && dock.isShown && dock.visibility == VISIBLE && dock.alpha > 0f && windowVisibility == VISIBLE && isHardwareAccelerated && (KyantDockConfig.enabled() && !LiteMode.isPowerSaverApplied())
-        visible.forEach { it.setSkipDrawSelector(available && visible.size >= 2) }
         if (!available) {
             ready = false
             removeCallbacks(longPress); gesture = false; longPressTab = null
             removeCallbacks(frame); framePending = false
             if (wasAvailable) source.release()
         }
+        publishNativeOwnership()
         if (wasRendering != isRendering()) dock.invalidate()
+    }
+
+    private fun publishNativeOwnership() {
+        val rendering = isRendering()
+        tabs.forEach { it.setSkipDrawSelector(rendering) }
+        dock.importantForAccessibility = if (rendering) View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS else View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
     }
 
     override fun onAttachedToWindow() {
@@ -135,18 +149,28 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         syncFromNative()
         if (available) backdropChanged()
     }
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        if (!hostInitialized) return
+        syncFromNative()
+        if (available) backdropChanged()
+    }
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        super.onWindowFocusChanged(hasWindowFocus)
+        if (hostInitialized && hasWindowFocus) { syncFromNative(); if (available) backdropChanged() }
+    }
     override fun onDetachedFromWindow() {
         LiteMode.removeOnPowerSaverAppliedListener(powerListener)
         tabs.forEach { it.setSkipDrawSelector(false) }
         dock.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
         removeCallbacks(longPress); longPressTab = null; gesture = false
-        removeCallbacks(frame); framePending = false; source.release(); ready = false
+        removeCallbacks(frame); framePending = false; source.release(); ready = false; available = false
         super.onDetachedFromWindow()
     }
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         if (!isRendering()) return false
         val density = resources.displayMetrics.density
-        val top = dock.y + KyantDockGeometry.panelInset(dock.height, dock.paddingTop, dock.paddingBottom, 64 * density)
+        val top = opticalGutter() + dock.y + KyantDockGeometry.panelInset(dock.height, dock.paddingTop, dock.paddingBottom, 64 * density)
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
             gesture = event.x >= dock.x && event.x < dock.x + dock.width && event.y >= top && event.y < top + 64 * density
         }
@@ -172,6 +196,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     @Composable override fun Content() {
         if (!available || tabs.size < 2) return
         geometryRevision // Layout/translation changes, never a continuous render ticker.
+        val needsReady = !ready // Observe readiness so a resumed composition republishes native ownership.
         val density = resources.displayMetrics.density
         val width = dock.width / density
         if (width <= 0) return
@@ -185,7 +210,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
             LocalConfiguration provides configuration,
             LocalLayoutDirection provides if (LocaleController.isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
         ) {
-            NativeDockBoundsLayout(dock.x.toInt(), (dock.y + verticalInset).toInt(), width) {
+            NativeDockBoundsLayout(dock.x.toInt(), opticalGutter() + (dock.y + verticalInset).toInt(), width) {
                 // Match Kyant's hidden source-layer technique. The source contains only the native
                 // page, so the dock can never capture itself or recursively sample its own glass.
                 Canvas(Modifier.fillMaxSize().alpha(0f).layerBackdrop(background)) {
@@ -230,7 +255,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
             }
         }
         SideEffect {
-            if (available && tabs.size >= 2 && !ready) { ready = true; dock.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS; dock.invalidate() }
+            if (available && tabs.size >= 2 && needsReady) { ready = true; publishNativeOwnership(); dock.invalidate() }
         }
     }
 }

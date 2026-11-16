@@ -169,7 +169,8 @@ def test_removed_rebound_has_no_runtime_classes_settings_or_resources():
                 for name in ['app.flexygram.elastic.','ElasticInteraction.observe','ElasticControlBackground','FlexyElasticTitle','fg_dm_elastic']:
                     assert name not in text,(path,name)
     tabs=(ROOT/'TMessagesProj/src/main/kotlin/app/flexygram/kyant/components/LiquidBottomTabs.kt').read_text()
-    assert 'InteractiveHighlight' not in tabs and 'scaleX' not in tabs and 'scaleY' not in tabs
+    assert 'InteractiveHighlight' not in tabs and '.velocity' not in tabs
+    assert '78f / 56f' in tabs and tabs.count('layerBlock =')==1
     selector=(ROOT/'TMessagesProj/src/main/kotlin/app/flexygram/kyant/utils/DockSelectionAnimation.kt').read_text()
     assert 'spring(' not in selector and 'positionJob?.cancel()' in selector
     assert not (ROOT/'TMessagesProj/src/main/res/drawable/fg_dm_elastic.xml').exists()

@@ -1,4 +1,4 @@
-// Adapted from Kyant AndroidLiquidGlass catalog; local static-dock patch removes stretch and unbounded highlight. Apache-2.0; see third_party/kyant-backdrop.
+// Adapted from Kyant AndroidLiquidGlass catalog; local dock-only optical magnification and bounded selector; unbounded highlight removed. Apache-2.0; see third_party/kyant-backdrop.
 package app.flexygram.kyant.components
 
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastRoundToInt
+import androidx.compose.ui.util.lerp
 import com.kyant.backdrop.Backdrop
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberCombinedBackdrop
@@ -197,6 +198,13 @@ fun LiquidBottomTabs(
                             radius = 8f.dp * progress,
                             alpha = progress
                         )
+                    },
+                    // Kyant's original 78/56 pressed-lens size, confined to the selector.
+                    // No global input observer, panel movement, icon scale or velocity deformation.
+                    layerBlock = {
+                        val scale = lerp(1f, 78f / 56f, selectionAnimation.pressProgress)
+                        scaleX = scale
+                        scaleY = scale
                     },
                     onDrawSurface = {
                         val progress = selectionAnimation.pressProgress

@@ -1,9 +1,9 @@
 AndroidLiquidGlass / Backdrop by Kyant
 https://github.com/Kyant0/AndroidLiquidGlass/tree/kmp
 Apache License 2.0. Library io.github.kyant0:backdrop:2.0.1.
-Catalog adaptation: package/integration and local static-dock changes removing stretch,
-velocity deformation and the unbounded rectangular interaction highlight. Bounded
-selector transitions replace elastic helpers. See provenance.json for upstream source
+Catalog adaptation: package/integration, original 78/56 dock-selector magnification
+with bounded finite transitions; global/panel/icon stretch, velocity deformation and
+the unbounded rectangular interaction highlight remain removed. See provenance.json for upstream source
 hashes and local-patches.json for modified/removed catalog files.
 The adapter records the native page into a retained RenderNode, without bitmap capture.
 Telegram's native LiquidGlassEffect remains separate from this optional home-dock material.

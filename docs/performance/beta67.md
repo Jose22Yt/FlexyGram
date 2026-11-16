@@ -1,3 +1,5 @@
+> Registro de beta67. La corrección actual del indicador y retorno de ventana está en [beta68](beta68.md).
+
 # beta67: retirada del rebote y barra óptica estable
 
 Rama `codex/flexygram-performance-67`, versión `1.0.0-beta.67-performance`, código1356.

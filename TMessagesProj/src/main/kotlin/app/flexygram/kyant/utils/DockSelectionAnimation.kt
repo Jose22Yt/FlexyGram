@@ -23,14 +23,16 @@ class DockSelectionAnimation(
     private val press=Animatable(0f)
     private var positionJob: Job?=null
     private var pressJob: Job?=null
+    private var pointerPressed=false
+    private var generation=0L
     val value: Float get()=position.value
     val targetValue: Float get()=position.targetValue
     val pressProgress: Float get()=press.value
     val modifier: Modifier=Modifier.pointerInput(Unit) {
         inspectDragGestures(
-            onDragStart={ pressTo(1f) },
-            onDragEnd={ onDragStopped();pressTo(0f) },
-            onDragCancel={ onDragStopped();pressTo(0f) }
+            onDragStart={ pointerPressed=true;pressTo(1f) },
+            onDragEnd={ pointerPressed=false;onDragStopped() },
+            onDragCancel={ pointerPressed=false;onDragStopped() }
         ) { _, delta -> onDrag(size,delta) }
     }
     private fun pressTo(target: Float) {
@@ -38,11 +40,18 @@ class DockSelectionAnimation(
         pressJob=animationScope.launch {press.animateTo(target,tween(120))}
     }
     fun updateValue(value: Float) {
+        generation++
         positionJob?.cancel()
+        if(!pointerPressed)pressTo(0f)
         positionJob=animationScope.launch {position.snapTo(value.coerceIn(valueRange))}
     }
     fun animateToValue(value: Float) {
+        val current=++generation
         positionJob?.cancel()
-        positionJob=animationScope.launch {position.animateTo(value.coerceIn(valueRange),tween(160))}
+        positionJob=animationScope.launch {
+            pressTo(1f) // Native tab clicks must activate the optical lens too, not just dragging it.
+            try {position.animateTo(value.coerceIn(valueRange),tween(160))}
+            finally {if(current==generation && !pointerPressed)pressTo(0f)}
+        }
     }
 }

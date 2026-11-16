@@ -24,7 +24,7 @@ class DockSelectionTest {
   }
   compose.runOnIdle {selector.animateToValue(3f)}
   compose.mainClock.advanceTimeBy(80)
-  compose.runOnIdle {assertTrue(selector.value in 0f..3f);selector.updateValue(1f)}
+  compose.runOnIdle {assertTrue(selector.value in 0f..3f);assertTrue("Tab clicks activate the lens",selector.pressProgress>0f);selector.updateValue(1f)}
   compose.mainClock.advanceTimeBy(32)
   compose.runOnIdle {assertEquals(1f,selector.value,.001f);selector.animateToValue(99f)}
   compose.mainClock.advanceTimeBy(240)
@@ -32,6 +32,13 @@ class DockSelectionTest {
   compose.mainClock.advanceTimeBy(32)
   compose.runOnIdle {assertEquals(0f,selector.value,.001f)}
   compose.mainClock.advanceTimeBy(1000)
-  compose.runOnIdle {assertEquals(0f,selector.value,.001f)}
+  compose.runOnIdle {
+   assertEquals(0f,selector.value,.001f);assertEquals(0f,selector.pressProgress,.001f)
+   selector.animateToValue(3f);selector.animateToValue(1f);selector.animateToValue(2f)
+  }
+  compose.mainClock.advanceTimeBy(80)
+  compose.runOnIdle {assertTrue("A cancelled transition cannot release the newer optical pulse",selector.pressProgress>0f)}
+  compose.mainClock.advanceTimeBy(500)
+  compose.runOnIdle {assertEquals(2f,selector.value,.001f);assertEquals(0f,selector.pressProgress,.001f)}
  }
 }

@@ -1,7 +1,7 @@
 {
-  "reason": "beta67: remove panel/tab stretch, rectangular interactive highlight and unused deformation helpers; keep original optical material and bounded selector navigation",
+  "reason": "beta68: dock-only original 78/56 optical magnification restored for clicks/drags; no unbounded highlight, panel/icon or velocity deformation. Bounded selector and readiness restored on visibility/layout transitions.",
   "modified": {
-    "components/LiquidBottomTabs.kt": "464a084f6847e7e4a76f895eb582bfc1be43a7ad554ced49c2f92e00c5fcc571",
+    "components/LiquidBottomTabs.kt": "706700e0baebffb19417654435c13213bd2ee81fef612a28363a2d1a71369080",
     "components/LiquidBottomTab.kt": "e54f917d62b62b5d9269075e65a6c0152a8d392dfe25df659b67f4105694cef2"
   },
   "removed": [
