@@ -21,7 +21,7 @@ import tw.nekomimi.nekogram.ui.cells.HeaderCell;
 import org.telegram.ui.Components.RecyclerListView;
 import app.flexygram.settings.SignatureMatteSettingsActivity;
 
-/** The clean profile exposes only three mutually exclusive shapes, without a live effect preview. */
+/** The clean profile exposes three shapes and small timestamps, without a live effect preview. */
 public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity {
     private static final int SLIDER = 110, PREVIEW = 111;
     private boolean personalizationExpanded;
@@ -40,6 +40,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
             addRow("flexyBubbleShapeTelegram");
             addRow("flexyBubbleShapeFlexyGram");
             addRow("flexyBubbleShapeIPhone");
+            timestampRow = addRow("flexyBubbleSmallTimestamp");
             return;
         }
         previewRow = addRow();
@@ -80,6 +81,11 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     @Override protected void onItemClick(View view, int position, float x, float y) {
         if (position < 0) return;
         if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) {
+            if (position == timestampRow) {
+                BubbleConfig.setSmallTimestamps(!BubbleConfig.smallTimestamps());
+                listAdapter.notifyItemChanged(position);
+                return;
+            }
             if (position > BubbleConfig.IPHONE || position == BubbleConfig.shape()) return;
             BubbleConfig.setShape(position);
             listAdapter.notifyDataSetChanged();
@@ -190,7 +196,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     private final class Adapter extends MatteListAdapter {
         Adapter(Context context) { super(context); }
         @Override public int getItemViewType(int position) {
-            if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return TYPE_RADIO;
+            if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return position == timestampRow ? TYPE_CHECK : TYPE_RADIO;
             if (position == appearanceHeaderRow || position == borderHeaderRow || position == fusionHeaderRow) return TYPE_HEADER;
             return position == personalizationRow ? TYPE_DETAIL_SETTINGS : position == previewRow ? PREVIEW : position == timestampRow || position == blurRow || position == fusionAdaptRow || position == enabledRow ? TYPE_CHECK : position == personalizationRow || position == effectRow || position == styleRow || position == fuseRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == fusionIntensityRow ? SLIDER : TYPE_INFO_PRIVACY;
         }
@@ -221,10 +227,14 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         }
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
             if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) {
+                if (position == timestampRow) {
+                    ((TextCheckCell) holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleSmallTimestamp), BubbleConfig.smallTimestamps(), false);
+                    return;
+                }
                 int title = position == BubbleConfig.FLEXYGRAM ? R.string.FlexyBubbleShapeFlexyGram
                         : position == BubbleConfig.IPHONE ? R.string.FlexyBubbleShapeIos27 : R.string.FlexyBubbleShapeTelegram;
                 ((TextRadioCell) holder.itemView).setTextAndCheck(getString(title),
-                        position == BubbleConfig.shape(), position < BubbleConfig.IPHONE);
+                        position == BubbleConfig.shape(), true);
                 return;
             }
             if (position == previewRow) {
@@ -266,6 +276,6 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
 
 
         }
-        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = settingsRowPosition(holder); if (p < 0) return false; if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return p <= BubbleConfig.IPHONE; return p == personalizationRow || p == timestampRow || p == effectRow || p == blurRow || p == styleRow || p == fuseRow || p == enabledRow || p==fusionAdaptRow; }
+        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = settingsRowPosition(holder); if (p < 0) return false; if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return p <= timestampRow; return p == personalizationRow || p == timestampRow || p == effectRow || p == blurRow || p == styleRow || p == fuseRow || p == enabledRow || p==fusionAdaptRow; }
     }
 }

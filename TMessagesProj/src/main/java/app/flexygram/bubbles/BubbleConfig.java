@@ -25,16 +25,18 @@ public final class BubbleConfig {
         return ApplicationLoader.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE);
     }
     public static void load() {
-        // The clean profile has one setting, cached until an explicit reload/change.
+        // The clean profile caches shape and small timestamps until an explicit reload/change.
         if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && loaded) return;
         reload();
     }
     public static void reload() {
         if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) {
-            shape = normalizeShape(preferences().getInt(SHAPE, TELEGRAM));
+            SharedPreferences p = preferences();
+            shape = normalizeShape(p.getInt(SHAPE, TELEGRAM));
+            smallTimestamps = p.getBoolean("small_timestamp", false);
             customizationEnabled = false;
             surfaceEffect = DEFAULT;
-            smallTimestamps = glass = border = edges = cachedBlur = false;
+            glass = border = edges = cachedBlur = false;
             transparency = 0;
             outlineEnabled = fuseGlass = false;
             fusionMode = 0;
@@ -93,7 +95,6 @@ public final class BubbleConfig {
     }
     public static boolean smallTimestamps() { return smallTimestamps; }
     public static void setSmallTimestamps(boolean value) {
-        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         if (!loaded) load();
         if (smallTimestamps == value) return;
         smallTimestamps = value;

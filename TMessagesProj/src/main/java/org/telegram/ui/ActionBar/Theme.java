@@ -8015,11 +8015,11 @@ public class Theme {
 
             dialogs_lockDrawable = resources.getDrawable(R.drawable.list_secret);
             dialogs_lock2Drawable = resources.getDrawable(R.drawable.msg_mini_lock2);
-            dialogs_checkDrawable = (BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) ? new app.flexygram.icons.IosListCheckDrawable(false) : resources.getDrawable(R.drawable.list_check).mutate();
+            dialogs_checkDrawable = BuildConfig.CONNECTED_ALPHA ? new app.flexygram.icons.IosListCheckDrawable(false) : resources.getDrawable(R.drawable.list_check).mutate();
             dialogs_communityCardsDrawable = resources.getDrawable(R.drawable.community_cards).mutate();
             dialogs_playDrawable = resources.getDrawable(R.drawable.minithumb_play).mutate();
-            dialogs_checkReadDrawable = (BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) ? new app.flexygram.icons.IosListCheckDrawable(false) : resources.getDrawable(R.drawable.list_check).mutate();
-            dialogs_halfCheckDrawable = (BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) ? new app.flexygram.icons.IosListCheckDrawable(true) : resources.getDrawable(R.drawable.list_halfcheck);
+            dialogs_checkReadDrawable = BuildConfig.CONNECTED_ALPHA ? new app.flexygram.icons.IosListCheckDrawable(false) : resources.getDrawable(R.drawable.list_check).mutate();
+            dialogs_halfCheckDrawable = BuildConfig.CONNECTED_ALPHA ? new app.flexygram.icons.IosListCheckDrawable(true) : resources.getDrawable(R.drawable.list_halfcheck);
             dialogs_clockDrawable = new MsgClockDrawable();
             dialogs_errorDrawable = resources.getDrawable(R.drawable.list_warning_sign);
             dialogs_reorderDrawable = resources.getDrawable(R.drawable.list_reorder).mutate();
@@ -8366,9 +8366,9 @@ public class Theme {
             playPauseAnimator.addSvgKeyFrame("M 48 7 C 50.21 7 52 8.79 52 11 C 52 19 52 19 52 19 C 52 21.21 50.21 23 48 23 L 4 23 C 1.79 23 0 21.21 0 19 L 0 11 C 0 8.79 1.79 7 4 7 C 48 7 48 7 48 7 Z", 383);
 
             // Native FlexyGram defaults: official Telegram-iOS 11×9pt check templates.
-            final int bubbleCheck = (BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)
+            final int bubbleCheck = BuildConfig.CONNECTED_ALPHA
                     ? R.drawable.flexy_check_ios27 : R.drawable.msg_check_s;
-            final int bubbleHalfCheck = (BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)
+            final int bubbleHalfCheck = BuildConfig.CONNECTED_ALPHA
                     ? R.drawable.flexy_halfcheck_ios27 : R.drawable.msg_halfcheck;
             chat_msgOutCheckDrawable = resources.getDrawable(bubbleCheck).mutate();
             chat_msgOutCheckSelectedDrawable = resources.getDrawable(bubbleCheck).mutate();
@@ -8378,8 +8378,8 @@ public class Theme {
             chat_msgStickerCheckDrawable = resources.getDrawable(bubbleCheck).mutate();
             chat_msgOutHalfCheckDrawable = resources.getDrawable(bubbleHalfCheck).mutate();
             chat_msgOutHalfCheckSelectedDrawable = resources.getDrawable(bubbleHalfCheck).mutate();
-            chat_msgMediaHalfCheckDrawable = resources.getDrawable((BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) ? R.drawable.flexy_halfcheck_ios27 : R.drawable.msg_halfcheck_s).mutate();
-            chat_msgStickerHalfCheckDrawable = resources.getDrawable((BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) ? R.drawable.flexy_halfcheck_ios27 : R.drawable.msg_halfcheck_s).mutate();
+            chat_msgMediaHalfCheckDrawable = resources.getDrawable(BuildConfig.CONNECTED_ALPHA ? R.drawable.flexy_halfcheck_ios27 : R.drawable.msg_halfcheck_s).mutate();
+            chat_msgStickerHalfCheckDrawable = resources.getDrawable(BuildConfig.CONNECTED_ALPHA ? R.drawable.flexy_halfcheck_ios27 : R.drawable.msg_halfcheck_s).mutate();
             chat_msgClockDrawable = new MsgClockDrawable();
             chat_msgUnlockDrawable = resources.getDrawable(R.drawable.ic_lock_header).mutate();
             chat_msgInViewsDrawable = resources.getDrawable(R.drawable.msg_views).mutate();

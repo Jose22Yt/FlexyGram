@@ -32222,14 +32222,21 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private int lastResumedBubbleShape = -1;
+    private boolean lastResumedSmallTimestamp;
     private void refreshCleanBubbleShape() {
         if (!org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         int shape = app.flexygram.bubbles.BubbleConfig.shape();
-        if (lastResumedBubbleShape >= 0 && lastResumedBubbleShape != shape && chatListView != null) {
+        boolean smallTimestamp = app.flexygram.bubbles.BubbleConfig.smallTimestamps();
+        if (lastResumedBubbleShape >= 0 && lastResumedSmallTimestamp != smallTimestamp && chatListView != null) {
+            // Rebind visible timestamps once so their StaticLayouts are measured at the new size.
+            // This does not reload messages from storage or network.
+            if (chatListView.getAdapter() != null) chatListView.getAdapter().notifyDataSetChanged();
+        } else if (lastResumedBubbleShape >= 0 && lastResumedBubbleShape != shape && chatListView != null) {
             // Invalidate visible display lists once after choosing a shape, without reloading messages.
             chatListView.invalidateViews();
         }
         lastResumedBubbleShape = shape;
+        lastResumedSmallTimestamp = smallTimestamp;
     }
 
     Bulletin.Delegate bulletinDelegate;

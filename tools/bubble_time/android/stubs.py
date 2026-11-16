@@ -19,10 +19,11 @@ def write(dest, root):
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text((java/rel).read_text())
     config = dest/'app/flexygram/bubbles/BubbleConfig.java'
-    config.write_text('package app.flexygram.bubbles;public class BubbleConfig {public static int opacity=35;public static boolean tiny=true;public static boolean smallTimestamps(){return tiny;}public static int transparency(){return opacity;}}')
+    config.write_text((java/'app/flexygram/bubbles/BubbleConfig.java').read_text())
     target = dest/'org/telegram/messenger/BuildConfig.java'
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text('package org.telegram.messenger;public class BuildConfig{public static final boolean CONNECTED_ALPHA=true;}')
+    target.write_text('package org.telegram.messenger;public class BuildConfig{public static final boolean CONNECTED_ALPHA=true,NATIVE_BASELINE_TEST=true;}')
+    (dest/'org/telegram/messenger/ApplicationLoader.java').write_text('package org.telegram.messenger;public class ApplicationLoader{public static android.content.Context applicationContext;}')
     (dest/'app/flexygram/bubbles/BubbleStyle.java').write_text((java/'app/flexygram/bubbles/BubbleStyle.java').read_text())
     source = (java/'org/telegram/ui/Cells/ChatMessageCell.java').read_text()
     body = method(source, 'private void drawReadableTimeLayout(') + '\n' + method(source, 'private void prepareTimestampPaint()')

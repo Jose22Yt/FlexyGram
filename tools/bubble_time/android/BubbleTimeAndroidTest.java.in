@@ -3,6 +3,12 @@ import org.junit.*;import static org.junit.Assert.*;import org.junit.runner.RunW
 import org.robolectric.*;import org.robolectric.annotation.*;
 @RunWith(RobolectricTestRunner.class) @Config(sdk=35,manifest=Config.NONE) @GraphicsMode(GraphicsMode.Mode.NATIVE)
 public class BubbleTimeAndroidTest {
+ @Before public void setup() {
+  org.telegram.messenger.ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();
+  org.telegram.messenger.ApplicationLoader.applicationContext.getSharedPreferences(app.flexygram.bubbles.BubbleConfig.FILE,0).edit().clear().commit();
+  app.flexygram.bubbles.BubbleConfig.reload();
+  app.flexygram.bubbles.BubbleConfig.setSmallTimestamps(true);
+ }
  private StaticLayout label() {
   TimeLabelProbe.Theme.chat_timePaint.setTextSize(18);
   return StaticLayout.Builder.obtain("12:34",0,5,TimeLabelProbe.Theme.chat_timePaint,180).setIncludePad(false).build();
@@ -59,8 +65,8 @@ public class BubbleTimeAndroidTest {
   assertEquals(9f,host.timestampPaint.getTextSize(),0f);
   int maxAlpha=0;for(int y=0;y<50;y++)for(int x=0;x<220;x++)maxAlpha=Math.max(maxAlpha,Color.alpha(bitmap.getPixel(x,y)));
   assertTrue(maxAlpha>0&&maxAlpha<=153);bitmap.recycle();
-  app.flexygram.bubbles.BubbleConfig.tiny=false;host.prepare();assertEquals(12f,host.timestampPaint.getTextSize(),0f);
-  app.flexygram.bubbles.BubbleConfig.tiny=true;host.prepare();assertEquals(9f,host.timestampPaint.getTextSize(),0f);
+  app.flexygram.bubbles.BubbleConfig.setSmallTimestamps(false);host.prepare();assertEquals(12f,host.timestampPaint.getTextSize(),0f);
+  app.flexygram.bubbles.BubbleConfig.setSmallTimestamps(true);host.prepare();assertEquals(9f,host.timestampPaint.getTextSize(),0f);
  }
 
 }

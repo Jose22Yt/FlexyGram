@@ -34,14 +34,14 @@ def test_native_bubble_and_delete_policy_never_reads_old_preferences(tmp_path):
 def test_native_clean_bubbles_cache_only_shape_and_reject_effects(tmp_path):
     probe(tmp_path,{
         'org/telegram/messenger/BuildConfig.java':NATIVE,
-        'android/content/Context.java':'''package android.content;public class Context{public static final int MODE_PRIVATE=0;public SharedPreferences getSharedPreferences(String f,int m){return p;}public static int reads,writes,stored;public static final SharedPreferences p=new SharedPreferences(){public int getInt(String k,int d){if(!k.equals("shape"))throw new AssertionError("effect preference read");reads++;return stored;}public boolean getBoolean(String k,boolean d){throw new AssertionError("effect preference read");}public Editor edit(){return new Editor(){public Editor putInt(String k,int v){if(!k.equals("shape"))throw new AssertionError("effect written");stored=v;writes++;return this;}public Editor putBoolean(String k,boolean v){throw new AssertionError("effect written");}public Editor remove(String k){throw new AssertionError();}public void apply(){}};}};}''',
+        'android/content/Context.java':'''package android.content;public class Context{public static final int MODE_PRIVATE=0;public SharedPreferences getSharedPreferences(String f,int m){return p;}public static boolean tiny;public static int reads,writes,stored;public static final SharedPreferences p=new SharedPreferences(){public int getInt(String k,int d){if(!k.equals("shape"))throw new AssertionError("effect preference read");reads++;return stored;}public boolean getBoolean(String k,boolean d){if(!k.equals("small_timestamp"))throw new AssertionError("effect preference read");reads++;return tiny;}public Editor edit(){return new Editor(){public Editor putInt(String k,int v){if(!k.equals("shape"))throw new AssertionError("effect written");stored=v;writes++;return this;}public Editor putBoolean(String k,boolean v){if(!k.equals("small_timestamp"))throw new AssertionError("effect written");tiny=v;writes++;return this;}public Editor remove(String k){throw new AssertionError();}public void apply(){}};}};}''',
         'android/content/SharedPreferences.java':'''package android.content;public interface SharedPreferences{int getInt(String k,int d);boolean getBoolean(String k,boolean d);Editor edit();interface Editor{Editor putInt(String k,int v);Editor putBoolean(String k,boolean v);Editor remove(String k);void apply();}}''',
         'org/telegram/messenger/ApplicationLoader.java':'package org.telegram.messenger;public class ApplicationLoader{public static android.content.Context applicationContext=new android.content.Context();}',
         'Probe.java':'''import app.flexygram.bubbles.*;import android.content.Context;
 public class Probe{static void check(boolean b){if(!b)throw new AssertionError();}
-static void clean(){check(BubbleConfig.surfaceEffect()==BubbleConfig.DEFAULT&&!BubbleConfig.backgroundBlur()&&!BubbleConfig.outlineEnabled()&&BubbleConfig.transparency()==0&&!BubbleStyle.signature()&&!BubbleConfig.glass()&&!BubbleConfig.border()&&!BubbleConfig.edges()&&!BubbleConfig.smallTimestamps()&&BubbleConfig.fusionMode()==0);}
+static void clean(){check(BubbleConfig.surfaceEffect()==BubbleConfig.DEFAULT&&!BubbleConfig.backgroundBlur()&&!BubbleConfig.outlineEnabled()&&BubbleConfig.transparency()==0&&!BubbleStyle.signature()&&!BubbleConfig.glass()&&!BubbleConfig.border()&&!BubbleConfig.edges()&&BubbleConfig.fusionMode()==0);}
 public static void main(String[]args){
- BubbleConfig.load();check(Context.reads==1&&BubbleConfig.shape()==0);
+ BubbleConfig.load();check(Context.reads==2&&BubbleConfig.shape()==0);
  for(int shape=0;shape<3;shape++){
   BubbleConfig.setShape(shape);BubbleConfig.reload();check(BubbleConfig.shape()==shape);
   check(BubbleStyle.customShape()==(shape!=0)&&BubbleStyle.flexyShape()==(shape==1));
@@ -49,9 +49,11 @@ public static void main(String[]args){
   for(int i=0;i<10000;i++){BubbleConfig.load();clean();BubbleConfig.shape();BubbleStyle.customShape();}
   check(Context.reads==reads&&Context.writes==writes);
   BubbleConfig.setShape(shape);check(Context.writes==writes);
-  BubbleConfig.setSurfaceEffect(0);BubbleConfig.setSmallTimestamps(true);BubbleConfig.setBackgroundBlur(true);BubbleConfig.setOutlineEnabled(true);BubbleConfig.setOutlineStyle(3);BubbleConfig.setBorderPosition(2);BubbleConfig.setBorderTenths(20);BubbleConfig.setPearlIntensity(100);BubbleConfig.setFusionMode(2);BubbleConfig.setFusionIntensity(100);BubbleConfig.setFusionAdapt(false);BubbleConfig.setFuseGlass(true);BubbleConfig.setGlass(true);BubbleConfig.setBorder(true);BubbleConfig.setEdges(true);BubbleConfig.setTransparency(80);
+  BubbleConfig.setSurfaceEffect(0);BubbleConfig.setBackgroundBlur(true);BubbleConfig.setOutlineEnabled(true);BubbleConfig.setOutlineStyle(3);BubbleConfig.setBorderPosition(2);BubbleConfig.setBorderTenths(20);BubbleConfig.setPearlIntensity(100);BubbleConfig.setFusionMode(2);BubbleConfig.setFusionIntensity(100);BubbleConfig.setFusionAdapt(false);BubbleConfig.setFuseGlass(true);BubbleConfig.setGlass(true);BubbleConfig.setBorder(true);BubbleConfig.setEdges(true);BubbleConfig.setTransparency(80);
   clean();check(Context.reads==reads&&Context.writes==writes);
  }
+ BubbleConfig.setSmallTimestamps(true);check(BubbleConfig.smallTimestamps()&&Context.tiny);BubbleConfig.reload();check(BubbleConfig.smallTimestamps());
+ int writes=Context.writes;BubbleConfig.setSmallTimestamps(true);check(Context.writes==writes);BubbleConfig.setSmallTimestamps(false);check(!BubbleConfig.smallTimestamps());
  Context.stored=99;BubbleConfig.reload();check(BubbleConfig.shape()==0);clean();
  Context.stored=-1;BubbleConfig.reload();check(BubbleConfig.shape()==0);
 }}'''

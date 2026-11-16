@@ -1,4 +1,4 @@
-# Diseños limpios sobre Native Test
+# Diseños limpios, ticks iOS y hora pequeña sobre Native Test
 
 Base instalada y verificada: `04ebd253b41abe23ca1ff388291eb181debfcfaa`
 (`1.0.0-beta.59-native-test`, app separada).
@@ -10,13 +10,13 @@ Ajustes de FlexyGram → conversaciones → burbujas: tres opciones de selecció
 única, Telegram (predeterminada), FlexyGram e iOS 27. La última recupera la
 geometría de Telegram para iPhone ya presente en el proyecto, cuya procedencia
 se documenta en `tools/ios_bubbles/provenance.json`; no introduce otro renderizador.
-El selector usa las filas radio nativas, sin vista previa animada ni capturas
-del wallpaper. Se mantienen los demás cambios de Native Test y la instalación
+El selector usa tres filas radio nativas y un interruptor de hora pequeña,
+sin vista previa animada ni capturas del wallpaper. Se mantienen los demás cambios de Native Test y la instalación
 separada; no se restaura el sistema completo de personalización.
 
 ## Trabajo de dibujo y configuración
 
-- Solo se lee `shape` de `flexygram_bubbles`, una vez al cargar el perfil, o al
+- Solo se leen `shape` y `small_timestamp` de `flexygram_bubbles`, una vez al cargar el perfil, o al
   pedir `reload()` expresamente. Los getters usados al dibujar leen el snapshot.
   Repetir la selección actual no guarda otra vez ni refresca la lista.
 - Las preferencias de materiales, bordes, transparencia y blur no se consultan.
@@ -30,7 +30,10 @@ separada; no se restaura el sistema completo de personalización.
   wallpaper/glass. Las formas personalizadas tampoco generan un bitmap ni una
   pasada de sombra adicional. Telegram conserva su ruta original NinePatch.
 - Al volver al chat, un cambio real de forma invalida las celdas visibles una
-  sola vez, sin recargar mensajes ni reconstruir la conversación. El primer
+  sola vez, sin recargar mensajes ni reconstruir la conversación. Al cambiar la hora
+  pequeña, se notifica al adaptador una vez para volver a medir los StaticLayout
+  de las celdas visibles a 9 dp o al tamaño nativo. El Paint compartido de otros
+  metadatos conserva su tamaño. El primer
   arranque y las reaperturas sin cambios no añaden esta invalidación.
 
 No se reactiva FastMotion, FlexyFiles, Studio, dock personalizado, reproductor
@@ -54,3 +57,26 @@ Estas pruebas comprueban corrección y reutilización del trabajo; no constituye
 mediciones de FPS ni de tiempo de arranque en un teléfono. No se compiló una
 nueva APK. Esta rama no está incluida en los disparadores de compilación por
 push del workflow de APK. La APK anterior y el respaldo beta.58 siguen intactos.
+
+## Restauración de ticks y tiempo
+
+Se recuperan los vectores iOS de 11×9 dp y sus posiciones de FlexyGram anterior,
+incluidos texto, medios, stickers, selección y la lista de chats. La prueba
+compara exactamente `drawStatusDrawable` y el bloque de recursos de Theme con
+el respaldo `9b305e3ee7ee16097576d60af07f6ed9f105de9c`. Los recursos no se
+recrean en cada frame; permanecen en el ciclo de carga del tema. No se modifica
+la lógica de estados enviado/leído ni sus transiciones.
+
+“Hora pequeña” vuelve como interruptor persistente, apagado por defecto. Se usa
+el tamaño existente de 9 dp y la implementación previa de medida/dibujo, sin
+panel, borde, blur ni sombreado añadido. Las dos preferencias se cargan juntas,
+y los getters usados durante el scroll no acceden a disco. Los otros efectos
+siguen bloqueados.
+
+Validación adicional: 9 pruebas gráficas iOS/estilos, 4 pruebas Android de hora
+con la configuración real Native Test, y comparaciones con el código respaldado.
+No se construye una APK; el ejecutable gráfico es solo un harness JVM aislado.
+
+Comprobación final de esta restauración: suite general con **531 aprobadas y
+41 omitidas**, sin nuevas omisiones. Sintaxis Java y `git diff --check` correctos.
+La comparación exacta con el respaldo y los 13 casos gráficos anteriores pasaron.

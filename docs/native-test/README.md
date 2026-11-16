@@ -3,7 +3,7 @@
 Prueba solicitada para comparar el coste conjunto de las personalizaciones de
 FlexyGram. Rama: `codex/flexygram-native-performance-test`.
 
-Continuación con solo diseños de burbuja: `codex/flexygram-native-clean-bubbles`,
+Continuación con diseños limpios, ticks iOS y hora pequeña: `codex/flexygram-native-clean-bubbles`,
 partiendo de la APK Native Test verificada en `04ebd253b41abe23ca1ff388291eb181debfcfaa`.
 Esta continuación queda en código y pruebas, sin compilar una nueva APK hasta
 terminar los cambios adicionales solicitados. Ver [clean-bubbles.md](clean-bubbles.md).
@@ -44,8 +44,8 @@ terminar los cambios adicionales solicitados. Ver [clean-bubbles.md](clean-bubbl
 - **Burbujas:** selector exclusivo de Telegram, FlexyGram e iOS 27 (geometría
   existente de Telegram para iPhone). Solo cambia la silueta, con relleno y
   colores nativos. Sin transparencia, blur de fondo, bordes personalizados,
-  panel animado Signature ni efectos de borrado propios. Solo se carga la
-  preferencia de forma; las preferencias antiguas de efectos se ignoran y sus
+  panel animado Signature ni efectos de borrado propios. Solo se cargan las
+  preferencias de forma y hora pequeña; las preferencias antiguas de efectos se ignoran y sus
   setters quedan bloqueados sin reescribirlas.
 - **Reacciones:** curvas y duraciones originales en lugar del vuelo/arco
   añadido por FlexyGram. Se conservan las correcciones de propiedad, limpieza,
