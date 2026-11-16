@@ -27,7 +27,7 @@ def main():
  values=out/'src/main/res/values';values.mkdir(parents=True,exist_ok=True)
  shutil.copyfile(source/'res/values/ids.xml',values/'ids.xml')
  (values/'elastic_strings.xml').write_text('<resources><string name="Send">Send</string><string name="AccDescrAttachButton">Attach media</string></resources>')
- for name in ['ElasticConfig','ElasticSpring','ElasticTransform','ElasticInteraction','ElasticFusionGroup','ElasticPreviewView']:
+ for name in ['ElasticConfig','ElasticSpring','ElasticTransform','ElasticInteraction','ElasticFusionGroup','ElasticPreviewView','ElasticControlBackground']:
   target=out/'src/main/java/app/flexygram/elastic'/f'{name}.java';target.parent.mkdir(parents=True,exist_ok=True)
   shutil.copyfile(source/'java/app/flexygram/elastic'/target.name,target)
  for kind in ['java','kotlin']:

@@ -34,14 +34,8 @@ public final class ElasticInteraction {
         surface.draw(canvas);canvas.restoreToCount(save);
     }
     public static void drawInputSurface(android.graphics.Canvas canvas, View scope, android.graphics.drawable.Drawable surface) {
-        if(!canvas.isHardwareAccelerated()){surface.draw(canvas);return;}
-        Session session=sessions.get(scope.getRootView());
-        ElasticTransform motion=session==null?null:session.inputTransform(scope);
-        View target=motion==null?null:motion.owner();
-        if(target==null){surface.draw(canvas);return;}
-        android.graphics.Rect bounds=surface.getBounds();
-        motion.getTransformation(target.getDrawingTime(),motion.surfaceTransformation);
-        int save=canvas.save();canvas.translate(motion.offsetX(),motion.offsetY());canvas.scale(motion.x.value,motion.y.value,bounds.exactCenterX(),bounds.exactCenterY());surface.draw(canvas);canvas.restoreToCount(save);
+        // Shared rails are stationary. Individual controls own their own backgrounds.
+        surface.draw(canvas);
     }
     public static void cancelAll() { for(Session s:new ArrayList<>(sessions.values()))s.cancel(); }
     private static final class Session implements View.OnAttachStateChangeListener {
@@ -53,6 +47,7 @@ public final class ElasticInteraction {
         float downX,downY; int slop;
         long lastTime=-1,downTime=-1;int lastAction=-1;float lastX,lastY;
         boolean dragging,blocked;
+        int candidateBudget;
         Session(View root){this.root=new WeakReference<>(root);slop=ViewConfiguration.get(root.getContext()).getScaledTouchSlop();root.addOnAttachStateChangeListener(this);}
         void observe(MotionEvent event){
             int action=event.getActionMasked();float x=event.getRawX(),y=event.getRawY();
@@ -68,8 +63,8 @@ public final class ElasticInteraction {
                         && !(view instanceof EditText) && !Boolean.TRUE.equals(view.getTag(org.telegram.messenger.R.id.flexy_elastic_input_scope)));
                 target=new WeakReference<>(view);
                 float dp=view.getWidth()/view.getResources().getDisplayMetrics().density;
-                float strength=dp>180?.075f:dp>110?.12f:.255f;
-                if(view instanceof EditText || Boolean.TRUE.equals(view.getTag(org.telegram.messenger.R.id.flexy_elastic_input_scope)))strength=.054f;
+                float strength=dp>180?.15f:dp>110?.24f:.51f;
+                if(view instanceof EditText || Boolean.TRUE.equals(view.getTag(org.telegram.messenger.R.id.flexy_elastic_input_scope)))strength=.108f;
                 if(view.getAnimation() instanceof ElasticTransform){
                     transform=(ElasticTransform)view.getAnimation();transform.press();
                 }else{
@@ -86,23 +81,18 @@ public final class ElasticInteraction {
             }
         }
         View surfaceTarget(View view){
-            // Explicit material owners take priority over nested icon/ripple views.
-            View ancestor=view;
-            for(int depth=0;depth<40&&ancestor!=null;depth++){
-                Object promoted=ancestor.getTag(org.telegram.messenger.R.id.flexy_elastic_surface);
-                if(promoted instanceof View)return (View)promoted;
-                ancestor=ancestor.getParent() instanceof View?(View)ancestor.getParent():null;
-            }
-            // Small decorated control wrappers own their background and content together.
-            // Never promote to a scrolling container or an entire screen/card.
-            ancestor=view.getParent() instanceof View?(View)view.getParent():null;
+            // An actionable child is a boundary: never climb to a bar/panel that owns
+            // other actions. Explicit tags may identify only this control itself.
+            if(view.getTag(org.telegram.messenger.R.id.flexy_elastic_surface)==view)return view;
+            if(view instanceof EditText)return view;
+            View ancestor=view.getParent() instanceof View?(View)view.getParent():null;
             float density=view.getResources().getDisplayMetrics().density;
-            for(int depth=0;depth<2&&ancestor!=null;depth++){
-                if(isList(ancestor)||ancestor instanceof android.widget.ScrollView)break;
-                if(ancestor instanceof ViewGroup && ((ViewGroup)ancestor).getChildCount()>1)break;
-                if(ancestor.getWidth()>360*density||ancestor.getHeight()>160*density)break;
-                if(ancestor.getBackground()!=null)return ancestor;
-                ancestor=ancestor.getParent() instanceof View?(View)ancestor.getParent():null;
+            for(int depth=0;depth<2&&ancestor instanceof ViewGroup;depth++){
+                ViewGroup group=(ViewGroup)ancestor;
+                if(isList(group)||group instanceof android.widget.ScrollView||group.getChildCount()!=1||group.isClickable()||group.isLongClickable())break;
+                if(group.getWidth()>360*density||group.getHeight()>160*density)break;
+                if(group.getBackground()!=null)return group;
+                ancestor=group.getParent() instanceof View?(View)group.getParent():null;
             }
             return view;
         }
@@ -114,11 +104,29 @@ public final class ElasticInteraction {
             if(view instanceof ViewGroup){ViewGroup group=(ViewGroup)view;
                 for(int i=group.getChildCount()-1;i>=0;i--){View child=find(group.getChildAt(i),x,y,depth+1);if(child!=null)return child;if(blocked)return null;}}
             String name=view.getClass().getName();
+            // These Canvas cells contain separate links/media/reaction actions. They
+            // cannot be treated as one control by a generic View observer.
+            if(name.endsWith("ChatMessageCell"))return null;
+            if(view instanceof ViewGroup && (view.isClickable()||view.isLongClickable()||view.getTag(org.telegram.messenger.R.id.flexy_elastic_surface)==view||view.getParent() instanceof View&&isList((View)view.getParent()))) {
+                candidateBudget=64;
+                if(hasIndependentChildAction((ViewGroup)view,0))return null;
+            }
             if(view.getParent() instanceof ViewGroup && isList((View)view.getParent())
                     && !name.contains("Header") && !name.contains("Info") && view.getHeight()<160*view.getResources().getDisplayMetrics().density)return view;
             if(isList(view)||view instanceof android.widget.ScrollView)return null;
-            boolean semantic=name.endsWith("ChatMessageCell")||name.endsWith("DialogCell")||name.contains("SeekBar")||name.endsWith("ControlsView");
-            return view.isClickable()||view.isLongClickable()||view instanceof EditText||semantic?view:null;
+            boolean semantic=name.endsWith("DialogCell")||name.contains("SeekBar");
+            return view.isClickable()||view.isLongClickable()||view instanceof EditText||semantic||view.getTag(org.telegram.messenger.R.id.flexy_elastic_surface)==view?view:null;
+        }
+        boolean hasIndependentChildAction(ViewGroup group,int depth){
+            if(depth>=8)return true; // Unclassified deep panels never become one animated control.
+            for(int i=0;i<group.getChildCount();i++){
+                if(--candidateBudget<0)return true;
+                View child=group.getChildAt(i);
+                if(child.getVisibility()!=View.VISIBLE||!child.isEnabled()||child.getAlpha()<.05f)continue;
+                if(child.isClickable()||child.isLongClickable()||child instanceof EditText)return true;
+                if(child instanceof ViewGroup&&hasIndependentChildAction((ViewGroup)child,depth+1))return true;
+            }
+            return false;
         }
         boolean insideScroll(View view){
             View parent=view.getParent() instanceof View?(View)view.getParent():null;
@@ -129,15 +137,6 @@ public final class ElasticInteraction {
             return false;
         }
         boolean isList(View view){return view instanceof androidx.recyclerview.widget.RecyclerView||view instanceof android.widget.AbsListView;}
-        ElasticTransform inputTransform(View scope){
-            for(int i=motions.size()-1;i>=0;i--){
-                ElasticTransform motion=motions.get(i).get();View view=motion==null?null:motion.owner();
-                if(view==null||motion.hasEnded()||view.getAnimation()!=motion||!Boolean.TRUE.equals(view.getTag(org.telegram.messenger.R.id.flexy_elastic_input_scope)))continue;
-                View ancestor=view;for(int d=0;d<40&&ancestor!=null&&ancestor!=scope;d++)ancestor=ancestor.getParent() instanceof View?(View)ancestor.getParent():null;
-                if(ancestor==scope)return motion;
-            }
-            return null;
-        }
         void cancel(){
             for(WeakReference<ElasticTransform> ref:motions){ElasticTransform motion=ref.get();if(motion!=null)motion.finish();}
             motions.clear();transform=null;target.clear();

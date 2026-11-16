@@ -386,7 +386,6 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         final boolean compact = MainTabsHelper.isMainTabsHideTitleStyle();
 
         tabsView = new MainTabsLayout(context, resourceProvider);
-        tabsView.setTag(R.id.flexy_elastic_surface, tabsView);
         tabsView.setClipChildren(false);
         // В M3 панель без внутренних
         // отступов и без ограничения ширины

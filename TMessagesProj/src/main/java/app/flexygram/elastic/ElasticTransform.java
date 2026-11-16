@@ -23,14 +23,14 @@ final class ElasticTransform extends Animation implements View.OnAttachStateChan
         inputPulse = view instanceof android.widget.EditText || Boolean.TRUE.equals(view.getTag(org.telegram.messenger.R.id.flexy_elastic_input_scope));
         view.addOnAttachStateChangeListener(this);
         width=view.getWidth();height=view.getHeight();
-        float rx=18*density,ry=18*density;
+        float rx=36*density,ry=36*density;
         if(view.getParent() instanceof android.view.ViewGroup && ((android.view.ViewGroup)view.getParent()).getClipChildren()) {
             android.view.ViewGroup parent=(android.view.ViewGroup)view.getParent();
             rx=Math.max(0,Math.min(view.getLeft(),parent.getWidth()-view.getRight()));
             ry=Math.max(0,Math.min(view.getTop(),parent.getHeight()-view.getBottom()));
         }
         roomX=rx;roomY=ry;
-        maxScaleX=1+2*Math.max(0,rx-10.5f*density)/Math.max(1,width);
+        maxScaleX=1+2*Math.max(0,rx-21f*density)/Math.max(1,width);
         pressX=maxScaleX>1.005f?Math.min(1+strength,maxScaleX):1-strength*.9f;
         setFillAfter(true); setDuration(700);
         x.target = pressX; y.target = 1 - strength * .78f;
@@ -43,11 +43,11 @@ final class ElasticTransform extends Animation implements View.OnAttachStateChan
     }
     void drag(float px, float py) {
         if (released) return;
-        x.target = Math.min(maxScaleX, pressX + Math.min(.075f, Math.abs(px) / (333.333f * density)));
+        x.target = Math.min(maxScaleX, pressX + Math.min(.15f, Math.abs(px) / (166.667f * density)));
         float maxDx=Math.max(0,roomX+(1-x.target)*width/2)/density;
         float maxDy=Math.max(0,roomY+(1-y.target)*height/2)/density;
-        dx.target = Math.max(-maxDx,Math.min(maxDx,10.5f * (float)Math.tanh(px / (22 * density))));
-        dy.target = Math.max(-maxDy,Math.min(maxDy,10.5f * (float)Math.tanh(py / (22 * density))));
+        dx.target = Math.max(-maxDx,Math.min(maxDx,21f * (float)Math.tanh(px / (22 * density))));
+        dy.target = Math.max(-maxDy,Math.min(maxDy,21f * (float)Math.tanh(py / (22 * density))));
         View view=owner.get(); if(view!=null)view.invalidate();
     }
     void release() {

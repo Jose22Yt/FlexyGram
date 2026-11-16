@@ -8959,6 +8959,7 @@ public class ChatActivity extends BaseFragment implements
         if (chatInfo != null) {
             chatActivityEnterView.setChatInfo(chatInfo);
         }
+        chatActivityEnterView.installIndependentElasticSurfaces(glassBackgroundDrawableFactory, blurredBackgroundColorProvider);
         chatActivityEnterView.setId(id_chat_compose_panel);
         chatActivityEnterView.setBotsCount(botsCount, hasBotsCommands, hasQuickReplies, false);
         chatActivityEnterView.updateBotWebView(false);

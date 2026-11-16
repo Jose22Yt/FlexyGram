@@ -393,7 +393,9 @@ public class ChatInputViewsContainer extends FrameLayout {
                 } else if(flexyChannels!=null&&flexyChannels.isSignatureCompactPresentation()){
                     drawSignatureChannelBackground(canvas);
                 } else {
-                    app.flexygram.elastic.ElasticInteraction.drawInputSurface(canvas, this, blurredBackgroundDrawable);
+                    if (flexyComposer == null || !flexyComposer.hasIndependentElasticSurfaces()) {
+                        app.flexygram.elastic.ElasticInteraction.drawInputSurface(canvas, this, blurredBackgroundDrawable);
+                    }
                 }
             }
 

@@ -67,7 +67,7 @@ class ElasticInteractionTest {
   step(button,8)
   val t=Transformation();button.animation!!.getTransformation(SystemClock.uptimeMillis(),t)
   val m=FloatArray(9);t.matrix.getValues(m)
-  assertTrue("Press deformation is visible",kotlin.math.abs(m[0]-1)>.16f)
+  assertTrue("Press deformation is visible",kotlin.math.abs(m[0]-1)>.32f)
   assertEquals(1f,button.scaleX,0f);assertEquals(1f,button.scaleY,0f)
   assertTrue("Native hit matrix stays unchanged",button.matrix.isIdentity)
   touch(MotionEvent.ACTION_UP);ShadowLooper.idleMainLooper()
@@ -210,6 +210,63 @@ class ElasticInteractionTest {
   touch(MotionEvent.ACTION_DOWN,110f,288f)
   assertNotNull(pill.animation);assertNull(icon.animation);assertNull(root.animation)
   touch(MotionEvent.ACTION_UP,110f,288f);ShadowLooper.idleMainLooper();assertEquals(1,clicks)
+ }
+
+ @Test fun independentControlsNeverAnimateTheirSharedTaggedBar() {
+  val bar=FrameLayout(activity).apply {
+   setTag(org.telegram.messenger.R.id.flexy_elastic_surface,this) // A stale beta65 aggregate tag.
+   setOnClickListener {clicks+=100}
+  }
+  val left=Button(activity).apply{setOnClickListener {clicks++}}
+  val right=Button(activity).apply{setOnClickListener {clicks+=10}}
+  bar.addView(left,FrameLayout.LayoutParams(80,56).apply{leftMargin=0})
+  bar.addView(right,FrameLayout.LayoutParams(80,56).apply{leftMargin=120})
+  root.addView(bar,FrameLayout.LayoutParams(240,56).apply{leftMargin=40;topMargin=400})
+  root.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(800,View.MeasureSpec.EXACTLY));root.layout(0,0,360,800)
+  touch(MotionEvent.ACTION_DOWN,70f,425f);step(left,8)
+  assertNotNull(left.animation);assertNull(right.animation);assertNull(bar.animation)
+  touch(MotionEvent.ACTION_UP,70f,425f);ShadowLooper.idleMainLooper();assertEquals(1,clicks)
+  step(left,100)
+  touch(MotionEvent.ACTION_DOWN,145f,425f) // Blank bar gap must not animate the whole panel.
+  assertNull(bar.animation);assertNull(left.animation);assertNull(right.animation)
+  touch(MotionEvent.ACTION_CANCEL,145f,425f)
+ }
+
+ @Test fun retainedControlMaterialAndContentDeformTogetherWhileSiblingPixelsStayUnchanged() {
+  val bar=FrameLayout(activity).apply{setBackgroundColor(0xff999999.toInt());clipChildren=false}
+  val own=Button(activity).apply{background=null;setOnClickListener{clicks++}}
+  val neighbor=Button(activity).apply{background=android.graphics.drawable.ColorDrawable(0xff00ff00.toInt());setOnClickListener{clicks+=10}}
+  bar.addView(own,FrameLayout.LayoutParams(80,56).apply{leftMargin=40;topMargin=20})
+  bar.addView(neighbor,FrameLayout.LayoutParams(80,56).apply{leftMargin=200;topMargin=20})
+  ElasticControlBackground.install(own,GradientDrawable().apply{setColor(0xff000000.toInt());cornerRadius=28f})
+  root.addView(bar,FrameLayout.LayoutParams(320,100).apply{leftMargin=20;topMargin=400})
+  root.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(800,View.MeasureSpec.EXACTLY));root.layout(0,0,360,800)
+  fun pixels():Bitmap {val bmp=Bitmap.createBitmap(320,100,Bitmap.Config.ARGB_8888);bar.draw(Canvas(bmp));return bmp}
+  val before=pixels()
+  touch(MotionEvent.ACTION_DOWN,100f,445f);step(own,8)
+  val during=pixels()
+  assertNotEquals("The button background really deforms",before.getPixel(80,24),during.getPixel(80,24))
+  for(y in 20..75)for(x in 200..279)assertEquals("Neighbor pixels are stationary",before.getPixel(x,y),during.getPixel(x,y))
+  assertNull(neighbor.animation);assertNull(bar.animation)
+  touch(MotionEvent.ACTION_UP,100f,445f);ShadowLooper.idleMainLooper();assertEquals(1,clicks)
+  step(own,100)
+  val restored=pixels();assertEquals(before.getPixel(80,24),restored.getPixel(80,24))
+  ElasticConfig.setEnabled(false)
+  assertEquals("OFF restores the original transparent control background",0xff999999.toInt(),pixels().getPixel(80,24))
+ }
+
+ @Test fun materialWrapperSurvivesThemeRippleReplacementAndPreservesPadding() {
+  val view=Button(activity).apply{setPadding(4,6,8,10)}
+  ElasticControlBackground.install(view,GradientDrawable().apply{setColor(0xff111111.toInt());cornerRadius=28f})
+  val background=view.background
+  assertEquals(4,view.paddingLeft);assertEquals(6,view.paddingTop);assertEquals(8,view.paddingRight);assertEquals(10,view.paddingBottom)
+  ElasticControlBackground.updateOriginal(view,android.graphics.drawable.ColorDrawable(0x22000000))
+  assertSame(background,view.background)
+  assertEquals(view,view.getTag(org.telegram.messenger.R.id.flexy_elastic_surface))
+  view.background.setVisible(false,false)
+  assertFalse(view.background.isVisible)
+  view.background.setVisible(true,false)
+  assertTrue(view.background.isVisible)
  }
 
 }

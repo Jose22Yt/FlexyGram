@@ -53,4 +53,7 @@ def test_controls_are_reachable_and_hooks_do_not_consume_or_rewrite_native_input
         assert 'ElasticInteraction.observe(' in (JAVA/'org/telegram/ui'/path).read_text(),path
     compositor=(JAVA/'org/telegram/ui/Components/ChatActivityEnterView.java').read_text()
     assert compositor.index('messageEditText.setTag(R.id.flexy_elastic_surface') > compositor.index('messageEditText = new ChatActivityEditTextCaption')
-    assert 'ElasticFusionGroup.bind(textFieldContainer, frameLayout, sendButtonContainer)' in compositor
+    assert 'ElasticFusionGroup.bind(textFieldContainer' not in compositor
+    assert 'frameLayout.setTag(R.id.flexy_elastic_surface' not in compositor
+    assert 'messageEditText.setTag(R.id.flexy_elastic_surface, messageEditText)' in compositor
+    assert 'ElasticControlBackground.install(control' in compositor

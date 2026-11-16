@@ -1,8 +1,8 @@
-# FlexyGram beta65: prueba de interacción elástica
+# FlexyGram beta66: prueba de interacción elástica
 
 Base optimizada y corrección de toques: beta63 `933befdeca9df32fd9edbd018bded2a8aa600cec`.
 Rama `codex/flexygram-elastic-test`, paquete conservado
-`com.flexygram.messenger.nativebaseline`, versión beta65/código1354.
+`com.flexygram.messenger.nativebaseline`, versión beta66/código1355.
 No se reactivan FlexyFiles, FlexyStudio, personalización de navegación antigua,
 efectos de burbujas, reproductor personalizado ni reescritura FastMotion.
 
@@ -10,7 +10,7 @@ efectos de burbujas, reproductor personalizado ni reescritura FastMotion.
 
 Navegación y gestos → Interacción elástica: activada inicialmente en esta prueba,
 preferencia independiente `flexy_elastic_interaction/enabled`.
-Respuesta visible: hasta25.5% para botones pequeños,12% para medianos y7.5% para
+Respuesta visible: hasta51% para botones pequeños,24% para medianos y15% para
 superficies anchas, adaptada al espacio disponible para evitar invadir sus padres.
 La preview utiliza dos controles pulsables reales con unión de contornos.
 Una elección OFF se conserva; no se sobrescriben las preferencias de Android.
@@ -28,20 +28,29 @@ ActionBarPopupWindow, PhotoViewer, ArticleViewer, StoryViewer y StoryRecorder.
 Se conserva el MotionEvent original: no se reenvía, retrasa ni sintetiza un clic.
 La raíz se canoniza por ventana y se deduplican observaciones del mismo evento.
 
-El objetivo visual se identifica al DOWN: botones, pestañas, filas nativas,
-interruptores, campos, controles y superficies dibujadas en celdas de mensajes.
-Las superficies Canvas de mensajes responden como celda, no como una malla
-independiente para cada subelemento. Las animaciones nativas de entrada/envío,
-progreso, reacción y transición se conservan, sin sustituir sus temporizaciones.
-Las superficies explícitas promocionan también los iconos internos a la píldora/círculo
-completo: cabecera, barra principal nativa y compositor (entrada y envío).
-Los wrappers pequeños de un solo hijo con fondo propio se promocionan igualmente;
-las listas, pantallas y grupos de acciones independientes no se agrandan como conjunto.
-La amplitud de pulsación/arrastre es triple respecto a beta64; los límites del padre
-pueden reducir la expansión para evitar recortes. El editor usa5.4%, tres veces su
-pulso anterior; no se añaden frames ni un segundo resorte por cada icono.
-El compositor promociona el editor a su contenedor visual; el fondo de entrada
-acompaña su pulso. Cabecera: fondo nativo y control comparten deformación.
+El objetivo visual se identifica al DOWN y queda limitado al control accionado.
+Se eliminan las promociones a MainTabsLayout, ActionBarMenu y al contenedor del
+editor/envío. Una etiqueta heredada en un padre no puede agrupar a sus hijos.
+Un grupo con acciones hijas independientes no se anima al tocar sus huecos.
+Solo se permite un wrapper decorativo pequeño de un único hijo sin acción propia.
+
+Cada control conserva su material y contenido en la misma transformación de dibujo.
+ElasticControlBackground conserva el ripple original, padding, estado y visibilidad;
+el material nuevo procede de la misma fábrica nativa de Telegram y se crea una
+sola vez al configurar el control. No añade capturas, blur por CPU ni capas animadas.
+El menú de cabecera usa materiales por acción; el compositor separa editor, emoji,
+adjuntar y controles auxiliares. Enviar/micrófono conservan su pintura nativa propia.
+Con OFF se dibuja de nuevo el material compartido y los fondos originales.
+El fondo compartido nunca se transforma siguiendo al editor o a una barra completa.
+La amplitud de pulsación/arrastre duplica beta65 (editor10.8%); los límites del padre
+pueden reducir la expansión. No se duplica la frecuencia de frames ni los resortes.
+
+Cobertura del observador común: actividades, diálogos, menús, hojas y visores citados.
+No se afirma cobertura óptica comprobada en cada pantalla de una sesión real.
+Las celdas ChatMessageCell contienen acciones Canvas independientes que no son Views:
+se excluye su deformación conjunta; sus interacciones nativas se conservan hasta tener
+geometría explícita por subcontrol. No se simula independencia animando toda la celda.
+Las animaciones nativas de envío, reacción y transición conservan prioridad.
 
 El scroll cancela la pulsación elástica al superar el slop. Los botones fuera de
 listas pueden seguir el arrastre con desplazamiento limitado. UP/CANCEL/multitouch
@@ -60,15 +69,10 @@ su recuperación juntas. Se limita ese conjunto y se cancela completamente con O
 El pose estable retenido no solicita más frames; OFF y detach limpian la transformación.
 Se respeta SharedConfig.animationsEnabled, la escala de animadores y ahorro de energía.
 
-La fusión utiliza conectores Bézier locales entre un máximo de4 superficies registradas:
-compositor, cabecera y preview. Una barra ya unificada no añade un conector duplicado.
-No se comparan todos los controles de la aplicación. Los límites del fondo nativo
-se obtienen de los drawables; referencias a vistas/drawables/ventanas son débiles.
-Se pintan únicamente los huecos de superficies cercanas mientras hay deformación.
-Es una unión visual2D; no una simulación de agua ni reproducción verificada de la
-óptica de Apple sobre la unión. La apariencia debe validarse en la APK real.
+La fusión de contornos se conserva únicamente en la preview de controles reales;
+no anima ni une como bloque la cabecera o el compositor. Cada resorte es independiente.
 No hay blur adicional, capturas Bitmap/PixelCopy ni lecturas GPU→CPU para elasticidad.
-Los snapshots de menús conservan el dibujo normal, sin la pose temporal de la entrada.
+Los snapshots conservan la propiedad de los materiales de cada control.
 
 La barra mantiene KyantDockContainer: el overlay no puede expandir WRAP_CONTENT a
 pantalla completa. Se mantienen coordenadas físicas/insets/RTL y clipChildren=false

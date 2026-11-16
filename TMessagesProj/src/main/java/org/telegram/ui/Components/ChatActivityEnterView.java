@@ -3084,9 +3084,6 @@ public class ChatActivityEnterView extends FrameLayout implements
                 return super.onTouchEvent(event);
             }
         };
-        frameLayout.setTag(R.id.flexy_elastic_surface, frameLayout);
-        sendButtonContainer.setTag(R.id.flexy_elastic_surface, sendButtonContainer);
-        app.flexygram.elastic.ElasticFusionGroup.bind(textFieldContainer, frameLayout, sendButtonContainer);
         sendButtonContainer.setClipChildren(false);
         sendButtonContainer.setClipToPadding(false);
         textFieldContainer.addView(sendButtonContainer, LayoutHelper.createFrame(100, DEFAULT_HEIGHT, Gravity.BOTTOM | Gravity.RIGHT));
@@ -6746,8 +6743,8 @@ public class ChatActivityEnterView extends FrameLayout implements
         messageEditText.setHintTextColor(getThemedColor(Theme.key_chat_messagePanelHint));
         messageEditText.setCursorColor(getThemedColor(Theme.key_chat_messagePanelCursor));
         messageEditText.setHandlesColor(getThemedColor(Theme.key_chat_TextSelectionCursor));
-        messageEditText.setTag(R.id.flexy_elastic_surface, messageEditTextContainer);
-        messageEditTextContainer.setTag(R.id.flexy_elastic_input_scope, true);
+        messageEditText.setTag(R.id.flexy_elastic_surface, messageEditText);
+        messageEditText.setTag(R.id.flexy_elastic_input_scope, true);
         messageEditTextContainer.addView(messageEditText, 1, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM, 52, 0, isChat ? 50 : 2, 1.5f));
 
         richDraftPreview = new RichMessageLayout.PreviewView(getContext(), currentAccount, resourcesProvider);
@@ -11936,7 +11933,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         updateAudioVideoSendButtonColor();
         updateRichEditorButtonColors();
         setIconColorFilter(emojiButton, new PorterDuffColorFilter(getThemedColor(Theme.key_glass_defaultIcon), PorterDuff.Mode.SRC_IN));
-        emojiButton.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
+        app.flexygram.elastic.ElasticControlBackground.updateOriginal(emojiButton, Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
         deleteRichDraftButton.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_glass_defaultIcon), PorterDuff.Mode.SRC_IN));
         deleteRichDraftButton.setBackground(Theme.createInsetRoundRectDrawable(getThemedColor(Theme.key_listSelector), dp(19), dp(1), dp(3)));
         sendOutlineView.setColorFilter(getThemedColor(Theme.key_telegram_color), PorterDuff.Mode.SRC_IN);
@@ -16858,6 +16855,23 @@ public class ChatActivityEnterView extends FrameLayout implements
             && recordInterfaceState == 0 && (recordedAudioPanel == null || recordedAudioPanel.getVisibility() != VISIBLE)
             && (topView == null || topView.getVisibility() != VISIBLE)
             && !richDraftActive;
+    }
+
+    private boolean independentElasticSurfaces;
+    public boolean hasIndependentElasticSurfaces() { return independentElasticSurfaces && app.flexygram.elastic.ElasticConfig.enabled(); }
+    public void installIndependentElasticSurfaces(
+            org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory factory,
+            org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProvider colors) {
+        if (independentElasticSurfaces) return;
+        View[] controls = {messageEditText, emojiButton, attachButton, notifyButton, botButton};
+        for (View control : controls) {
+            if (control == null) continue;
+            app.flexygram.elastic.ElasticControlBackground.install(control,
+                factory.create(control, colors).setRadius(dp(22)).setPadding(0));
+        }
+        // Recording owns a single Canvas-painted circle even when it uses only onTouchEvent.
+        if (audioVideoButtonContainer != null) audioVideoButtonContainer.setTag(R.id.flexy_elastic_surface, audioVideoButtonContainer);
+        independentElasticSurfaces = true;
     }
 
     /** Shared glass only for the settled native microphone; transitions keep native paint. */

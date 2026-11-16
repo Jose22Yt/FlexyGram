@@ -267,6 +267,14 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             .setPadding(dp(6));
 
         if (menu != null) {
+            for (int i=0;i<menu.getChildCount();i++) {
+                View control=menu.getChildAt(i);
+                if (control instanceof ActionBarMenuItem && !((ActionBarMenuItem)control).isSearchField()
+                        && !(control.getBackground() instanceof app.flexygram.elastic.ElasticControlBackground)) {
+                    app.flexygram.elastic.ElasticControlBackground.install(control,
+                        factory.create(control).setColorProvider(colorProvider).setRadius(dp(23)).setPadding(0));
+                }
+            }
             menu.setTranslationX(-dp(10));
             menu.setGlassMode(true);
         }
@@ -286,11 +294,19 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     public void registerElasticSurfaces(View avatar) {
         elasticTitleView = new java.lang.ref.WeakReference<>(avatar);
         if (backButtonImageView != null) backButtonImageView.setTag(org.telegram.messenger.R.id.flexy_elastic_surface, backButtonImageView);
-        if (avatar != null) avatar.setTag(org.telegram.messenger.R.id.flexy_elastic_surface, avatar);
-        if (menu != null) menu.setTag(org.telegram.messenger.R.id.flexy_elastic_surface, menu);
-        app.flexygram.elastic.ElasticFusionGroup.bindSurfaces(this,
-            new View[]{backButtonImageView,avatar,menu},
-            new android.graphics.drawable.Drawable[]{glassDrawableBack,glassDrawable,glassDrawableMenu});
+    }
+
+    private void drawElasticMenuBackground(Canvas canvas) {
+        if (app.flexygram.elastic.ElasticConfig.enabled() && menu != null) {
+            boolean individual=false;
+            for(int i=0;i<menu.getChildCount();i++) {
+                View child=menu.getChildAt(i);
+                if(child.getVisibility()==VISIBLE && child.getBackground() instanceof app.flexygram.elastic.ElasticControlBackground) individual=true;
+                else if(child.getVisibility()==VISIBLE && child.getWidth()>0) { individual=false;break; }
+            }
+            if(individual)return; // Each action paints its own native material with its content.
+        }
+        glassDrawableMenu.draw(canvas);
     }
 
     private ChatAvatarContainer findGlassAvatarContainer() {
@@ -1646,7 +1662,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                     Math.round(g.actionsVisual.top) + offset, Math.round(g.actionsVisual.right),
                     Math.round(g.actionsVisual.bottom) + offset);
             }
-            app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, menu, glassDrawableMenu);
+            glassDrawableMenu.draw(canvas);
             return true;
         }
         var g = header.geometry;
@@ -1673,7 +1689,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
         glassDrawableMenu.setBounds(Math.round(g.avatar.left), Math.round(g.avatar.top),
                 Math.round(g.avatar.right), Math.round(g.avatar.bottom));
-        app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, menu, glassDrawableMenu);
+        glassDrawableMenu.draw(canvas);
         return true;
     }
 
@@ -2718,7 +2734,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             }
             glassDrawableMenu.setBounds(menuLeft, menuTop, menuRight, menuBottom);
             glassDrawableMenu.setAlpha(hasForcedMenuWidth ? 255 : (int) (255 * animatorHasMenuItems.getFloatValue()));
-            app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, menu, glassDrawableMenu);
+            drawElasticMenuBackground(canvas);
         }
 
         if (!signature && blurredBackground && actionBarColor != Color.TRANSPARENT) {

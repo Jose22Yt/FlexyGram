@@ -10,7 +10,7 @@ def test_software_menu_captures_preserve_live_backgrounds_and_restore_owner_on_f
 class Canvas{boolean hardware,fail;Canvas(boolean h){hardware=h;}boolean isHardwareAccelerated(){return hardware;}}
 class Rect{void set(int l,int t,int r,int b){}void inset(int x,int y){}void offset(int x,int y){}}
 class Drawable{int alpha=255,hides;void setBounds(int a,int b,int c,int d){}void setBounds(Rect r){}void draw(Canvas c){}void setAlpha(int a){alpha=a;hides++;}}
-class Composer{boolean nativeDrawn,voice,send,compact=true;boolean isFlexyCompactPresentation(){return compact;}
+class Composer{boolean nativeDrawn,voice,send,compact=true;boolean isFlexyCompactPresentation(){return compact;} boolean hasIndependentElasticSurfaces(){return false;}
  void setFlexyNativeGlassBackdropDrawn(boolean v){nativeDrawn=v;}void setFlexyVoiceBackdropDrawn(boolean v){voice=v;}void setFlexySendBackdropDrawn(boolean v){send=v;}}
 class Channels{boolean isSignatureCompactPresentation(){return true;}}
 class Base{protected void dispatchDraw(Canvas c){Host h=(Host)this;
