@@ -35,6 +35,12 @@ final class ElasticTransform extends Animation implements View.OnAttachStateChan
         setFillAfter(true); setDuration(700);
         x.target = pressX; y.target = 1 - strength * .78f;
     }
+    View owner(){return owner.get();}
+    void press(){
+        if(finished)return;
+        released=false;firstTime=0;x.target=pressX;y.target=1-strength*.78f;dx.target=dy.target=0;
+        View view=owner.get();if(view!=null)view.invalidate();
+    }
     void drag(float px, float py) {
         if (released) return;
         x.target = Math.min(maxScaleX, pressX + Math.min(.025f, Math.abs(px) / (1000 * density)));

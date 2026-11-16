@@ -88,7 +88,8 @@ jobs:
             1c323bf54c401204b69f1a204cb5e817d7584d17 \
             751c926d91acd536d96b427af5f34f2fe6bedbc4 \
             9037e41cfde3c8bf2de7bb30d675186471988238 \
-            9b305e3ee7ee16097576d60af07f6ed9f105de9c
+            9b305e3ee7ee16097576d60af07f6ed9f105de9c \
+            d50640dec57ee26c957b2b0342fe47cf4006acf5
           printf 'toolchainVersion=21\ntoolchainVendor=ADOPTIUM\n' > gradle/gradle-daemon-jvm.properties
           printf 'sdk.dir=%s\n' "$ANDROID_HOME" > local.properties
           if [ -n "${TELEGRAM_APP_ID:-}" ]; then

@@ -163,4 +163,21 @@ class ElasticInteractionTest {
   touch(MotionEvent.ACTION_UP,(left.left+left.width/2).toFloat(),(300+sampleY).toFloat());step(left,100)
   assertEquals(before,pixel())
  }
+
+ @Test fun rapidRetapKeepsSpringStateAndDifferentControlsRecoverTogether() {
+  touch(MotionEvent.ACTION_DOWN);step(button,5)
+  val animation=button.animation!!
+  touch(MotionEvent.ACTION_UP)
+  touch(MotionEvent.ACTION_DOWN)
+  assertSame("Retap continues the existing spring, without snapping to its start",animation,button.animation)
+  touch(MotionEvent.ACTION_UP)
+  val second=Button(activity).apply{setOnClickListener {clicks++}}
+  root.addView(second,FrameLayout.LayoutParams(100,56).apply{leftMargin=200;topMargin=140})
+  root.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(800,View.MeasureSpec.EXACTLY));root.layout(0,0,360,800)
+  touch(MotionEvent.ACTION_DOWN,240f,164f)
+  assertSame("The preceding control keeps recovering smoothly",animation,button.animation)
+  assertNotNull(second.animation)
+  ElasticConfig.setEnabled(false)
+  assertNull(button.animation);assertNull(second.animation)
+ }
 }

@@ -48,6 +48,8 @@ conserva prioridad. Kyant tiene su interacción propia, evitando una segunda cap
 Transformación de dibujo Animation, no View.scaleX/translationX ni layout.
 La matriz nativa de hit testing permanece estable; los cambios de tamaño son visuales.
 Resorte integrado en pasos pequeños, finito, interrumpible y sin ticker global.
+Un retap conserva posición/velocidad; hasta3 superficies por ventana pueden terminar
+su recuperación juntas. Se limita ese conjunto y se cancela completamente con OFF.
 El pose estable retenido no solicita más frames; OFF y detach limpian la transformación.
 Se respeta SharedConfig.animationsEnabled, la escala de animadores y ahorro de energía.
 

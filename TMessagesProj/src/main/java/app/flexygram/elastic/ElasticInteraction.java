@@ -35,12 +35,11 @@ public final class ElasticInteraction {
     }
     public static void drawInputSurface(android.graphics.Canvas canvas, View scope, android.graphics.drawable.Drawable surface) {
         if(!canvas.isHardwareAccelerated()){surface.draw(canvas);return;}
-        Session session=sessions.get(scope.getRootView());View target=session==null?null:session.target.get();
-        if(target==null || !Boolean.TRUE.equals(target.getTag(org.telegram.messenger.R.id.flexy_elastic_input_scope))
-                || !(target.getAnimation() instanceof ElasticTransform)){surface.draw(canvas);return;}
-        View ancestor=target;while(ancestor!=null&&ancestor!=scope)ancestor=ancestor.getParent() instanceof View?(View)ancestor.getParent():null;
-        if(ancestor==null){surface.draw(canvas);return;}
-        ElasticTransform motion=(ElasticTransform)target.getAnimation();android.graphics.Rect bounds=surface.getBounds();
+        Session session=sessions.get(scope.getRootView());
+        ElasticTransform motion=session==null?null:session.inputTransform(scope);
+        View target=motion==null?null:motion.owner();
+        if(target==null){surface.draw(canvas);return;}
+        android.graphics.Rect bounds=surface.getBounds();
         motion.getTransformation(target.getDrawingTime(),motion.surfaceTransformation);
         int save=canvas.save();canvas.translate(motion.offsetX(),motion.offsetY());canvas.scale(motion.x.value,motion.y.value,bounds.exactCenterX(),bounds.exactCenterY());surface.draw(canvas);canvas.restoreToCount(save);
     }
@@ -50,6 +49,7 @@ public final class ElasticInteraction {
         final Rect hit=new Rect();
         WeakReference<View> target=new WeakReference<>(null);
         ElasticTransform transform;
+        final ArrayList<WeakReference<ElasticTransform>> motions=new ArrayList<>(3);
         float downX,downY; int slop;
         long lastTime=-1,downTime=-1;int lastAction=-1;float lastX,lastY;
         boolean dragging,blocked;
@@ -59,18 +59,25 @@ public final class ElasticInteraction {
             if(lastTime==event.getEventTime()&&downTime==event.getDownTime()&&lastAction==action&&lastX==x&&lastY==y)return;
             lastTime=event.getEventTime();downTime=event.getDownTime();lastAction=action;lastX=x;lastY=y;
             if(action==MotionEvent.ACTION_DOWN){
-                cancel();View owner=root.get();if(owner==null)return;
+                if(transform!=null)transform.release();transform=null;target.clear();
+                View owner=root.get();if(owner==null)return;
                 blocked=false;View view=find(owner,x,y,0);if(view==null)return;
                 Object promoted=view.getTag(org.telegram.messenger.R.id.flexy_elastic_surface);
                 if(promoted instanceof View)view=(View)promoted;
-                if(view.getAnimation()!=null)return; // Native show/hide/transition has priority.
+                if(view.getAnimation()!=null && !(view.getAnimation() instanceof ElasticTransform))return; // Native transition has priority.
                 downX=x;downY=y;dragging=view instanceof SeekBar || (!insideScroll(view)
                         && !(view instanceof EditText) && !Boolean.TRUE.equals(view.getTag(org.telegram.messenger.R.id.flexy_elastic_input_scope)));
                 target=new WeakReference<>(view);
                 float dp=view.getWidth()/view.getResources().getDisplayMetrics().density;
                 float strength=dp>180?.025f:dp>110?.04f:.085f;
                 if(view instanceof EditText)strength=.018f;
-                transform=new ElasticTransform(view,strength);view.startAnimation(transform);
+                if(view.getAnimation() instanceof ElasticTransform){
+                    transform=(ElasticTransform)view.getAnimation();transform.press();
+                }else{
+                    for(int i=motions.size()-1;i>=0;i--){ElasticTransform old=motions.get(i).get();if(old==null||old.hasEnded())motions.remove(i);}
+                    if(motions.size()>=3){ElasticTransform old=motions.remove(0).get();if(old!=null)old.finish();}
+                    transform=new ElasticTransform(view,strength);motions.add(new WeakReference<>(transform));view.startAnimation(transform);
+                }
             }else if(action==MotionEvent.ACTION_MOVE&&transform!=null){
                 float dx=x-downX,dy=y-downY;
                 if(!dragging&&(dx*dx+dy*dy)>slop*slop){transform.release();transform=null;}
@@ -102,10 +109,18 @@ public final class ElasticInteraction {
             return false;
         }
         boolean isList(View view){return view instanceof androidx.recyclerview.widget.RecyclerView||view instanceof android.widget.AbsListView;}
+        ElasticTransform inputTransform(View scope){
+            for(int i=motions.size()-1;i>=0;i--){
+                ElasticTransform motion=motions.get(i).get();View view=motion==null?null:motion.owner();
+                if(view==null||motion.hasEnded()||view.getAnimation()!=motion||!Boolean.TRUE.equals(view.getTag(org.telegram.messenger.R.id.flexy_elastic_input_scope)))continue;
+                View ancestor=view;for(int d=0;d<40&&ancestor!=null&&ancestor!=scope;d++)ancestor=ancestor.getParent() instanceof View?(View)ancestor.getParent():null;
+                if(ancestor==scope)return motion;
+            }
+            return null;
+        }
         void cancel(){
-            if(transform!=null){transform.finish();transform=null;}
-            View view=target.get();if(view!=null&&view.getAnimation() instanceof ElasticTransform)((ElasticTransform)view.getAnimation()).finish();
-            target.clear();
+            for(WeakReference<ElasticTransform> ref:motions){ElasticTransform motion=ref.get();if(motion!=null)motion.finish();}
+            motions.clear();transform=null;target.clear();
         }
         @Override public void onViewAttachedToWindow(View view){}
         @Override public void onViewDetachedFromWindow(View view){cancel();}
