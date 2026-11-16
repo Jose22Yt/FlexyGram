@@ -134,7 +134,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         if (!isRendering()) return false
         val density = resources.displayMetrics.density
-        val top = dock.y + (dock.height - 64 * density) / 2
+        val top = dock.y + KyantDockGeometry.panelInset(dock.height, dock.paddingTop, dock.paddingBottom, 64 * density)
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
             gesture = event.x >= dock.x && event.x < dock.x + dock.width && event.y >= top && event.y < top + 64 * density
         }
@@ -163,7 +163,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         val density = resources.displayMetrics.density
         val width = dock.width / density
         if (width <= 0) return
-        val verticalInset = (dock.height - 64 * density) / 2
+        val verticalInset = KyantDockGeometry.panelInset(dock.height, dock.paddingTop, dock.paddingBottom, 64 * density)
         val configuration = Configuration(LocalConfiguration.current).apply {
             uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or
                 if (Theme.isCurrentThemeDark()) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO

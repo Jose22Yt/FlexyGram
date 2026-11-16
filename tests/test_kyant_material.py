@@ -145,3 +145,14 @@ def test_opt_in_policy_never_creates_shaders_for_hidden_or_non_glass_surfaces(tm
  p.kyantGlassEffect=new Object();p.setKyantEffectAllowed(false);
  if(p.kyantEffectAllowed||p.kyantGlassEffect!=null||p.renderNodeFill.clears!=1||p.invalidations!=2)throw new AssertionError("GPU effect retained on OFF");
  }}'''.replace('BODY',body)})
+
+
+def test_physical_dock_geometry_excludes_system_inset_but_preserves_symmetric_margins(tmp_path):
+    probe(tmp_path,{'Probe.java':'''import app.flexygram.kyant.KyantDockGeometry;
+public class Probe{static void check(boolean b){if(!b)throw new AssertionError();}public static void main(String[]args){
+ check(KyantDockGeometry.panelInset(88,0,24,64)==0); // Material3 + gesture navigation
+ check(KyantDockGeometry.panelInset(112,0,48,64)==0); // 3-button navigation
+ check(KyantDockGeometry.panelInset(72,12,12,64)==4); // upstream floating dock
+ check(KyantDockGeometry.panelInset(64,8,8,64)==0); // compact style reserves full touch height
+ check(KyantDockGeometry.panelInset(216,0,24,192)==0); // display density 3
+}}'''},[JAVA/'app/flexygram/kyant/KyantDockGeometry.java'])

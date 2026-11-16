@@ -39,7 +39,12 @@ public final class MainTabsHelper {
     }
 
     public static int getMainTabsHeightWithMargins() {
-        return getMainTabsHeight() + getMainTabsMargin() * 2;
+        int height = getMainTabsHeight() + getMainTabsMargin() * 2;
+        if (android.os.Build.VERSION.SDK_INT >= 33 && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_KYANT_GLASS)) {
+            // The real Kyant control has a 64dp hit area, including the compact native style.
+            height = Math.max(height, 64);
+        }
+        return height;
     }
 
     public static boolean isContactsTabHidden() {

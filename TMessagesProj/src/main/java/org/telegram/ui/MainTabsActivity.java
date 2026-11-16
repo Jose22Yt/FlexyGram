@@ -1384,6 +1384,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         if (tabsView == null) return;
         if (NaConfig.INSTANCE.getHideBottomNavigationBar().Bool()) {
             tabsView.setVisibility(View.GONE);
+            if (kyantDockView != null) kyantDockView.syncFromNative();
             return;
         }
         final boolean isUpdateLayoutVisible = updateLayoutWrapper.isUpdateLayoutVisible();
@@ -1399,6 +1400,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsView.setEnabled(factor > 1);
         tabsView.setAlpha(factor);
         tabsView.setVisibility(factor > 0 ? View.VISIBLE : View.GONE);
+        if (kyantDockView != null) kyantDockView.syncFromNative();
     }
 
     private void checkUi_callTabVisible(boolean callTabsVisible, boolean animated) {
