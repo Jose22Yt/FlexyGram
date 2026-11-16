@@ -215,7 +215,7 @@ def test_all_root_categories_have_compact_or_already_short_destinations():
     registered = re.findall(r'new Entry\("(\w+)"',(S/'Settings3Registry.java').read_text())
     assert set(registered)=={'home','chat','universal','navigation','ayu','plugins','files','flexyfiles','studio','about'}
     for category in set(registered)-{'files','flexyfiles','studio','about'}:
-        assert 'case "'+category+'":return '+category.upper()+'.clone()' in plan
+        assert ('case "'+category+'":return '+category.upper()+'.clone()' in plan) if category not in ['chat','navigation'] else ('? NATIVE_'+category.upper()+' : '+category.upper()+').clone()' in plan)
     for category, path, keys in [
         ('flexyfiles',S/'SignatureFlexyFilesActivity.java',['flexyfilesEnabled','flexyfilesHelp']),
         ('studio',JAVA/'app/flexygram/studio/FlexyStudioActivity.java',['flexystudioExport','flexystudioImport','flexystudioShare'])]:
@@ -236,7 +236,7 @@ def test_search_and_old_routes_reach_exact_sections_in_all_categories(tmp_path):
         'tw/nekomimi/nekogram/settings/BaseNekoSettingsActivity.java':'''package tw.nekomimi.nekogram.settings;public class BaseNekoSettingsActivity extends org.telegram.ui.ActionBar.BaseFragment{public String route;public String getSignatureSettingsRoute(){return route;}public void useSignatureSettingsPage(String source,String route,int title){this.route=route;}}''',
         'tw/nekomimi/nekogram/settings/BaseNekoXSettingsActivity.java':'''package tw.nekomimi.nekogram.settings;public class BaseNekoXSettingsActivity extends org.telegram.ui.ActionBar.BaseFragment{public String getSignatureSettingsRoute(){return "general_extra";}}''',
         'app/flexygram/settings/signature/SignatureLegacyExtras.java':'''package app.flexygram.settings.signature;public class SignatureLegacyExtras{public static String canonicalRouteForKey(String key){return null;}public static String categoryForKey(String key){return "universal";}public static String routeForKey(String key){return "appearance_extra";}}''',
-        'app/flexygram/settings/signature/SignatureSettingsRegistry.java':'package app.flexygram.settings.signature;public class SignatureSettingsRegistry{public static org.telegram.ui.ActionBar.BaseFragment open(String route){return Settings3Registry.openRoute(route);}}',
+        'app/flexygram/settings/signature/SignatureSettingsRegistry.java':'package app.flexygram.settings.signature;public class SignatureSettingsRegistry{public static boolean visible(String route){return true;}public static org.telegram.ui.ActionBar.BaseFragment open(String route){return Settings3Registry.openRoute(route);}}',
         'app/flexygram/settings/signature/SignatureDirectSettingsActivity.java':'''package app.flexygram.settings.signature;public class SignatureDirectSettingsActivity extends tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity{public String category,segment;public SignatureDirectSettingsActivity(String c){category=c;segment="";}public SignatureDirectSettingsActivity(String c,String s){category=c;segment=s;}}''',
     }
     names=set(re.findall(r'(?:new |instanceof )((?:app|tw)\.[\w.]+)',registry))
@@ -261,4 +261,22 @@ public class Probe{
  expect(Settings3Registry.searchTarget(new app.flexygram.settings.signature.SignatureLauncherSettingsActivity(),"settings2Launcher"),"universal","launcher");
  expect(Settings3Registry.searchTarget(new tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity(),"SwitchStyle"),"universal","extras");
  }}'''
+    probe(tmp_path,files,[])
+
+
+def test_native_overviews_omit_retired_pages_and_reject_their_ids(tmp_path):
+    plan=(S/'CompactSettingsPlan.java').read_text()
+    files={'org/telegram/messenger/R.java':resources(plan),
+     'org/telegram/messenger/BuildConfig.java':'package org.telegram.messenger;public class BuildConfig{public static final boolean NATIVE_BASELINE_TEST=true;}',
+     'app/flexygram/settings/signature/CompactSettingsPlan.java':plan,
+     'app/flexygram/settings/signature/PlanProbe.java':'''package app.flexygram.settings.signature;public class PlanProbe{public static void main(String[]args){
+      if(CompactSettingsPlan.pages("chat").length!=6||CompactSettingsPlan.pages("navigation").length!=3)throw new AssertionError();
+      for(String[] pair:new String[][]{{"chat","glare"},{"chat","animations"},{"navigation","tabs"}}){
+       if(!CompactSettingsPlan.retired(pair[0],pair[1]))throw new AssertionError();
+       for(var page:CompactSettingsPlan.pages(pair[0]))if(page.id.equals(pair[1]))throw new AssertionError("retired page visible");
+       try{CompactSettingsPlan.page(pair[0],pair[1]);throw new AssertionError();}catch(IllegalArgumentException expected){}
+      }
+      if(CompactSettingsPlan.retired("chat","messages")||CompactSettingsPlan.retired("navigation","controls"))throw new AssertionError("native controls hidden");
+     }}''',
+     'Probe.java':'public class Probe{public static void main(String[]args){app.flexygram.settings.signature.PlanProbe.main(args);}}'}
     probe(tmp_path,files,[])

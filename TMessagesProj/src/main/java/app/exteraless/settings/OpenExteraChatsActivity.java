@@ -448,7 +448,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
         signatureThemeRow = addRow("flexyThemeWallpaper");
         smartPreviewsRow = -1; // Canonical controls are embedded in Home by SmartPreviewsSettingsActivity.
         signatureInteractionHeader = addRow("settings2RetiredHeader");
-        flexyContextPanelRow = addRow("flexyContextPanel");
+        flexyContextPanelRow = org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? -1 : addRow("flexyContextPanel");
         signatureMessagesRow = addRow("flexyMessagesGestures");
         signatureStickersRow = addRow("flexyStickersMedia");
         signatureAdditionalHeader = addRow("settings2RetiredHeader");
@@ -489,7 +489,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
     private void updateChatRows() {
         linksHeaderRow = addRow("linksHeader");
         menusRow = addRow("menus");
-        flexyContextPanelRow = addRow("flexyContextPanel");
+        flexyContextPanelRow = org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? -1 : addRow("flexyContextPanel");
         mediaRow = addRow("media");
         aiChatRow = addRow("aiChat");
         linksDividerRow = addRow();

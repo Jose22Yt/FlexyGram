@@ -54,11 +54,23 @@ final class CompactSettingsPlan {
     private static final Page[] PLUGINS={
         new Page("translation",R.string.CompactTranslation,R.drawable.fg_dm_traduccion)
     };
+    private static final Page[] NATIVE_CHAT = nativePages(CHAT);
+    private static final Page[] NATIVE_NAVIGATION = nativePages(NAVIGATION);
+    static boolean retired(String category, String id) {
+        return org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST
+                && (("chat".equals(category) && ("glare".equals(id) || "animations".equals(id)))
+                || ("navigation".equals(category) && "tabs".equals(id)));
+    }
+    private static Page[] nativePages(Page[] pages) {
+        java.util.ArrayList<Page> result = new java.util.ArrayList<>();
+        for (Page page : pages) if (!"glare".equals(page.id) && !"animations".equals(page.id) && !"tabs".equals(page.id)) result.add(page);
+        return result.toArray(new Page[0]);
+    }
     static boolean hasOverview(String category){return category.equals("home")||category.equals("chat")||category.equals("universal")||category.equals("navigation")||category.equals("ayu")||category.equals("plugins");}
     static Page[] pages(String category){
         switch(category){
-            case "home":return HOME.clone();case "chat":return CHAT.clone();
-            case "universal":return UNIVERSAL.clone();case "navigation":return NAVIGATION.clone();
+            case "home":return HOME.clone();case "chat":return (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? NATIVE_CHAT : CHAT).clone();
+            case "universal":return UNIVERSAL.clone();case "navigation":return (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? NATIVE_NAVIGATION : NAVIGATION).clone();
             case "ayu":return AYU.clone();case "plugins":return PLUGINS.clone();
             default:throw new IllegalArgumentException("Unknown compact category");
         }

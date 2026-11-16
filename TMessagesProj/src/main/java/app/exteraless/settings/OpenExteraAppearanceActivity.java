@@ -174,8 +174,8 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
         iconsDividerRow = addRow();
 
         linksHeaderRow = addRow("linksHeader");
-        bottomTabsRow = addRow("bottomTabs");
-        appNavigationRow = addRow("appNavigation");
+        bottomTabsRow = org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? -1 : addRow("bottomTabs");
+        appNavigationRow = org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? -1 : addRow("appNavigation");
         pillStackRow = addRow("pillStack");
         hidingRow = addRow("hiding");
         linksDividerRow = addRow();
@@ -194,7 +194,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
 
         blurHeaderRow = addRow("blurHeader");
         gooeyAvatarRow = addRow("gooeyAvatar");
-        glassOutlineRow = addRow("glassOutline");
+        glassOutlineRow = org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? -1 : addRow("glassOutline");
         glassMessageMenuRow = addRow("glassMessageMenu");
         forceBlurRow = addRow("forceBlur");
         disableAvatarBlurRow = addRow("disableAvatarBlur");

@@ -46,6 +46,7 @@ public final class Settings3Registry {
         return "chat";
     }
     public static BaseFragment openRoute(String route){
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && !SignatureSettingsRegistry.visible(route)) return open("chat");
         // Shared links to the retired effect return to the current home overview.
         if("motion".equals(route)||"scroll_effects".equals(route))return open("home");
         String category=category(route);

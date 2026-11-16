@@ -80,3 +80,15 @@ No se construye una APK; el ejecutable gráfico es solo un harness JVM aislado.
 Comprobación final de esta restauración: suite general con **531 aprobadas y
 41 omitidas**, sin nuevas omisiones. Sintaxis Java y `git diff --check` correctos.
 La comparación exacta con el respaldo y los 13 casos gráficos anteriores pasaron.
+
+## beta.60: limpieza de ajustes y compilación
+
+La versión `1.0.0-beta.60-native-test` (1349) conserva el paquete separado
+`com.flexygram.messenger.nativebaseline`. Se retiran del plan de navegación
+las secciones de bordes/reflejos, animaciones personalizadas y dock configurable;
+los enlaces antiguos vuelven a una pantalla válida. También se ocultan las
+filas antiguas de interacción personalizada, contorno glass y navegación
+personalizada en los editores secundarios, para que no reaparezcan en búsqueda.
+La restauración del estado de una sección retirada vuelve a su vista general.
+Los controles nativos de exteraLess, burbujas limpias y hora pequeña se conservan.
+La copia beta.58 sigue separada e intacta.

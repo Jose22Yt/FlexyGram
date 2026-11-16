@@ -27,7 +27,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
     public org.telegram.ui.Components.UndoView settings3Tooltip(){if(sharedTooltip==null)sharedTooltip=new org.telegram.ui.Components.UndoView(fragmentView.getContext());return sharedTooltip;}
     public SignatureDirectSettingsActivity(){}
     public SignatureDirectSettingsActivity(String category){Settings3Registry.entry(category);this.category=category;}
-    public SignatureDirectSettingsActivity(String category,String segment){this(category);CompactSettingsPlan.page(category,segment);this.segment=segment;}
+    public SignatureDirectSettingsActivity(String category,String segment){this(category);if(!CompactSettingsPlan.retired(category,segment)){CompactSettingsPlan.page(category,segment);this.segment=segment;}}
     private boolean include(String id){return (!org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST || !java.util.Arrays.asList("glare","animations","bubbles","context","bottom_tabs","studio","flexyfiles").contains(id)) && segment.equals(id);}
     private void overview(){
         if(category.equals("chat"))links(new String[]{"composer_style","header_style","bubble_style","delete_motion","context"},new int[]{R.string.FlexyInterfaceLower,R.string.FlexyInterfaceUpper,R.string.FlexyBubblesTitle,R.string.FlexyDeleteTitle,R.string.FlexyMenuTitle},new int[]{R.drawable.fg_dm_interfaz_inferior,R.drawable.fg_dm_interfaz_superior,R.drawable.fg_dm_burbujas,R.drawable.fg_dm_borrador,R.drawable.fg_dm_menu_mensajes});
@@ -146,7 +146,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
     @Override public void restoreSelfArgs(Bundle args){
         super.restoreSelfArgs(args);String saved=args.getString("settings3Category","chat");Settings3Registry.entry(saved);category=saved;
         segment=args.getString("settings3Segment","");
-        if(category.equals("home")&&segment.equals("motion"))segment="";
+        if((category.equals("home")&&segment.equals("motion"))||CompactSettingsPlan.retired(category,segment))segment="";
         if(!segment.isEmpty())CompactSettingsPlan.page(category,segment);
         scrollState=args.getParcelable("settings3Scroll");
     }
