@@ -15,6 +15,7 @@ public final class KyantDockConfig {
             enabled=preferences.getBoolean("kyant_home_dock",false);
         }
     }
+    public static void reload(){load();if(preferences!=null)enabled=preferences.getBoolean("kyant_home_dock",false);}
     public static boolean enabled(){load();return enabled;}
     public static void setEnabled(boolean value){load();enabled=value;if(preferences!=null)preferences.edit().putBoolean("kyant_home_dock",value).apply();}
 }

@@ -21,6 +21,13 @@ import org.telegram.ui.Components.blur3.source.BlurredBackgroundSource;
 @RequiresApi(api = Build.VERSION_CODES.Q)
 public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawable {
     private final BlurredBackgroundSource source;
+    private boolean sourceCaptureEnabled = true;
+    public boolean isSourceCaptureEnabled() { return sourceCaptureEnabled; }
+    public void setSourceCaptureEnabled(boolean enabled) {
+        if(sourceCaptureEnabled==enabled)return;
+        sourceCaptureEnabled=enabled;
+        source.dispatchOnDrawablesRelativePositionChange();
+    }
     private final Outline outline = new Outline();
     private final Rect outlineRect = new Rect();
 
@@ -226,6 +233,8 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
             return;
         }
 
+        // A real live draw restores capture ownership after a style/surface transition.
+        setSourceCaptureEnabled(true);
         if (!renderNode.hasDisplayList()) {
             source.dispatchOnDrawablesRelativePositionChange();
             updateDisplayList();

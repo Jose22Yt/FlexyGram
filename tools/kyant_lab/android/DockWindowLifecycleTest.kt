@@ -23,10 +23,15 @@ import org.telegram.ui.Components.glass.GlassTabView
 @Config(sdk=[35],qualifiers="w360dp-h800dp-mdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class DockWindowLifecycleTest {
+ @org.junit.Before fun resetProcessSnapshot() {
+  // Robolectric replaces Application between tests; production owns application-scoped prefs.
+  ReflectionHelpers.setStaticField(KyantDockConfig::class.java,"preferences",null)
+  ReflectionHelpers.setStaticField(KyantDockConfig::class.java,"enabled",false)
+ }
  @Test fun enabledMaterialSurvivesWindowHideReturnAndFocusWithoutChangingPreference() {
   val controller=Robolectric.buildActivity(ComponentActivity::class.java).setup()
   val activity=controller.get()
-  ApplicationLoader.applicationContext=activity
+  ApplicationLoader.applicationContext=activity.applicationContext
   KyantDockConfig.setEnabled(true)
   val root=FrameLayout(activity)
   val scene=View(activity)
@@ -51,8 +56,13 @@ class DockWindowLifecycleTest {
   }
   try {
    ReflectionHelpers.setField(info,"mHardwareAccelerated",true)
-   window(View.VISIBLE)
+   host.onHostResume();window(View.VISIBLE)
    assertTrue(available());publishComposition();assertTrue(host.isRendering())
+   val tabSnapshot=ReflectionHelpers.getField<MutableState<List<GlassTabView>>>(host,"tabs\$delegate").value
+   val scratch=ReflectionHelpers.getField<Any>(host,"visibleScratch")
+   repeat(1000){host.syncFromNative()}
+   assertSame("Unchanged native sync reuses its tab snapshot",tabSnapshot,ReflectionHelpers.getField<MutableState<List<GlassTabView>>>(host,"tabs\$delegate").value)
+   assertSame(scratch,ReflectionHelpers.getField<Any>(host,"visibleScratch"))
    repeat(3){
     window(View.INVISIBLE);assertFalse(available());assertFalse(host.isRendering())
     assertEquals(View.IMPORTANT_FOR_ACCESSIBILITY_AUTO,dock.importantForAccessibility)
@@ -63,18 +73,37 @@ class DockWindowLifecycleTest {
     host.onWindowFocusChanged(true);assertTrue(host.isRendering())
    }
    val epoch=ReflectionHelpers.getField<androidx.compose.runtime.MutableIntState>(host,"materialEpoch\$delegate").intValue
+   host.onHostPause()
+   assertFalse("Backgrounding releases the real composition",host.hasComposition)
+   assertFalse(host.isRendering());assertFalse(available());assertTrue(KyantDockConfig.enabled())
+   repeat(10){host.syncFromNative()}
+   assertFalse("Visibility callbacks cannot revive a paused host",available())
    host.onHostResume()
    assertTrue(ReflectionHelpers.getField<androidx.compose.runtime.MutableIntState>(host,"materialEpoch\$delegate").intValue>epoch)
    assertFalse("Stale composition cannot hide native fallback",host.isRendering())
    val check=ReflectionHelpers.getField<android.view.ViewTreeObserver.OnPreDrawListener>(host,"resumePreDraw")
    assertTrue(check.onPreDraw())
+   assertTrue("Foreground creates a fresh composition",host.hasComposition)
    assertNull("Resume check removes itself after one pre-draw",ReflectionHelpers.getField<Any?>(host,"resumeObserver"))
    publishComposition();assertTrue(host.isRendering())
    KyantDockConfig.setEnabled(false);host.syncFromNative();assertFalse(available());assertFalse(host.isRendering())
+   host.onHostPause()
   } finally {
    ReflectionHelpers.setField(info,"mHardwareAccelerated",hardware)
    KyantDockConfig.setEnabled(false);host.syncFromNative()
    controller.pause().stop().destroy()
   }
  }
+ @Test fun storedDockChoiceSurvivesFreshPreferenceSnapshot() {
+  val controller=Robolectric.buildActivity(ComponentActivity::class.java).setup()
+  ApplicationLoader.applicationContext=controller.get().applicationContext
+  try {
+   KyantDockConfig.setEnabled(true)
+   ReflectionHelpers.setStaticField(KyantDockConfig::class.java,"preferences",null)
+   ReflectionHelpers.setStaticField(KyantDockConfig::class.java,"enabled",false)
+   KyantDockConfig.reload()
+   assertTrue("Cold config restores the stored dock opt-in",KyantDockConfig.enabled())
+  } finally {KyantDockConfig.setEnabled(false);controller.pause().stop().destroy()}
+ }
+
 }

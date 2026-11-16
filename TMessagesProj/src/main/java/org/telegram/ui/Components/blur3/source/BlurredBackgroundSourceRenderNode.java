@@ -158,7 +158,7 @@ public class BlurredBackgroundSourceRenderNode implements BlurredBackgroundSourc
         int count = 0;
 
         for (BlurredBackgroundDrawableRenderNode d : drawables) {
-            if (d.hasDisplayList() && d.getAlpha() > 0 && !d.getPaddedBounds().isEmpty()) {
+            if (d.isSourceCaptureEnabled() && d.hasDisplayList() && d.getAlpha() > 0 && !d.getPaddedBounds().isEmpty()) {
                 final RectF rectf;
                 if (index < positions.size()) {
                     rectf = positions.get(index);

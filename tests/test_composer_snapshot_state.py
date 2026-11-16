@@ -9,7 +9,7 @@ def test_software_menu_captures_preserve_live_backgrounds_and_restore_owner_on_f
     probe(tmp_path, {'Probe.java': '''
 class Canvas{boolean hardware,fail;Canvas(boolean h){hardware=h;}boolean isHardwareAccelerated(){return hardware;}}
 class Rect{void set(int l,int t,int r,int b){}void inset(int x,int y){}void offset(int x,int y){}}
-class Drawable{int alpha=255,hides;void setBounds(int a,int b,int c,int d){}void setBounds(Rect r){}void draw(Canvas c){}void setAlpha(int a){alpha=a;hides++;}}
+class Drawable{boolean capture=true;int alpha=255,hides;void setBounds(int a,int b,int c,int d){}void setBounds(Rect r){}void draw(Canvas c){}void setAlpha(int a){alpha=a;hides++;}}
 class Composer{boolean nativeDrawn,voice,send,compact=true;boolean isFlexyCompactPresentation(){return compact;}
  void setFlexyNativeGlassBackdropDrawn(boolean v){nativeDrawn=v;}void setFlexyVoiceBackdropDrawn(boolean v){voice=v;}void setFlexySendBackdropDrawn(boolean v){send=v;}}
 class Channels{boolean isSignatureCompactPresentation(){return true;}}
@@ -17,6 +17,8 @@ class Base{protected void dispatchDraw(Canvas c){Host h=(Host)this;
  if(h.flexyComposer!=null&&h.drawInputBackground&&h.flexyComposer.compact){
   if(h.flexyComposer.nativeDrawn!=c.hardware||h.flexyComposer.voice!=c.hardware||h.flexyComposer.send!=c.hardware)throw new AssertionError("wrong capture ownership");}
  if(c.fail)throw new IllegalStateException("capture failed");}}
+// Explicit capture-region service double; software snapshots must not alter live ownership.
+class app{static class flexygram{static class chat{static class ChatMaterialCapture{static void setEnabled(Drawable d,boolean enabled){d.capture=enabled;}}}}}
 class Host extends Base{
  static int dp(int v){return v;}static final int INPUT_KEYBOARD_RADIUS=12;
  final Drawable underKeyboardBackgroundDrawable=new Drawable(),blurredBackgroundDrawable=new Drawable();
@@ -32,7 +34,7 @@ class Host extends Base{
 }
 public class Probe{
  static void check(boolean v){if(!v)throw new AssertionError();}
- static void live(Host h){check(h.flexyNativeGlassDrawn&&h.flexyVoiceDrawn&&h.flexySendDrawn);check(h.flexyComposer.nativeDrawn&&h.flexyComposer.voice&&h.flexyComposer.send);for(Drawable d:h.compactGlass)check(d.alpha==255&&d.hides==0);for(boolean drawn:h.compactGlassDrawn)check(drawn);}
+ static void live(Host h){check(!h.blurredBackgroundDrawable.capture);check(h.flexyNativeGlassDrawn&&h.flexyVoiceDrawn&&h.flexySendDrawn);check(h.flexyComposer.nativeDrawn&&h.flexyComposer.voice&&h.flexyComposer.send);for(Drawable d:h.compactGlass)check(d.alpha==255&&d.hides==0);for(boolean drawn:h.compactGlassDrawn)check(drawn);}
  public static void main(String[]args){Host h=new Host();Canvas screen=new Canvas(true),snapshot=new Canvas(false);
  h.dispatchDraw(screen);live(h);
  for(int i=0;i<1000;i++){h.dispatchDraw(snapshot);live(h);} // Menu stays open without requiring a live redraw.

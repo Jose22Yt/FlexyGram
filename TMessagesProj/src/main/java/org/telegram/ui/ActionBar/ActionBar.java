@@ -2629,6 +2629,16 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         boolean signature = signatureHeader != null && signatureHeader.active();
         configureSignatureGlassGeometry(signature);
         if (signature) signatureHeader.draw(canvas);
+        if (canvas.isHardwareAccelerated()) {
+            boolean nativeSignature=signature && signatureHeader.nativeMaterialDrawn();
+            boolean fusion=nativeSignature && signatureHeader.fusionActive();
+            var g=fusion ? signatureHeader.fusionGeometry() : null;
+            app.flexygram.chat.ChatMaterialCapture.setEnabled(glassDrawableBack, signature ? nativeSignature : hasBackButton);
+            app.flexygram.chat.ChatMaterialCapture.setEnabled(glassDrawable, signature ? nativeSignature : drawGlassMiddlePill && !glassOnlyBack && drawGlassTitle);
+            app.flexygram.chat.ChatMaterialCapture.setEnabled(glassDrawableMenu, signature ? nativeSignature : menuWidth>0 && !glassOnlyBack && !doNotDrawGlassMenu);
+            app.flexygram.chat.ChatMaterialCapture.setEnabled(signatureGlassCall, fusion && g!=null && g.mattePortrait && g.callAvailable);
+            app.flexygram.chat.ChatMaterialCapture.setEnabled(signatureGlassUnread, nativeSignature && (fusion ? g!=null && g.separateUnread : signatureHeader.geometry.separateCount));
+        }
         if (!signature && glassDrawable != null && drawGlassMiddlePill && !glassOnlyBack && drawGlassTitle) {
             final int menuWidthWithPadding = menuWidth + ((hasForcedMenuWidth || hasForcedMenuMinWidth) ? (menuWidth > 0 ? p : 0) : (int) (p * animatorHasMenuItems.getFloatValue()));
             final int rightOffset = lerp(menuWidthWithPadding, Math.max(menuWidthWithPadding, p + s), chatAvatarContainer == null ? 0f : 1f - animatorAvatarContainerHasAvatar.getFloatValue());

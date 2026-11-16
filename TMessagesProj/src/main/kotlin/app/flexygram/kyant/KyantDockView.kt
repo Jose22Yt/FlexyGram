@@ -39,7 +39,7 @@ import org.telegram.ui.Components.glass.GlassTabView
 /** Original Kyant Compose material, mounted over a native dock with native actions and icons. */
 @RequiresApi(33)
 class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: View) : AbstractComposeView(context) {
-    private val powerListener = Utilities.Callback<Boolean> { syncFromNative(); backdropChanged(); dock.invalidate() }
+    private val powerListener = Utilities.Callback<Boolean> { syncFromNative(); backdropChanged(); if (available) scheduleResumeCheck(); dock.invalidate() }
     private val source = KyantBackdropSource(scene, dock)
     private var tabs by mutableStateOf<List<GlassTabView>>(emptyList())
     private var selectedIndex by mutableIntStateOf(0)
@@ -51,6 +51,8 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     private var materialEpoch by mutableIntStateOf(0)
     private var ready by mutableStateOf(false)
     private var hostInitialized = false
+    private var hostResumed = false
+    private val visibleScratch = ArrayList<GlassTabView>(6)
     private var resumeObserver: android.view.ViewTreeObserver? = null
     private val resumePreDraw = android.view.ViewTreeObserver.OnPreDrawListener {
         clearResumeCheck()
@@ -66,7 +68,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         resumeObserver = null
     }
     private fun scheduleResumeCheck() {
-        if (!isAttachedToWindow || windowVisibility != VISIBLE) return
+        if (!hostResumed || !isAttachedToWindow || windowVisibility != VISIBLE) return
         val observer = viewTreeObserver
         if (resumeObserver === observer) return
         clearResumeCheck()
@@ -75,10 +77,21 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         invalidate()
     }
     fun onHostResume() {
-        // STOPPED recomposition can coalesce hide/show state and retain obsolete graphics layers.
-        // Renew only this optional dock material, once per native host resume.
-        if (hasComposition) { materialEpoch++; ready = false }
+        hostResumed = true
         syncFromNative(); backdropChanged(); scheduleResumeCheck()
+    }
+    fun onHostPause() {
+        hostResumed = false
+        clearResumeCheck()
+        removeCallbacks(frame); framePending = false
+        removeCallbacks(longPress); gesture = false; longPressTab = null
+        available = false; ready = false
+        sourceDirty = false; iconsDirty = false
+        source.release()
+        publishNativeOwnership()
+        // Release the actual composition/resources, not just an observable readiness flag.
+        // The first eligible foreground pre-draw creates a fresh composition.
+        if (hasComposition) disposeComposition()
     }
     private var framePending = false
     private var sourceDirty = false
@@ -142,17 +155,32 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     fun syncFromNative() {
         val wasRendering = isRendering()
         val wasAvailable = available
-        val visible = (0 until dock.childCount).mapNotNull { dock.getChildAt(it) as? GlassTabView }
-            .filter { dock.isViewVisible(it) && it.width > 0 }.sortedBy { it.x }
-            .let { if (LocaleController.isRTL) it.reversed() else it }
-        if (tabs != visible) tabs = visible
+        val visible = visibleScratch
+        visible.clear()
+        for (i in 0 until dock.childCount) {
+            val child = dock.getChildAt(i) as? GlassTabView ?: continue
+            if (dock.isViewVisible(child) && child.width > 0) {
+                var slot = visible.size
+                visible.add(child)
+                while (slot > 0 && visible[slot - 1].x > child.x) {
+                    visible[slot] = visible[slot - 1]; slot--
+                }
+                visible[slot] = child
+            }
+        }
+        if (LocaleController.isRTL) java.util.Collections.reverse(visible)
+        var changed = tabs.size != visible.size
+        if (!changed) for (i in visible.indices) if (tabs[i] !== visible[i]) { changed = true; break }
+        if (changed) tabs = visible.toList() // Allocate only when membership/order actually changes.
         if (visible.size < 2) ready = false
-        val index = visible.indexOfFirst { it.isTabSelected }
-        if (index >= 0 && selectedIndex != index) selectedIndex = index
+        for (i in visible.indices) if (visible[i].isTabSelected) {
+            if (selectedIndex != i) selectedIndex = i
+            break
+        }
         alpha = dock.alpha
         if (geometry.update(dock.x, dock.y, dock.width, dock.height, dock.paddingTop, dock.paddingBottom,
                 LocaleController.isRTL, Theme.isCurrentThemeDark())) geometryRevision++
-        available = isShown && dock.isShown && dock.visibility == VISIBLE && dock.alpha > 0f && windowVisibility == VISIBLE && isHardwareAccelerated && (KyantDockConfig.enabled() && !LiteMode.isPowerSaverApplied())
+        available = hostResumed && isShown && dock.isShown && dock.visibility == VISIBLE && dock.alpha > 0f && windowVisibility == VISIBLE && isHardwareAccelerated && (KyantDockConfig.enabled() && !LiteMode.isPowerSaverApplied())
         if (available && !wasAvailable) { materialEpoch++; ready = false }
         if (!available) {
             ready = false
@@ -166,7 +194,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
 
     private fun publishNativeOwnership() {
         val rendering = isRendering()
-        tabs.forEach { it.setSkipDrawSelector(rendering) }
+        for (i in tabs.indices) tabs[i].setSkipDrawSelector(rendering)
         dock.importantForAccessibility = if (rendering) View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS else View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
     }
 

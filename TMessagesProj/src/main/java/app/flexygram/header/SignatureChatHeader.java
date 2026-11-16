@@ -26,6 +26,7 @@ public final class SignatureChatHeader {
     private Fusion fusion;
     private boolean fusionLayout;
     private boolean nativeGlassDrawn;
+    public boolean nativeMaterialDrawn() { return nativeGlassDrawn; }
     public float fusionTop;
     public float height, titlePx, subtitlePx;
     public boolean fusionActive() { return fusionLayout && HeaderConfig.fusion() && active(); }

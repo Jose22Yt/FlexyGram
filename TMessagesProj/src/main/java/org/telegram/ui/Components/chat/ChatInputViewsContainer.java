@@ -411,6 +411,12 @@ public class ChatInputViewsContainer extends FrameLayout {
                 }
             }
 
+            if (!snapshotPass) {
+                boolean islands=false;
+                for(boolean drawn:compactGlassDrawn) islands|=drawn;
+                // Keep the transition alpha for island draws, but stop blurring the hidden full band.
+                app.flexygram.chat.ChatMaterialCapture.setEnabled(blurredBackgroundDrawable,drawInputBackground && !islands);
+            }
             for (int i = 0; i < compactGlass.length; i++) {
                 if (!snapshotPass && !compactGlassDrawn[i] && compactGlass[i] != null) compactGlass[i].setAlpha(0);
             }
