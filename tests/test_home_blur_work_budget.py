@@ -13,7 +13,7 @@ public class MainTabsUiHelper{public static void setBlurBounds(Object rect,Objec
 public class Probe {
  static class Build{static class VERSION{static int SDK_INT=31;}static class VERSION_CODES{static final int S=31;}}
  static class SharedConfig{static boolean enabled;static boolean chatBlurEnabled(){return enabled;}}
- static class LiteMode{static final int FLAG_KYANT_GLASS=1;static boolean enabled;static boolean isEnabled(int flag){return enabled;}}
+ static class LiteMode{static final int FLAG_LIQUID_GLASS=1;static boolean enabled;static boolean isEnabled(int flag){return enabled;}}
  static class View{static final int VISIBLE=0;int width=1080,height=1920;int getMeasuredWidth(){return width;}int getMeasuredHeight(){return height;}int getVisibility(){return VISIBLE;}int getSumHeightOfAllVisibleChild(){return 10;}}
  static class MainTabsLayout{static boolean visible;static boolean isBottomNavigationVisible(){return visible;}}
  static class DialogStoriesCell{static final int HEIGHT_IN_DP=100;}

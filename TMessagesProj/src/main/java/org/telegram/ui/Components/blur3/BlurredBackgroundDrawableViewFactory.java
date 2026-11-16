@@ -80,13 +80,13 @@ public class BlurredBackgroundDrawableViewFactory {
     }
 
 
-    private boolean isKyantEffectAllowed;
+    private boolean isLiquidGlassEffectAllowed;
     // Factories outlive their views. Never retain a chat or a removed tab here.
     private final ArrayList<WeakReference<BlurredBackgroundDrawable>> createdDrawables = new ArrayList<>();
     private int creationsSincePrune;
 
-    public void setKyantEffectAllowed(boolean allowed) {
-        isKyantEffectAllowed = allowed;
+    public void setLiquidGlassEffectAllowed(boolean liquidGlassEffectAllowed) {
+        isLiquidGlassEffectAllowed = liquidGlassEffectAllowed;
         for (int i = createdDrawables.size() - 1; i >= 0; i--) {
             BlurredBackgroundDrawable drawable = createdDrawables.get(i).get();
             if (drawable == null) {
@@ -94,7 +94,7 @@ public class BlurredBackgroundDrawableViewFactory {
                 continue;
             }
             if (Build.VERSION.SDK_INT >= 33 && drawable instanceof BlurredBackgroundDrawableRenderNode) {
-                ((BlurredBackgroundDrawableRenderNode) drawable).setKyantEffectAllowed(allowed);
+                ((BlurredBackgroundDrawableRenderNode) drawable).setLiquidGlassEffectAllowed(liquidGlassEffectAllowed);
             }
             drawable.updateColors();
         }
@@ -117,18 +117,6 @@ public class BlurredBackgroundDrawableViewFactory {
     }
 
     public BlurredBackgroundDrawable create(View view, BlurredBackgroundColorProvider provider, boolean multiwindow) {
-        return createInternal(view, provider, multiwindow, false);
-    }
-
-    /** Opt-in belongs to the requested surface, never to an entire screen or shared source. */
-    public BlurredBackgroundDrawable createKyant(View view) { return createKyant(view, null); }
-
-    public BlurredBackgroundDrawable createKyant(View view, BlurredBackgroundColorProvider provider) {
-        return createInternal(view, provider, false, true);
-    }
-
-    private BlurredBackgroundDrawable createInternal(View view, BlurredBackgroundColorProvider provider,
-                                                     boolean multiwindow, boolean kyantSurface) {
         final BlurredBackgroundDrawable drawable = source.createDrawable();
         if (++creationsSincePrune >= 32) {
             creationsSincePrune = 0;
@@ -137,11 +125,10 @@ public class BlurredBackgroundDrawableViewFactory {
             }
         }
         createdDrawables.add(new WeakReference<>(drawable));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                && drawable instanceof BlurredBackgroundDrawableRenderNode) {
-            BlurredBackgroundDrawableRenderNode node = (BlurredBackgroundDrawableRenderNode) drawable;
-            node.setKyantSurface(kyantSurface);
-            node.setKyantEffectAllowed(isKyantEffectAllowed);
+        if (isLiquidGlassEffectAllowed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (drawable instanceof BlurredBackgroundDrawableRenderNode) {
+                ((BlurredBackgroundDrawableRenderNode) drawable).setLiquidGlassEffectAllowed();
+            }
         }
 
         drawable.setColorProvider(provider);

@@ -196,7 +196,7 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
 
     private BlurredBackgroundDrawable containerDrawable;
     public void setupDrawableForContainer() {
-        containerDrawable = blurredBackgroundDrawableViewFactory.createKyant(this)
+        containerDrawable = blurredBackgroundDrawableViewFactory.create(this)
             .setColorProvider(colorProvider)
             .setRadius(dp(22))
             .setPadding(dp(6));

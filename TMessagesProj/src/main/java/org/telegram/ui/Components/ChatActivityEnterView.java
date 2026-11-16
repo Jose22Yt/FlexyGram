@@ -1891,11 +1891,11 @@ public class ChatActivityEnterView extends FrameLayout implements
                 colorProvider = new BlurredBackgroundColorProviderThemed(resourcesProvider, Theme.key_chat_messagePanelVoiceLockBackground);
             }
 
-            lockBackgroundDrawable = factory.createKyant(this, colorProvider);
+            lockBackgroundDrawable = factory.create(this, colorProvider);
             lockBackgroundDrawable.setRadius(dp(18));
             lockBackgroundDrawable.setPadding(dp(3));
 
-            periodBackgroundDrawable = factory.createKyant(this, colorProvider);
+            periodBackgroundDrawable = factory.create(this, colorProvider);
             periodBackgroundDrawable.setRadius(dp(18));
             periodBackgroundDrawable.setPadding(dp(3));
 
@@ -3084,6 +3084,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                 return super.onTouchEvent(event);
             }
         };
+        app.flexygram.elastic.ElasticFusionGroup.bind(textFieldContainer, frameLayout, sendButtonContainer);
         sendButtonContainer.setClipChildren(false);
         sendButtonContainer.setClipToPadding(false);
         textFieldContainer.addView(sendButtonContainer, LayoutHelper.createFrame(100, DEFAULT_HEIGHT, Gravity.BOTTOM | Gravity.RIGHT));
@@ -6743,6 +6744,8 @@ public class ChatActivityEnterView extends FrameLayout implements
         messageEditText.setHintTextColor(getThemedColor(Theme.key_chat_messagePanelHint));
         messageEditText.setCursorColor(getThemedColor(Theme.key_chat_messagePanelCursor));
         messageEditText.setHandlesColor(getThemedColor(Theme.key_chat_TextSelectionCursor));
+        messageEditText.setTag(R.id.flexy_elastic_surface, messageEditTextContainer);
+        messageEditTextContainer.setTag(R.id.flexy_elastic_input_scope, true);
         messageEditTextContainer.addView(messageEditText, 1, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM, 52, 0, isChat ? 50 : 2, 1.5f));
 
         richDraftPreview = new RichMessageLayout.PreviewView(getContext(), currentAccount, resourcesProvider);

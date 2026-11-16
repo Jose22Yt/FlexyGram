@@ -1213,6 +1213,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
 
         @Override
         public boolean dispatchTouchEvent(MotionEvent ev) {
+            app.flexygram.elastic.ElasticInteraction.observe(this, ev);
             flingDetected = false;
             if (collageListView != null && collageListView.isVisible()) {
                 final float y = containerView.getY() + actionBarContainer.getY() + collageListView.getY();

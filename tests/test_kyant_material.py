@@ -21,8 +21,8 @@ def test_original_kyant_material_and_animation_sources_are_preserved():
     assert 'performLongClick()' in bridge and 'MotionEvent.ACTION_CANCEL' in bridge
     build=(ROOT/'TMessagesProj/build.gradle').read_text()
     assert "implementation 'io.github.kyant0:backdrop:2.0.1'" in build
-    assert not (ROOT/'TMessagesProj/src/main/res/raw/liquid_glass_shader.agsl').exists()
-    assert not (JAVA/'org/telegram/ui/Components/blur3/LiquidGlassEffect.java').exists()
+    assert (ROOT/'TMessagesProj/src/main/res/raw/liquid_glass_shader.agsl').exists()
+    assert (JAVA/'org/telegram/ui/Components/blur3/LiquidGlassEffect.java').exists()
 
 
 def test_raw_scene_cache_records_only_on_change_and_never_captures_the_bar(tmp_path):
@@ -88,63 +88,19 @@ def test_scroll_frames_refresh_backdrop_without_rebuilding_native_tab_controls(t
  p.frame();if(p.syncs!=1)throw new AssertionError("idle native work");
  }}'''.replace('BODY',body)})
 
-def test_native_shader_matches_upstream_program_and_no_original_renderer_remains():
-    provenance=json.loads((ROOT/'third_party/kyant-backdrop/native-shader-provenance.json').read_text())
-    shader=(ROOT/'TMessagesProj/src/main/res/raw/kyant_rounded_rect_refraction.agsl').read_bytes()
-    assert hashlib.sha256(shader).hexdigest()==provenance['sha256']
-    assert b'uniform shader content;' in shader and b'refract_index' not in shader
+def test_native_material_restored_and_kyant_opt_in_only_on_home_dock():
+    for rel in ['TMessagesProj/src/main/res/raw/liquid_glass_shader.agsl','TMessagesProj/src/main/java/org/telegram/ui/Components/blur3/LiquidGlassEffect.java']:
+        assert (ROOT/rel).read_bytes()==subprocess.check_output(['git','show','d50640dec:'+rel],cwd=ROOT)
+    assert not (JAVA/'app/flexygram/kyant/KyantGlassEffect.java').exists()
+    assert not (ROOT/'TMessagesProj/src/main/res/raw/kyant_rounded_rect_refraction.agsl').exists()
     for p in JAVA.rglob('*.java'):
-        source=p.read_text()
-        assert 'new LiquidGlassEffect(' not in source, p
-        assert 'R.raw.liquid_glass_shader' not in source, p
-        assert 'setLiquidGlassEffectAllowed' not in source, p
-
-
-def test_refraction_is_explicitly_scoped_and_never_restores_retired_features():
-    eligible={
-      'org/telegram/ui/ActionBar/ActionBar.java',
-      'org/telegram/ui/DialogsActivity.java',
-      'org/telegram/ui/ChatActivity.java',
-      'org/telegram/ui/Components/SharedMediaLayout.java',
-      'org/telegram/ui/Components/SearchTagsList.java',
-      'org/telegram/ui/Components/ChatActivityEnterView.java',
-      'org/telegram/ui/Components/chat/layouts/ChatActivityChannelButtonsLayout.java',
-    }
-    actual={str(p.relative_to(JAVA)) for p in JAVA.rglob('*.java') if '.createKyant(' in p.read_text()}
-    assert actual==eligible
-    factory=(JAVA/'org/telegram/ui/Components/blur3/BlurredBackgroundDrawableViewFactory.java').read_text()
-    assert 'return createInternal(view, provider, multiwindow, false);' in factory
-    assert 'return createInternal(view, provider, false, true);' in factory
-    header=(JAVA/'org/telegram/ui/ActionBar/ActionBar.java').read_text()
-    assert 'setupGlassInternal(factory, colorProvider, isForum, false)' in header
-    assert 'setupGlassInternal(factory, provider, forum, true)' in header
-    host=(JAVA/'org/telegram/ui/MainTabsActivity.java').read_text()
-    assert 'app.exteraless.player.baseline.PlayerMiniView' in host
-    assert 'LiquidNavigationConfig' not in host and 'SignatureMusic' not in host
+        assert '.createKyant(' not in p.read_text(),p
+    bridge=(ROOT/'TMessagesProj/src/main/kotlin/app/flexygram/kyant/KyantDockView.kt').read_text()
+    assert 'ElasticConfig.kyantDock()' in bridge and '!LiteMode.isPowerSaverApplied()' in bridge
+    assert 'FLAG_LIQUID_GLASS' not in bridge
     build=(ROOT/'TMessagesProj/build.gradle').read_text()
     assert "buildConfigField 'boolean', 'NATIVE_BASELINE_TEST', 'true'" in build
     assert "id 'app.flexygram.fast-motion'" not in build
-
-
-def test_opt_in_policy_never_creates_shaders_for_hidden_or_non_glass_surfaces(tmp_path):
-    from test_composer_layout import method
-    source=(JAVA/'org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawableRenderNode.java').read_text()
-    body=method(source,'public void setKyantEffectAllowed(boolean allowed)')
-    probe(tmp_path,{'Probe.java':'''public class Probe{
- boolean kyantSurface,kyantEffectAllowed;Object kyantGlassEffect;
- static class Node {int clears;void setRenderEffect(Object e){if(e!=null)throw new AssertionError();clears++;}}
- Node renderNodeFill=new Node();int invalidations;void invalidateDisplayList(){invalidations++;}void invalidateSelf(){}
- BODY
- public static void main(String[]args){Probe p=new Probe();
- for(int i=0;i<10000;i++)p.setKyantEffectAllowed(true);
- if(p.kyantEffectAllowed||p.invalidations!=0||p.kyantGlassEffect!=null)throw new AssertionError("unscoped surface activated");
- p.kyantSurface=true;p.setKyantEffectAllowed(true);
- if(!p.kyantEffectAllowed||p.invalidations!=1||p.kyantGlassEffect!=null)throw new AssertionError("eager shader construction");
- for(int i=0;i<10000;i++)p.setKyantEffectAllowed(true);
- if(p.invalidations!=1)throw new AssertionError("unchanged policy rebuild");
- p.kyantGlassEffect=new Object();p.setKyantEffectAllowed(false);
- if(p.kyantEffectAllowed||p.kyantGlassEffect!=null||p.renderNodeFill.clears!=1||p.invalidations!=2)throw new AssertionError("GPU effect retained on OFF");
- }}'''.replace('BODY',body)})
 
 
 def test_physical_dock_geometry_excludes_system_inset_but_preserves_symmetric_margins(tmp_path):

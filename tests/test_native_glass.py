@@ -27,7 +27,7 @@ def test_native_liquid_flag_respects_saved_preferences(tmp_path):
     assert len(methods) == 2
     harness = tmp_path / "FlagsTest.java"
     harness.write_text('''public class FlagsTest {
- static final int FLAG_KYANT_GLASS=1<<18, FLAG_CHAT_FORUM_TWOCOLUMN=4;
+ static final int FLAG_LIQUID_GLASS=1<<18, FLAG_CHAT_FORUM_TWOCOLUMN=4;
  static int saved;
  static class AndroidUtilities { static boolean isTablet(){return false;} }
  static int getValue(){return saved;}
@@ -36,13 +36,13 @@ def test_native_liquid_flag_respects_saved_preferences(tmp_path):
 ''' + "\n".join(methods.values()) + '''
  static void check(boolean ok){if(!ok)throw new AssertionError();}
  public static void main(String[] args){
-  for(int savedFlags : new int[]{0,FLAG_KYANT_GLASS,FLAG_KYANT_GLASS|8,8}) {
+  for(int savedFlags : new int[]{0,FLAG_LIQUID_GLASS,FLAG_LIQUID_GLASS|8,8}) {
    saved=savedFlags;
-   check(isEnabled(FLAG_KYANT_GLASS)==((savedFlags&FLAG_KYANT_GLASS)!=0));
-   check(isEnabledSetting(FLAG_KYANT_GLASS)==((savedFlags&FLAG_KYANT_GLASS)!=0));
+   check(isEnabled(FLAG_LIQUID_GLASS)==((savedFlags&FLAG_LIQUID_GLASS)!=0));
+   check(isEnabledSetting(FLAG_LIQUID_GLASS)==((savedFlags&FLAG_LIQUID_GLASS)!=0));
    check(isEnabled(8)==((savedFlags&8)!=0));
-   check(isEnabled(FLAG_KYANT_GLASS|8)==((savedFlags&(FLAG_KYANT_GLASS|8))!=0));
-   check(isEnabledSetting(FLAG_KYANT_GLASS|8)==((savedFlags&(FLAG_KYANT_GLASS|8))!=0));
+   check(isEnabled(FLAG_LIQUID_GLASS|8)==((savedFlags&(FLAG_LIQUID_GLASS|8))!=0));
+   check(isEnabledSetting(FLAG_LIQUID_GLASS|8)==((savedFlags&(FLAG_LIQUID_GLASS|8))!=0));
    check(saved==savedFlags);
   }
  }

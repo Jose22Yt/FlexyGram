@@ -121,7 +121,7 @@ public class SearchTagsList extends FrameLayout implements NotificationCenter.No
         strokePaint.setStyle(Paint.Style.STROKE);
 
         if (premiumLayout != null) {
-            premiumLayout.setBackground(blurredFactory.createKyant(premiumLayout)
+            premiumLayout.setBackground(blurredFactory.create(premiumLayout)
                 .setColorProvider(BlurredBackgroundProviderImpl.topPanelChatActivity(resourcesProvider))
                 .setRadius(dp(9), dp(15), dp(15), dp(9))
                 .setThickness(dp(5f))
@@ -792,7 +792,7 @@ public class SearchTagsList extends FrameLayout implements NotificationCenter.No
             super(context);
             ScaleStateListAnimator.apply(this);
             if (blurredFactory != null) {
-                blurredDrawable = blurredFactory.createKyant(this)
+                blurredDrawable = blurredFactory.create(this)
                         .setColorProvider(blurredColorProvider)
                         .setThickness(dp(5f))
                         .setClipToOutline(false)

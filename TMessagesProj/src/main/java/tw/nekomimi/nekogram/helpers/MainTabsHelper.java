@@ -40,7 +40,7 @@ public final class MainTabsHelper {
 
     public static int getMainTabsHeightWithMargins() {
         int height = getMainTabsHeight() + getMainTabsMargin() * 2;
-        if (android.os.Build.VERSION.SDK_INT >= 33 && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_KYANT_GLASS)) {
+        if (android.os.Build.VERSION.SDK_INT >= 33 && (app.flexygram.elastic.ElasticConfig.kyantDock() && !org.telegram.messenger.LiteMode.isPowerSaverApplied())) {
             // The real Kyant control has a 64dp hit area, including the compact native style.
             height = Math.max(height, 64);
         }

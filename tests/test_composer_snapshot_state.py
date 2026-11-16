@@ -17,6 +17,10 @@ class Base{protected void dispatchDraw(Canvas c){Host h=(Host)this;
  if(h.flexyComposer!=null&&h.drawInputBackground&&h.flexyComposer.compact){
   if(h.flexyComposer.nativeDrawn!=c.hardware||h.flexyComposer.voice!=c.hardware||h.flexyComposer.send!=c.hardware)throw new AssertionError("wrong capture ownership");}
  if(c.fail)throw new IllegalStateException("capture failed");}}
+// Explicit host API double: the elastic helper delegates snapshots to the same drawable.
+class app{static class flexygram{static class elastic{static class ElasticInteraction{
+ static void drawInputSurface(Canvas c,Object owner,Drawable d){d.draw(c);}
+}}}}
 class Host extends Base{
  static int dp(int v){return v;}static final int INPUT_KEYBOARD_RADIUS=12;
  final Drawable underKeyboardBackgroundDrawable=new Drawable(),blurredBackgroundDrawable=new Drawable();

@@ -40,6 +40,7 @@ final class CompactSettingsPlan {
     };
     private static final Page[] NAVIGATION={
         new Page("tabs",R.string.CompactTabs,R.drawable.fg_dm_barra_inferior),
+        new Page("elastic",R.string.FlexyElasticTitle,R.drawable.fg_dm_elastic),
         new Page("controls",R.string.CompactNavigationControls,R.drawable.fg_dm_comportamiento),
         new Page("gestures",R.string.CompactGestures,R.drawable.fg_dm_gestos),
         new Page("extras",R.string.CompactNavigationExtras,R.drawable.fg_dm_mas_opciones)
@@ -58,12 +59,11 @@ final class CompactSettingsPlan {
     private static final Page[] NATIVE_NAVIGATION = nativePages(NAVIGATION);
     static boolean retired(String category, String id) {
         return org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST
-                && (("chat".equals(category) && ("glare".equals(id) || "animations".equals(id)))
-                || ("navigation".equals(category) && "tabs".equals(id)));
+                && ("chat".equals(category) && ("glare".equals(id) || "animations".equals(id)));
     }
     private static Page[] nativePages(Page[] pages) {
         java.util.ArrayList<Page> result = new java.util.ArrayList<>();
-        for (Page page : pages) if (!"glare".equals(page.id) && !"animations".equals(page.id) && !"tabs".equals(page.id)) result.add(page);
+        for (Page page : pages) if (!"glare".equals(page.id) && !"animations".equals(page.id)) result.add(page);
         return result.toArray(new Page[0]);
     }
     static boolean hasOverview(String category){return category.equals("home")||category.equals("chat")||category.equals("universal")||category.equals("navigation")||category.equals("ayu")||category.equals("plugins");}

@@ -3151,6 +3151,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
         @Override
         public boolean dispatchTouchEvent(MotionEvent ev) {
+            app.flexygram.elastic.ElasticInteraction.observe(this, ev);
             textSelectionHelper.getOverlayView(getContext()).checkCancelAction(ev);
             if (textSelectionHelper.isInSelectionMode()) {
                 if (textSelectionHelper.getOverlayView(getContext()).onTouchEvent(ev)) {
@@ -4921,7 +4922,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         glassAttachedViews = new ReferenceList<>();
         iBlur3BlurredDrawables = new ReferenceList<>();
         iBlur3FactoryFrostedLiquidGlass = new BlurredBackgroundDrawableViewFactory(blurredBackgroundSource);
-        // iBlur3FactoryFrostedLiquidGlass.setKyantEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS));
+        // iBlur3FactoryFrostedLiquidGlass.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
         iBlur3FactoryFrostedLiquidGlass.setSourceRootView(new ViewPositionWatcher(containerView), containerView);
         iBlur3FactoryFrostedLiquidGlass.setLinkedViewsRef(glassAttachedViews);
 

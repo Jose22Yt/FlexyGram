@@ -49,7 +49,7 @@ public static void makeGlobalBlurBitmap(org.telegram.messenger.Utilities.Callbac
 public static android.graphics.Typeface bold(){return android.graphics.Typeface.create("sans-serif",1);}
 }''')
     put('org/telegram/messenger/Utilities.java','package org.telegram.messenger;public class Utilities{public interface Callback<T>{void run(T value);}}')
-    put('org/telegram/messenger/LiteMode.java','package org.telegram.messenger; public class LiteMode {public static final int FLAG_CHAT_BLUR=256,FLAG_KYANT_GLASS=262144;public static boolean blurEnabled;public static boolean isEnabled(int flag){return blurEnabled;}public static boolean isPowerSaverApplied(){return false;}}')
+    put('org/telegram/messenger/LiteMode.java','package org.telegram.messenger; public class LiteMode {public static final int FLAG_CHAT_BLUR=256,FLAG_LIQUID_GLASS=262144;public static boolean blurEnabled;public static boolean isEnabled(int flag){return blurEnabled;}public static boolean isPowerSaverApplied(){return false;}}')
     put('org/telegram/messenger/LocaleController.java','''package org.telegram.messenger; public class LocaleController {public static boolean isRTL;public static String getString(int id){
 if(id==R.string.FlexyMusicQueueTitle)return "A continuación";
 if(id==R.string.FlexyMusicCompact)return "Comprimir reproductor";

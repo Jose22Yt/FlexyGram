@@ -11,7 +11,7 @@ def test_shared_material_tracks_light_dark_flags_account_and_theme(tmp_path):
         'androidx/core/graphics/ColorUtils.java':'package androidx.core.graphics;public class ColorUtils{public static int setAlphaComponent(int c,int a){return(c&0xffffff)|(a<<24);}}',
         'org/telegram/messenger/AndroidUtilities.java':'package org.telegram.messenger;public class AndroidUtilities{public static float computePerceivedBrightness(int c){return((c>>16&255)+(c>>8&255)+(c&255))/765f;}}',
         'org/telegram/messenger/SharedConfig.java':'package org.telegram.messenger;public class SharedConfig{public static boolean enabled;public static boolean chatBlurEnabled(){return enabled;}}',
-        'org/telegram/messenger/LiteMode.java':'package org.telegram.messenger;public class LiteMode{public static final int FLAG_KYANT_GLASS=1;public static boolean liquid;public static boolean isEnabled(int f){return liquid;}}',
+        'org/telegram/messenger/LiteMode.java':'package org.telegram.messenger;public class LiteMode{public static final int FLAG_LIQUID_GLASS=1;public static boolean liquid;public static boolean isEnabled(int f){return liquid;}}',
         'org/telegram/messenger/MessagesController.java':'''package org.telegram.messenger;public class MessagesController{
  public static final MessagesController[] accounts={new MessagesController(),new MessagesController()};public static MessagesController getInstance(int a){return accounts[a];}
  public final Config config=new Config();public static class Config{public Flag disableBlurInLightTheme=new Flag(),disableBlurInDarkTheme=new Flag();}public static class Flag{public boolean value;public boolean get(){return value;}}}''',

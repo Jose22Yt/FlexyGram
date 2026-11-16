@@ -18,8 +18,18 @@ def main():
  (out/'gradle.properties').write_text('org.gradle.jvmargs=-Xmx1536m\nandroid.useAndroidX=true\n')
  (out/'local.properties').write_text('sdk.dir='+args.sdk_root.resolve().as_posix()+'\n')
  source=ROOT/'TMessagesProj/src/main'
+ stale=out/'src/main/java/app/flexygram/kyant/KyantGlassEffect.java'
+ if stale.exists():stale.unlink()
+ stale=out/'src/test/java/app/flexygram/kyant/NativeGlassTest.java'
+ if stale.exists():stale.unlink()
  raw_dir=out/'src/main/res/raw'; raw_dir.mkdir(parents=True,exist_ok=True)
- shutil.copyfile(source/'res/raw/kyant_rounded_rect_refraction.agsl', raw_dir/'kyant_rounded_rect_refraction.agsl')
+ shutil.copyfile(source/'res/raw/liquid_glass_shader.agsl', raw_dir/'liquid_glass_shader.agsl')
+ values=out/'src/main/res/values';values.mkdir(parents=True,exist_ok=True)
+ shutil.copyfile(source/'res/values/ids.xml',values/'ids.xml')
+ (values/'elastic_strings.xml').write_text('<resources><string name="Send">Send</string><string name="AccDescrAttachButton">Attach media</string></resources>')
+ for name in ['ElasticConfig','ElasticSpring','ElasticTransform','ElasticInteraction','ElasticFusionGroup','ElasticPreviewView']:
+  target=out/'src/main/java/app/flexygram/elastic'/f'{name}.java';target.parent.mkdir(parents=True,exist_ok=True)
+  shutil.copyfile(source/'java/app/flexygram/elastic'/target.name,target)
  for kind in ['java','kotlin']:
   target=out/'src/main'/kind/'app/flexygram/kyant'
   shutil.copytree(source/kind/'app/flexygram/kyant',target,dirs_exist_ok=True)

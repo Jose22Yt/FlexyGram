@@ -3775,7 +3775,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                 setVisibleHeight(lastVisibleHeight);
             });
 
-            BlurredBackgroundDrawable filterTabsViewBackground = iBlur3FactoryLiquidGlass.createKyant(scrollSlidingTextTabStrip, BlurredBackgroundProviderImpl.topPanel(resourcesProvider));
+            BlurredBackgroundDrawable filterTabsViewBackground = iBlur3FactoryLiquidGlass.create(scrollSlidingTextTabStrip, BlurredBackgroundProviderImpl.topPanel(resourcesProvider));
             filterTabsViewBackground.setRadius(dp(18));
             filterTabsViewBackground.setPadding(dp(6.666f));
             scrollSlidingTextTabStrip.setPadding(0, dp(7), 0, dp(7));

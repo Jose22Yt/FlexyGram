@@ -1,6 +1,0 @@
-{
-  "upstream": "https://github.com/Kyant0/AndroidLiquidGlass",
-  "source": "backdrop/src/commonMain/kotlin/com/kyant/backdrop/internal/Shaders.kt",
-  "program": "RoundedRectRefractionShaderString + RoundedRectSDF (Kotlin interpolation expanded, no optical changes)",
-  "sha256": "d47b971a904fe996030edb1cd59f3c2b896ca0d8c5d79525679395e8421faebf"
-}

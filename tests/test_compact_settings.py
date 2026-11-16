@@ -80,7 +80,7 @@ public class Probe{
  p.open("universal","launcher");p.expect("SignatureLauncherSettingsActivity");
  p.open("universal","advanced");p.expect("other:advanced");p.expect("ng:advanced_extra");p.expect("nx:advanced_extra");
  p.open("universal","extras");p.expect("ng:general_extra|appearance_extra");
- p.open("navigation","tabs");p.expect("BottomTabsSettingsActivity");p.open("navigation","controls");p.expect("NativeControls");
+ p.open("navigation","tabs");p.expect("NativeDockSettingsActivity");p.open("navigation","elastic");p.expect("ElasticSettingsActivity");p.open("navigation","controls");p.expect("NativeControls");
  p.open("navigation","gestures");p.expect("chats:gestures");p.open("navigation","extras");p.expect("ng:navigation_extra");p.expect("nx:navigation_extra");
  p.open("ayu","ghost");p.expect("GhostModeActivity");for(String route:new String[]{"privacy","saving","tools","maintenance"}){p.open("ayu",route);p.expect("ayu:ayu_"+route);}
  p.open("plugins","translation");p.expect("general:translation_options");
@@ -270,8 +270,8 @@ def test_native_overviews_omit_retired_pages_and_reject_their_ids(tmp_path):
      'org/telegram/messenger/BuildConfig.java':'package org.telegram.messenger;public class BuildConfig{public static final boolean NATIVE_BASELINE_TEST=true;}',
      'app/flexygram/settings/signature/CompactSettingsPlan.java':plan,
      'app/flexygram/settings/signature/PlanProbe.java':'''package app.flexygram.settings.signature;public class PlanProbe{public static void main(String[]args){
-      if(CompactSettingsPlan.pages("chat").length!=6||CompactSettingsPlan.pages("navigation").length!=3)throw new AssertionError();
-      for(String[] pair:new String[][]{{"chat","glare"},{"chat","animations"},{"navigation","tabs"}}){
+      if(CompactSettingsPlan.pages("chat").length!=6||CompactSettingsPlan.pages("navigation").length!=5)throw new AssertionError();
+      for(String[] pair:new String[][]{{"chat","glare"},{"chat","animations"}}){
        if(!CompactSettingsPlan.retired(pair[0],pair[1]))throw new AssertionError();
        for(var page:CompactSettingsPlan.pages(pair[0]))if(page.id.equals(pair[1]))throw new AssertionError("retired page visible");
        try{CompactSettingsPlan.page(pair[0],pair[1]);throw new AssertionError();}catch(IllegalArgumentException expected){}

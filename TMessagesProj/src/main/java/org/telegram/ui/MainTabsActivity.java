@@ -343,6 +343,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     @Override
     public void onResume() {
         super.onResume();
+        updateLayout();
         if (kyantDockView != null) { kyantDockView.syncFromNative(); kyantDockView.backdropChanged(); }
         if (miniPlayer != null) {
             miniPlayer.update(true);
@@ -456,7 +457,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
         BlurredBackgroundDrawableViewFactory iBlur3FactoryGlass = new BlurredBackgroundDrawableViewFactory(iBlur3SourceTabGlass != null ? iBlur3SourceTabGlass : iBlur3SourceColor);
         iBlur3FactoryGlass.setSourceRootView(viewPositionWatcher, contentView);
-        iBlur3FactoryGlass.setKyantEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS));
+        iBlur3FactoryGlass.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
 
         tabsViewBackground = iBlur3FactoryGlass.create(tabsView, BlurredBackgroundProviderImpl.mainTabs(resourceProvider));
         tabsViewBackground.setRadius(MainTabsUiHelper.getBackgroundRadius());
@@ -1593,6 +1594,9 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         if (kyantDockView != null) kyantDockView.backdropChanged();
         blur3_updateFadeColors();
         if (tabsViewBackground != null) {
+            if (Build.VERSION.SDK_INT >= 33 && tabsViewBackground instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
+                ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)tabsViewBackground).setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) && !app.flexygram.elastic.ElasticConfig.kyantDock());
+            }
             tabsViewBackground.updateColors();
         }
         blur3_invalidateBlur();

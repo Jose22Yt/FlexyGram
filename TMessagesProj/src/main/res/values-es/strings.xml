@@ -1318,4 +1318,10 @@
     <string name="Understood">👍 Entendido</string>
     <string name="FlexyFolderThemeAccent">Usar acento del tema en carpeta activa</string>
 
+    <string name="FlexyElasticTitle">Interacción elástica</string>
+    <string name="FlexyElasticSubtitle">Respuesta visible al pulsar y arrastrar los controles</string>
+    <string name="FlexyElasticInfo">Prueba los botones de arriba. Las superficies relacionadas pueden unirse visualmente conservando sus acciones. Respeta las animaciones del sistema y el ahorro de energía.</string>
+    <string name="FlexyKyantDockTitle">Liquid Glass Kyant</string>
+    <string name="FlexyKyantDockSubtitle">Solo en la barra inferior de la pantalla principal</string>
+    <string name="FlexyKyantDockInfo">Material opcional para esta barra en Android 13 o posterior. Las demás superficies conservan el cristal de Telegram y sus ajustes.</string>
 </resources>

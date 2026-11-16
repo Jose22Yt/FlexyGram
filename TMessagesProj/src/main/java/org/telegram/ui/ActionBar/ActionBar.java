@@ -223,15 +223,6 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         this.chatAvatarContainer = chatAvatarContainer;
     }
 
-    private boolean kyantHeader;
-    public void setupKyantGlass(BlurredBackgroundDrawableViewFactory factory,
-                               BlurredBackgroundColorProvider provider, boolean forum) {
-        setupGlassInternal(factory, provider, forum, true);
-    }
-    private BlurredBackgroundDrawable createHeaderSurface(BlurredBackgroundDrawableViewFactory factory) {
-        return kyantHeader ? factory.createKyant(this) : factory.create(this);
-    }
-
     public void setupGlass(BlurredBackgroundDrawableViewFactory factory, BlurredBackgroundColorProvider colorProvider) {
         setupGlass(factory, colorProvider, false);
     }
@@ -239,12 +230,6 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     public void setupGlass(BlurredBackgroundDrawableViewFactory factory,
                            BlurredBackgroundColorProvider colorProvider,
                            boolean isForum) {
-        setupGlassInternal(factory, colorProvider, isForum, false);
-    }
-
-    private void setupGlassInternal(BlurredBackgroundDrawableViewFactory factory,
-                                   BlurredBackgroundColorProvider colorProvider, boolean isForum, boolean kyant) {
-        kyantHeader = kyant;
         setBackground(null);
         setClipChildren(false);
         glassMode = true;
@@ -257,7 +242,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         signatureGlassRadius=-1;
         signatureUnreadGlassRadius=-1;
 
-        glassDrawable = createHeaderSurface(factory)
+        glassDrawable = factory.create(this)
             .setColorProvider(colorProvider)
             .setPadding(dp(6));
         final int glassAvatarSizeDp = app.exteraless.appearance.ChatHeaderUiHelper.getChatAvatarSizeDp();
@@ -271,12 +256,12 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         glassDrawable.setRadius(glassDrawableLeftRadius, dp(23), dp(23), glassDrawableLeftRadius);
 
 
-        glassDrawableBack = createHeaderSurface(factory)
+        glassDrawableBack = factory.create(this)
             .setColorProvider(colorProvider)
             .setRadius(dp(23))
             .setPadding(dp(6));
 
-        glassDrawableMenu = createHeaderSurface(factory)
+        glassDrawableMenu = factory.create(this)
             .setColorProvider(colorProvider)
             .setRadius(dp(23))
             .setPadding(dp(6));
@@ -292,6 +277,12 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         if (backButtonImageView != null) {
             backButtonImageView.setTranslationX(dp(2));
         }
+    }
+
+    public void registerElasticSurfaces(View avatar) {
+        app.flexygram.elastic.ElasticFusionGroup.bindSurfaces(this,
+            new View[]{backButtonImageView,avatar,menu},
+            new android.graphics.drawable.Drawable[]{glassDrawableBack,glassDrawable,glassDrawableMenu});
     }
 
     private ChatAvatarContainer findGlassAvatarContainer() {
@@ -1592,7 +1583,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable drawable, boolean allowed) {
         if (android.os.Build.VERSION.SDK_INT >= 33
                 && drawable instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
-            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)drawable).setKyantEffectAllowed(allowed);
+            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)drawable).setLiquidGlassEffectAllowed(allowed);
         }
         if (drawable!=null) drawable.updateColors();
     }
@@ -1615,7 +1606,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             glassDrawableBack.setBounds(Math.round(g.backVisual.left),
                     Math.round(g.backVisual.top) + offset, Math.round(g.backVisual.right),
                     Math.round(g.backVisual.bottom) + offset);
-            glassDrawableBack.draw(canvas);
+            app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, backButtonImageView, glassDrawableBack);
             if (g.separateUnread && signatureGlassUnread != null) {
                 setSignatureUnreadGlassRadius(g.unread.height()*.5f);
                 signatureGlassUnread.setBounds(Math.round(g.unread.left),Math.round(g.unread.top)+offset,
@@ -1626,7 +1617,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             glassDrawable.setBounds(Math.round(g.center.left),
                     Math.round(g.center.top) + offset, Math.round(g.center.right),
                     Math.round(g.center.bottom) + offset);
-            glassDrawable.draw(canvas);
+            app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, chatAvatarContainer, glassDrawable);
             // Portrait layout has two distinct action circles; keep both native hit targets.
             if (g.mattePortrait) {
                 if (g.callAvailable) {
@@ -1647,7 +1638,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                     Math.round(g.actionsVisual.top) + offset, Math.round(g.actionsVisual.right),
                     Math.round(g.actionsVisual.bottom) + offset);
             }
-            glassDrawableMenu.draw(canvas);
+            app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, menu, glassDrawableMenu);
             return true;
         }
         var g = header.geometry;
@@ -1666,15 +1657,15 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         }
         glassDrawableBack.setBounds(Math.round(backLeft), Math.round(g.back.top),
                 Math.round(backRight), Math.round(g.back.bottom));
-        glassDrawableBack.draw(canvas);
+        app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, backButtonImageView, glassDrawableBack);
 
         glassDrawable.setBounds(Math.round(g.title.left), Math.round(g.title.top),
                 Math.round(g.title.right), Math.round(g.title.bottom));
-        glassDrawable.draw(canvas);
+        app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, chatAvatarContainer, glassDrawable);
 
         glassDrawableMenu.setBounds(Math.round(g.avatar.left), Math.round(g.avatar.top),
                 Math.round(g.avatar.right), Math.round(g.avatar.bottom));
-        glassDrawableMenu.draw(canvas);
+        app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, menu, glassDrawableMenu);
         return true;
     }
 
@@ -2677,11 +2668,11 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             }
 
             glassDrawable.setBounds(left, t, right, b);
-            glassDrawable.draw(canvas);
+            app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, chatAvatarContainer, glassDrawable);
         }
         if (!signature && glassDrawableBack != null && hasBackButton) {
             glassDrawableBack.setBounds(0, t, s + p * 2, b);
-            glassDrawableBack.draw(canvas);
+            app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, backButtonImageView, glassDrawableBack);
         }
         if (!signature && glassDrawableMenu != null && menuWidth > 0 && !glassOnlyBack && !doNotDrawGlassMenu) {
             int menuLeft = getWidth() - Math.max(s, menuWidth) - p * 2;
@@ -2719,7 +2710,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             }
             glassDrawableMenu.setBounds(menuLeft, menuTop, menuRight, menuBottom);
             glassDrawableMenu.setAlpha(hasForcedMenuWidth ? 255 : (int) (255 * animatorHasMenuItems.getFloatValue()));
-            glassDrawableMenu.draw(canvas);
+            app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, menu, glassDrawableMenu);
         }
 
         if (!signature && blurredBackground && actionBarColor != Color.TRANSPARENT) {

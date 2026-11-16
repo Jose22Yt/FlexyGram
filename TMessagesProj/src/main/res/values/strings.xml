@@ -6308,7 +6308,7 @@
     <string name="LiteOptionsTopics">Side menu in topics</string>
     <string name="LiteOptionsSpoiler">Animated spoiler effect</string>
     <string name="LiteOptionsBlur2">Blur</string>
-    <string name="LiteOptionsLiquidGlass">Kyant Liquid Glass</string>
+    <string name="LiteOptionsLiquidGlass">Liquid Glass</string>
     <string name="LiteOptionsScale">Zoom animations</string>
     <string name="LiteOptionsThanos">Dust-effect deletion</string>
     <string name="LiteOptionsCalls">Animations in Calls</string>
@@ -11543,4 +11543,10 @@
     <string name="CreateManagedBotUsernameCheckFailed">Couldn\'t check this username. Please try again.</string>
     <string name="FlexyFolderThemeAccent">Use theme accent for active folder</string>
 
+    <string name="FlexyElasticTitle">Elastic interaction</string>
+    <string name="FlexyElasticSubtitle">Visible response to pressing and dragging controls</string>
+    <string name="FlexyElasticInfo">Try the buttons above. Related surfaces can join visually while keeping separate actions. Respects system animation settings and power saving.</string>
+    <string name="FlexyKyantDockTitle">Kyant Liquid Glass</string>
+    <string name="FlexyKyantDockSubtitle">Only on the main screen bottom bar</string>
+    <string name="FlexyKyantDockInfo">Optional material for this bar on Android 13 or later. Other surfaces keep Telegram glass and its existing settings.</string>
 </resources>

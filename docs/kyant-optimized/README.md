@@ -1,3 +1,5 @@
+> Registro histórico de beta63. La implementación actual de beta64 se describe en [Interacción elástica](../elastic/README.md).
+
 # Kyant en la base principal optimizada
 
 Base: `d50640dec57ee26c957b2b0342fe47cf4006acf5` (Native Test beta60).

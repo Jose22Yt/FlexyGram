@@ -361,20 +361,20 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
             glassBackgroundSourceFrostedRenderNode.setScrollableNoiseSuppressor(scrollableViewNoiseSuppressor, DownscaleScrollableNoiseSuppressor.DRAW_FROSTED_GLASS);
             glassBackgroundSourceFrostedRenderNode.setUnderSource(navbarContentSourceWallpaper);
 
-            if (LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS)) {
+            if (LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS)) {
                 glassBackgroundSourceRenderNode = new BlurredBackgroundSourceRenderNode(navbarContentSourceWallpaper);
                 glassBackgroundSourceRenderNode.setScrollableNoiseSuppressor(scrollableViewNoiseSuppressor, DownscaleScrollableNoiseSuppressor.DRAW_GLASS);
                 glassBackgroundSourceRenderNode.setUnderSource(navbarContentSourceWallpaper);
                 glassBackgroundDrawableFactory = new BlurredBackgroundDrawableViewFactory(glassBackgroundSourceRenderNode);
                 glassBackgroundDrawableFactory.setGlassEngine(glassEngine);
-                glassBackgroundDrawableFactory.setOutset(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS) ? dp(8) : dp(48));
-                glassBackgroundDrawableFactory.setKyantEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS));
+                glassBackgroundDrawableFactory.setOutset(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? dp(8) : dp(48));
+                glassBackgroundDrawableFactory.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
                 recommendedAdditionalSizeY = 0;
             } else {
                 glassBackgroundSourceRenderNode = null;
                 glassBackgroundDrawableFactory = new BlurredBackgroundDrawableViewFactory(glassBackgroundSourceFrostedRenderNode);
                 glassBackgroundDrawableFactory.setGlassEngine(glassEngine);
-                glassBackgroundDrawableFactory.setOutset(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS) ? dp(8) : dp(48));
+                glassBackgroundDrawableFactory.setOutset(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? dp(8) : dp(48));
                 recommendedAdditionalSizeY = dp(48);
             }
         } else {

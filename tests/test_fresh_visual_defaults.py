@@ -85,7 +85,7 @@ class LiteMode {
 public class Probe {
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[]args){var p=MessagesController.p;
- int effects=LiteMode.FLAG_CHAT_BLUR|LiteMode.FLAG_KYANT_GLASS;
+ int effects=LiteMode.FLAG_CHAT_BLUR|LiteMode.FLAG_LIQUID_GLASS;
  LiteMode.PRESET_HIGH|=effects;LiteMode.PRESET_MEDIUM|=effects;LiteMode.PRESET_LOW|=effects;
  for(int device=0;device<3;device++){
   SharedConfig.device=device;p.data.clear();LiteMode.loadPreference();check((LiteMode.value&effects)==0);
@@ -94,7 +94,7 @@ public class Probe {
   p.data.put("lite_mode6",nativeFlags);LiteMode.loadPreference();check(LiteMode.value==nativeFlags);
  }
  p.data.clear();p.data.put("lite_mode6",effects|8);p.data.put("kyant_material_v1",true);
- LiteMode.loadPreference();check(LiteMode.value==((effects|8)&~LiteMode.FLAG_KYANT_GLASS));
+ LiteMode.loadPreference();check(LiteMode.value==((effects|8)&~LiteMode.FLAG_LIQUID_GLASS));
  check(!p.data.containsKey("kyant_material_v1"));
  p.data.put("lite_mode6",effects|8);LiteMode.loadPreference();check(LiteMode.value==(effects|8));
  p.data.put("lite_mode6",0);LiteMode.loadPreference();check(LiteMode.value==0); // explicit OFF survives reload

@@ -46,19 +46,19 @@ def test_independent_flags_and_retained_chat_sources_switch_without_reopening(tm
     probe(tmp_path, {'Probe.java': '''
 public class Probe {
  static class LiteMode {
-  static final int FLAG_CHAT_BLUR=1,FLAG_KYANT_GLASS=2;static int flags;
+  static final int FLAG_CHAT_BLUR=1,FLAG_LIQUID_GLASS=2;static int flags;
   static boolean isEnabled(int f){return (flags&f)!=0;}
  }
  static class SharedConfig {static boolean capable=true;static boolean canBlurChat(){return capable;}SHARED}
  static class DownscaleScrollableNoiseSuppressor {
   static final int DRAW_GLASS=0,DRAW_FROSTED_GLASS=1;static int builds;
-  final boolean isKyantGlassEnabled=LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS);
+  final boolean isLiquidGlassEnabled=LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
   DownscaleScrollableNoiseSuppressor(){builds++;}
  }
  static class Source {int updates;void setScrollableNoiseSuppressor(DownscaleScrollableNoiseSuppressor s,int index){updates++;}}
- static class Factory {boolean liquid;int changes;void setKyantEffectAllowed(boolean b){liquid=b;changes++;}}
+ static class Factory {boolean liquid;int changes;void setLiquidGlassEffectAllowed(boolean b){liquid=b;changes++;}}
  static class Bar {boolean liquid;void updateSignatureNativeGlassPolicy(boolean b){liquid=b;}}
- static class Input {boolean liquid;void updateKyantGlassPolicy(boolean b){liquid=b;}}
+ static class Input {boolean liquid;void updateNativeLiquidGlassPolicy(boolean b){liquid=b;}}
  static class View {void invalidate(){}}
  boolean signatureNativeGlassAllowed,signatureLiquidGlassAllowed;
  DownscaleScrollableNoiseSuppressor scrollableViewNoiseSuppressor=new DownscaleScrollableNoiseSuppressor();
@@ -76,7 +76,7 @@ public class Probe {
    boolean liquid=(flags&2)!=0;
    check(p.signatureLiquidGlassAllowed==liquid&&p.glassBackgroundDrawableFactory.liquid==liquid);
    check(p.glassBackgroundDrawableFactoryFrosted.liquid==liquid&&p.actionBar.liquid==liquid&&p.chatInputViewsContainer.liquid==liquid);
-   check(p.scrollableViewNoiseSuppressor.isKyantGlassEnabled==liquid);
+   check(p.scrollableViewNoiseSuppressor.isLiquidGlassEnabled==liquid);
    int builds=DownscaleScrollableNoiseSuppressor.builds,changes=p.glassBackgroundDrawableFactory.changes;
    for(int i=0;i<10000;i++)p.refreshSignatureNativeGlassPolicy();
    check(builds==DownscaleScrollableNoiseSuppressor.builds&&changes==p.glassBackgroundDrawableFactory.changes);
@@ -105,16 +105,16 @@ public class Probe {
 
 
 def test_switch_updates_existing_drawables_and_releases_dead_owners(tmp_path):
-    body = method((JAVA/'org/telegram/ui/Components/blur3/BlurredBackgroundDrawableViewFactory.java').read_text(), 'public void setKyantEffectAllowed(')
+    body = method((JAVA/'org/telegram/ui/Components/blur3/BlurredBackgroundDrawableViewFactory.java').read_text(), 'public void setLiquidGlassEffectAllowed(')
     probe(tmp_path, {'Probe.java': '''
 import java.lang.ref.WeakReference;import java.util.ArrayList;
 public class Probe {
  static class Build {static class VERSION{static int SDK_INT=33;}}
  static class BlurredBackgroundDrawable {int colors;void updateColors(){colors++;}}
  static class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawable {
-  boolean refraction;void setKyantEffectAllowed(boolean b){refraction=b;}
+  boolean refraction;void setLiquidGlassEffectAllowed(boolean b){refraction=b;}
  }
- boolean isKyantEffectAllowed;
+ boolean isLiquidGlassEffectAllowed;
  ArrayList<WeakReference<BlurredBackgroundDrawable>> createdDrawables=new ArrayList<>();
  BODY
  static void check(boolean b){if(!b)throw new AssertionError();}
@@ -122,9 +122,9 @@ public class Probe {
   BlurredBackgroundDrawableRenderNode header=new BlurredBackgroundDrawableRenderNode(),composer=new BlurredBackgroundDrawableRenderNode();
   p.createdDrawables.add(new WeakReference<>(header));p.createdDrawables.add(new WeakReference<>(composer));
   WeakReference<BlurredBackgroundDrawable> removed=new WeakReference<>(new BlurredBackgroundDrawable());removed.clear();p.createdDrawables.add(removed);
-  p.setKyantEffectAllowed(true);check(header.refraction&&composer.refraction&&p.createdDrawables.size()==2);
-  p.setKyantEffectAllowed(false);check(!header.refraction&&!composer.refraction&&header.colors==2&&composer.colors==2);
-  Build.VERSION.SDK_INT=30;p.setKyantEffectAllowed(false);check(header.colors==3);
+  p.setLiquidGlassEffectAllowed(true);check(header.refraction&&composer.refraction&&p.createdDrawables.size()==2);
+  p.setLiquidGlassEffectAllowed(false);check(!header.refraction&&!composer.refraction&&header.colors==2&&composer.colors==2);
+  Build.VERSION.SDK_INT=30;p.setLiquidGlassEffectAllowed(false);check(header.colors==3);
  }
 }'''.replace('BODY', body)})
 
@@ -152,7 +152,7 @@ def test_native_tint_tracks_mode_changes_without_overriding_explicit_alpha(tmp_p
     probe(tmp_path, {
         'androidx/core/graphics/ColorUtils.java': 'package androidx.core.graphics;public class ColorUtils{}',
         'org/telegram/messenger/AndroidUtilities.java': 'package org.telegram.messenger;public class AndroidUtilities{public static float computePerceivedBrightness(int c){return .9f;}public static float dpf2(float f){return f;}}',
-        'org/telegram/messenger/LiteMode.java': 'package org.telegram.messenger;public class LiteMode{public static final int FLAG_KYANT_GLASS=2;public static boolean liquid;public static boolean isEnabled(int f){return liquid;}}',
+        'org/telegram/messenger/LiteMode.java': 'package org.telegram.messenger;public class LiteMode{public static final int FLAG_LIQUID_GLASS=2;public static boolean liquid;public static boolean isEnabled(int f){return liquid;}}',
         'org/telegram/ui/ActionBar/Theme.java': '''package org.telegram.ui.ActionBar;public class Theme{
  public interface ResourcesProvider{}public static final int key_windowBackgroundWhiteBlackText=1;
  public static int getColor(int id,ResourcesProvider r){return -1;}

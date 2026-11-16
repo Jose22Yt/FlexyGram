@@ -552,13 +552,13 @@ public class ChatActivity extends BaseFragment implements
     private final Utilities.Callback<Boolean> signatureGlassPowerListener = ignored -> refreshSignatureNativeGlassPolicy();
     private void refreshSignatureNativeGlassPolicy() {
         boolean allowed = SharedConfig.chatBlurEnabled();
-        boolean liquidPolicy = LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS);
+        boolean liquidPolicy = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
         if (signatureNativeGlassAllowed == allowed && signatureLiquidGlassAllowed == liquidPolicy) return;
         signatureNativeGlassAllowed = allowed;
         signatureLiquidGlassAllowed = liquidPolicy;
         // The native suppressor snapshots Liquid Glass in its constructor. Refresh only on a
         // policy transition, otherwise a source created with Glass off remains frosted forever.
-        if (scrollableViewNoiseSuppressor != null && scrollableViewNoiseSuppressor.isKyantGlassEnabled != liquidPolicy) {
+        if (scrollableViewNoiseSuppressor != null && scrollableViewNoiseSuppressor.isLiquidGlassEnabled != liquidPolicy) {
             scrollableViewNoiseSuppressor = new DownscaleScrollableNoiseSuppressor();
             if (glassBackgroundSourceRenderNode != null) glassBackgroundSourceRenderNode.setScrollableNoiseSuppressor(
                     scrollableViewNoiseSuppressor, DownscaleScrollableNoiseSuppressor.DRAW_GLASS);
@@ -566,10 +566,10 @@ public class ChatActivity extends BaseFragment implements
                     scrollableViewNoiseSuppressor, DownscaleScrollableNoiseSuppressor.DRAW_FROSTED_GLASS);
             if (contentView != null) invalidateMergedVisibleBlurredPositionsAndSourcesPositions();
         }
-        glassBackgroundDrawableFactory.setKyantEffectAllowed(liquidPolicy);
-        glassBackgroundDrawableFactoryFrosted.setKyantEffectAllowed(liquidPolicy);
+        glassBackgroundDrawableFactory.setLiquidGlassEffectAllowed(liquidPolicy);
+        glassBackgroundDrawableFactoryFrosted.setLiquidGlassEffectAllowed(liquidPolicy);
         if (actionBar!=null) actionBar.updateSignatureNativeGlassPolicy(liquidPolicy);
-        if (chatInputViewsContainer!=null) chatInputViewsContainer.updateKyantGlassPolicy(liquidPolicy);
+        if (chatInputViewsContainer!=null) chatInputViewsContainer.updateNativeLiquidGlassPolicy(liquidPolicy);
         if (contentView!=null) contentView.invalidate();
     }
 
@@ -3065,7 +3065,7 @@ public class ChatActivity extends BaseFragment implements
     public ChatActivity(Bundle args) {
         super(args);
         signatureNativeGlassAllowed = SharedConfig.chatBlurEnabled();
-        signatureLiquidGlassAllowed = LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS);
+        signatureLiquidGlassAllowed = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
 
         navbarContentSourceWallpaper = new BlurredBackgroundSourceWrapped();
         // Retain the source while the master switch is off, so enabling it does not need a new chat.
@@ -3080,7 +3080,7 @@ public class ChatActivity extends BaseFragment implements
             glassBackgroundSourceFrostedRenderNode.setUnderSource(navbarContentSourceWallpaper);
 
             glassBackgroundDrawableFactoryFrosted = new BlurredBackgroundDrawableViewFactory(glassBackgroundSourceFrostedRenderNode);
-            glassBackgroundDrawableFactoryFrosted.setKyantEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS));
+            glassBackgroundDrawableFactoryFrosted.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
 
             { // Retain the native source for runtime policy changes; no recording while unused.
                 glassBackgroundSourceRenderNode = new BlurredBackgroundSourceRenderNode(navbarContentSourceWallpaper);
@@ -3088,7 +3088,7 @@ public class ChatActivity extends BaseFragment implements
                 glassBackgroundSourceRenderNode.setScrollableNoiseSuppressor(scrollableViewNoiseSuppressor, DownscaleScrollableNoiseSuppressor.DRAW_GLASS);
                 glassBackgroundSourceRenderNode.setUnderSource(navbarContentSourceWallpaper);
                 glassBackgroundDrawableFactory = new BlurredBackgroundDrawableViewFactory(glassBackgroundSourceRenderNode);
-                glassBackgroundDrawableFactory.setKyantEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS));
+                glassBackgroundDrawableFactory.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
             }
         } else {
             scrollableViewNoiseSuppressor = null;
@@ -5405,11 +5405,12 @@ public class ChatActivity extends BaseFragment implements
 
         contentView.setOccupyStatusBar(!inBubbleMode && !isInsideContainer && !inPreviewMode);
 
-        actionBar.setupKyantGlass(
+        actionBar.setupGlass(
             glassBackgroundDrawableFactory,
             blurredBackgroundColorProviderTop,
             ChatObject.isForum(currentChat));
         app.exteraless.appearance.ChatHeaderUiHelper.applyChatHeaderGlassStyle(actionBar);
+        actionBar.registerElasticSurfaces(avatarContainer);
         //actionBar.setChatAvatarContainer(avatarContainer);
         //avatarContainer.setActionBar(actionBar);
 
@@ -5432,7 +5433,7 @@ public class ChatActivity extends BaseFragment implements
         chatInputViewsContainer.drawInputBackground = !isFeedSearch();
         chatInputViewsContainer.setWindowInsetsProvider(windowInsetsStateHolder);
         chatInputViewsContainer.setInputIslandBubbleDrawable(
-            glassBackgroundDrawableFactory.createKyant(chatInputViewsContainer, blurredBackgroundColorProvider));
+            glassBackgroundDrawableFactory.create(chatInputViewsContainer, blurredBackgroundColorProvider));
         chatInputViewsContainer.setCompactGlassFactory(glassBackgroundDrawableFactory, blurredBackgroundColorProvider);
         chatInputViewsContainer.setUnderKeyboardBackgroundDrawable(
             glassBackgroundDrawableFactoryFrosted.create(chatInputViewsContainer, blurredBackgroundColorProvider));
@@ -8686,7 +8687,7 @@ public class ChatActivity extends BaseFragment implements
             hashtagSearchTabs.setVisibility(View.GONE);
             hashtagSearchTabs.setTabs(searchViewPager.createTabsView(true, ViewPagerFixed.SELECTOR_TYPE_BUBBLE_STYLE));
             hashtagSearchTabs.setPadding(0, dp(7.66f), 0, dp(7.66f));
-            hashtagSearchTabs.setBackground(glassBackgroundDrawableFactory.createKyant(hashtagSearchTabs)
+            hashtagSearchTabs.setBackground(glassBackgroundDrawableFactory.create(hashtagSearchTabs)
                 .setColorProvider(BlurredBackgroundProviderImpl.topPanelChatActivity(resourceProvider))
                 .setRadius(dp(18)).setPadding(dp(7f)));
 
@@ -9886,7 +9887,7 @@ public class ChatActivity extends BaseFragment implements
         }
 
         checkUi_topPanelLayoutWidth();
-        topPanelLayout.setBlurredBackground(glassBackgroundDrawableFactory.createKyant(topPanelLayout)
+        topPanelLayout.setBlurredBackground(glassBackgroundDrawableFactory.create(topPanelLayout)
             .setColorProvider(blurredBackgroundColorProviderTop)
             .setRadius(dp(18))
             .setPadding(dp(7)));
@@ -11076,8 +11077,8 @@ public class ChatActivity extends BaseFragment implements
             checkUi_topFade();
         });
 
-        topicsTabs.setSideMenuBackgroundDrawable(glassBackgroundDrawableFactory.createKyant(topicsTabs, BlurredBackgroundProviderImpl.topPanelChatActivity(themeDelegate)));
-        topicsTabs.setTopMenuBackgroundDrawable(glassBackgroundDrawableFactory.createKyant(topicsTabs, BlurredBackgroundProviderImpl.topPanelChatActivity(themeDelegate)));
+        topicsTabs.setSideMenuBackgroundDrawable(glassBackgroundDrawableFactory.create(topicsTabs, BlurredBackgroundProviderImpl.topPanelChatActivity(themeDelegate)));
+        topicsTabs.setTopMenuBackgroundDrawable(glassBackgroundDrawableFactory.create(topicsTabs, BlurredBackgroundProviderImpl.topPanelChatActivity(themeDelegate)));
 
         int index = 8;
         topicsTabs.setCurrentTopic(getTopicId());
