@@ -10,17 +10,13 @@ def test_software_menu_captures_preserve_live_backgrounds_and_restore_owner_on_f
 class Canvas{boolean hardware,fail;Canvas(boolean h){hardware=h;}boolean isHardwareAccelerated(){return hardware;}}
 class Rect{void set(int l,int t,int r,int b){}void inset(int x,int y){}void offset(int x,int y){}}
 class Drawable{int alpha=255,hides;void setBounds(int a,int b,int c,int d){}void setBounds(Rect r){}void draw(Canvas c){}void setAlpha(int a){alpha=a;hides++;}}
-class Composer{boolean nativeDrawn,voice,send,compact=true;boolean isFlexyCompactPresentation(){return compact;} boolean hasIndependentElasticSurfaces(){return false;}
+class Composer{boolean nativeDrawn,voice,send,compact=true;boolean isFlexyCompactPresentation(){return compact;}
  void setFlexyNativeGlassBackdropDrawn(boolean v){nativeDrawn=v;}void setFlexyVoiceBackdropDrawn(boolean v){voice=v;}void setFlexySendBackdropDrawn(boolean v){send=v;}}
 class Channels{boolean isSignatureCompactPresentation(){return true;}}
 class Base{protected void dispatchDraw(Canvas c){Host h=(Host)this;
  if(h.flexyComposer!=null&&h.drawInputBackground&&h.flexyComposer.compact){
   if(h.flexyComposer.nativeDrawn!=c.hardware||h.flexyComposer.voice!=c.hardware||h.flexyComposer.send!=c.hardware)throw new AssertionError("wrong capture ownership");}
  if(c.fail)throw new IllegalStateException("capture failed");}}
-// Explicit host API double: the elastic helper delegates snapshots to the same drawable.
-class app{static class flexygram{static class elastic{static class ElasticInteraction{
- static void drawInputSurface(Canvas c,Object owner,Drawable d){d.draw(c);}
-}}}}
 class Host extends Base{
  static int dp(int v){return v;}static final int INPUT_KEYBOARD_RADIUS=12;
  final Drawable underKeyboardBackgroundDrawable=new Drawable(),blurredBackgroundDrawable=new Drawable();

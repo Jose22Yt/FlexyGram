@@ -26,13 +26,22 @@ def main():
  shutil.copyfile(source/'res/raw/liquid_glass_shader.agsl', raw_dir/'liquid_glass_shader.agsl')
  values=out/'src/main/res/values';values.mkdir(parents=True,exist_ok=True)
  shutil.copyfile(source/'res/values/ids.xml',values/'ids.xml')
- (values/'elastic_strings.xml').write_text('<resources><string name="Send">Send</string><string name="AccDescrAttachButton">Attach media</string></resources>')
- for name in ['ElasticConfig','ElasticSpring','ElasticTransform','ElasticInteraction','ElasticFusionGroup','ElasticPreviewView','ElasticControlBackground']:
-  target=out/'src/main/java/app/flexygram/elastic'/f'{name}.java';target.parent.mkdir(parents=True,exist_ok=True)
-  shutil.copyfile(source/'java/app/flexygram/elastic'/target.name,target)
+ stale_strings=values/'elastic_strings.xml'
+ if stale_strings.exists():stale_strings.unlink()
+ # Remove classes/tests from earlier runs of the abandoned elastic experiment.
+ for stale_dir in [out/'src/main/java/app/flexygram/elastic']:
+  if stale_dir.exists():shutil.rmtree(stale_dir)
+ stale_test=out/'src/test/kotlin/app/flexygram/kyant/ElasticInteractionTest.kt'
+ if stale_test.exists():stale_test.unlink()
  for kind in ['java','kotlin']:
   target=out/'src/main'/kind/'app/flexygram/kyant'
   shutil.copytree(source/kind/'app/flexygram/kyant',target,dirs_exist_ok=True)
+ # The isolated renderer probe has no settings screen host.
+ settings=out/'src/main/java/app/flexygram/kyant/NativeDockSettingsActivity.java'
+ if settings.exists():settings.unlink()
+ for stale in ['DampedDragAnimation','InteractiveHighlight','ProgressConverter']:
+  retired=out/'src/main/kotlin/app/flexygram/kyant/utils'/f'{stale}.kt'
+  if retired.exists():retired.unlink()
  shutil.copytree(ROOT/'buildSrc/src',out/'buildSrc/src',dirs_exist_ok=True)
  shutil.copyfile(ROOT/'buildSrc/build.gradle.kts',out/'buildSrc/build.gradle.kts')
  shutil.copytree(Path(__file__).with_name('stubs'),out/'src/main/java',dirs_exist_ok=True)

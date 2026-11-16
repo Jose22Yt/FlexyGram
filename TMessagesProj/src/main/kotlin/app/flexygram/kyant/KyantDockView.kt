@@ -79,6 +79,10 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     init {
         clipChildren = false
         clipToPadding = false
+        clipToOutline = false
+        elevation = 0f
+        outlineProvider = null
+        background = null
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
     }
 
@@ -109,8 +113,8 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         alpha = dock.alpha
         if (geometry.update(dock.x, dock.y, dock.width, dock.height, dock.paddingTop, dock.paddingBottom,
                 LocaleController.isRTL, Theme.isCurrentThemeDark())) geometryRevision++
-        dock.importantForAccessibility = if (ready && dock.visibility == VISIBLE && dock.alpha > 0f && (app.flexygram.elastic.ElasticConfig.kyantDock() && !LiteMode.isPowerSaverApplied())) View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS else View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
-        available = isShown && dock.isShown && dock.visibility == VISIBLE && dock.alpha > 0f && windowVisibility == VISIBLE && isHardwareAccelerated && (app.flexygram.elastic.ElasticConfig.kyantDock() && !LiteMode.isPowerSaverApplied())
+        dock.importantForAccessibility = if (ready && dock.visibility == VISIBLE && dock.alpha > 0f && (KyantDockConfig.enabled() && !LiteMode.isPowerSaverApplied())) View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS else View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+        available = isShown && dock.isShown && dock.visibility == VISIBLE && dock.alpha > 0f && windowVisibility == VISIBLE && isHardwareAccelerated && (KyantDockConfig.enabled() && !LiteMode.isPowerSaverApplied())
         visible.forEach { it.setSkipDrawSelector(available && visible.size >= 2) }
         if (!available) {
             ready = false

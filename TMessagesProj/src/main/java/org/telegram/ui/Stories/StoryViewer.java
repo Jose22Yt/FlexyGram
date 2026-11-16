@@ -921,7 +921,6 @@ public class StoryViewer implements NotificationCenter.NotificationCenterDelegat
 
                 @Override
                 public boolean dispatchTouchEvent(MotionEvent ev) {
-            app.flexygram.elastic.ElasticInteraction.observe(this, ev);
                     boolean swipeToReplyCancelled = false;
                     PeerStoriesView peerStoriesView = storiesViewPager.getCurrentPeerView();
                     if (peerStoriesView != null && peerStoriesView.checkTextSelectionEvent(ev)) {

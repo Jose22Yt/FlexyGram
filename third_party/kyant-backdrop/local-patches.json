@@ -1,0 +1,15 @@
+{
+  "reason": "beta67: remove panel/tab stretch, rectangular interactive highlight and unused deformation helpers; keep original optical material and bounded selector navigation",
+  "modified": {
+    "components/LiquidBottomTabs.kt": "464a084f6847e7e4a76f895eb582bfc1be43a7ad554ced49c2f92e00c5fcc571",
+    "components/LiquidBottomTab.kt": "e54f917d62b62b5d9269075e65a6c0152a8d392dfe25df659b67f4105694cef2"
+  },
+  "removed": [
+    "utils/DampedDragAnimation.kt",
+    "utils/InteractiveHighlight.kt",
+    "utils/ProgressConverter.kt"
+  ],
+  "new": [
+    "utils/DockSelectionAnimation.kt"
+  ]
+}

@@ -81,6 +81,10 @@ class NativeDockHostTest {
     @Test fun boundedOverlayPreservesNativeBarBoundsAndPassesHeaderChatsAndScroll() {
         val f=Fixture(true,24)
         try {
+            assertFalse("Optical edges may draw outside the wrapper",f.wrapper.clipChildren)
+            assertFalse(f.wrapper.clipToPadding)
+            assertNull("No rectangular backdrop on the Android host",f.wrapper.background)
+            assertEquals("No platform rectangular elevation shadow",0f,f.wrapper.elevation,0f)
             assertEquals(96,f.wrapper.measuredHeight)
             assertEquals(704,f.wrapper.top)
             assertEquals(72,f.dock.height)

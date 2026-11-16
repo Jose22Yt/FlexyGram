@@ -1,4 +1,4 @@
-> Registro histórico de beta63. La implementación actual de beta64 se describe en [Interacción elástica](../elastic/README.md).
+> Registro histórico de beta63. La implementación actual sin rebote se describe en [beta67](../performance/beta67.md).
 
 # Kyant en la base principal optimizada
 

@@ -344,6 +344,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     public void onResume() {
         super.onResume();
         updateLayout();
+        updateKyantDock();
         if (kyantDockView != null) { kyantDockView.syncFromNative(); kyantDockView.backdropChanged(); }
         if (miniPlayer != null) {
             miniPlayer.update(true);
@@ -353,6 +354,21 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         checkUnreadCount(true);
 
         showAccountChangeHint();
+    }
+
+    private void updateKyantDock() {
+        if (Build.VERSION.SDK_INT < 33 || tabsViewWrapper == null) return;
+        if (app.flexygram.kyant.KyantDockConfig.enabled()) {
+            if (kyantDockView == null) {
+                kyantDockView = new app.flexygram.kyant.KyantDockView(tabsView.getContext(), tabsView, viewPager);
+                tabsView.setKyantHost(kyantDockView);
+                tabsViewWrapper.addView(kyantDockView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            }
+        } else if (kyantDockView != null) {
+            tabsViewWrapper.removeView(kyantDockView);
+            tabsView.setKyantHost(null);
+            kyantDockView = null;
+        }
     }
 
     private void checkContactsTabBadge() {
@@ -380,6 +396,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     @Override
     public View createView(Context context) {
         super.createView(context);
+        contentView.setClipChildren(false);
         Bulletin.addDelegate(contentView, getBulletinDelegate());
         tabletLayout = false;
 
@@ -496,12 +513,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         // высота досчитывается вместе с нижним системным отступом в applyTabsBottomInset
         tabsViewWrapper.addView(tabsView, LayoutHelper.createFrame(MainTabsUiHelper.getTabsViewWidth(), MainTabsUiHelper.getTabsViewHeightDp(), Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
         tabsViewWrapper.setClipToPadding(false);
-        if (Build.VERSION.SDK_INT >= 33) {
-            kyantDockView = new app.flexygram.kyant.KyantDockView(context, tabsView, viewPager);
-            tabsView.setKyantHost(kyantDockView);
-            tabsViewWrapper.setClipChildren(false);
-            tabsViewWrapper.addView(kyantDockView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        }
+        updateKyantDock();
         contentView.addView(tabsViewWrapper, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM));
 
         updateLayoutWrapper = new UpdateLayoutWrapper(context);
@@ -1595,7 +1607,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         blur3_updateFadeColors();
         if (tabsViewBackground != null) {
             if (Build.VERSION.SDK_INT >= 33 && tabsViewBackground instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
-                ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)tabsViewBackground).setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) && !app.flexygram.elastic.ElasticConfig.kyantDock());
+                ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)tabsViewBackground).setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) && !app.flexygram.kyant.KyantDockConfig.enabled());
             }
             tabsViewBackground.updateColors();
         }

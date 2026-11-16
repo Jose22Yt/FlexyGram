@@ -3151,7 +3151,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
         @Override
         public boolean dispatchTouchEvent(MotionEvent ev) {
-            app.flexygram.elastic.ElasticInteraction.observe(this, ev);
             textSelectionHelper.getOverlayView(getContext()).checkCancelAction(ev);
             if (textSelectionHelper.isInSelectionMode()) {
                 if (textSelectionHelper.getOverlayView(getContext()).onTouchEvent(ev)) {

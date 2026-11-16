@@ -239,7 +239,6 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
 
     @Override public boolean dispatchTouchEvent(android.view.MotionEvent event) {
         app.flexygram.icons.IconPressFeedback.observe(getWindow().getDecorView(), event);
-        app.flexygram.elastic.ElasticInteraction.observe(getWindow().getDecorView(), event);
         return super.dispatchTouchEvent(event);
     }
 

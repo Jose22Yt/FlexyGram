@@ -40,7 +40,6 @@ final class CompactSettingsPlan {
     };
     private static final Page[] NAVIGATION={
         new Page("tabs",R.string.CompactTabs,R.drawable.fg_dm_barra_inferior),
-        new Page("elastic",R.string.FlexyElasticTitle,R.drawable.fg_dm_elastic),
         new Page("controls",R.string.CompactNavigationControls,R.drawable.fg_dm_comportamiento),
         new Page("gestures",R.string.CompactGestures,R.drawable.fg_dm_gestos),
         new Page("extras",R.string.CompactNavigationExtras,R.drawable.fg_dm_mas_opciones)

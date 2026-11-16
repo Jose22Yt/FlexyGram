@@ -11,6 +11,10 @@ public final class KyantDockContainer extends FrameLayout {
     public KyantDockContainer(Context context, View nativeDock) {
         super(context);
         this.nativeDock = nativeDock;
+        setClipChildren(false);
+        setClipToPadding(false);
+        setElevation(0f);
+        setBackground(null);
     }
 
     @Override

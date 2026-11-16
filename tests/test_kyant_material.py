@@ -4,9 +4,16 @@ from pathlib import Path
 from test_render_work_reuse import ROOT,JAVA,probe
 
 
-def test_original_kyant_material_and_animation_sources_are_preserved():
+def test_kyant_provenance_and_explicit_static_dock_patch_are_verified():
     hashes=json.loads((ROOT/'third_party/kyant-backdrop/provenance.json').read_text())
+    patches=json.loads((ROOT/'third_party/kyant-backdrop/local-patches.json').read_text())
     for rel,expected in hashes.items():
+        if rel in patches['removed']:
+            assert not (ROOT/'TMessagesProj/src/main/kotlin/app/flexygram/kyant'/rel).exists()
+            continue
+        if rel in patches['modified']:
+            assert hashlib.sha256((ROOT/'TMessagesProj/src/main/kotlin/app/flexygram/kyant'/rel).read_bytes()).hexdigest()==patches['modified'][rel]
+            continue
         text=(ROOT/'TMessagesProj/src/main/kotlin/app/flexygram/kyant'/rel).read_text()
         original=text.split('\n',1)[1].replace('app.flexygram.kyant','com.kyant.backdrop.catalog')
         assert hashlib.sha256(original.encode()).hexdigest()==expected,rel
@@ -96,7 +103,7 @@ def test_native_material_restored_and_kyant_opt_in_only_on_home_dock():
     for p in JAVA.rglob('*.java'):
         assert '.createKyant(' not in p.read_text(),p
     bridge=(ROOT/'TMessagesProj/src/main/kotlin/app/flexygram/kyant/KyantDockView.kt').read_text()
-    assert 'ElasticConfig.kyantDock()' in bridge and '!LiteMode.isPowerSaverApplied()' in bridge
+    assert 'KyantDockConfig.enabled()' in bridge and '!LiteMode.isPowerSaverApplied()' in bridge
     assert 'FLAG_LIQUID_GLASS' not in bridge
     build=(ROOT/'TMessagesProj/build.gradle').read_text()
     assert "buildConfigField 'boolean', 'NATIVE_BASELINE_TEST', 'true'" in build
@@ -125,3 +132,46 @@ public class Probe{static void check(boolean b){if(!b)throw new AssertionError()
  check(state.update(12,4,320,96,0,24,true,true)); // native measured position/width
  check(!state.update(12,4,320,96,0,24,true,true));
 }}'''},[JAVA/'app/flexygram/kyant/KyantDockGeometry.java'])
+
+
+def test_disabled_kyant_never_constructs_a_compose_host_and_enable_disable_is_idempotent(tmp_path):
+    from test_composer_layout import method
+    body=method((JAVA/'org/telegram/ui/MainTabsActivity.java').read_text(),'private void updateKyantDock()')
+    probe(tmp_path,{
+        'android/os/Build.java':'package android.os;public class Build{public static class VERSION{public static int SDK_INT=33;}}',
+        'android/view/ViewGroup.java':'package android.view;public class ViewGroup{public static class LayoutParams{public static int MATCH_PARENT=-1;}}',
+        'android/widget/FrameLayout.java':'package android.widget;public class FrameLayout{public static class LayoutParams{public LayoutParams(int x,int y){}}}',
+        'app/flexygram/kyant/KyantDockConfig.java':'package app.flexygram.kyant;public class KyantDockConfig{public static boolean on;public static boolean enabled(){return on;}}',
+        'app/flexygram/kyant/KyantDockView.java':'package app.flexygram.kyant;public class KyantDockView{public static int creates;public KyantDockView(Object c,Object d,Object s){creates++;}}',
+        'Probe.java':'''import android.os.Build;import android.view.ViewGroup;import android.widget.FrameLayout;import app.flexygram.kyant.*;
+public class Probe{
+ static class Dock{Object host;Object getContext(){return this;}void setKyantHost(Object v){host=v;}}
+ static class Host{int adds,removes;void addView(Object v,Object p){adds++;}void removeView(Object v){removes++;}}
+ Dock tabsView=new Dock();Host tabsViewWrapper=new Host();Object viewPager=new Object();KyantDockView kyantDockView;
+ BODY
+ static void check(boolean b){if(!b)throw new AssertionError();}
+ public static void main(String[]args){Probe p=new Probe();
+ for(int i=0;i<10000;i++)p.updateKyantDock();check(KyantDockView.creates==0&&p.tabsViewWrapper.adds==0);
+ KyantDockConfig.on=true;for(int i=0;i<10000;i++)p.updateKyantDock();check(KyantDockView.creates==1&&p.tabsViewWrapper.adds==1&&p.tabsView.host==p.kyantDockView);
+ KyantDockConfig.on=false;for(int i=0;i<10000;i++)p.updateKyantDock();check(p.kyantDockView==null&&p.tabsView.host==null&&p.tabsViewWrapper.removes==1);
+ KyantDockConfig.on=true;p.updateKyantDock();check(KyantDockView.creates==2);
+ Build.VERSION.SDK_INT=32;p=new Probe();p.updateKyantDock();check(p.kyantDockView==null&&KyantDockView.creates==2);
+ }}'''.replace('BODY',body)
+    })
+
+
+def test_removed_rebound_has_no_runtime_classes_settings_or_resources():
+    assert not (JAVA/'app/flexygram/elastic').exists()
+    for root in [ROOT/'TMessagesProj/src/main/java',ROOT/'TMessagesProj/src/main/kotlin']:
+        for path in root.rglob('*'):
+            if path.suffix in {'.java','.kt'}:
+                text=path.read_text()
+                for name in ['app.flexygram.elastic.','ElasticInteraction.observe','ElasticControlBackground','FlexyElasticTitle','fg_dm_elastic']:
+                    assert name not in text,(path,name)
+    tabs=(ROOT/'TMessagesProj/src/main/kotlin/app/flexygram/kyant/components/LiquidBottomTabs.kt').read_text()
+    assert 'InteractiveHighlight' not in tabs and 'scaleX' not in tabs and 'scaleY' not in tabs
+    selector=(ROOT/'TMessagesProj/src/main/kotlin/app/flexygram/kyant/utils/DockSelectionAnimation.kt').read_text()
+    assert 'spring(' not in selector and 'positionJob?.cancel()' in selector
+    assert not (ROOT/'TMessagesProj/src/main/res/drawable/fg_dm_elastic.xml').exists()
+    for directory in ['values','values-es']:
+        assert 'name="FlexyElastic' not in (ROOT/'TMessagesProj/src/main/res'/directory/'strings.xml').read_text()

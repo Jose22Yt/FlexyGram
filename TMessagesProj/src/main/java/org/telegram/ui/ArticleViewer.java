@@ -1018,7 +1018,6 @@ public class ArticleViewer extends IArticleViewer implements NotificationCenter.
 
         @Override
         public boolean dispatchTouchEvent(MotionEvent ev) {
-            app.flexygram.elastic.ElasticInteraction.observe(this, ev);
             if (pinchToZoomHelper.isInOverlayMode()) {
                 ev.offsetLocation(-containerView.getX(), -containerView.getY());
                 return pinchToZoomHelper.onTouchEvent(ev);
