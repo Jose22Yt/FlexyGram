@@ -11,9 +11,13 @@ def main():
     args.add_argument('--android-jar',type=Path,required=True)
     args.add_argument('--maven',default='mvn')
     args.add_argument('--output',type=Path,required=True)
+    args.add_argument('--native-baseline',action='store_true',help='Exercise the clean shapes-only Native Test profile')
     options=args.parse_args();out=options.output.resolve();source=out/'src/test/java';source.mkdir(parents=True,exist_ok=True)
     spec=importlib.util.spec_from_file_location('bubble_hosts',ROOT/'tools/connected_alpha/bubble_visual/stubs.py')
     hosts=importlib.util.module_from_spec(spec);spec.loader.exec_module(hosts);hosts.write_stubs(source,ROOT)
+    (source/'org/telegram/messenger/BuildConfig.java').write_text(
+        'package org.telegram.messenger;public final class BuildConfig{public static final boolean CONNECTED_ALPHA=true,NATIVE_BASELINE_TEST='
+        +str(options.native_baseline).lower()+';}')
     theme=source/'org/telegram/ui/ActionBar/Theme.java'
     theme.write_text(theme.read_text().replace('public class Theme {','public class Theme {public static final int key_chat_serviceBackground=130,key_chat_serviceBackgroundSelected=131;'))
     # Service wallpaper availability is isolated; native MessageDrawable, paths, paints and widgets are real.
@@ -27,7 +31,8 @@ def main():
     path.write_text('package app.flexygram.header;public class HeaderPreviewView extends android.view.View{public HeaderPreviewView(android.content.Context c){super(c);}public void settingsChanged(){}}')
     for name in ['flexy_check_ios27','flexy_halfcheck_ios27']:
         (out/(name+'.xml')).write_bytes((ROOT/'TMessagesProj/src/main/res/drawable'/(name+'.xml')).read_bytes())
-    test=(ROOT/'tools/ios_bubbles/NativeStylesTest.java.in').read_text().replace('"/workspace/work/style-validation/compact-bubbles.png"','System.getProperty("probe.root")+"/compact-bubbles.png"')
+    template='CleanBubbleStylesTest.java.in' if options.native_baseline else 'NativeStylesTest.java.in'
+    test=(ROOT/'tools/ios_bubbles'/template).read_text().replace('"/workspace/work/style-validation/compact-bubbles.png"','System.getProperty("probe.root")+"/compact-bubbles.png"')
     (source/'NativeStylesTest.java').write_text(test)
     (out/'pom.xml').write_text((ROOT/'tools/connected_alpha/bubble_visual/pom.xml').read_text().replace('<version>4.17</version>','<version>4.16</version>'))
     command=[options.maven,'-B','-f',str(out/'pom.xml'),'-Dandroid.sdk.jar='+str(options.android_jar.resolve())]

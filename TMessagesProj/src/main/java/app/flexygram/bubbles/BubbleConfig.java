@@ -25,11 +25,13 @@ public final class BubbleConfig {
         return ApplicationLoader.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE);
     }
     public static void load() {
+        // The clean profile has one setting, cached until an explicit reload/change.
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && loaded) return;
         reload();
     }
     public static void reload() {
         if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) {
-            shape = TELEGRAM;
+            shape = normalizeShape(preferences().getInt(SHAPE, TELEGRAM));
             customizationEnabled = false;
             surfaceEffect = DEFAULT;
             smallTimestamps = glass = border = edges = cachedBlur = false;
@@ -72,6 +74,7 @@ public final class BubbleConfig {
     public static int shape() { return shape; }
     public static void setShape(int value) {
         if (!loaded) load(); value = normalizeShape(value);
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && shape == value) return;
         shape = value; customizationEnabled = true; preferences().edit().putInt(SHAPE, value).apply();
     }
     private static void enableCustomization() {
@@ -79,6 +82,7 @@ public final class BubbleConfig {
     }
     public static boolean adaptive() { return surfaceEffect == ADAPTIVE; }
     public static void setSurfaceEffect(int value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         if (!loaded) load();
         value = normalizeSurfaceEffect(value);
         if (surfaceEffect == value) return;
@@ -89,6 +93,7 @@ public final class BubbleConfig {
     }
     public static boolean smallTimestamps() { return smallTimestamps; }
     public static void setSmallTimestamps(boolean value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         if (!loaded) load();
         if (smallTimestamps == value) return;
         smallTimestamps = value;
@@ -102,6 +107,7 @@ public final class BubbleConfig {
     @Deprecated public static void setMatteEnabled(boolean ignored) { }
     @Deprecated public static void setMatteStrength(int ignored) { }
     public static void setBackgroundBlur(boolean value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         if (!loaded) load();
         enableCustomization();
         if (cachedBlur == value) return;
@@ -115,6 +121,7 @@ public final class BubbleConfig {
     public static void setSkin(int value) { }
     public static int borderPosition() { return borderPosition; }
     public static void setBorderPosition(int value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         if (!loaded) load();
         if (value <= 0) { setOutlineEnabled(false); return; } // Legacy "none" callers remain compatible.
         value = Math.max(1, Math.min(5, value));
@@ -125,21 +132,57 @@ public final class BubbleConfig {
     public static int fusionMode(){return fusionMode;}
     public static int fusionIntensity(){return fusionIntensity;}
     public static boolean fusionAdapt(){return fusionAdapt;}
-    public static void setFusionMode(int mode){if(!loaded)load();fusionMode=Math.max(0,Math.min(2,mode));fuseGlass=fusionMode==1;preferences().edit().putInt("signature_fusion_mode",fusionMode).putBoolean("signature_fuse_glass",fuseGlass).apply();}
-    public static void setFusionIntensity(int value){if(!loaded)load();fusionIntensity=Math.max(0,Math.min(100,value));preferences().edit().putInt("signature_fusion_intensity",fusionIntensity).apply();}
-    public static void setFusionAdapt(boolean value){if(!loaded)load();fusionAdapt=value;preferences().edit().putBoolean("signature_fusion_adapt",value).apply();}
+    public static void setFusionMode(int mode) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
+        if(!loaded)load();
+        fusionMode=Math.max(0,Math.min(2,mode));
+        fuseGlass=fusionMode==1;
+        preferences().edit().putInt("signature_fusion_mode",fusionMode).putBoolean("signature_fuse_glass",fuseGlass).apply();
+    }
+    public static void setFusionIntensity(int value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
+        if(!loaded)load();
+        fusionIntensity=Math.max(0,Math.min(100,value));
+        preferences().edit().putInt("signature_fusion_intensity",fusionIntensity).apply();
+    }
+    public static void setFusionAdapt(boolean value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
+        if(!loaded)load();
+        fusionAdapt=value;
+        preferences().edit().putBoolean("signature_fusion_adapt",value).apply();
+    }
     public static boolean fuseGlass() { return fusionMode==1; }
     public static void setFuseGlass(boolean value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         if (!loaded) load(); if ((value?1:0) == fusionMode) return;
         setFusionMode(value?1:0);
     }
-    public static void setOutlineEnabled(boolean value) { if (!loaded) load(); enableCustomization();outlineEnabled = value; preferences().edit().putBoolean("signature_outline_enabled", value).putInt("signature_border_position", borderPosition).apply(); }
-    public static void setOutlineStyle(int value) { if (!loaded) load(); outlineStyle = Math.max(0, Math.min(3, value)); preferences().edit().putInt("signature_outline_style", outlineStyle).apply(); }
-    public static void setPearlIntensity(int value) { if (!loaded) load(); value = Math.max(0, Math.min(100, value)); if (value == pearlIntensity) return; pearlIntensity = value; preferences().edit().putInt("signature_pearl_intensity", value).apply(); }
+    public static void setOutlineEnabled(boolean value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
+        if (!loaded) load();
+        enableCustomization();
+        outlineEnabled = value;
+        preferences().edit().putBoolean("signature_outline_enabled", value).putInt("signature_border_position", borderPosition).apply();
+    }
+    public static void setOutlineStyle(int value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
+        if (!loaded) load();
+        outlineStyle = Math.max(0, Math.min(3, value));
+        preferences().edit().putInt("signature_outline_style", outlineStyle).apply();
+    }
+    public static void setPearlIntensity(int value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
+        if (!loaded) load();
+        value = Math.max(0, Math.min(100, value));
+        if (value == pearlIntensity) return;
+        pearlIntensity = value;
+        preferences().edit().putInt("signature_pearl_intensity", value).apply();
+    }
     public static int transparency() { return customizationEnabled ? transparency : 0; }
     public static int borderTenths() { return borderTenths; }
     public static float borderDp() { return borderTenths / 10f; }
     public static void setBorderTenths(int value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         if (!loaded) load();
         value = Math.max(0, Math.min(20, value));
         if (borderTenths == value) return;
@@ -147,15 +190,19 @@ public final class BubbleConfig {
         preferences().edit().putInt("signature_border_tenths", value).apply();
     }
     public static void setGlass(boolean value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         if (!loaded) load(); glass = value; preferences().edit().putBoolean(GLASS, value).apply();
     }
     public static void setBorder(boolean value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         if (!loaded) load(); border = value; preferences().edit().putBoolean(BORDER, value).apply();
     }
     public static void setEdges(boolean value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         if (!loaded) load(); edges = value; preferences().edit().putBoolean(EDGES, value).apply();
     }
     public static void setTransparency(int value) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
         if (!loaded) load(); value = BubbleStyle.transparency(value);
         enableCustomization();
         if (transparency == value) return;

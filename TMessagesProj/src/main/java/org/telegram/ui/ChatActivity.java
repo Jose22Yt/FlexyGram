@@ -32221,6 +32221,17 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
+    private int lastResumedBubbleShape = -1;
+    private void refreshCleanBubbleShape() {
+        if (!org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
+        int shape = app.flexygram.bubbles.BubbleConfig.shape();
+        if (lastResumedBubbleShape >= 0 && lastResumedBubbleShape != shape && chatListView != null) {
+            // Invalidate visible display lists once after choosing a shape, without reloading messages.
+            chatListView.invalidateViews();
+        }
+        lastResumedBubbleShape = shape;
+    }
+
     Bulletin.Delegate bulletinDelegate;
 
     private int getCurrentFolderUnreadMessageCount() {
@@ -32289,6 +32300,7 @@ public class ChatActivity extends BaseFragment implements
             if (audioCallIconItem != null && usesSignatureHeader()) audioCallIconItem.setVisibility(View.GONE);
         }
         app.flexygram.bubbles.BubbleConfig.load();
+        refreshCleanBubbleShape();
         if (chatActivityFadeView != null) {
             chatActivityFadeView.setFlexyEdgeBlur(false, glassBackgroundDrawableFactoryFrosted);
         }

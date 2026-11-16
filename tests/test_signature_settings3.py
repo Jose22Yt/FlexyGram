@@ -64,6 +64,9 @@ def test_original_editor_click_logic_is_unchanged():
   if path.endswith('/HeaderSettingsActivity.java'):
    current=current.replace('getString(R.string.FlexyHeaderFloating),\n                            ','').replace('new int[]{4, 3, 0, 2, 1}','new int[]{3, 0, 2, 1}')
   if path.endswith('/BubbleSettingsActivity.java'):
+   # Native Test intentionally adds a shapes-only selector; legacy callbacks remain intact.
+   current=current.replace(method(current,'if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)'),'',1)
+   current=current.replace('        \n','')
    # Material and timestamp controls are additive; earlier callbacks stay intact.
    for key in ['personalizationRow','effectRow','timestampRow']:
     added=method(current,'if (position == '+key+')')

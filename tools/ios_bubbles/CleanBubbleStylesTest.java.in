@@ -1,0 +1,119 @@
+import android.graphics.*;
+import app.flexygram.bubbles.*;
+import org.telegram.messenger.*;
+import org.telegram.ui.ActionBar.*;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import static org.junit.Assert.*;
+
+/** Real Android/Skia geometry and pixels; host theme/preferences are isolated. No APK is built. */
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest=Config.NONE,sdk=35)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class NativeStylesTest {
+    @Before public void setup() {
+        ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();
+        ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit().clear().commit();
+        AndroidUtilities.density=1;
+        Theme.dark=false;
+        BubbleConfig.reload();
+    }
+    private Bitmap render(MessageDrawable bubble,MessageDrawable.PathDrawParams cache) {
+        Bitmap image=Bitmap.createBitmap(200,120,Bitmap.Config.ARGB_8888);
+        bubble.drawCached(new Canvas(image),cache);
+        return image;
+    }
+    private MessageDrawable bubble(boolean out,boolean selected,boolean topNear,boolean bottomNear) {
+        MessageDrawable b=new MessageDrawable(MessageDrawable.TYPE_TEXT,out,selected);
+        b.setBounds(4,4,184,104);
+        b.setTop(0,200,120,topNear,bottomNear);
+        b.setFlexyGlassSource((canvas,path)->{throw new AssertionError("clean shape requested wallpaper/glass");});
+        return b;
+    }
+    @Test public void shapesAreDistinctAndRestoreOriginalTelegramPixels() {
+        MessageDrawable b=bubble(true,false,false,false);
+        MessageDrawable.PathDrawParams cache=new MessageDrawable.PathDrawParams();
+        Bitmap[] images=new Bitmap[3];
+        for(int shape=0;shape<3;shape++){
+            BubbleConfig.setShape(shape);
+            images[shape]=render(b,cache);
+            assertEquals(Theme.getColor(Theme.key_chat_outBubble),images[shape].getPixel(80,50));
+        }
+        assertFalse(images[0].sameAs(images[1]));
+        assertFalse(images[0].sameAs(images[2]));
+        assertFalse(images[1].sameAs(images[2]));
+        BubbleConfig.setShape(0);
+        assertTrue(images[0].sameAs(render(b,cache)));
+    }
+    @Test public void repeatedRowsReuseGeometryAndChangingShapeInvalidatesIt() {
+        // The actual invalidateShape/invalidatePath methods drive the real cached path.
+        for(int shape=1;shape<3;shape++){
+            BubbleConfig.setShape(shape);
+            MessageDrawable b=bubble(true,false,false,false);
+            MessageDrawable.PathDrawParams cache=new MessageDrawable.PathDrawParams();
+            Bitmap first=render(b,cache);
+            int generation=cache.getPath().getGenerationId();
+            for(int i=0;i<40;i++)assertTrue(first.sameAs(render(b,cache)));
+            assertEquals(generation,cache.getPath().getGenerationId());
+            BubbleConfig.setShape(shape==1?2:1);
+            assertFalse(first.sameAs(render(b,cache)));
+            assertNotEquals(generation,cache.getPath().getGenerationId());
+        }
+    }
+    @Test public void cleanShapesUseNativePaintForSelectionAlphaAndGradients() {
+        for(int shape=1;shape<3;shape++)for(boolean out:new boolean[]{false,true})for(boolean selected:new boolean[]{false,true}){
+            BubbleConfig.setShape(shape);
+            MessageDrawable b=bubble(out,selected,false,false);
+            assertNull(b.getShadowDrawable());
+            MessageDrawable.PathDrawParams cache=new MessageDrawable.PathDrawParams();
+            assertEquals(Theme.getColor(out?(selected?Theme.key_chat_outBubbleSelected:Theme.key_chat_outBubble):(selected?Theme.key_chat_inBubbleSelected:Theme.key_chat_inBubble)),render(b,cache).getPixel(80,50));
+            b.setAlpha(111);
+            assertEquals(111,Color.alpha(render(b,cache).getPixel(80,50)));
+            b.setAlpha(255);
+            Shader shader=new LinearGradient(0,0,180,0,Color.RED,Color.BLUE,Shader.TileMode.CLAMP);
+            b.paint.setShader(shader);
+            Bitmap gradient=render(b,cache);
+            assertNotEquals(gradient.getPixel(40,50),gradient.getPixel(140,50));
+            assertSame(shader,b.paint.getShader());
+        }
+    }
+    @Test public void staleEffectPreferencesAndSettersCannotChangePixels() {
+        for(int shape=0;shape<3;shape++){
+            BubbleConfig.setShape(shape);
+            MessageDrawable b=bubble(true,false,false,false);
+            MessageDrawable.PathDrawParams cache=new MessageDrawable.PathDrawParams();
+            Bitmap clean=render(b,cache);
+            ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit()
+                .putInt("surface_effect",0).putBoolean("signature_outline_enabled",true)
+                .putBoolean("signature_cached_blur",true).putInt("transparency",90)
+                .putInt("signature_fusion_mode",2).apply();
+            BubbleConfig.reload();
+            BubbleConfig.setSurfaceEffect(0);BubbleConfig.setOutlineEnabled(true);
+            BubbleConfig.setBackgroundBlur(true);BubbleConfig.setTransparency(90);BubbleConfig.setFusionMode(2);
+            assertTrue(clean.sameAs(render(b,cache)));
+            assertFalse(BubbleStyle.signature());
+        }
+    }
+    @Test public void groupedIncomingOutgoingAndMediaRemainVisibleWithoutGlass() {
+        for(int shape=1;shape<3;shape++)for(boolean out:new boolean[]{false,true})for(boolean top:new boolean[]{false,true})for(boolean bottom:new boolean[]{false,true})for(int type:new int[]{MessageDrawable.TYPE_TEXT,MessageDrawable.TYPE_MEDIA}){
+            BubbleConfig.setShape(shape);
+            MessageDrawable b=new MessageDrawable(type,out,false);
+            b.setBounds(4,4,184,104);b.setTop(0,200,120,top,bottom);
+            assertEquals(255,Color.alpha(render(b,new MessageDrawable.PathDrawParams()).getPixel(80,50)));
+        }
+    }
+    @Test public void cleanDrawablesDoNotAllocateMaterialEffectHelpers() throws Exception {
+        MessageDrawable b=bubble(true,false,false,false);
+        for(String field:new String[]{"flexyFillPaint","flexyBorderPaint","signatureBorderPath","bubbleFusion"}){
+            java.lang.reflect.Field f=MessageDrawable.class.getDeclaredField(field);
+            f.setAccessible(true);
+            assertNull(field,f.get(b));
+        }
+        for(int shape=0;shape<3;shape++){
+            BubbleConfig.setShape(shape);
+            render(b,new MessageDrawable.PathDrawParams());
+        }
+    }
+}

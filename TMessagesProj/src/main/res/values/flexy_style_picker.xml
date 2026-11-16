@@ -6,4 +6,5 @@
     <string name="FlexyBubblePersonalization">Personalize bubbles</string>
     <string name="FlexyBubblePersonalizationShow">Material, blur and borders</string>
     <string name="FlexyBubblePersonalizationHide">Hide controls</string>
+    <string name="FlexyBubbleShapeIos27" translatable="false">iOS 27</string>
 </resources>

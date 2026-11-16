@@ -8,6 +8,12 @@ The native unit runner builds a JVM test harness, never an APK:
 python tools/ios_bubbles/run_native.py --android-jar /path/to/android.jar --maven mvn --output /tmp/flexy-style-tests
 ```
 
+For the Native Test shapes-only profile, add `--native-baseline`. This selects
+`CleanBubbleStylesTest.java.in` with the real build flag enabled. It checks distinct
+silhouettes, return to Telegram pixels, cached path reuse, native colors/alpha/shaders,
+grouped/media geometry, inert effect preferences, absent material helpers and custom
+shadow bitmap suppression. It builds only an isolated JVM graphics harness, no APK.
+
 Requires JDK21, Maven, network for test dependencies and Android SDK35. It reuses explicit isolated Telegram hosts from the existing graphics harness; Android paths, Skia rendering, layouts and accessibility are real Robolectric APIs. The service wallpaper provider is a fallback double, so this does not validate real wallpaper blur or the entire Telegram activity. Preview tick drawables are Android fixture resources, not a fidelity check of the status icons. No login/account/network-message behavior is mocked as device acceptance.
 
 ## Indicadores de envío y lectura

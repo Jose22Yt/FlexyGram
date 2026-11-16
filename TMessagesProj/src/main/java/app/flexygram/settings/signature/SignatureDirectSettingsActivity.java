@@ -55,7 +55,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
     }
     private void links(String[] ids,int[] titles,int[] icons){
         java.util.ArrayList<String> names=new java.util.ArrayList<>();java.util.ArrayList<Integer> labels=new java.util.ArrayList<>(),glyphs=new java.util.ArrayList<>();
-        for(int i=0;i<ids.length;i++){if(org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && java.util.Arrays.asList("bubble_style","delete_motion","context","navigationEditor").contains(ids[i]))continue;if(ids[i].equals("passcode")&&tw.nekomimi.nekogram.helpers.PasscodeHelper.isSettingsHidden())continue;names.add(ids[i]);labels.add(titles[i]);glyphs.add(icons[i]);}
+        for(int i=0;i<ids.length;i++){if(org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && java.util.Arrays.asList("delete_motion","context","navigationEditor").contains(ids[i]))continue;if(ids[i].equals("passcode")&&tw.nekomimi.nekogram.helpers.PasscodeHelper.isSettingsHidden())continue;names.add(ids[i]);labels.add(titles[i]);glyphs.add(icons[i]);}
         int[] t=new int[labels.size()],g=new int[glyphs.size()];for(int i=0;i<t.length;i++){t[i]=labels.get(i);g[i]=glyphs.get(i);}add(new Settings3LinksSection(names.toArray(new String[0]),t,g));
     }
     private void build(){

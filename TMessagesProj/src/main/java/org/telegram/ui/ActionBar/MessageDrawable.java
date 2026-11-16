@@ -40,19 +40,20 @@ public class MessageDrawable extends Drawable {
         }
     }
     private GlassSource flexyGlassSource;
-    private final Paint flexyFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint flexyBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final app.flexygram.bubbles.SignatureBorderPath signatureBorderPath = new app.flexygram.bubbles.SignatureBorderPath();
+    // The clean profile uses the native paint/path and never allocates material effects.
+    private final Paint flexyFillPaint = org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? null : new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint flexyBorderPaint = org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? null : new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final app.flexygram.bubbles.SignatureBorderPath signatureBorderPath = org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? null : new app.flexygram.bubbles.SignatureBorderPath();
     private app.flexygram.bubbles.IosBubbleShape iosBubbleShape;
     private int previewBubbleShape = -1;
     public void setFlexyBubbleShapePreview(int shape) { previewBubbleShape = app.flexygram.bubbles.BubbleConfig.normalizeShape(shape); }
     private int bubbleShape() {
-        return previewBubbleShape >= 0 ? previewBubbleShape : (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)
+        return previewBubbleShape >= 0 ? previewBubbleShape : org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
                 ? app.flexygram.bubbles.BubbleConfig.shape() : app.flexygram.bubbles.BubbleConfig.TELEGRAM;
     }
     /** Kept for old preview callers; skins no longer alter the native geometry or finish. */
     public void setFlexySkinPreview(int skin) { }
-    private final app.flexygram.bubbles.BubbleFusion bubbleFusion=new app.flexygram.bubbles.BubbleFusion();
+    private final app.flexygram.bubbles.BubbleFusion bubbleFusion = org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? null : new app.flexygram.bubbles.BubbleFusion();
     private int outlineBase, outlineMode = -1, outlineIntensity = -1, outlineColor;
     private int signatureOutline(int base) {
         int mode = app.flexygram.bubbles.BubbleConfig.outlineStyle();
@@ -66,7 +67,8 @@ public class MessageDrawable extends Drawable {
     }
     public void setFlexyGlassSource(GlassSource source) { flexyGlassSource = source; }
     private boolean flexySurface() {
-        return currentType != TYPE_PREVIEW && (app.flexygram.bubbles.BubbleStyle.signature() || bubbleShape() != app.flexygram.bubbles.BubbleConfig.TELEGRAM);
+        return !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST
+                && currentType != TYPE_PREVIEW && (app.flexygram.bubbles.BubbleStyle.signature() || bubbleShape() != app.flexygram.bubbles.BubbleConfig.TELEGRAM);
     }
     private int bubbleRadius() {
         return bubbleShape() == app.flexygram.bubbles.BubbleConfig.IPHONE ? 16
@@ -496,6 +498,9 @@ public class MessageDrawable extends Drawable {
     }
 
     public Drawable getShadowDrawable() {
+        // Clean custom silhouettes need only the cached fill path, no extra shadow bitmap/pass.
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST
+                && bubbleShape() != app.flexygram.bubbles.BubbleConfig.TELEGRAM) return null;
         if (isCrossfadeBackground) {
             return null;
         }
@@ -610,7 +615,7 @@ public class MessageDrawable extends Drawable {
 
     public void draw(Canvas canvas, Paint paintToUse) {
         Rect bounds = getBounds();
-        if (!flexySurface() && !oeRemoveMessageTail() && paintToUse == null && paint.getStyle() == Paint.Style.FILL && gradientShader == null && overrideRoundRadius == 0 && overrideRounding <= 0) {
+        if (bubbleShape() == app.flexygram.bubbles.BubbleConfig.TELEGRAM && !flexySurface() && !oeRemoveMessageTail() && paintToUse == null && paint.getStyle() == Paint.Style.FILL && gradientShader == null && overrideRoundRadius == 0 && overrideRounding <= 0) {
             Drawable background = getBackgroundDrawable();
             if (background != null) {
                 background.setBounds(bounds);
