@@ -101,6 +101,8 @@ def test_navigation_and_player_use_the_upstream_routes():
     context_bar=(JAVA/'org/telegram/ui/Components/FragmentContextView.java').read_text()
     assert 'new app.exteraless.player.PlayerBarView(' not in context_bar
     assert 'new app.exteraless.player.baseline.PlayerBarView(' in context_bar
+    service=(JAVA/'org/telegram/messenger/MusicPlayerService.java').read_text()
+    assert service.count('app.exteraless.player.baseline.PlayerSheet.onModesChanged();')==2
     native=(player/'Md3Player.java').read_text()
     assert 'return AppearanceConfig.md3Player();' in native
     assert 'return AppearanceConfig.md3MiniPlayer();' in native
@@ -129,3 +131,15 @@ def test_home_controls_cannot_draw_the_extra_glass_layer():
     assert 'boolean home = !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && isSignatureHome()' in source
     assert 'if (!org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && isSignatureHome() && child == menu' in source
     assert 'signatureHomeGlassFactory = org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? null :' in source
+
+
+def test_custom_music_queue_actions_do_not_read_playback_state(tmp_path):
+    body=method((JAVA/'app/exteraless/player/MusicQueueActions.java').read_text(),'public static boolean eligible(MessageObject item)')
+    probe(tmp_path, {'org/telegram/messenger/BuildConfig.java':NATIVE,
+        'Probe.java':'''public class Probe{
+ static class MessageObject{boolean scheduled;int currentAccount;boolean isMusic(){throw new AssertionError("custom metadata work");}boolean isVoiceOnce(){return false;}boolean isRoundOnce(){return false;}}
+ static class MediaController{static MediaController getInstance(){throw new AssertionError("custom playback work");}MessageObject getPlayingMessageObject(){return null;}}
+ static class MusicQueueOrder{static boolean same(MessageObject a,MessageObject b){return false;}}
+ BODY
+ public static void main(String[]args){if(eligible(null)||eligible(new MessageObject()))throw new AssertionError();}
+}'''.replace('BODY',body)})

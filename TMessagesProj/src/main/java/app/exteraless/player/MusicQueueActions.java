@@ -15,6 +15,7 @@ public final class MusicQueueActions {
     public static final int NEXT = 154, LAST = 155;
     private MusicQueueActions() { }
     public static boolean eligible(MessageObject item) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return false;
         if (item == null || !item.isMusic() || item.scheduled || item.isVoiceOnce() || item.isRoundOnce()) return false;
         MessageObject playing = MediaController.getInstance().getPlayingMessageObject();
         return (playing == null || playing.isMusic() && playing.currentAccount == item.currentAccount)
@@ -30,6 +31,7 @@ public final class MusicQueueActions {
         options.add(R.drawable.msg_add, LocaleController.getString(R.string.FlexyQueueLast), () -> enqueue(context, item, false));
     }
     public static boolean showRowMenu(Context context, ViewGroup host, View anchor, MessageObject item) {
+        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return false;
         if (item == null || MusicQueueOrder.same(item,MediaController.getInstance().getPlayingMessageObject())) return false;
         ItemOptions options=ItemOptions.makeOptions(host,null,anchor,true);
         add(options,context,item);
