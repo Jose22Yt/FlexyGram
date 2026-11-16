@@ -83,3 +83,24 @@ def test_build_plugins_share_the_kyant_compatible_kotlin_version():
     # kotlin-dsl in buildSrc otherwise exports its older compiler to the application.
     assert '`kotlin-dsl`' not in helpers
     assert '`java-gradle-plugin`' in helpers
+
+
+def test_scroll_frames_refresh_backdrop_without_rebuilding_native_tab_controls(tmp_path):
+    from test_composer_layout import method
+    source=(ROOT/'TMessagesProj/src/main/kotlin/app/flexygram/kyant/KyantDockView.kt').read_text()
+    body=method(source,'private val frame = Runnable')
+    # Run the actual callback body in the existing JVM work-count host; only Kotlin's
+    # local-val syntax and optional semicolons are lowered. The Android harness also
+    # compiles the unchanged production Kotlin against real Compose dependencies.
+    body=body[body.index('{'):].replace('val refreshNative = iconsDirty','boolean refreshNative = iconsDirty;')
+    body=body.replace('framePending = false\n','framePending = false;\n').replace('++ }','++; }').replace('syncFromNative()\n','syncFromNative();\n')
+    probe(tmp_path,{'Probe.java':'''public class Probe{
+ boolean framePending,sourceDirty,iconsDirty;long revision,iconsRevision;int syncs;
+ void syncFromNative(){syncs++;}
+ void frame()BODY
+ public static void main(String[]args){Probe p=new Probe();
+ for(int i=0;i<10000;i++){p.sourceDirty=true;p.framePending=true;p.frame();}
+ if(p.syncs!=0||p.revision!=10000||p.iconsRevision!=0||p.framePending)throw new AssertionError("scroll rebuilt native controls");
+ p.iconsDirty=true;p.frame();if(p.syncs!=1||p.iconsRevision!=1||p.iconsDirty)throw new AssertionError("icon update lost");
+ p.frame();if(p.syncs!=1)throw new AssertionError("idle native work");
+ }}'''.replace('BODY',body)})

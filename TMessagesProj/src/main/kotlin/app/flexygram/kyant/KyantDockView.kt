@@ -68,9 +68,11 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     }
     private val frame = Runnable {
         framePending = false
+        val refreshNative = iconsDirty
         if (sourceDirty) { sourceDirty = false; revision++ }
         if (iconsDirty) { iconsDirty = false; iconsRevision++ }
-        syncFromNative()
+        // Scrolling changes only the background layer; do not rebuild the tab list/composition.
+        if (refreshNative) syncFromNative()
     }
 
     init {
