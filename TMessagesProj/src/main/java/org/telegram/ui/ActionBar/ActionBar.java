@@ -279,7 +279,12 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         }
     }
 
+    private java.lang.ref.WeakReference<View> elasticTitleView;
+    private View elasticTitleTarget() {
+        return chatAvatarContainer != null ? chatAvatarContainer : elasticTitleView == null ? null : elasticTitleView.get();
+    }
     public void registerElasticSurfaces(View avatar) {
+        elasticTitleView = new java.lang.ref.WeakReference<>(avatar);
         app.flexygram.elastic.ElasticFusionGroup.bindSurfaces(this,
             new View[]{backButtonImageView,avatar,menu},
             new android.graphics.drawable.Drawable[]{glassDrawableBack,glassDrawable,glassDrawableMenu});
@@ -1617,7 +1622,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             glassDrawable.setBounds(Math.round(g.center.left),
                     Math.round(g.center.top) + offset, Math.round(g.center.right),
                     Math.round(g.center.bottom) + offset);
-            app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, chatAvatarContainer, glassDrawable);
+            app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, elasticTitleTarget(), glassDrawable);
             // Portrait layout has two distinct action circles; keep both native hit targets.
             if (g.mattePortrait) {
                 if (g.callAvailable) {
@@ -1661,7 +1666,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
         glassDrawable.setBounds(Math.round(g.title.left), Math.round(g.title.top),
                 Math.round(g.title.right), Math.round(g.title.bottom));
-        app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, chatAvatarContainer, glassDrawable);
+        app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, elasticTitleTarget(), glassDrawable);
 
         glassDrawableMenu.setBounds(Math.round(g.avatar.left), Math.round(g.avatar.top),
                 Math.round(g.avatar.right), Math.round(g.avatar.bottom));
@@ -2668,7 +2673,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             }
 
             glassDrawable.setBounds(left, t, right, b);
-            app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, chatAvatarContainer, glassDrawable);
+            app.flexygram.elastic.ElasticInteraction.drawSurface(canvas, elasticTitleTarget(), glassDrawable);
         }
         if (!signature && glassDrawableBack != null && hasBackButton) {
             glassDrawableBack.setBounds(0, t, s + p * 2, b);
