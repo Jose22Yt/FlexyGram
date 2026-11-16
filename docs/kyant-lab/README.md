@@ -49,3 +49,19 @@ redibujados estables producen una sola captura; revisiones/geometría la invalid
 La compilación aislada usa las dependencias reales y dobles explícitos únicamente
 para las APIs anfitrionas de FlexyGram; no es una prueba de interfaz en dispositivo.
 El helper Android de espera de frame sustituye el expect/actual del catálogo KMP.
+
+La prueba de distribución Android/Compose se reproduce con:
+
+```sh
+python tools/kyant_lab/android/run.py --sdk-root "$ANDROID_HOME" --output-dir /tmp/kyant-layout
+```
+
+Usa Compose real y Robolectric API35 con huéspedes nativos explícitamente dobles.
+Verifica posición física, ancho y alto en LTR/RTL y al redimensionar; incluye un
+control negativo que reproduce el fallo del contenedor anterior en RTL.
+La base MATCH_PARENT se separa del panel para que no imponga su tamaño; las
+coordenadas absolutas no se vuelven a reflejar según el idioma. Los iconos se
+escalan uniformemente para mantener su proporción. El generador Lottie también
+se ejecuta contra un recurso de 48fps/120frames. No es una prueba de la apariencia
+del material ni del coste GPU en un teléfono. Este paso se ejecuta antes de
+ensamblar la app completa en GitHub.

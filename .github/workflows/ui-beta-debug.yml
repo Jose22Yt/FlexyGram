@@ -133,6 +133,10 @@ jobs:
               --chaquopy TMessagesProj/chaquopy --output "$RUNNER_TEMP/beta-wheelhouse"
           } 2>&1 | tee build/reports/ui-beta/wheels.log
           echo "ALPHA_WHEELHOUSE=$RUNNER_TEMP/beta-wheelhouse" >> "$GITHUB_ENV"
+      - name: Verify native dock bounds with real Compose layout
+        shell: bash
+        run: |
+          python tools/kyant_lab/android/run.py --sdk-root "$ANDROID_HOME" --output-dir build/reports/kyant-layout
       - name: Assemble debug APK with native libraries and Python
         env:
           TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}

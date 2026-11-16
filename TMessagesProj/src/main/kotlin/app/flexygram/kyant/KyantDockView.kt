@@ -10,7 +10,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -24,7 +23,6 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.kyant.backdrop.backdrops.layerBackdrop
@@ -166,7 +164,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
             LocalConfiguration provides configuration,
             LocalLayoutDirection provides if (LocaleController.isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
         ) {
-            Box(Modifier.offset { IntOffset(dock.x.toInt(), (dock.y + verticalInset).toInt()) }.size(width.dp, 64.dp)) {
+            NativeDockBoundsLayout(dock.x.toInt(), (dock.y + verticalInset).toInt(), width) {
                 // Match Kyant's hidden source-layer technique. The source contains only the native
                 // page, so the dock can never capture itself or recursively sample its own glass.
                 Canvas(Modifier.fillMaxSize().alpha(0f).layerBackdrop(background)) {
@@ -196,7 +194,9 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
                                     drawIntoCanvas { canvas ->
                                         val target = canvas.nativeCanvas
                                         val save = target.save()
-                                        target.scale(size.width / tab.width.coerceAtLeast(1), size.height / tab.height.coerceAtLeast(1))
+                                        val scale = minOf(size.width / tab.width.coerceAtLeast(1), size.height / tab.height.coerceAtLeast(1))
+                                        target.translate((size.width - tab.width * scale) / 2, (size.height - tab.height * scale) / 2)
+                                        target.scale(scale, scale)
                                         drawingIcon = true
                                         try { tab.draw(target) } finally { drawingIcon = false }
                                         target.restoreToCount(save)
