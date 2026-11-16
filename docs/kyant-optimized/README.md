@@ -2,7 +2,7 @@
 
 Base: `d50640dec57ee26c957b2b0342fe47cf4006acf5` (Native Test beta60).
 Rama: `codex/flexygram-optimized-kyant`. Paquete conservado:
-`com.flexygram.messenger.nativebaseline`; beta62/code1351.
+`com.flexygram.messenger.nativebaseline`; beta63/code1352.
 La etiqueta `flexygram-optimized-base-beta60` conserva la base previa.
 El experimento antiguo Glass Lab se mantiene separado.
 
@@ -60,8 +60,11 @@ no se construyen para superficies ocultas durante createView.
 
 La composición, callbacks, listener de energía y captura del dock se liberan al
 separarse de la ventana. La preferencia de ahorro conserva su bit para migración,
-renombrado FLAG_KYANT_GLASS. Una migración única activa Kyant en Android13+;
-una desactivación posterior del usuario se respeta. Ahorro de energía, hardware
+renombrado FLAG_KYANT_GLASS. El interruptor existente es la única autorización
+para la refracción: no hay activación automática. Se retira la migración de beta62;
+si existe su marcador `kyant_material_v1`, se apaga su activación forzada una sola vez
+y se elimina el marcador. Los siguientes encendidos/apagados explícitos se conservan,
+incluido al reiniciar, sin modificar el resto de preferencias. Ahorro de energía, hardware
 no disponible y versiones anteriores conservan fondos normales, nunca el motor viejo.
 
 ## Validación reproducible
@@ -71,6 +74,12 @@ no disponible y versiones anteriores conservan fondos normales, nunca el motor v
 - `python tools/kyant_lab/android/run.py --sdk-root "$ANDROID_HOME" --output-dir /tmp/kyant-check`:
   compilación del puente real con Compose/Skia; dobles explícitos solo para APIs
   anfitrionas. Distribución física LTR/RTL/redimensionado y compilación real del AGSL.
+  La prueba de contenedor reproduce con Compose real que el MATCH_PARENT anterior
+  expande el WRAP_CONTENT a toda la pantalla e intercepta los controles nativos.
+  KyantDockContainer obtiene su altura de la barra nativa, márgenes e insets antes
+  de medir el overlay. Se comprueban clicks sobre cabecera/lista/conversación,
+  paso de gestos de scroll y barra oculta. Los controles son fixtures explícitos;
+  no se afirma una prueba de navegación completa en el dispositivo del usuario.
 - Workflow ARM64: compila Java/Kotlin antes de ensamblar JNI/Python, valida firma/ABI.
 
 Estas pruebas no miden FPS, consumo GPU ni apariencia en un teléfono. La prueba

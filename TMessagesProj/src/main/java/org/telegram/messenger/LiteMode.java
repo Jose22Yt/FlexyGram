@@ -290,11 +290,11 @@ public class LiteMode {
         }
         int prevValue = value;
         value = preferences.getInt("lite_mode6", defaultValue);
-        // One-time migration of the optimized base to the requested Kyant material.
-        // Subsequent user OFF choices are preserved; power saver still gates isEnabled().
-        if (!preferences.contains("kyant_material_v1")) {
-            if (Build.VERSION.SDK_INT >= 33) value |= FLAG_KYANT_GLASS;
-            preferences.edit().putInt("lite_mode6", value).putBoolean("kyant_material_v1", true).apply();
+        // Repair the previous build's forced activation once. Removing the marker makes
+        // subsequent explicit user ON/OFF choices authoritative, including after restart.
+        if (preferences.getBoolean("kyant_material_v1", false)) {
+            value &= ~FLAG_KYANT_GLASS;
+            preferences.edit().putInt("lite_mode6", value).remove("kyant_material_v1").apply();
         }
         if (loaded) {
             onFlagsUpdate(prevValue, value);

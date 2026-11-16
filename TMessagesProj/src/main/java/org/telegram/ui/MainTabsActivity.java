@@ -489,7 +489,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             }
         });
 
-        tabsViewWrapper = new FrameLayout(context);
+        tabsViewWrapper = new app.flexygram.kyant.KyantDockContainer(context, tabsView);
         tabsViewWrapper.setOnClickListener(v -> {});
         // В M3 панель во всю ширину,
         // высота досчитывается вместе с нижним системным отступом в applyTabsBottomInset

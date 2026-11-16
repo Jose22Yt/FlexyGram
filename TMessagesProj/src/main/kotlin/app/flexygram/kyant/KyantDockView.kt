@@ -46,7 +46,8 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     private var revision by mutableLongStateOf(0)
     private var iconsRevision by mutableLongStateOf(0)
     private var geometryRevision by mutableIntStateOf(0)
-    private var available by mutableStateOf(true)
+    private val geometry = KyantDockGeometry.State()
+    private var available by mutableStateOf(false)
     private var ready = false
     private var framePending = false
     private var sourceDirty = false
@@ -84,19 +85,20 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     fun isRendering(): Boolean = ready && available && isAttachedToWindow && tabs.size >= 2
 
     fun sourceInvalidated(target: View) {
-        if (!source.isRecording && source.contains(target)) { sourceDirty = true; scheduleFrame() }
+        if (available && !source.isRecording && source.contains(target)) { sourceDirty = true; scheduleFrame() }
     }
 
-    fun nativeIconsInvalidated() { if (!drawingIcon) { iconsDirty = true; scheduleFrame() } }
+    fun nativeIconsInvalidated() { if (available && !drawingIcon) { iconsDirty = true; scheduleFrame() } }
     fun backdropChanged() { sourceDirty = true; iconsDirty = true; scheduleFrame() }
     private fun scheduleFrame() {
-        if (!framePending && isAttachedToWindow && isShown && windowVisibility == VISIBLE) {
+        if (available && !framePending && isAttachedToWindow && isShown && windowVisibility == VISIBLE) {
             framePending = true; postOnAnimation(frame)
         }
     }
 
     fun syncFromNative() {
         val wasRendering = isRendering()
+        val wasAvailable = available
         val visible = (0 until dock.childCount).mapNotNull { dock.getChildAt(it) as? GlassTabView }
             .filter { dock.isViewVisible(it) && it.width > 0 }.sortedBy { it.x }
             .let { if (LocaleController.isRTL) it.reversed() else it }
@@ -105,11 +107,17 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         val index = visible.indexOfFirst { it.isTabSelected }
         if (index >= 0 && selectedIndex != index) selectedIndex = index
         alpha = dock.alpha
-        geometryRevision++
+        if (geometry.update(dock.x, dock.y, dock.width, dock.height, dock.paddingTop, dock.paddingBottom,
+                LocaleController.isRTL, Theme.isCurrentThemeDark())) geometryRevision++
         dock.importantForAccessibility = if (ready && dock.visibility == VISIBLE && dock.alpha > 0f && LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS)) View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS else View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
         available = isShown && dock.isShown && dock.visibility == VISIBLE && dock.alpha > 0f && windowVisibility == VISIBLE && isHardwareAccelerated && LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS)
         visible.forEach { it.setSkipDrawSelector(available && visible.size >= 2) }
-        if (!available) { removeCallbacks(longPress); gesture = false; longPressTab = null }
+        if (!available) {
+            ready = false
+            removeCallbacks(longPress); gesture = false; longPressTab = null
+            removeCallbacks(frame); framePending = false
+            if (wasAvailable) source.release()
+        }
         if (wasRendering != isRendering()) dock.invalidate()
     }
 
@@ -218,7 +226,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
             }
         }
         SideEffect {
-            if (!ready) { ready = true; dock.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS; dock.invalidate() }
+            if (available && tabs.size >= 2 && !ready) { ready = true; dock.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS; dock.invalidate() }
         }
     }
 }

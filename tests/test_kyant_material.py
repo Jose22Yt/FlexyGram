@@ -156,3 +156,16 @@ public class Probe{static void check(boolean b){if(!b)throw new AssertionError()
  check(KyantDockGeometry.panelInset(64,8,8,64)==0); // compact style reserves full touch height
  check(KyantDockGeometry.panelInset(216,0,24,192)==0); // display density 3
 }}'''},[JAVA/'app/flexygram/kyant/KyantDockGeometry.java'])
+
+
+def test_unchanged_native_geometry_does_not_request_recomposition(tmp_path):
+    probe(tmp_path,{'Probe.java':'''import app.flexygram.kyant.KyantDockGeometry;
+public class Probe{static void check(boolean b){if(!b)throw new AssertionError();}public static void main(String[]args){
+ var state=new KyantDockGeometry.State();check(state.update(8,4,344,72,12,12,false,false));
+ for(int i=0;i<10000;i++)check(!state.update(8,4,344,72,12,12,false,false));
+ check(state.update(8,4,344,72,12,12,true,false)); // RTL change
+ check(state.update(8,4,344,72,12,12,true,true)); // theme change
+ check(state.update(8,4,344,96,0,24,true,true)); // gesture navigation inset
+ check(state.update(12,4,320,96,0,24,true,true)); // native measured position/width
+ check(!state.update(12,4,320,96,0,24,true,true));
+}}'''},[JAVA/'app/flexygram/kyant/KyantDockGeometry.java'])

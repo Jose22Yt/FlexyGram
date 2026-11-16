@@ -88,11 +88,15 @@ public class Probe {
  int effects=LiteMode.FLAG_CHAT_BLUR|LiteMode.FLAG_KYANT_GLASS;
  LiteMode.PRESET_HIGH|=effects;LiteMode.PRESET_MEDIUM|=effects;LiteMode.PRESET_LOW|=effects;
  for(int device=0;device<3;device++){
-  SharedConfig.device=device;p.data.clear();LiteMode.loadPreference();check((LiteMode.value&effects)==LiteMode.FLAG_KYANT_GLASS);
+  SharedConfig.device=device;p.data.clear();LiteMode.loadPreference();check((LiteMode.value&effects)==0);
   int nativeFlags=device==0?LiteMode.PRESET_LOW:device==1?LiteMode.PRESET_MEDIUM:LiteMode.PRESET_HIGH;
   check((LiteMode.value&~effects)==(nativeFlags&~effects));
   p.data.put("lite_mode6",nativeFlags);LiteMode.loadPreference();check(LiteMode.value==nativeFlags);
  }
+ p.data.clear();p.data.put("lite_mode6",effects|8);p.data.put("kyant_material_v1",true);
+ LiteMode.loadPreference();check(LiteMode.value==((effects|8)&~LiteMode.FLAG_KYANT_GLASS));
+ check(!p.data.containsKey("kyant_material_v1"));
+ p.data.put("lite_mode6",effects|8);LiteMode.loadPreference();check(LiteMode.value==(effects|8));
  p.data.put("lite_mode6",0);LiteMode.loadPreference();check(LiteMode.value==0); // explicit OFF survives reload
  p.data.clear();p.data.put("chatBlur",true);LiteMode.loadPreference();check((LiteMode.value&LiteMode.FLAG_CHAT_BLUR)!=0);
  p.data.clear();p.data.put("lite_mode5",effects);LiteMode.loadPreference();check((LiteMode.value&LiteMode.FLAG_CHAT_BLUR)!=0);

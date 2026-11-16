@@ -29,7 +29,8 @@ def main():
  raw=out/'src/main/res/raw/kyant_probe.json';raw.parent.mkdir(parents=True,exist_ok=True)
  raw.write_text('{"v":"5.7.4","fr":48,"ip":10,"op":130,"w":32,"h":32,"layers":[]}')
  test=out/'src/test/kotlin/app/flexygram/kyant/NativeBoundsTest.kt';test.parent.mkdir(parents=True,exist_ok=True)
- shutil.copyfile(Path(__file__).with_name('NativeBoundsTest.kt'),test)
+ for kotlin_test in Path(__file__).parent.glob('*Test.kt'):
+  shutil.copyfile(kotlin_test, test.parent/kotlin_test.name)
  for extra in Path(__file__).parent.glob('*Test.java'):
   java_test=out/'src/test/java/app/flexygram/kyant'/extra.name
   java_test.parent.mkdir(parents=True,exist_ok=True)
@@ -37,5 +38,5 @@ def main():
  subprocess.run([str(args.gradle.resolve()),'-p',str(out),'--no-daemon','--max-workers=2','--console=plain','testDebugUnitTest'],check=True)
  generated=list((out/'build/generated').rglob('ResLottieMeta.java'))
  assert len(generated)==1 and 'pack(R.raw.kyant_probe, 48, 120, false)' in generated[0].read_text()
- print('PASS: original Lottie generation and Compose physical bounds LTR/RTL/resize; actual phone/GPU appearance NOT_TESTED.')
+ print('PASS: original Lottie generation and Compose physical bounds LTR/RTL/resize and native host touch dispatch; actual phone/GPU appearance NOT_TESTED.')
 if __name__=='__main__':main()
