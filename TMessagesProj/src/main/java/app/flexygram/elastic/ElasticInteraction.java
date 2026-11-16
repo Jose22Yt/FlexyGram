@@ -62,15 +62,14 @@ public final class ElasticInteraction {
                 if(transform!=null)transform.release();transform=null;target.clear();
                 View owner=root.get();if(owner==null)return;
                 blocked=false;View view=find(owner,x,y,0);if(view==null)return;
-                Object promoted=view.getTag(org.telegram.messenger.R.id.flexy_elastic_surface);
-                if(promoted instanceof View)view=(View)promoted;
+                view=surfaceTarget(view);
                 if(view.getAnimation()!=null && !(view.getAnimation() instanceof ElasticTransform))return; // Native transition has priority.
                 downX=x;downY=y;dragging=view instanceof SeekBar || (!insideScroll(view)
                         && !(view instanceof EditText) && !Boolean.TRUE.equals(view.getTag(org.telegram.messenger.R.id.flexy_elastic_input_scope)));
                 target=new WeakReference<>(view);
                 float dp=view.getWidth()/view.getResources().getDisplayMetrics().density;
-                float strength=dp>180?.025f:dp>110?.04f:.085f;
-                if(view instanceof EditText)strength=.018f;
+                float strength=dp>180?.075f:dp>110?.12f:.255f;
+                if(view instanceof EditText || Boolean.TRUE.equals(view.getTag(org.telegram.messenger.R.id.flexy_elastic_input_scope)))strength=.054f;
                 if(view.getAnimation() instanceof ElasticTransform){
                     transform=(ElasticTransform)view.getAnimation();transform.press();
                 }else{
@@ -85,6 +84,27 @@ public final class ElasticInteraction {
             }else if(action==MotionEvent.ACTION_UP||action==MotionEvent.ACTION_CANCEL||action==MotionEvent.ACTION_POINTER_DOWN){
                 if(transform!=null){transform.release();transform=null;}
             }
+        }
+        View surfaceTarget(View view){
+            // Explicit material owners take priority over nested icon/ripple views.
+            View ancestor=view;
+            for(int depth=0;depth<40&&ancestor!=null;depth++){
+                Object promoted=ancestor.getTag(org.telegram.messenger.R.id.flexy_elastic_surface);
+                if(promoted instanceof View)return (View)promoted;
+                ancestor=ancestor.getParent() instanceof View?(View)ancestor.getParent():null;
+            }
+            // Small decorated control wrappers own their background and content together.
+            // Never promote to a scrolling container or an entire screen/card.
+            ancestor=view.getParent() instanceof View?(View)view.getParent():null;
+            float density=view.getResources().getDisplayMetrics().density;
+            for(int depth=0;depth<2&&ancestor!=null;depth++){
+                if(isList(ancestor)||ancestor instanceof android.widget.ScrollView)break;
+                if(ancestor instanceof ViewGroup && ((ViewGroup)ancestor).getChildCount()>1)break;
+                if(ancestor.getWidth()>360*density||ancestor.getHeight()>160*density)break;
+                if(ancestor.getBackground()!=null)return ancestor;
+                ancestor=ancestor.getParent() instanceof View?(View)ancestor.getParent():null;
+            }
+            return view;
         }
         View find(View view,float x,float y,int depth){
             if(depth>40||view.getVisibility()!=View.VISIBLE||!view.isEnabled()||view.getAlpha()<.05f

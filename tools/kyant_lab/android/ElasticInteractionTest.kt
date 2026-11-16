@@ -67,7 +67,7 @@ class ElasticInteractionTest {
   step(button,8)
   val t=Transformation();button.animation!!.getTransformation(SystemClock.uptimeMillis(),t)
   val m=FloatArray(9);t.matrix.getValues(m)
-  assertTrue("Press deformation is visible",kotlin.math.abs(m[0]-1)>.035f)
+  assertTrue("Press deformation is visible",kotlin.math.abs(m[0]-1)>.16f)
   assertEquals(1f,button.scaleX,0f);assertEquals(1f,button.scaleY,0f)
   assertTrue("Native hit matrix stays unchanged",button.matrix.isIdentity)
   touch(MotionEvent.ACTION_UP);ShadowLooper.idleMainLooper()
@@ -180,4 +180,36 @@ class ElasticInteractionTest {
   ElasticConfig.setEnabled(false)
   assertNull(button.animation);assertNull(second.animation)
  }
+ @Test fun taggedPillStretchesBackgroundAndIconTogetherWithNativeClick() {
+  val pill=FrameLayout(activity).apply {
+   background=GradientDrawable().apply{setColor(0xff000000.toInt());cornerRadius=28f}
+   setTag(org.telegram.messenger.R.id.flexy_elastic_surface,this)
+  }
+  val icon=Button(activity).apply{setOnClickListener {clicks++}}
+  pill.addView(icon,FrameLayout.LayoutParams(40,40).apply{leftMargin=30;topMargin=8})
+  root.addView(pill,FrameLayout.LayoutParams(100,56).apply{leftMargin=60;topMargin=260})
+  root.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(800,View.MeasureSpec.EXACTLY));root.layout(0,0,360,800)
+  touch(MotionEvent.ACTION_DOWN,110f,288f);step(pill,8)
+  assertNotNull("The whole material surface owns the deformation",pill.animation)
+  assertNull("The icon must not move independently",icon.animation)
+  val t=Transformation();pill.animation!!.getTransformation(SystemClock.uptimeMillis(),t)
+  val m=FloatArray(9);t.matrix.getValues(m)
+  assertTrue("Whole-pill stretch is substantially visible",m[0]>1.16f)
+  assertTrue("Its background compresses vertically with the content",m[4]<.87f)
+  assertTrue(pill.matrix.isIdentity);assertTrue(icon.matrix.isIdentity)
+  touch(MotionEvent.ACTION_UP,110f,288f);ShadowLooper.idleMainLooper()
+  assertEquals(1,clicks);step(pill,100);assertNull(pill.animation)
+ }
+
+ @Test fun singleIconBackgroundWrapperIsPromotedWithoutAnimatingTheScreen() {
+  val pill=FrameLayout(activity).apply {background=GradientDrawable().apply{setColor(0xff000000.toInt());cornerRadius=28f}}
+  val icon=Button(activity).apply{setOnClickListener {clicks++}}
+  pill.addView(icon,FrameLayout.LayoutParams(40,40).apply{leftMargin=30;topMargin=8})
+  root.addView(pill,FrameLayout.LayoutParams(100,56).apply{leftMargin=60;topMargin=260})
+  root.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(800,View.MeasureSpec.EXACTLY));root.layout(0,0,360,800)
+  touch(MotionEvent.ACTION_DOWN,110f,288f)
+  assertNotNull(pill.animation);assertNull(icon.animation);assertNull(root.animation)
+  touch(MotionEvent.ACTION_UP,110f,288f);ShadowLooper.idleMainLooper();assertEquals(1,clicks)
+ }
+
 }

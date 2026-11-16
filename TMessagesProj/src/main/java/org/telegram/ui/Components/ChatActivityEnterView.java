@@ -3084,6 +3084,8 @@ public class ChatActivityEnterView extends FrameLayout implements
                 return super.onTouchEvent(event);
             }
         };
+        frameLayout.setTag(R.id.flexy_elastic_surface, frameLayout);
+        sendButtonContainer.setTag(R.id.flexy_elastic_surface, sendButtonContainer);
         app.flexygram.elastic.ElasticFusionGroup.bind(textFieldContainer, frameLayout, sendButtonContainer);
         sendButtonContainer.setClipChildren(false);
         sendButtonContainer.setClipToPadding(false);

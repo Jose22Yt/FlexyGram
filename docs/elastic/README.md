@@ -1,8 +1,8 @@
-# FlexyGram beta64: prueba de interacción elástica
+# FlexyGram beta65: prueba de interacción elástica
 
 Base optimizada y corrección de toques: beta63 `933befdeca9df32fd9edbd018bded2a8aa600cec`.
 Rama `codex/flexygram-elastic-test`, paquete conservado
-`com.flexygram.messenger.nativebaseline`, versión beta64/código1353.
+`com.flexygram.messenger.nativebaseline`, versión beta65/código1354.
 No se reactivan FlexyFiles, FlexyStudio, personalización de navegación antigua,
 efectos de burbujas, reproductor personalizado ni reescritura FastMotion.
 
@@ -10,7 +10,7 @@ efectos de burbujas, reproductor personalizado ni reescritura FastMotion.
 
 Navegación y gestos → Interacción elástica: activada inicialmente en esta prueba,
 preferencia independiente `flexy_elastic_interaction/enabled`.
-Respuesta visible: hasta8.5% para botones pequeños,4% para medianos y2.5% para
+Respuesta visible: hasta25.5% para botones pequeños,12% para medianos y7.5% para
 superficies anchas, adaptada al espacio disponible para evitar invadir sus padres.
 La preview utiliza dos controles pulsables reales con unión de contornos.
 Una elección OFF se conserva; no se sobrescriben las preferencias de Android.
@@ -33,6 +33,13 @@ interruptores, campos, controles y superficies dibujadas en celdas de mensajes.
 Las superficies Canvas de mensajes responden como celda, no como una malla
 independiente para cada subelemento. Las animaciones nativas de entrada/envío,
 progreso, reacción y transición se conservan, sin sustituir sus temporizaciones.
+Las superficies explícitas promocionan también los iconos internos a la píldora/círculo
+completo: cabecera, barra principal nativa y compositor (entrada y envío).
+Los wrappers pequeños de un solo hijo con fondo propio se promocionan igualmente;
+las listas, pantallas y grupos de acciones independientes no se agrandan como conjunto.
+La amplitud de pulsación/arrastre es triple respecto a beta64; los límites del padre
+pueden reducir la expansión para evitar recortes. El editor usa5.4%, tres veces su
+pulso anterior; no se añaden frames ni un segundo resorte por cada icono.
 El compositor promociona el editor a su contenedor visual; el fondo de entrada
 acompaña su pulso. Cabecera: fondo nativo y control comparten deformación.
 

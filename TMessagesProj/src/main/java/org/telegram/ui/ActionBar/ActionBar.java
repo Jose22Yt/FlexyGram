@@ -285,6 +285,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     }
     public void registerElasticSurfaces(View avatar) {
         elasticTitleView = new java.lang.ref.WeakReference<>(avatar);
+        if (backButtonImageView != null) backButtonImageView.setTag(org.telegram.messenger.R.id.flexy_elastic_surface, backButtonImageView);
+        if (avatar != null) avatar.setTag(org.telegram.messenger.R.id.flexy_elastic_surface, avatar);
+        if (menu != null) menu.setTag(org.telegram.messenger.R.id.flexy_elastic_surface, menu);
         app.flexygram.elastic.ElasticFusionGroup.bindSurfaces(this,
             new View[]{backButtonImageView,avatar,menu},
             new android.graphics.drawable.Drawable[]{glassDrawableBack,glassDrawable,glassDrawableMenu});
