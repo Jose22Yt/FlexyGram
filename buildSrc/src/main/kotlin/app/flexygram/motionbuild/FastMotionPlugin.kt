@@ -22,7 +22,7 @@ class FastMotionPlugin : Plugin<Project> {
 }
 
 abstract class FastMotionFactory : AsmClassVisitorFactory<InstrumentationParameters.None> {
-    override fun isInstrumentable(classData: ClassData): Boolean = !classData.className.startsWith("app.flexygram.animation.")
+    override fun isInstrumentable(classData: ClassData): Boolean = !classData.className.startsWith("app.flexygram.animation.") && !classData.className.startsWith("app.flexygram.kyant.")
     override fun createClassVisitor(classContext: ClassContext, nextClassVisitor: ClassVisitor): ClassVisitor {
         val cache = HashMap<Pair<String, String>, Boolean>()
         return FastMotionVisitor(nextClassVisitor) { owner, base ->

@@ -107,6 +107,7 @@ def test_identity_and_distribution_inputs_are_unchanged():
     # The native startup integration changes only LaunchActivity's theme.
     current=current.replace(b'android:name="org.telegram.ui.LaunchActivity"\n            android:theme="@style/Theme.FlexyGram.Start"',b'android:name="org.telegram.ui.LaunchActivity"\n            android:theme="@style/Theme.TMessages.Start"',1)
    if name=='gradle.properties':
+    current=current.replace(b'APP_PACKAGE=com.flexygram.messenger.kyantlab',b'APP_PACKAGE=com.flexygram.messenger')
     # Beta version advances independently; distribution identity/configuration remains protected.
     for prefix in (b'BETA_VERSION_NAME=',b'BETA_VERSION_CODE='):
      baseline=next(line for line in original.split(b'\n') if line.startswith(prefix))

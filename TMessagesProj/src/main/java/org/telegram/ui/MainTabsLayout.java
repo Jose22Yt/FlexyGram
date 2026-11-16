@@ -36,6 +36,12 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         default float measureTextWidth(float size){return measureTextWidth();}
         default void setTextSizeDp(float size){}
     }
+    private app.flexygram.kyant.KyantDockView kyantHost;
+    public void setKyantHost(app.flexygram.kyant.KyantDockView host) { kyantHost = host; invalidate(); }
+    @Override public void onDescendantInvalidated(@NonNull View child, @NonNull View target) {
+        super.onDescendantInvalidated(child, target);
+        if (kyantHost != null) kyantHost.nativeIconsInvalidated();
+    }
     private final Theme.ResourcesProvider resourcesProvider;
     private final GradientDrawable surface=new GradientDrawable();
     private org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable glassBackground;
@@ -45,6 +51,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     }
     @Override protected boolean verifyDrawable(android.graphics.drawable.Drawable who) { return who == glassBackground || super.verifyDrawable(who); }
     @Override protected void onDraw(Canvas canvas) {
+        if (kyantHost != null && kyantHost.isRendering()) return;
         if (glassBackground != null && canvas.isHardwareAccelerated()
                 && org.telegram.messenger.SharedConfig.chatBlurEnabled()
                 && org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.checkBlurEnabled(resourcesProvider)) {
@@ -75,6 +82,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         surface.setCornerRadius(dp(LiquidNavigationConfig.radiusDp()));
         for(int i=0;i<getChildCount();i++)if(getChildAt(i) instanceof GlassTabView)((GlassTabView)getChildAt(i)).setSkipDrawSelector(true);
         if (glassBackground != null) glassBackground.updateColors();
+        if (kyantHost != null) kyantHost.backdropChanged();
         // This method changes drawables only. Geometry setters already request layout when needed.
         invalidate();
     }
@@ -119,6 +127,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     public void setTabSelected(View tab,boolean animated){for(int i=0;i<getChildCount();i++)if(getChildAt(i) instanceof GlassTabView)((GlassTabView)getChildAt(i)).setSelected(getChildAt(i)==tab,animated);updateSelection(animated);}
     public void revealSelectedDestination(){updateSelection(true);}
     private void updateSelection(boolean animated){
+        if (kyantHost != null) { selection.cancel(); kyantHost.syncFromNative(); return; }
         View v=selected();if(v==null||v.getWidth()==0)return;float x=v.getX()+v.getWidth()*.5f;
         if(!animated||Float.isNaN(selectionX)||!LiquidNavigationConfig.animation()
                 ||android.os.Build.VERSION.SDK_INT>=26&&!android.animation.ValueAnimator.areAnimatorsEnabled()){
@@ -129,6 +138,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     public void addTabToIgnoreClick(View v){} // Native child click/long-click owns all gestures.
     public void setDrawTopDivider(boolean value){drawTopDivider=value;invalidate();}
     @Override protected void dispatchDraw(@NonNull Canvas canvas){
+        if (kyantHost != null && kyantHost.isRendering()) return;
         View v=selected();if(v!=null&&slotWidth>0){
             float x=selection.isRunning()?selectionX:v.getX()+v.getWidth()*.5f;
             float w=Math.max(0,slotWidth-dp(8)),h=getHeight()-getPaddingTop()-getPaddingBottom()-dp(6);

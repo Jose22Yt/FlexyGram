@@ -183,10 +183,12 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private MainTabsLayout tabsView;
     private android.widget.ImageView separateSearchButton;
     private org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable separateSearchGlass;
+    private app.flexygram.kyant.KyantDockView kyantDockView;
     private final Runnable refreshTabsTheme = this::blur3_updateColors;
     private final org.telegram.messenger.Utilities.Callback<Boolean> dockPowerListener = ignored -> refreshMainNativeGlassPolicy();
     private void refreshMainNativeGlassPolicy() {
         invalidateTabsGlass();
+        if (kyantDockView != null) kyantDockView.backdropChanged();
         if(tabsView!=null)tabsView.refreshBottomBarAppearance();
         updateSeparateSearchAppearance();
     }
@@ -275,6 +277,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
             @Override public void onDescendantInvalidated(View child, View target) {
                 super.onDescendantInvalidated(child,target);
+                if (kyantDockView != null) kyantDockView.sourceInvalidated(target);
                 if (child == viewPager && SharedConfig.chatBlurEnabled() && BlurredBackgroundProviderImpl.checkBlurEnabled(resourceProvider)) {
                     tabsGlassRevision++;
                     if (iBlur3SourceTabGlass != null) iBlur3SourceTabGlass.invalidateDisplayListForDrawables();
@@ -465,11 +468,17 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             BlurredBackgroundDrawableViewFactory dockFactory = new BlurredBackgroundDrawableViewFactory(iBlur3SourceTabGlass);
             dockFactory.setSourceRootView(viewPositionWatcher, tabsViewWrapper);
             dockGlassColors = new org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProviderThemed(resourceProvider, Theme.key_windowBackgroundWhite, .65f);
-            tabsView.setGlassBackground(dockFactory.create(tabsView, dockGlassColors).setPadding(0));
+            // Kyant owns the dock material; never install Telegram refraction underneath it.
             separateSearchGlass = dockFactory.create(separateSearchButton, dockGlassColors).setPadding(0).setRadius(dp(28));
         }
 
         updateLayoutWrapper = new UpdateLayoutWrapper(context);
+        if (Build.VERSION.SDK_INT >= 33) {
+            kyantDockView = new app.flexygram.kyant.KyantDockView(context, tabsView, viewPager);
+            tabsView.setKyantHost(kyantDockView);
+            tabsViewWrapper.setClipChildren(false);
+            tabsViewWrapper.addView(kyantDockView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
         contentView.addView(updateLayoutWrapper, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM));
 
         updateLayout = ApplicationLoader.applicationLoaderInstance.takeUpdateLayout(getParentActivity(), updateLayoutWrapper);
@@ -1037,6 +1046,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsView.setTranslationX(dockLeft - tabsView.getLeft());
         separateSearchButton.setTranslationX(searchLeft - separateSearchButton.getLeft());
         separateSearchButton.setTranslationY(tabsView.getBottom() - separateSearchButton.getBottom());
+        if (kyantDockView != null) kyantDockView.syncFromNative();
     }
 
     /** Create optional destinations only when the current width/order actually shows them. */
@@ -1609,6 +1619,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsView.setEnabled(factor >= .999f);
         tabsView.setAlpha(factor);
         tabsView.setVisibility(factor > 0 ? View.VISIBLE : View.GONE);
+        if (kyantDockView != null) kyantDockView.syncFromNative();
     }
 
     private void checkUi_callTabVisible(boolean callTabsVisible, boolean animated) {

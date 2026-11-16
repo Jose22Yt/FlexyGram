@@ -8,7 +8,8 @@ def test_native_blur_routes_cover_home_dock_folders_header_and_composer():
     folders=(JAVA/'org/telegram/ui/DialogsActivity.java').read_text()
     header=(JAVA/'org/telegram/ui/ActionBar/ActionBar.java').read_text()
     composer=(JAVA/'org/telegram/ui/Components/chat/ChatInputViewsContainer.java').read_text()
-    assert 'tabsView.setGlassBackground(dockFactory.create(tabsView, dockGlassColors)' in home
+    assert 'tabsView.setGlassBackground(dockFactory.create(tabsView, dockGlassColors)' not in home
+    assert 'new app.flexygram.kyant.KyantDockView(context, tabsView, viewPager)' in home
     assert 'glassBackground.draw(canvas)' in dock and 'SharedConfig.chatBlurEnabled()' in dock
     assert 'filterTabsView.setSignatureGlassFactory(iBlur3FactoryLiquidGlass)' in folders
     assert 'if (filterTabsView != null) filterTabsView.updateColors();' in folders

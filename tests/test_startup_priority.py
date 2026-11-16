@@ -30,6 +30,7 @@ public class Probe {
  static class GlassTabView{boolean skip;void setSkipDrawSelector(boolean value){skip=value;}}
  static class Background{int updates;void updateColors(){updates++;}}
  static class Tabs{int layouts;void setLayoutParams(FrameLayout.LayoutParams p){layouts++;}}
+ static class KyantHost{void backdropChanged(){}}KyantHost kyantHost;
  Tabs tabsView=new Tabs();Selection selection=new Selection();float selectionX;Surface surface=new Surface();
  Object resourcesProvider;Background glassBackground=new Background();GlassTabView child=new GlassTabView();
  int layouts,invalidations;int dp(int value){return value*2;}void requestLayout(){layouts++;}void invalidate(){invalidations++;}

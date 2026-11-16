@@ -3,7 +3,7 @@ run-name: UI beta debug ARM64 · ${{ github.sha }}
 
 on:
   push:
-    branches: [codex/flexygram-beta-glass, codex/flexygram-beta55-audit, codex/flexygram-update56]
+    branches: [codex/flexygram-beta-glass, codex/flexygram-beta55-audit, codex/flexygram-update56, codex/flexygram-legacy-kyant-glass-test]
   workflow_dispatch:
 
 permissions:
@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.repository == 'Jose22Yt/FlexyGram' && (github.ref == 'refs/heads/codex/flexygram-beta-glass' || github.ref == 'refs/heads/codex/flexygram-beta55-audit' || github.ref == 'refs/heads/codex/flexygram-update56')
+    if: github.repository == 'Jose22Yt/FlexyGram' && (github.ref == 'refs/heads/codex/flexygram-beta-glass' || github.ref == 'refs/heads/codex/flexygram-beta55-audit' || github.ref == 'refs/heads/codex/flexygram-update56' || github.ref == 'refs/heads/codex/flexygram-legacy-kyant-glass-test')
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     env:
@@ -81,6 +81,7 @@ jobs:
           sudo apt-get "${flexy_apt_options[@]}" install -y --no-install-recommends nasm ninja-build patchelf autoconf automake libtool pkg-config maven
           python -m pip install pytest==9.2.0 PyYAML==6.0.3 tree-sitter==0.26.0 tree-sitter-java==0.23.5
           git fetch --no-recurse-submodules --no-tags --depth=1 origin \
+            9b305e3ee7ee16097576d60af07f6ed9f105de9c \
             4679f74ebd312acc4968dd2e044a6c6b7478445a \
             bf96667efac14d0cbbf6677471890a366c3ef3c0 \
             3c7a20a229d425c8f3b5ea1740ccb6d8b3361fea \
@@ -149,13 +150,13 @@ jobs:
               try:
                   parsed = json.loads(base64.b64decode(b64))
                   has_client = any(
-                      c.get("client_info", {}).get("android_client_info", {}).get("package_name") == "com.flexygram.messenger"
+                      c.get("client_info", {}).get("android_client_info", {}).get("package_name") == "com.flexygram.messenger.kyantlab"
                       for c in parsed.get("client", [])
                   )
                   if has_client:
                       data = parsed
                   else:
-                      print("REJECTED: Firebase configuration contains no client for com.flexygram.messenger; discarding incompatible secret.")
+                      print("REJECTED: Firebase configuration contains no client for com.flexygram.messenger.kyantlab; discarding incompatible secret.")
                       data = None
               except Exception as e:
                   print("Could not parse Firebase secret:", e)
@@ -171,7 +172,7 @@ jobs:
                       "client_info": {
                           "mobilesdk_app_id": "1:100000000000:android:0000000000000000000000",
                           "android_client_info": {
-                              "package_name": "com.flexygram.messenger"
+                              "package_name": "com.flexygram.messenger.kyantlab"
                           }
                       },
                       "oauth_client": [],
@@ -184,6 +185,11 @@ jobs:
               json.dump(data, f, indent=2)
           '
           export GRADLE_OPTS="-Dorg.gradle.internal.http.socketTimeout=120000 -Dorg.gradle.internal.http.connectionTimeout=120000 -Dorg.gradle.wrapper.networkTimeout=120000"
+          # Check the new Kotlin/Java bridge before spending time assembling C++ libraries.
+          ./gradlew --no-daemon --max-workers=2 --console=plain \
+            --init-script "$RUNNER_TEMP/flexy-native-pools.gradle" \
+            -PflexyPerformanceBuild=true -PflexyReleaseReduction=true \
+            :TMessagesProj:compileDebugKotlin :TMessagesProj:compileDebugJavaWithJavac 2>&1 | tee build/reports/ui-beta/kyant-compile.log
           ./gradlew --no-daemon --max-workers=2 --console=plain \
             --init-script "$RUNNER_TEMP/flexy-native-pools.gradle" \
             -PflexyPerformanceBuild=true -PflexyReleaseReduction=true :TMessagesProj:assembleDebug 2>&1 | tee build/reports/ui-beta/assemble.log
@@ -195,7 +201,7 @@ jobs:
           mapfile -t apks < <(find TMessagesProj/build/outputs/apk/debug -type f -name '*.apk')
           test "${#apks[@]}" -gt 0
           for apk in "${apks[@]}"; do
-            "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$apk"
+            "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$apk"
             unzip -Z1 "$apk" > build/reports/ui-beta/apk-entries.txt
             grep -Eq '^lib/arm64-v8a/libtmessages.*\.so$' build/reports/ui-beta/apk-entries.txt
             grep -Eq '^lib/arm64-v8a/libchaquopy_java\.so$' build/reports/ui-beta/apk-entries.txt

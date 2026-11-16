@@ -114,7 +114,7 @@
         android:dataExtractionRules="@xml/connected_alpha_extraction_rules"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_flexy_glossy"
-        android:label="@string/NagramX"
+        android:label="FlexyGram Glass Lab"
         android:largeHeap="true"
         android:theme="@style/Theme.TMessages.Start"
         android:manageSpaceActivity="org.telegram.ui.ExternalActionActivity"
@@ -177,7 +177,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="vnd.android.cursor.item/vnd.io.github.jose22yt.flexygram.alpha.android.profile"/>
+                <data android:mimeType="vnd.android.cursor.item/vnd.com.flexygram.messenger.kyantlab.android.profile"/>
             </intent-filter>
             <!-- FlexyStudio: own MIME, or an exact extension on a content URI. No catch-all association. -->
             <intent-filter>
@@ -761,8 +761,8 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="vnd.android.cursor.item/vnd.io.github.jose22yt.flexygram.alpha.android.call"/>
-                <data android:mimeType="vnd.android.cursor.item/vnd.io.github.jose22yt.flexygram.alpha.android.call.video"/>
+                <data android:mimeType="vnd.android.cursor.item/vnd.com.flexygram.messenger.kyantlab.android.call"/>
+                <data android:mimeType="vnd.android.cursor.item/vnd.com.flexygram.messenger.kyantlab.android.call.video"/>
             </intent-filter>
         </activity-alias>
         <activity
