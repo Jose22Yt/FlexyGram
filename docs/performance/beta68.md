@@ -1,3 +1,5 @@
+> Registro de beta68. El usuario reportó persistencia al volver: la recuperación reforzada y los cambios actuales están en [beta69](beta69.md).
+
 # beta68: lente de la barra y recuperación de ventana
 
 Base a9ca3b9117df4384b7bcd95492c82a1dcc63260b (beta67), versión

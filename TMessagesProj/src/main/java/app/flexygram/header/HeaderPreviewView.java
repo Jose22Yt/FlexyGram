@@ -150,7 +150,7 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
     }
     private void drawClassic(Canvas canvas){
         float y=getHeight()/2f,d=AndroidUtilities.density;boolean rtl=LocaleController.isRTL;
-        avatar.setColor(Theme.getColor(Theme.key_actionBarDefault));canvas.drawRect(0,y-28*d,getWidth(),y+28*d,avatar);
+        avatar.setColor(app.flexygram.chat.ConversationSurfaceTint.apply(Theme.getColor(Theme.key_actionBarDefault),null));canvas.drawRect(0,y-28*d,getWidth(),y+28*d,avatar);
         int color=Theme.getColor(Theme.key_actionBarDefaultTitle);
         back.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);more.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);
         int size=AndroidUtilities.dp(24),backX=Math.round(rtl?getWidth()-20*d:20*d),menuX=Math.round(rtl?20*d:getWidth()-20*d);
@@ -166,7 +166,7 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         var g=fusion.geometry;float d=AndroidUtilities.density;
         int color=Theme.getColor(Theme.key_actionBarDefaultTitle);
         if(fusion.color!=color){fusion.color=color;iconColor=color;fusion.phone.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);fusion.more.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);back.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);}
-        int fill=(Theme.getColor(Theme.key_windowBackgroundWhite)&0xffffff)|((previewPortrait()?255:Math.round(HeaderConfig.opacity()*2.55f))<<24);
+        int fill=(app.flexygram.chat.ConversationSurfaceTint.apply(Theme.getColor(Theme.key_windowBackgroundWhite),null)&0xffffff)|((previewPortrait()?255:Math.round(HeaderConfig.opacity()*2.55f))<<24);
         int edge=(Theme.getColor(Theme.key_divider)&0xffffff)|0x66000000;
         int outer=canvas.save();canvas.translate(0,fusionTop);
         fusion.surface.drawBackdrop(canvas,g,fill,edge,edge,d);

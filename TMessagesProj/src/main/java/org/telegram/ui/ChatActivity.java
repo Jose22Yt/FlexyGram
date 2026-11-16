@@ -549,11 +549,14 @@ public class ChatActivity extends BaseFragment implements
     private int performanceOpenTransitionCookie, performanceCloseTransitionCookie;
     private boolean signatureNativeGlassAllowed;
     private boolean signatureLiquidGlassAllowed;
+    private boolean signatureSurfaceTintEnabled;
     private final Utilities.Callback<Boolean> signatureGlassPowerListener = ignored -> refreshSignatureNativeGlassPolicy();
     private void refreshSignatureNativeGlassPolicy() {
         boolean allowed = SharedConfig.chatBlurEnabled();
         boolean liquidPolicy = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
-        if (signatureNativeGlassAllowed == allowed && signatureLiquidGlassAllowed == liquidPolicy) return;
+        boolean tint = app.flexygram.chat.ConversationSurfaceTint.enabled();
+        if (signatureNativeGlassAllowed == allowed && signatureLiquidGlassAllowed == liquidPolicy && signatureSurfaceTintEnabled == tint) return;
+        signatureSurfaceTintEnabled = tint;
         signatureNativeGlassAllowed = allowed;
         signatureLiquidGlassAllowed = liquidPolicy;
         // The native suppressor snapshots Liquid Glass in its constructor. Refresh only on a
@@ -4151,14 +4154,14 @@ public class ChatActivity extends BaseFragment implements
             @Override
             public int getBackgroundColor() {
                 if (!BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, themeDelegate)) {
-                    return ColorUtils.setAlphaComponent(getThemedColor(Theme.key_chat_messagePanelBackground), 255);
+                    return app.flexygram.chat.ConversationSurfaceTint.apply(ColorUtils.setAlphaComponent(getThemedColor(Theme.key_chat_messagePanelBackground), 255), themeDelegate);
                 }
 
                 final boolean isThemeLight = themeDelegate != null && !themeDelegate.isDark();
                 if (isThemeLight) {
-                    return ColorUtils.setAlphaComponent(super.getBackgroundColor(), 216);
+                    return app.flexygram.chat.ConversationSurfaceTint.apply(ColorUtils.setAlphaComponent(super.getBackgroundColor(), 216), themeDelegate);
                 }
-                return super.getBackgroundColor();
+                return app.flexygram.chat.ConversationSurfaceTint.apply(super.getBackgroundColor(), themeDelegate);
             }
         };
         blurredBackgroundColorProviderWhite = new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.key_windowBackgroundWhite) {
@@ -4176,7 +4179,11 @@ public class ChatActivity extends BaseFragment implements
             }
         };
 
-        blurredBackgroundColorProviderTop = new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.key_chat_topPanelBackground);
+        blurredBackgroundColorProviderTop = new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.key_chat_topPanelBackground) {
+            @Override public int getBackgroundColor() {
+                return app.flexygram.chat.ConversationSurfaceTint.apply(super.getBackgroundColor(), themeDelegate);
+            }
+        };
 
         if (textSelectionHelper == null) {
             Timer.Task t1 = Timer.start(t, "new ChatActivityTextSelectionHelper");
@@ -5433,6 +5440,7 @@ public class ChatActivity extends BaseFragment implements
         chatInputViewsContainer.setWindowInsetsProvider(windowInsetsStateHolder);
         chatInputViewsContainer.setInputIslandBubbleDrawable(
             glassBackgroundDrawableFactory.create(chatInputViewsContainer, blurredBackgroundColorProvider));
+        chatInputViewsContainer.setConversationResources(themeDelegate);
         chatInputViewsContainer.setCompactGlassFactory(glassBackgroundDrawableFactory, blurredBackgroundColorProvider);
         chatInputViewsContainer.setUnderKeyboardBackgroundDrawable(
             glassBackgroundDrawableFactoryFrosted.create(chatInputViewsContainer, blurredBackgroundColorProvider));

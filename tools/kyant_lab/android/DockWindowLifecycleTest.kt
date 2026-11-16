@@ -62,6 +62,14 @@ class DockWindowLifecycleTest {
     publishComposition();assertTrue(host.isRendering())
     host.onWindowFocusChanged(true);assertTrue(host.isRendering())
    }
+   val epoch=ReflectionHelpers.getField<androidx.compose.runtime.MutableIntState>(host,"materialEpoch\$delegate").intValue
+   host.onHostResume()
+   assertTrue(ReflectionHelpers.getField<androidx.compose.runtime.MutableIntState>(host,"materialEpoch\$delegate").intValue>epoch)
+   assertFalse("Stale composition cannot hide native fallback",host.isRendering())
+   val check=ReflectionHelpers.getField<android.view.ViewTreeObserver.OnPreDrawListener>(host,"resumePreDraw")
+   assertTrue(check.onPreDraw())
+   assertNull("Resume check removes itself after one pre-draw",ReflectionHelpers.getField<Any?>(host,"resumeObserver"))
+   publishComposition();assertTrue(host.isRendering())
    KyantDockConfig.setEnabled(false);host.syncFromNative();assertFalse(available());assertFalse(host.isRendering())
   } finally {
    ReflectionHelpers.setField(info,"mHardwareAccelerated",hardware)

@@ -1321,4 +1321,11 @@
     <string name="FlexyKyantDockTitle">Liquid Glass Kyant</string>
     <string name="FlexyKyantDockSubtitle">Solo en la barra inferior de la pantalla principal</string>
     <string name="FlexyKyantDockInfo">Material opcional para esta barra en Android 13 o posterior. Las demás superficies conservan el cristal de Telegram y sus ajustes.</string>
+
+    <string name="FlexyConversationAccentTitle">Acento del tema en interfaces del chat</string>
+    <string name="FlexyConversationAccentSubtitle">Tono sutil del tema en la cabecera y la entrada de mensajes</string>
+    <string name="FlexyConversationAccentInfo">Se aplica a las dos interfaces del chat. El desenfoque y Liquid Glass conservan sus ajustes habituales.</string>
+    <string name="FlexySwitchStyleTitle">Estilo de interruptor</string>
+    <string name="FlexySwitchCurrent">FlexyGram</string>
+    <string name="FlexySwitchOutlined">Contorno con cruz y marca</string>
 </resources>

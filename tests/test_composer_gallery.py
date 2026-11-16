@@ -44,6 +44,9 @@ public class Probe {
  static class MeasureSpec{static int getSize(int w){return w;}}
  boolean miniature,conversationStage;int forcedStyle,measuredHeight;final Paint paint=new Paint();
  final Drawable plus=new Drawable(),clip=new Drawable(),smile=new Drawable(),folded=new Drawable(),voice=new Drawable();
+ // Theme/preference service is explicitly OFF for this geometry-only host.
+ Object resourcesProvider;
+ static class app{static class flexygram{static class chat{static class ConversationSurfaceTint{static int apply(int c,Object p){return c;}}}}}
  int getThemedColor(int key){return 0;}String getString(int key){return "Mensaje";}
  Resources getResources(){return new Resources();}
  void icon(Canvas c,Drawable d,float x,float y,int color){check(y-dp(14)>=-.1&&y+dp(14)<=c.height+.1);}
@@ -78,30 +81,30 @@ public class Probe {
         JAVA/'app/flexygram/composer/ComposerGeometry.java'])
 
 
-def test_composer_controls_follow_gallery_without_adding_rows_to_header(tmp_path):
+def test_composer_controls_and_shared_tint_are_reachable_in_both_galleries(tmp_path):
     source=(JAVA/'app/flexygram/settings/signature/ConversationStyleSettingsActivity.java').read_text()
     adapter=source[source.index('@Override protected BaseListAdapter createAdapter'):]
     probe(tmp_path, {'Probe.java': '''import java.util.*;
 public class Probe {
- static final int GALLERY=310,POSITION=311,TYPE_HEADER=4,TYPE_INFO_PRIVACY=7,TYPE_SETTINGS=2;
+ static final int GALLERY=310,POSITION=311,TYPE_HEADER=4,TYPE_INFO_PRIVACY=7,TYPE_SETTINGS=2,TYPE_CHECK=3;
  static class HeaderConfig{static void load(){}}
  static class Base{int rowCount;final List<String> keys=new ArrayList<>();
   void updateRows(){rowCount=0;keys.clear();}int addRow(){return addRow("");}
   int addRow(String key){keys.add(key);return rowCount++;}int addHeader(String key){return addRow(key);}}
  static class Page extends Base{
-  boolean header;int galleryRow,layoutHeaderRow,levelRow,positionRow,resetPositionRow,infoRow;
+  boolean header;int accentRow,accentInfoRow;int galleryRow,layoutHeaderRow,levelRow,positionRow,resetPositionRow,infoRow;
   __ROWS__
   class Adapter{__TYPE__}
  }
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[]args){
   Page page=new Page();Page.Adapter a=page.new Adapter();
-  page.updateRows();check(page.rowCount==6&&page.galleryRow==0);
-  check(a.getItemViewType(0)==GALLERY&&a.getItemViewType(1)==TYPE_HEADER);
-  check(page.levelRow==2&&page.positionRow==3&&page.resetPositionRow==4&&page.infoRow==5);
+  page.updateRows();check(page.rowCount==8&&page.galleryRow==0);
+  check(a.getItemViewType(0)==GALLERY&&a.getItemViewType(page.accentRow)==TYPE_CHECK&&a.getItemViewType(page.layoutHeaderRow)==TYPE_HEADER);
+  check(page.levelRow==4&&page.positionRow==5&&page.resetPositionRow==6&&page.infoRow==7);
   check(a.getItemViewType(page.positionRow)==POSITION&&a.getItemViewType(page.levelRow)==TYPE_SETTINGS);
   check(page.keys.contains("flexyComposerLevel")&&page.keys.contains("flexyComposerPosition"));
-  page.header=true;page.updateRows();check(page.rowCount==1&&a.getItemViewType(0)==GALLERY);
+  page.header=true;page.updateRows();check(page.rowCount==3&&a.getItemViewType(0)==GALLERY);
   check(page.positionRow==-1&&page.levelRow==-1&&page.infoRow==-1);
  }
 }'''.replace('__ROWS__',method(source,'protected void updateRows()')).replace('__TYPE__',method(adapter,'public int getItemViewType('))})

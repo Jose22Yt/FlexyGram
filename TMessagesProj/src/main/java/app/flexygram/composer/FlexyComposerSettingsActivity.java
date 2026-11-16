@@ -199,7 +199,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
         private void drawComposer(Canvas c,float width,float height) {
             if (forcedStyle == FlexyComposerConfig.CLASSIC || forcedStyle < 0 && !FlexyComposerConfig.compact()) {
                 float y=height/2, radius=dp(22), end=width-dp(36);
-                paint.setColor(getThemedColor(Theme.key_chat_messagePanelBackground));
+                paint.setColor(app.flexygram.chat.ConversationSurfaceTint.apply(getThemedColor(Theme.key_chat_messagePanelBackground),resourcesProvider));
                 c.drawRoundRect(dp(6),y-radius,end-dp(30),y+radius,radius,radius,paint);
                 paint.setColor(getThemedColor(Theme.key_chat_messagePanelSend));c.drawCircle(end,y,radius,paint);
                 int ink=getThemedColor(Theme.key_chat_messagePanelIcons);
@@ -214,7 +214,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             if(conversationStage)y=Math.max(radius+dp(4),Math.min(height-radius-dp(4),y));
             float gap = dp(FlexyComposerConfig.gap());
             boolean dark = ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4;
-            int surface = ComposerStyle.surface(dark, FlexyComposerConfig.glass()), ink = ComposerStyle.icon(dark);
+            int surface = app.flexygram.chat.ConversationSurfaceTint.apply(ComposerStyle.surface(dark, FlexyComposerConfig.glass()),resourcesProvider), ink = ComposerStyle.icon(dark);
             paint.setColor(surface);
             float side = ComposerStyle.sideMargin(Math.round(width), org.telegram.messenger.AndroidUtilities.density, dp(7));
             float left = side + dp(22), right = width - side - dp(22);

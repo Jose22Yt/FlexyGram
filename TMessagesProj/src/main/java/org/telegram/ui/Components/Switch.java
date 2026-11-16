@@ -58,6 +58,7 @@ public class Switch extends View {
     public static final int SWITCH_STYLE_DEFAULT = 0;
     public static final int SWITCH_STYLE_MODERN = 1;
     public static final int SWITCH_STYLE_MD3 = 2;
+    public static final int SWITCH_STYLE_OUTLINED = 3;
     private int separateTrackColorKey = -1;
     private int lastCheckColor = Integer.MIN_VALUE;
     private final Paint googleBorderPaint;
@@ -701,7 +702,8 @@ public class Switch extends View {
                     : Theme.key_chat_outInstant; // a1_10
         }
 
-        boolean isMd3 = switchStyle == SWITCH_STYLE_MD3;
+        boolean isMd3 = switchStyle == SWITCH_STYLE_OUTLINED;
+        googleBorderPaint.setStrokeWidth(dpf2(isMd3 ? 2 : 1));
         boolean isModern = switchStyle == SWITCH_STYLE_MODERN;
         float iconVisibilityFactor = animatorIconVisibility.getFloatValue();
         boolean hasVisibleIcon = iconDrawable != null && iconVisibilityFactor > 0;

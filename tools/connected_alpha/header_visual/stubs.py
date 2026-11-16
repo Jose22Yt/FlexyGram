@@ -15,12 +15,14 @@ def write_stubs(source,root):
  # This geometry fixture deliberately excludes default-pack selection (covered by loader JVM tests).
  put('app/flexygram/icons/ExactIcons.java','package app.flexygram.icons;public class ExactIcons {public static boolean isEnabled(){return false;}public static android.graphics.drawable.Drawable create(android.content.res.Resources r,int id,int d,android.content.res.Resources.Theme t){return null;}}')
  put('app/flexygram/icons/ConversationControlIcons.java',(root/'TMessagesProj/src/main/java/app/flexygram/icons/ConversationControlIcons.java').read_text())
+ for rel in ['app/flexygram/chat/ConversationSurfaceTint.java','app/flexygram/settings/signature/SettingsCardStyle.java']:
+  put(rel,(root/'TMessagesProj/src/main/java'/rel).read_text())
  folder=root/'TMessagesProj/src/main/java/app/flexygram/header'
  for name in ['HeaderConfig','HeaderGeometry','HeaderSurface','SignatureChatHeader','HeaderPreviewView']:put('app/flexygram/header/'+name+'.java',(folder/(name+'.java')).read_text())
  for p in (folder/'fusion').glob('*.java'):put('app/flexygram/header/fusion/'+p.name,p.read_text())
  actual=(root/'TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java').read_text()
  avatar_methods='\n'.join(body(actual,a)for a in ['public void setSignatureHeader(', 'private boolean signatureActive(', 'private boolean signatureFusionActive(', 'private boolean signatureFusionHasPhoto(', 'private void prepareFusionControls(', 'public boolean signatureCallAvailable(', 'public float signaturePreferredTitleWidth(', 'private void measureSignature(', 'private void layoutSignature(', 'protected boolean drawChild(', 'public boolean dispatchTouchEvent(', 'public boolean onTouchEvent(MotionEvent ev)']).replace('@NonNull ','')
- code='\n'.join((folder/(n+'.java')).read_text()for n in ['HeaderConfig','HeaderSurface','SignatureChatHeader','HeaderPreviewView'])
+ code='\n'.join((folder/(n+'.java')).read_text()for n in ['HeaderConfig','HeaderSurface','SignatureChatHeader','HeaderPreviewView'])+(root/'TMessagesProj/src/main/java/app/flexygram/chat/ConversationSurfaceTint.java').read_text()
  code+='\n'+avatar_methods+'\nTheme.key_actionBarDefaultSubtitle'
  assert actual.index('addView(avatarImageView)')<actual.index('addView(titleTextView)')<actual.index('addView(subtitleTextView)')
  r=source/'org/telegram/messenger/R.java';s=r.read_text();missing=set(re.findall(r'R.string.(\w+)',code))-set(re.findall(r'int (\w+)=',s));s=s.replace('class string {','class string {'+''.join('public static final int '+n+'='+str(1000+i)+';'for i,n in enumerate(sorted(missing))));s=s.replace('public class R {','public class R {public static class drawable {public static int ic_ab_back,ic_ab_other,msg_callback,flexy_ios_back,flexy_ios_call,flexy_ios_more;}');r.write_text(s)

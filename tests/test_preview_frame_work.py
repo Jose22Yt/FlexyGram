@@ -9,6 +9,8 @@ def test_classic_header_prepares_text_once_not_every_draw(tmp_path):
     assert 'if(previewStyle()==1){prepareClassicText(width);return;}' in method(source,'protected void onMeasure(')
     methods=methods.replace('android.text.TextUtils','TextUtils').replace('android.graphics.PorterDuff','PorterDuff')
     probe(tmp_path, {'Probe.java': '''public class Probe {
+ // Explicit disabled preference service; this probe measures text layout work only.
+ static class app{static class flexygram{static class chat{static class ConversationSurfaceTint{static int apply(int c,Object p){return c;}}}}}
  static class AndroidUtilities {static float density=1;static int dp(float f){return Math.round(f*density);}}
  static class LocaleController {static boolean isRTL;}
  static class Theme {static int key_actionBarDefault,key_actionBarDefaultTitle,key_windowBackgroundWhiteBlueText,key_actionBarDefaultSubtitle;static int getColor(int key){return key;}}

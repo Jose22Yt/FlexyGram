@@ -99,6 +99,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
                 if(include("maps"))add(scope(new OpenExteraGeneralActivity(),"general","general_maps"));
                 if(include("profile")||include("archive"))add(scope(new OpenExteraGeneralActivity(),"general",segment));
                 if(include("fonts")||include("effects"))add(scope(new OpenExteraAppearanceActivity(),"appearance",segment));
+                if(include("effects"))add(new app.flexygram.settings.signature.SwitchStyleSettingsActivity());
                 if(include("advanced")){
                     add(scope(new OpenExteraOtherActivity(),"other","advanced"));
                     extra("ng","advanced_extra");extra("nx","advanced_extra");

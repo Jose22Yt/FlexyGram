@@ -48,8 +48,38 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     private var geometryRevision by mutableIntStateOf(0)
     private val geometry = KyantDockGeometry.State()
     private var available by mutableStateOf(false)
+    private var materialEpoch by mutableIntStateOf(0)
     private var ready by mutableStateOf(false)
     private var hostInitialized = false
+    private var resumeObserver: android.view.ViewTreeObserver? = null
+    private val resumePreDraw = android.view.ViewTreeObserver.OnPreDrawListener {
+        clearResumeCheck()
+        syncFromNative()
+        if (available) {
+            if (!hasComposition) { ready = false; createComposition() }
+            backdropChanged()
+        }
+        true
+    }
+    private fun clearResumeCheck() {
+        resumeObserver?.takeIf { it.isAlive }?.removeOnPreDrawListener(resumePreDraw)
+        resumeObserver = null
+    }
+    private fun scheduleResumeCheck() {
+        if (!isAttachedToWindow || windowVisibility != VISIBLE) return
+        val observer = viewTreeObserver
+        if (resumeObserver === observer) return
+        clearResumeCheck()
+        resumeObserver = observer
+        observer.addOnPreDrawListener(resumePreDraw)
+        invalidate()
+    }
+    fun onHostResume() {
+        // STOPPED recomposition can coalesce hide/show state and retain obsolete graphics layers.
+        // Renew only this optional dock material, once per native host resume.
+        if (hasComposition) { materialEpoch++; ready = false }
+        syncFromNative(); backdropChanged(); scheduleResumeCheck()
+    }
     private var framePending = false
     private var sourceDirty = false
     private var iconsDirty = false
@@ -123,6 +153,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         if (geometry.update(dock.x, dock.y, dock.width, dock.height, dock.paddingTop, dock.paddingBottom,
                 LocaleController.isRTL, Theme.isCurrentThemeDark())) geometryRevision++
         available = isShown && dock.isShown && dock.visibility == VISIBLE && dock.alpha > 0f && windowVisibility == VISIBLE && isHardwareAccelerated && (KyantDockConfig.enabled() && !LiteMode.isPowerSaverApplied())
+        if (available && !wasAvailable) { materialEpoch++; ready = false }
         if (!available) {
             ready = false
             removeCallbacks(longPress); gesture = false; longPressTab = null
@@ -142,24 +173,27 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         LiteMode.addOnPowerSaverAppliedListener(powerListener)
-        syncFromNative(); backdropChanged()
+        syncFromNative(); backdropChanged(); scheduleResumeCheck()
     }
     override fun onVisibilityAggregated(isVisible: Boolean) {
         super.onVisibilityAggregated(isVisible)
         syncFromNative()
         if (available) backdropChanged()
+        if (isVisible) scheduleResumeCheck() else clearResumeCheck()
     }
     override fun onWindowVisibilityChanged(visibility: Int) {
         super.onWindowVisibilityChanged(visibility)
         if (!hostInitialized) return
         syncFromNative()
         if (available) backdropChanged()
+        if (visibility == VISIBLE) scheduleResumeCheck() else clearResumeCheck()
     }
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
         super.onWindowFocusChanged(hasWindowFocus)
-        if (hostInitialized && hasWindowFocus) { syncFromNative(); if (available) backdropChanged() }
+        if (hostInitialized && hasWindowFocus) { syncFromNative(); if (available) backdropChanged(); scheduleResumeCheck() }
     }
     override fun onDetachedFromWindow() {
+        clearResumeCheck()
         LiteMode.removeOnPowerSaverAppliedListener(powerListener)
         tabs.forEach { it.setSkipDrawSelector(false) }
         dock.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
@@ -195,8 +229,14 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
 
     @Composable override fun Content() {
         if (!available || tabs.size < 2) return
+        val needsReady = !ready
+        key(materialEpoch) { DrawDockMaterial() }
+        SideEffect {
+            if (available && tabs.size >= 2 && needsReady) { ready = true; publishNativeOwnership(); dock.invalidate() }
+        }
+    }
+    @Composable private fun DrawDockMaterial() {
         geometryRevision // Layout/translation changes, never a continuous render ticker.
-        val needsReady = !ready // Observe readiness so a resumed composition republishes native ownership.
         val density = resources.displayMetrics.density
         val width = dock.width / density
         if (width <= 0) return
@@ -254,8 +294,6 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
                 }
             }
         }
-        SideEffect {
-            if (available && tabs.size >= 2 && needsReady) { ready = true; publishNativeOwnership(); dock.invalidate() }
-        }
+
     }
 }

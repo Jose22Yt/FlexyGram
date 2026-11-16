@@ -164,7 +164,7 @@ public final class SignatureChatHeader {
             drawUnread(canvas);
             return;
         }
-        int fill = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
+        int fill = app.flexygram.chat.ConversationSurfaceTint.apply(Theme.getColor(Theme.key_windowBackgroundWhite, provider), provider);
         fill = (fill & 0xffffff) | ((HeaderConfig.portrait() ? 255 : Math.round(HeaderConfig.opacity() * 2.55f)) << 24);
         int border = (Theme.getColor(Theme.key_divider, provider) & 0xffffff) | 0x66000000;
         int save = canvas.save(); canvas.translate(0, fusionTop);

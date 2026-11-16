@@ -11,10 +11,7 @@ public final class SettingsCardStyle {
     public static int surface(int requested, int page, int accent, boolean dark) {
         if (dark) {
             // Charcoal with an 8% Monet accent, always distinct from the black page.
-            int r = (29 * 92 + ((accent >>> 16) & 255) * 8 + 50) / 100;
-            int g = (31 * 92 + ((accent >>> 8) & 255) * 8 + 50) / 100;
-            int b = (33 * 92 + (accent & 255) * 8 + 50) / 100;
-            return 0xff000000 | (r << 16) | (g << 8) | b;
+            return accentTint(0xff1d1f21,accent,8);
         }
         int r=(requested>>>16)&255,g=(requested>>>8)&255,b=requested&255;
         int pr=(page>>>16)&255,pg=(page>>>8)&255,pb=page&255;
@@ -23,6 +20,14 @@ public final class SettingsCardStyle {
             r=Math.max(0,Math.min(255,r+shift));g=Math.max(0,Math.min(255,g+shift));b=Math.max(0,Math.min(255,b+shift));
         }
         return 0xFF000000|(r<<16)|(g<<8)|b;
+    }
+    /** Mix only RGB, retaining native material opacity. Shared with optional chat surfaces. */
+    public static int accentTint(int color,int accent,int percent) {
+        int amount=Math.max(0,Math.min(100,percent)),base=100-amount;
+        int r=(((color>>>16)&255)*base+((accent>>>16)&255)*amount+50)/100;
+        int g=(((color>>>8)&255)*base+((accent>>>8)&255)*amount+50)/100;
+        int b=((color&255)*base+(accent&255)*amount+50)/100;
+        return (color&0xff000000)|(r<<16)|(g<<8)|b;
     }
     private static int luminance(int color) {
         return ((color>>>16)&255)*299+((color>>>8)&255)*587+(color&255)*114;

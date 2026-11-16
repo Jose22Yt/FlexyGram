@@ -18,7 +18,7 @@ public final class HeaderSurface {
     }
 
     public void draw(Canvas canvas, HeaderGeometry g, float density, Theme.ResourcesProvider provider) {
-        int color = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
+        int color = app.flexygram.chat.ConversationSurfaceTint.apply(Theme.getColor(Theme.key_windowBackgroundWhite, provider), provider);
         boolean effects = org.telegram.messenger.SharedConfig.chatBlurEnabled();
         int opacity = HeaderConfig.opacity();
         int dividerColor = effects ? Theme.getColor(Theme.key_divider, provider) : 0;

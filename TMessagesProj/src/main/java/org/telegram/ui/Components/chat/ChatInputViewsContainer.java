@@ -48,6 +48,7 @@ public class ChatInputViewsContainer extends FrameLayout {
     private boolean flexyPearlGlass;
     private final SharedPreferences.OnSharedPreferenceChangeListener flexyListener = (prefs, key) -> {
         flexyPearlGlass = FlexyComposerConfig.glass();
+        prepareCompactGlass();
         // Surface changes never request layout or change insets.
         invalidate();
     };
@@ -116,6 +117,7 @@ public class ChatInputViewsContainer extends FrameLayout {
         super.onAttachedToWindow();
         flexyPearlGlass = FlexyComposerConfig.glass();
         FlexyComposerConfig.preferences().registerOnSharedPreferenceChangeListener(flexyListener);
+        prepareCompactGlass();
     }
 
     @Override protected void onDetachedFromWindow() {
@@ -143,11 +145,22 @@ public class ChatInputViewsContainer extends FrameLayout {
     private boolean flexySendDrawn;
     private boolean flexyNativeGlassDrawn;
     private final float[] compactGlassRadius = {-1, -1, -1, -1};
+    private org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory compactGlassFactory;
+    private org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProvider compactGlassColors;
+    private org.telegram.ui.ActionBar.Theme.ResourcesProvider conversationResources;
+    public void setConversationResources(org.telegram.ui.ActionBar.Theme.ResourcesProvider resources) { conversationResources=resources; }
+    private int tintSurface(int color) { return app.flexygram.chat.ConversationSurfaceTint.apply(color,conversationResources); }
     public void setCompactGlassFactory(org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory factory,
             org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProvider colors) {
-        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
-        for (int i = 0; i < compactGlass.length; i++) {
-            compactGlass[i] = factory.create(this, colors).setPadding(0);
+        compactGlassFactory=factory;compactGlassColors=colors;
+        prepareCompactGlass();
+    }
+    private void prepareCompactGlass() {
+        // Classic/default chat never allocates the four extra island materials.
+        if(compactGlassFactory==null || compactGlass[0]!=null || !FlexyComposerConfig.compact()
+                || !org.telegram.messenger.SharedConfig.chatBlurEnabled())return;
+        for(int i=0;i<compactGlass.length;i++){
+            compactGlass[i]=compactGlassFactory.create(this,compactGlassColors).setPadding(0);
             compactGlass[i].setAlpha(0);
         }
     }
@@ -165,6 +178,7 @@ public class ChatInputViewsContainer extends FrameLayout {
     }
 
     public void updateNativeLiquidGlassPolicy(boolean allowed) {
+        prepareCompactGlass();
         updateNativeLiquidGlassDrawable(blurredBackgroundDrawable, allowed);
         updateNativeLiquidGlassDrawable(underKeyboardBackgroundDrawable, allowed);
         for (BlurredBackgroundDrawable drawable : compactGlass) updateNativeLiquidGlassDrawable(drawable, allowed);
@@ -460,7 +474,7 @@ public class ChatInputViewsContainer extends FrameLayout {
             tmpRectF.inset(-dp(7),-dp(7));tmpRectF.round(tmpRect);blurredBackgroundDrawable.setBounds(tmpRect);
             canvas.save();canvas.clipPath(signatureChannelMask);blurredBackgroundDrawable.draw(canvas);canvas.restore();
             flexySurface.setColor(ColorUtils.setAlphaComponent(app.flexygram.composer.ComposerStyle.surface(dark,false),(dark?80:60)*blurredBackgroundDrawable.getAlpha()/255));
-        }else flexySurface.setColor(app.flexygram.composer.ComposerStyle.surface(dark,false));
+        }else flexySurface.setColor(tintSurface(app.flexygram.composer.ComposerStyle.surface(dark,false)));
         flexySurface.setAlpha(Math.round(flexySurface.getAlpha()*flexyChannels.getSignatureAlpha()));
         canvas.drawRoundRect(signatureChannelMiddle,radius,radius,flexySurface);
         if(!signatureChannelLeft.isEmpty())canvas.drawRoundRect(signatureChannelLeft,radius,radius,flexySurface);
@@ -525,7 +539,7 @@ public class ChatInputViewsContainer extends FrameLayout {
         final boolean attach = flexyComposer.getFlexyAttachmentBounds(flexyAttach);
         if (attach) flexyAttach.offset(offsetX, offsetY);
         final float radius = flexyComposer.getFlexyActionDiameter() / 2f;
-        final boolean nativeGlass = !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && compactGlass[0] != null && canvas.isHardwareAccelerated()
+        final boolean nativeGlass = compactGlass[0] != null && canvas.isHardwareAccelerated()
                 && flexyComposer.flexyNativeGlassIslandsAvailable();
         if (nativeGlass) {
             drawFlexyNativeGlassIslands(canvas, offsetX, offsetY, radius, attach);
@@ -572,7 +586,7 @@ public class ChatInputViewsContainer extends FrameLayout {
         } else {
             // Opaque, legible off-white/charcoal surfaces without a full-width backing.
             final int panel = flexyComposer.getThemedColor(Theme.key_chat_messagePanelBackground);
-            flexySurface.setColor(app.flexygram.composer.ComposerStyle.surface(ColorUtils.calculateLuminance(panel) < 0.4, false));
+            flexySurface.setColor(tintSurface(app.flexygram.composer.ComposerStyle.surface(ColorUtils.calculateLuminance(panel) < 0.4, false)));
             canvas.drawRoundRect(flexyPill, radius, radius, flexySurface);
             if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexySurface);
         }

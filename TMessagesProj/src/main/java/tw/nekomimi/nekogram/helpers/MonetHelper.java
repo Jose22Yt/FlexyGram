@@ -709,7 +709,8 @@ public class MonetHelper {
     }
 
     public static boolean useMonetMd3Colors() {
-        return NaConfig.INSTANCE.getSwitchStyle().Int() == SWITCH_STYLE_MD3
+        int style=NaConfig.INSTANCE.getSwitchStyle().Int();
+        return (style == SWITCH_STYLE_MD3 || style == org.telegram.ui.Components.Switch.SWITCH_STYLE_OUTLINED)
             && Theme.getActiveTheme() != null
             && Theme.getActiveTheme().isMonet();
     }

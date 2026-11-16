@@ -193,7 +193,8 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     private final AbstractConfigCell switchStyleRow = cellGroup.appendCell(new ConfigCellSelectBox("SwitchStyle", NaConfig.INSTANCE.getSwitchStyle(), new String[]{
             getString(R.string.Default),
             getString(R.string.StyleModern),
-            getString(R.string.StyleMaterialDesign3)
+            getString(R.string.StyleMaterialDesign3),
+            getString(R.string.FlexySwitchOutlined)
     }, null));
     private final AbstractConfigCell sliderStyleRow = cellGroup.appendCell(new ConfigCellSelectBox("SliderStyle", NaConfig.INSTANCE.getSliderStyle(), new String[]{
             getString(R.string.Default),

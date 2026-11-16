@@ -43,7 +43,7 @@ public class Probe {
 def test_independent_flags_and_retained_chat_sources_switch_without_reopening(tmp_path):
     shared = method((JAVA/'org/telegram/messenger/SharedConfig.java').read_text(), 'public static boolean chatBlurEnabled()')
     refresh = method((JAVA/'org/telegram/ui/ChatActivity.java').read_text(), 'private void refreshSignatureNativeGlassPolicy()')
-    probe(tmp_path, {'Probe.java': '''
+    probe(tmp_path, {'app/flexygram/chat/ConversationSurfaceTint.java':'package app.flexygram.chat;public class ConversationSurfaceTint{public static boolean on;public static boolean enabled(){return on;}}','Probe.java': '''
 public class Probe {
  static class LiteMode {
   static final int FLAG_CHAT_BLUR=1,FLAG_LIQUID_GLASS=2;static int flags;
@@ -60,7 +60,7 @@ public class Probe {
  static class Bar {boolean liquid;void updateSignatureNativeGlassPolicy(boolean b){liquid=b;}}
  static class Input {boolean liquid;void updateNativeLiquidGlassPolicy(boolean b){liquid=b;}}
  static class View {void invalidate(){}}
- boolean signatureNativeGlassAllowed,signatureLiquidGlassAllowed;
+ boolean signatureNativeGlassAllowed,signatureLiquidGlassAllowed,signatureSurfaceTintEnabled;
  DownscaleScrollableNoiseSuppressor scrollableViewNoiseSuppressor=new DownscaleScrollableNoiseSuppressor();
  Source glassBackgroundSourceRenderNode=new Source(),glassBackgroundSourceFrostedRenderNode=new Source();
  Factory glassBackgroundDrawableFactory=new Factory(),glassBackgroundDrawableFactoryFrosted=new Factory();
@@ -131,7 +131,7 @@ public class Probe {
 
 def test_alpha_animation_reuses_display_list_and_notifies_only_on_reentry(tmp_path):
     body = method((JAVA/'org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawableRenderNode.java').read_text(), 'public void setAlpha(int alpha)')
-    probe(tmp_path, {'Probe.java': '''
+    probe(tmp_path, {'app/flexygram/chat/ConversationSurfaceTint.java':'package app.flexygram.chat;public class ConversationSurfaceTint{public static boolean on;public static boolean enabled(){return on;}}','Probe.java': '''
 public class Probe extends Base {
  static class Node {int updates;void setAlpha(float a){updates++;}}
  static class Source {int positions;void dispatchOnDrawablesRelativePositionChange(){positions++;}}

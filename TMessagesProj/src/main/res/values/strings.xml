@@ -11546,4 +11546,11 @@
     <string name="FlexyKyantDockTitle">Kyant Liquid Glass</string>
     <string name="FlexyKyantDockSubtitle">Only on the main screen bottom bar</string>
     <string name="FlexyKyantDockInfo">Optional material for this bar on Android 13 or later. Other surfaces keep Telegram glass and its existing settings.</string>
+
+    <string name="FlexyConversationAccentTitle">Theme accent on chat interfaces</string>
+    <string name="FlexyConversationAccentSubtitle">Subtle theme color on the header and message composer</string>
+    <string name="FlexyConversationAccentInfo">Applies to both chat interfaces. Blur and Liquid Glass continue to follow their existing settings.</string>
+    <string name="FlexySwitchStyleTitle">Switch style</string>
+    <string name="FlexySwitchCurrent">FlexyGram</string>
+    <string name="FlexySwitchOutlined">Outline with cross and check</string>
 </resources>

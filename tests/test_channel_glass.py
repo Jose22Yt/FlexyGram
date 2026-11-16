@@ -62,6 +62,7 @@ public class ChannelGlassRegression {
     final Channels flexyChannels=new Channels();final View inputIslandBubbleContainer=new View();boolean flexyPearlGlass;
     int dp(float n){return Math.round(n);}
     void drawCompactGlass(Canvas canvas,int index,RectF r,float radius){canvas.draws.add("native"+index);}
+    int tintSurface(int color){return color;} // Explicit default-OFF tint service; color behavior tested separately.
     DRAW
     static void require(boolean ok,String message){if(!ok)throw new AssertionError(message);}
     public static void main(String[] args){
