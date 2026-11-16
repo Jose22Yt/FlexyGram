@@ -1,5 +1,6 @@
 """Source compatibility checks; Android pixel/controller checks live in tools/glare/android."""
 import subprocess
+import re
 from pathlib import Path
 import xml.etree.ElementTree as E
 ROOT=Path(__file__).resolve().parents[1]
@@ -18,6 +19,7 @@ def test_no_preference_migration_or_backend_replacement():
    getter='\n    /** Native metadata only; account/session preferences are not part of this catalog. */\n    fun getStudioItems(): List<ConfigItem> = configs.toList()\n'
    assert current.count(getter)==1
    current=without_width_extension(current.replace(getter,'').replace('        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return 0\n',''))
+   current=re.sub(r'\n\n    // BEGIN original Extera player configuration \(Telegram 13\.0\.2\)\.\n.*?    // END original Extera player configuration\.\n','',current,flags=re.S)
   if p.endswith('GlassOutlineStyle.java'):
    current=current.replace('    HIDDEN,\n    /** Fine translucent black rim, appended to preserve existing ordinals. */\n    MICRO;', '    HIDDEN;')
   assert current==subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT,text=True)

@@ -143,3 +143,42 @@ def test_custom_music_queue_actions_do_not_read_playback_state(tmp_path):
  BODY
  public static void main(String[]args){if(eligible(null)||eligible(new MessageObject()))throw new AssertionError();}
 }'''.replace('BODY',body)})
+
+
+def test_original_player_configuration_exports_cover_all_java_accesses():
+    appearance=(ROOT/'TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt').read_text()
+    fields=set(re.findall(r'@JvmField\s+val\s+(\w+)',appearance))
+    functions=set(re.findall(r'@JvmStatic\s+fun\s+(\w+)',appearance))
+    references=set()
+    for p in (JAVA/'app/exteraless/player/baseline').glob('*.java'):
+        references.update(re.findall(r'AppearanceConfig\.(\w+)',p.read_text()))
+    assert not references-fields-functions, sorted(references-fields-functions)
+    assert {'playerMiniTop','playerCoverStyle','playerControlsSize'} <= fields
+    assert 'playerStyleItems' in functions
+
+
+def test_original_player_resource_dependencies_have_default_definitions():
+    res=ROOT/'TMessagesProj/src/main/res'
+    known=set()
+    for directory in res.iterdir():
+        if not directory.is_dir(): continue
+        kind=directory.name.split('-')[0]
+        for p in directory.iterdir():
+            if not p.is_file(): continue
+            if kind!='values': known.add((kind,p.name.split('.')[0]))
+            if p.suffix!='.xml': continue
+            for node in ET.parse(p).getroot().iter():
+                if directory.name=='values' and node.get('name'):
+                    tag=node.get('type') if node.tag=='item' else node.tag
+                    if tag in ['string-array','integer-array']: tag='array'
+                    known.add((tag,node.get('name').replace('.','_')))
+                for value in node.attrib.values():
+                    for name in re.findall(r'@\+id/(\w+)',value): known.add(('id',name))
+    references=set()
+    for p in (JAVA/'app/exteraless/player/baseline').glob('*.java'):
+        references.update(re.findall(r'(?<!android\.)\bR\.(\w+)\.(\w+)',p.read_text()))
+    assert not references-known, sorted(references-known)
+    base=ET.parse(res/'values/native_player_original.xml').getroot()
+    spanish=ET.parse(res/'values-es/native_player_original.xml').getroot()
+    assert {n.get('name') for n in base}=={n.get('name') for n in spanish}
+    assert all(n.text and n.text.strip() for n in [*base,*spanish])

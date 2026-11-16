@@ -5,7 +5,8 @@
   "adaptations": [
     "Player package renamed to app.exteraless.player.baseline to avoid loading the modified player",
     "MainTabsActivity retains openChatsSearch compatibility, a Settings entry and visible-surface reporting",
-    "MainTabsUiHelper retains a compatibility height alias"
+    "MainTabsUiHelper retains a compatibility height alias",
+    "Original player ConfigItems and only missing original string keys restored alongside the player graph"
   ],
   "files": [
     {
@@ -103,6 +104,18 @@
     {
       "path": "TMessagesProj/src/main/java/org/telegram/ui/MainTabsLayout.java",
       "upstream_sha256": "2fde86f0682a3c39f33c87b406e7666749c4195b18e9552a8d77351dd9df2d37"
+    },
+    {
+      "path": "TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt",
+      "upstream_sha256": "f273d4dbbb63a31f24af5e1ddce760ae59ff0b35ea19e9043151e94cc5f45ef3"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_oe_player.xml",
+      "upstream_sha256": "f30e470a893bb496c1283ff021aa0f7a0b7b9cd3304826314a94299d5b8900e4"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/strings_oe_player.xml",
+      "upstream_sha256": "1eadfb78d54356f621e8f86b4bcf5dc649b69c2b5850626262f03f51e56a2e98"
     }
   ]
 }
