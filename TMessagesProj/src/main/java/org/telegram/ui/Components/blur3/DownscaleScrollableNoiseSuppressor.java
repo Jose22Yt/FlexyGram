@@ -26,7 +26,7 @@ import java.util.List;
 
 @RequiresApi(api = Build.VERSION_CODES.S)
 public class DownscaleScrollableNoiseSuppressor {
-    public final boolean isLiquidGlassEnabled;
+    public final boolean isKyantGlassEnabled;
     public final boolean allowNoiseSuppress;
     private final boolean simpleMode;
     private final int k;
@@ -36,12 +36,12 @@ public class DownscaleScrollableNoiseSuppressor {
     }
 
     public DownscaleScrollableNoiseSuppressor(boolean simple, boolean allowNoiseSuppress) {
-        isLiquidGlassEnabled = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
+        isKyantGlassEnabled = LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS);
         simpleMode = simple;
-        k = isLiquidGlassEnabled || allowNoiseSuppress ? 1 : 8; // 1
+        k = isKyantGlassEnabled || allowNoiseSuppress ? 1 : 8; // 1
 
         this.allowNoiseSuppress = allowNoiseSuppress;
-        resultRenderNodes = new RenderNode[isLiquidGlassEnabled || !simpleMode ? 2 : 1];
+        resultRenderNodes = new RenderNode[isKyantGlassEnabled || !simpleMode ? 2 : 1];
         for (int a = 0; a < resultRenderNodes.length; a++) {
             resultRenderNodes[a] = new RenderNode(null);
         }
@@ -56,13 +56,13 @@ public class DownscaleScrollableNoiseSuppressor {
             throw new IllegalStateException();
         }
 
-        if (!isLiquidGlassEnabled && simpleMode) {
+        if (!isKyantGlassEnabled && simpleMode) {
             canvas.drawRenderNode(resultRenderNodes[0]);
             return;
         }
 
         if (index == DRAW_GLASS) {
-            canvas.drawRenderNode(resultRenderNodes[isLiquidGlassEnabled ? 0 : 1]);
+            canvas.drawRenderNode(resultRenderNodes[isKyantGlassEnabled ? 0 : 1]);
         } else if (index == DRAW_FROSTED_GLASS_NO_SATURATION) {
             canvas.drawRenderNode(resultRenderNodes[0]);
         } else if (index == DRAW_FROSTED_GLASS) {
@@ -72,10 +72,10 @@ public class DownscaleScrollableNoiseSuppressor {
 
     public void drawInline(Canvas canvas, int index) {
         final int a;
-        if (!isLiquidGlassEnabled && simpleMode) {
+        if (!isKyantGlassEnabled && simpleMode) {
             a = 0;
         } else if (index == DRAW_GLASS) {
-            a = isLiquidGlassEnabled ? 0 : 1;
+            a = isKyantGlassEnabled ? 0 : 1;
         } else if (index == DRAW_FROSTED_GLASS_NO_SATURATION) {
             a = 0;
         } else if (index == DRAW_FROSTED_GLASS) {
@@ -347,7 +347,7 @@ public class DownscaleScrollableNoiseSuppressor {
 
     private RenderNode getRenderNode(int a, int b) {
         final SourcePart sourcePart = rectRenderNodes.get(b);
-        if (isLiquidGlassEnabled && sourcePart.renderNodesForGlass != null) {
+        if (isKyantGlassEnabled && sourcePart.renderNodesForGlass != null) {
             if (a == 0) {
                 return (sourcePart.renderNodesForGlass.renderNodeRestored[0]);
             } else {
@@ -406,10 +406,10 @@ public class DownscaleScrollableNoiseSuppressor {
         long lastHash;
 
         private SourcePart() {
-            if (isLiquidGlassEnabled) {
+            if (isKyantGlassEnabled) {
                 renderNodesForGlass = new DownscaledRenderNode("glass", 0, true);
                 renderNodesForGlass.setScale(4, 4);
-                renderNodesForGlass.setPrimaryEffectBlur(dpf2(6f), RenderNodeEffects.getSaturationX3RenderEffect());
+                renderNodesForGlass.setPrimaryEffectBlur(dpf2(8f), RenderNodeEffects.createSaturationXRenderEffect(1.5f));
                 renderNodesForBlur = new DownscaledRenderNode("blur", 0);
                 renderNodesForBlur.setScale(8, 8);
                 renderNodesForBlur.setPrimaryEffectBlur(dpf2(40 - 1.66f));

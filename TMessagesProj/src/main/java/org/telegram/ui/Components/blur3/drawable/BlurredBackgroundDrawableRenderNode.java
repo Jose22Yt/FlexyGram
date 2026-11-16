@@ -15,7 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Components.blur3.LiquidGlassEffect;
+import app.flexygram.kyant.KyantGlassEffect;
 import org.telegram.ui.Components.blur3.source.BlurredBackgroundSource;
 
 @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -68,21 +68,25 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
         return super.setClipToOutline(clipToOutline);
     }
 
-    private LiquidGlassEffect liquidGlassEffect;
+    private KyantGlassEffect kyantGlassEffect;
+    private boolean kyantSurface;
+    private boolean kyantEffectAllowed;
+
+    public void setKyantSurface(boolean eligible) { kyantSurface = eligible; }
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    public void setLiquidGlassEffectAllowed() {
-        setLiquidGlassEffectAllowed(true);
+    public void setKyantEffectAllowed() {
+        setKyantEffectAllowed(true);
     }
 
     /** Policy changes reuse this native drawable; an OFF transition must clear the old GPU effect. */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    public void setLiquidGlassEffectAllowed(boolean allowed) {
-        if (allowed == (liquidGlassEffect != null)) return;
-        if (allowed) {
-            liquidGlassEffect = new LiquidGlassEffect(renderNodeFill);
-        } else {
-            liquidGlassEffect = null;
+    public void setKyantEffectAllowed(boolean allowed) {
+        allowed = allowed && kyantSurface;
+        if (allowed == kyantEffectAllowed) return;
+        kyantEffectAllowed = allowed;
+        if (!allowed) {
+            kyantGlassEffect = null;
             renderNodeFill.setRenderEffect(null);
         }
         invalidateDisplayList();
@@ -151,19 +155,11 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
             c = renderNodeFill.beginRecording();
             c.save();
             c.translate(-sL, -sT);
-            if (liquidGlassEffect != null && Build.VERSION.SDK_INT >= 33) {
-                final int thickness = Math.max(Math.min(
-                    boundProps.liquidThickness <= 0 ? dp(11) : boundProps.liquidThickness,
-                    Math.min(boundProps.boundsWithPadding.width(), boundProps.boundsWithPadding.height()) / 5), 1);
-
-                liquidGlassEffect.update(
-                    0, 0, boundProps.boundsWithPadding.width(), boundProps.boundsWithPadding.height(),
-                    boundProps.shaderRadii[0], boundProps.shaderRadii[2], boundProps.shaderRadii[4], boundProps.shaderRadii[6],
-                    thickness,
-                    boundProps.liquidIntensity,
-                    boundProps.liquidIndex,
-                    backgroundColor
-                );
+            if (kyantEffectAllowed && Build.VERSION.SDK_INT >= 33) {
+                // Hidden surfaces never compile a runtime shader during screen construction.
+                if (kyantGlassEffect == null) kyantGlassEffect = new KyantGlassEffect(renderNodeFill);
+                kyantGlassEffect.update(boundProps.boundsWithPadding.width(), boundProps.boundsWithPadding.height(),
+                    boundProps.shaderRadii[0], boundProps.shaderRadii[2], boundProps.shaderRadii[4], boundProps.shaderRadii[6]);
             }
             source.draw(c, sL, sT, sR, sB);
             c.restore();
@@ -176,7 +172,7 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
             c.drawColor(backgroundColor);
         } else {
             c.drawRenderNode(renderNodeFill);
-            if (liquidGlassEffect == null && Color.alpha(backgroundColor) != 0) {
+            if (Color.alpha(backgroundColor) != 0) {
                 c.drawColor(backgroundColor);
             }
         }
@@ -226,6 +222,9 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
             return;
         }
 
+        if (Build.VERSION.SDK_INT >= 33 && kyantSurface) {
+            setKyantEffectAllowed(org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_KYANT_GLASS));
+        }
         if (!renderNode.hasDisplayList()) {
             source.dispatchOnDrawablesRelativePositionChange();
             updateDisplayList();

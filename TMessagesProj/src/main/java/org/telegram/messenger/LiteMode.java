@@ -41,8 +41,8 @@ public class LiteMode {
     public static final int FLAG_CHAT_BLUR = 256;
     public static final int FLAG_CHAT_SCALE = 32768;
     public static final int FLAG_CHAT_THANOS = 65536;
-    public static final int FLAG_LIQUID_GLASS = 1 << 18;
-    public static final int FLAGS_CHAT = FLAG_CHAT_BACKGROUND | FLAG_CHAT_FORUM_TWOCOLUMN | FLAG_CHAT_SPOILER | FLAG_CHAT_BLUR | FLAG_CHAT_SCALE | FLAG_CHAT_THANOS | FLAG_LIQUID_GLASS;
+    public static final int FLAG_KYANT_GLASS = 1 << 18;
+    public static final int FLAGS_CHAT = FLAG_CHAT_BACKGROUND | FLAG_CHAT_FORUM_TWOCOLUMN | FLAG_CHAT_SPOILER | FLAG_CHAT_BLUR | FLAG_CHAT_SCALE | FLAG_CHAT_THANOS | FLAG_KYANT_GLASS;
 
     public static final int FLAG_CALLS_ANIMATIONS = 512;
     public static final int FLAG_AUTOPLAY_VIDEOS = 1024;
@@ -217,7 +217,7 @@ public class LiteMode {
         if (!preferences.contains("lite_mode6")) {
             if (preferences.contains("lite_mode5")) {
                 defaultValue = preferences.getInt("lite_mode5", defaultValue);
-                defaultValue &=~ FLAG_LIQUID_GLASS;
+                defaultValue &=~ FLAG_KYANT_GLASS;
                 preferences.edit().putInt("lite_mode6", defaultValue).apply();
             } else if (preferences.contains("lite_mode4")) {
                 defaultValue = preferences.getInt("lite_mode4", defaultValue);
@@ -286,10 +286,16 @@ public class LiteMode {
                 && !preferences.contains("lite_mode4") && !preferences.contains("lite_mode3")
                 && !preferences.contains("lite_mode2") && !preferences.contains("lite_mode")
                 && !preferences.contains("light_mode") && !preferences.contains("chatBlur")) {
-            defaultValue &= ~(FLAG_CHAT_BLUR | FLAG_LIQUID_GLASS);
+            defaultValue &= ~(FLAG_CHAT_BLUR | FLAG_KYANT_GLASS);
         }
         int prevValue = value;
         value = preferences.getInt("lite_mode6", defaultValue);
+        // One-time migration of the optimized base to the requested Kyant material.
+        // Subsequent user OFF choices are preserved; power saver still gates isEnabled().
+        if (!preferences.contains("kyant_material_v1")) {
+            if (Build.VERSION.SDK_INT >= 33) value |= FLAG_KYANT_GLASS;
+            preferences.edit().putInt("lite_mode6", value).putBoolean("kyant_material_v1", true).apply();
+        }
         if (loaded) {
             onFlagsUpdate(prevValue, value);
         }

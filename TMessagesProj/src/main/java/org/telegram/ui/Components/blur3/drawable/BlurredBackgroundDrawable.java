@@ -262,7 +262,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         // FlexyGram frosted mode shares the native downsampled source and contour.
         // No refraction shader or second background capture is needed.
         if (org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_CHAT_BLUR)
-                && !org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)) {
+                && !org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_KYANT_GLASS)) {
             backgroundColor = app.exteraless.appearance.GlassContrastPolicy.frostedSurface(backgroundColor);
         }
         shadowColor = glare ? colorProvider.getShadowColor() : 0;

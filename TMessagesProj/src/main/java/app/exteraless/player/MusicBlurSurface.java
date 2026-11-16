@@ -97,7 +97,7 @@ final class MusicBlurSurface extends Drawable {
         geometryDirty=false;
         }
         if(allowGlass&&android.os.Build.VERSION.SDK_INT>=33&&canvas.isHardwareAccelerated()&&bitmap!=null&&!bitmap.isRecycled()
-                &&LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS)){
+                &&LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS)){
             int save = canvas.save();
             canvas.clipPath(clip);
             if(glass==null)glass=new MusicGlassRenderer(target,radius);

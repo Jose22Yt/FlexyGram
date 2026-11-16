@@ -26,7 +26,7 @@ final class MusicGlassRenderer {
     private final Matrix cropMatrix = new Matrix();
     private int width,height,surface,outline;
     MusicGlassRenderer(View target,float radius){
-        BlurredBackgroundDrawableViewFactory factory=new BlurredBackgroundDrawableViewFactory(source);factory.setLiquidGlassEffectAllowed(true);
+        BlurredBackgroundDrawableViewFactory factory=new BlurredBackgroundDrawableViewFactory(source);factory.setKyantEffectAllowed(true);
         drawable=factory.create(target,new BlurredBackgroundColorProvider(){
             public int getShadowColor(){return 0;}
             public int getBackgroundColor(){return (surface&0xffffff)|0x99000000;}

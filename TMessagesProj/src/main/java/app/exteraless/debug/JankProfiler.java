@@ -642,7 +642,7 @@ public final class JankProfiler {
         out.append("sampling: trigger ").append(TRIGGER_NS / 1_000_000).append(" ms, interval ").append(SAMPLE_INTERVAL_MS)
                 .append(" ms, slow message >= ").append(SLOW_NS / 1_000_000).append(" ms\n");
         out.append("debug logs: ").append(BuildVars.LOGS_ENABLED ? "on" : "off")
-                .append(", liquid glass: ").append(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? "on" : "off")
+                .append(", liquid glass: ").append(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS) ? "on" : "off")
                 .append(", chat blur: ").append(LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR) ? "on" : "off").append('\n');
         appendPlugins(out);
 

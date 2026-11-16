@@ -201,15 +201,15 @@ def test_opaque_native_material_skips_backdrop_recording_and_transparency_restor
  static class Rect {int left,top,right=200,bottom=60;int width(){return right-left;}int height(){return bottom-top;}}
  static class Props {Rect boundsWithPadding=new Rect();int liquidThickness;float liquidIntensity,liquidIndex,strokeWidthTop,strokeWidthBottom;float[]radii=new float[8],shaderRadii=new float[8];boolean useFullStroke;Object strokePathTop;}
  static class Source {int draws;void draw(Canvas c,float a,float b,float d,float e){draws++;}}
- static class Liquid {int updates;void update(Object...args){updates++;}}
- float sourceOffsetX,sourceOffsetY;Props boundProps=new Props();Node renderNode=new Node(),renderNodeFill=new Node();Source source=new Source();Liquid liquidGlassEffect=new Liquid();int backgroundColor,strokeColorTop,strokeColorBottom,strokeColorFull;Object paintStrokeTop,paintStrokeBottom,paintStrokeFull;
+ static class KyantGlassEffect {static int updates,creates;KyantGlassEffect(Node n){creates++;}void update(Object...args){updates++;}}
+ float sourceOffsetX,sourceOffsetY;Props boundProps=new Props();Node renderNode=new Node(),renderNodeFill=new Node();Source source=new Source();boolean kyantEffectAllowed=true;KyantGlassEffect kyantGlassEffect;int backgroundColor,strokeColorTop,strokeColorBottom,strokeColorFull;Object paintStrokeTop,paintStrokeBottom,paintStrokeFull;
  void drawStrokeRaw(Object...args){}
  UPDATE
  public static void main(String[]args){Probe p=new Probe();p.backgroundColor=0xff123456;
  for(int i=0;i<1000;i++)p.updateDisplayList();
- if(p.source.draws!=0||p.renderNodeFill.records!=0||p.liquidGlassEffect.updates!=0||p.renderNode.records!=1000)throw new AssertionError();
- p.backgroundColor=0x80123456;p.updateDisplayList();if(p.source.draws!=1||p.liquidGlassEffect.updates!=1)throw new AssertionError();
- p.liquidGlassEffect=null;p.updateDisplayList();if(p.source.draws!=2)throw new AssertionError();
+ if(p.source.draws!=0||p.renderNodeFill.records!=0||KyantGlassEffect.updates!=0||p.renderNode.records!=1000||KyantGlassEffect.creates!=0)throw new AssertionError();
+ p.backgroundColor=0x80123456;p.updateDisplayList();if(p.source.draws!=1||KyantGlassEffect.updates!=1)throw new AssertionError();
+ p.kyantEffectAllowed=false;p.updateDisplayList();if(p.source.draws!=2)throw new AssertionError();
  }}'''.replace('UPDATE', update)})
 
 
@@ -245,29 +245,19 @@ public class Probe {static void check(boolean v){if(!v)throw new AssertionError(
     }, [JAVA/'org/telegram/ui/Components/chat/ViewPositionWatcher.java'])
 
 
-def test_glass_reads_program_once_but_never_shares_mutable_shaders(tmp_path):
+def test_kyant_reads_program_once_but_never_shares_mutable_shaders(tmp_path):
     probe(tmp_path, {
-        'androidx/annotation/RequiresApi.java': 'package androidx.annotation;public @interface RequiresApi{int api();}',
-        'android/graphics/Color.java': '''package android.graphics;public class Color {
- public static int alpha(int c){return c>>>24;}public static int red(int c){return c>>>16&255;}
- public static int green(int c){return c>>>8&255;}public static int blue(int c){return c&255;}}''',
-        'android/graphics/RuntimeShader.java': '''package android.graphics;public class RuntimeShader {
- public static int instances;public RuntimeShader(String code){if(!code.equals("program"))throw new AssertionError();instances++;}
- public void setFloatUniform(String key,float...v){}}''',
-        'android/graphics/RenderEffect.java': '''package android.graphics;public class RenderEffect {
- public static int creates;public RuntimeShader shader;public static RenderEffect createRuntimeShaderEffect(RuntimeShader s,String key){creates++;RenderEffect e=new RenderEffect();e.shader=s;return e;}}''',
-        'android/graphics/RenderNode.java': '''package android.graphics;public class RenderNode {
- public RenderEffect effect;public int getWidth(){return 200;}public int getHeight(){return 60;}public void setRenderEffect(RenderEffect e){effect=e;}}''',
-        'org/telegram/messenger/AndroidUtilities.java': 'package org.telegram.messenger;public class AndroidUtilities {public static int reads;public static String readRes(int id){reads++;return "program";}}',
-        'org/telegram/messenger/R.java': 'package org.telegram.messenger;public class R {public static class raw{public static int liquid_glass_shader;}}',
-        'Probe.java': '''import android.graphics.*;import org.telegram.ui.Components.blur3.LiquidGlassEffect;import org.telegram.messenger.AndroidUtilities;
-public class Probe {public static void main(String[]args){java.util.Set<RuntimeShader>shaders=new java.util.HashSet<>();
- for(int i=0;i<1000;i++){RenderNode n=new RenderNode();LiquidGlassEffect glass=new LiquidGlassEffect(n);shaders.add(n.effect.shader);
- glass.update(0,0,200,60,20,20,20,20,10,1,1,0x80123456);int effects=RenderEffect.creates;
- for(int j=0;j<100;j++)glass.update(0,0,200,60,20,20,20,20,10,1,1,0x80123456);
- if(RenderEffect.creates!=effects)throw new AssertionError("unchanged uniforms rebuild effect");
- glass.update(0,0,200,60,20,20,20,20,10,1,1,0x80334455);if(RenderEffect.creates!=effects+1)throw new AssertionError();
- }
- if(AndroidUtilities.reads!=1||shaders.size()!=1000||RuntimeShader.instances!=1000)throw new AssertionError();
- }}'''
-    }, [JAVA/'org/telegram/ui/Components/blur3/LiquidGlassEffect.java'])
+        'androidx/annotation/RequiresApi.java':'package androidx.annotation;public @interface RequiresApi{int value();}',
+        'android/graphics/RuntimeShader.java':'''package android.graphics;public class RuntimeShader{public static int instances;public RuntimeShader(String code){if(!code.equals("program"))throw new AssertionError();instances++;}public void setFloatUniform(String key,float...v){}}''',
+        'android/graphics/RenderEffect.java':'''package android.graphics;public class RenderEffect{public static int creates;public RuntimeShader shader;public static RenderEffect createRuntimeShaderEffect(RuntimeShader s,String key){if(!key.equals("content"))throw new AssertionError();creates++;RenderEffect e=new RenderEffect();e.shader=s;return e;}}''',
+        'android/graphics/RenderNode.java':'package android.graphics;public class RenderNode{public RenderEffect effect;public void setRenderEffect(RenderEffect e){effect=e;}}',
+        'org/telegram/messenger/AndroidUtilities.java':'package org.telegram.messenger;public class AndroidUtilities{public static int reads;public static String readRes(int id){reads++;return "program";}public static float dpf2(float v){return v;}}',
+        'org/telegram/messenger/R.java':'package org.telegram.messenger;public class R{public static class raw{public static final int kyant_rounded_rect_refraction=1;}}',
+        'Probe.java':'''import android.graphics.*;import app.flexygram.kyant.KyantGlassEffect;import org.telegram.messenger.AndroidUtilities;
+public class Probe{public static void main(String[]args){java.util.Set<RuntimeShader> shaders=new java.util.HashSet<>();
+for(int i=0;i<1000;i++){RenderNode n=new RenderNode();KyantGlassEffect glass=new KyantGlassEffect(n);glass.update(200,60,20,20,20,20);shaders.add(n.effect.shader);int effects=RenderEffect.creates;
+for(int j=0;j<100;j++)glass.update(200,60,20,20,20,20);
+if(RenderEffect.creates!=effects)throw new AssertionError("unchanged uniforms rebuild effect");
+glass.update(200,60,21,20,20,20);if(RenderEffect.creates!=effects+1)throw new AssertionError("geometry update lost");}
+if(AndroidUtilities.reads!=1||shaders.size()!=1000||RuntimeShader.instances!=1000)throw new AssertionError();}}'''
+    },[JAVA/'app/flexygram/kyant/KyantGlassEffect.java'])

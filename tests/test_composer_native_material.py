@@ -62,6 +62,6 @@ def test_composer_keeps_native_policy_and_solid_fallback():
     assert draw.index('drawFlexyNativeGlassIslands(') < draw.index('if (flexyPearlGlass')
     assert 'ComposerStyle.surface(' in draw
     assert 'drawFlexyComposerTint' not in source
-    policy = method(source, 'public void updateNativeLiquidGlassPolicy(')
+    policy = method(source, 'public void updateKyantGlassPolicy(')
     assert 'for (BlurredBackgroundDrawable drawable : compactGlass)' in policy
     assert 'flexyComposer.invalidateNativeGlassColors()' in policy

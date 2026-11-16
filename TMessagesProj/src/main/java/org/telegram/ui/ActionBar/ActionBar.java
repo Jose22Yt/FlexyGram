@@ -223,6 +223,15 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         this.chatAvatarContainer = chatAvatarContainer;
     }
 
+    private boolean kyantHeader;
+    public void setupKyantGlass(BlurredBackgroundDrawableViewFactory factory,
+                               BlurredBackgroundColorProvider provider, boolean forum) {
+        setupGlassInternal(factory, provider, forum, true);
+    }
+    private BlurredBackgroundDrawable createHeaderSurface(BlurredBackgroundDrawableViewFactory factory) {
+        return kyantHeader ? factory.createKyant(this) : factory.create(this);
+    }
+
     public void setupGlass(BlurredBackgroundDrawableViewFactory factory, BlurredBackgroundColorProvider colorProvider) {
         setupGlass(factory, colorProvider, false);
     }
@@ -230,6 +239,12 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     public void setupGlass(BlurredBackgroundDrawableViewFactory factory,
                            BlurredBackgroundColorProvider colorProvider,
                            boolean isForum) {
+        setupGlassInternal(factory, colorProvider, isForum, false);
+    }
+
+    private void setupGlassInternal(BlurredBackgroundDrawableViewFactory factory,
+                                   BlurredBackgroundColorProvider colorProvider, boolean isForum, boolean kyant) {
+        kyantHeader = kyant;
         setBackground(null);
         setClipChildren(false);
         glassMode = true;
@@ -242,7 +257,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         signatureGlassRadius=-1;
         signatureUnreadGlassRadius=-1;
 
-        glassDrawable = factory.create(this)
+        glassDrawable = createHeaderSurface(factory)
             .setColorProvider(colorProvider)
             .setPadding(dp(6));
         final int glassAvatarSizeDp = app.exteraless.appearance.ChatHeaderUiHelper.getChatAvatarSizeDp();
@@ -256,12 +271,12 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         glassDrawable.setRadius(glassDrawableLeftRadius, dp(23), dp(23), glassDrawableLeftRadius);
 
 
-        glassDrawableBack = factory.create(this)
+        glassDrawableBack = createHeaderSurface(factory)
             .setColorProvider(colorProvider)
             .setRadius(dp(23))
             .setPadding(dp(6));
 
-        glassDrawableMenu = factory.create(this)
+        glassDrawableMenu = createHeaderSurface(factory)
             .setColorProvider(colorProvider)
             .setRadius(dp(23))
             .setPadding(dp(6));
@@ -1577,7 +1592,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable drawable, boolean allowed) {
         if (android.os.Build.VERSION.SDK_INT >= 33
                 && drawable instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
-            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)drawable).setLiquidGlassEffectAllowed(allowed);
+            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)drawable).setKyantEffectAllowed(allowed);
         }
         if (drawable!=null) drawable.updateColors();
     }

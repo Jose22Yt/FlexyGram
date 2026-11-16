@@ -1891,11 +1891,11 @@ public class ChatActivityEnterView extends FrameLayout implements
                 colorProvider = new BlurredBackgroundColorProviderThemed(resourcesProvider, Theme.key_chat_messagePanelVoiceLockBackground);
             }
 
-            lockBackgroundDrawable = factory.create(this, colorProvider);
+            lockBackgroundDrawable = factory.createKyant(this, colorProvider);
             lockBackgroundDrawable.setRadius(dp(18));
             lockBackgroundDrawable.setPadding(dp(3));
 
-            periodBackgroundDrawable = factory.create(this, colorProvider);
+            periodBackgroundDrawable = factory.createKyant(this, colorProvider);
             periodBackgroundDrawable.setRadius(dp(18));
             periodBackgroundDrawable.setPadding(dp(3));
 

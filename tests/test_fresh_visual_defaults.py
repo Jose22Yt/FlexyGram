@@ -73,6 +73,7 @@ def test_native_power_defaults_exclude_glass_but_saved_and_legacy_flags_survive(
     probe(tmp_path, {
         'android/content/SharedPreferences.java': PREFS,
         'Probe.java': '''import android.content.SharedPreferences;
+class Build{static class VERSION{static int SDK_INT=35;}}
 class SharedConfig{static final int PERFORMANCE_CLASS_LOW=0,PERFORMANCE_CLASS_AVERAGE=1;static int device;static int getDevicePerformanceClass(){return device;}}
 class MessagesController{static SharedPreferences p=new SharedPreferences();static SharedPreferences getGlobalMainSettings(){return p;}}
 class LiteMode {
@@ -84,14 +85,15 @@ class LiteMode {
 public class Probe {
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[]args){var p=MessagesController.p;
- int effects=LiteMode.FLAG_CHAT_BLUR|LiteMode.FLAG_LIQUID_GLASS;
+ int effects=LiteMode.FLAG_CHAT_BLUR|LiteMode.FLAG_KYANT_GLASS;
  LiteMode.PRESET_HIGH|=effects;LiteMode.PRESET_MEDIUM|=effects;LiteMode.PRESET_LOW|=effects;
  for(int device=0;device<3;device++){
-  SharedConfig.device=device;p.data.clear();LiteMode.loadPreference();check((LiteMode.value&effects)==0);
+  SharedConfig.device=device;p.data.clear();LiteMode.loadPreference();check((LiteMode.value&effects)==LiteMode.FLAG_KYANT_GLASS);
   int nativeFlags=device==0?LiteMode.PRESET_LOW:device==1?LiteMode.PRESET_MEDIUM:LiteMode.PRESET_HIGH;
   check((LiteMode.value&~effects)==(nativeFlags&~effects));
   p.data.put("lite_mode6",nativeFlags);LiteMode.loadPreference();check(LiteMode.value==nativeFlags);
  }
+ p.data.put("lite_mode6",0);LiteMode.loadPreference();check(LiteMode.value==0); // explicit OFF survives reload
  p.data.clear();p.data.put("chatBlur",true);LiteMode.loadPreference();check((LiteMode.value&LiteMode.FLAG_CHAT_BLUR)!=0);
  p.data.clear();p.data.put("lite_mode5",effects);LiteMode.loadPreference();check((LiteMode.value&LiteMode.FLAG_CHAT_BLUR)!=0);
  }}'''.replace('CONSTANTS',constants).replace('LOADER',body),

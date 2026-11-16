@@ -179,6 +179,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private FrameLayout tabsViewWrapper;
     private MainTabsLayout tabsView;
     private BlurredBackgroundDrawable tabsViewBackground;
+    private app.flexygram.kyant.KyantDockView kyantDockView;
     private View fadeView;
     private boolean lastHideContacts = NaConfig.INSTANCE.getMainTabsHideContacts().Bool();
     private boolean lastHideCalls = MainTabsHelper.isCallsTabHidden();
@@ -273,10 +274,15 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     @Override
     protected FrameLayout createContentView(Context context) {
         return new FrameLayout(context) {
+            @Override public void onDescendantInvalidated(View child, View target) {
+                super.onDescendantInvalidated(child, target);
+                if (kyantDockView != null) kyantDockView.sourceInvalidated(target);
+            }
             @Override
             protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
                 super.onLayout(changed, left, top, right, bottom);
                 checkUi_tabsPosition();
+                if (kyantDockView != null) kyantDockView.syncFromNative();
                 checkUi_fadeView();
             }
 
@@ -337,6 +343,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     @Override
     public void onResume() {
         super.onResume();
+        if (kyantDockView != null) { kyantDockView.syncFromNative(); kyantDockView.backdropChanged(); }
         if (miniPlayer != null) {
             miniPlayer.update(true);
         }
@@ -449,11 +456,12 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
         BlurredBackgroundDrawableViewFactory iBlur3FactoryGlass = new BlurredBackgroundDrawableViewFactory(iBlur3SourceTabGlass != null ? iBlur3SourceTabGlass : iBlur3SourceColor);
         iBlur3FactoryGlass.setSourceRootView(viewPositionWatcher, contentView);
-        iBlur3FactoryGlass.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
+        iBlur3FactoryGlass.setKyantEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS));
 
         tabsViewBackground = iBlur3FactoryGlass.create(tabsView, BlurredBackgroundProviderImpl.mainTabs(resourceProvider));
         tabsViewBackground.setRadius(MainTabsUiHelper.getBackgroundRadius());
         tabsViewBackground.setPadding(MainTabsUiHelper.getBackgroundInset());
+        // Plain fallback only. Kyant owns the sole optical material when its host is ready.
         tabsView.setBackground(tabsViewBackground);
 
         BlurredBackgroundDrawableViewFactory iBlur3FactoryFade = new BlurredBackgroundDrawableViewFactory(iBlur3SourceColor);
@@ -487,6 +495,12 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         // высота досчитывается вместе с нижним системным отступом в applyTabsBottomInset
         tabsViewWrapper.addView(tabsView, LayoutHelper.createFrame(MainTabsUiHelper.getTabsViewWidth(), MainTabsUiHelper.getTabsViewHeightDp(), Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
         tabsViewWrapper.setClipToPadding(false);
+        if (Build.VERSION.SDK_INT >= 33) {
+            kyantDockView = new app.flexygram.kyant.KyantDockView(context, tabsView, viewPager);
+            tabsView.setKyantHost(kyantDockView);
+            tabsViewWrapper.setClipChildren(false);
+            tabsViewWrapper.addView(kyantDockView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
         contentView.addView(tabsViewWrapper, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM));
 
         updateLayoutWrapper = new UpdateLayoutWrapper(context);
@@ -1554,6 +1568,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     private void blur3_invalidateBlur() {
+        if (kyantDockView != null && kyantDockView.isRendering()) return;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || iBlur3SourceTabGlass == null || fragmentView == null) {
             return;
         }
@@ -1573,6 +1588,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     private void blur3_updateColors() {
+        if (kyantDockView != null) kyantDockView.backdropChanged();
         blur3_updateFadeColors();
         if (tabsViewBackground != null) {
             tabsViewBackground.updateColors();

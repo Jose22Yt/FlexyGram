@@ -164,18 +164,18 @@ public class ChatInputViewsContainer extends FrameLayout {
         drawable.draw(canvas);
     }
 
-    public void updateNativeLiquidGlassPolicy(boolean allowed) {
-        updateNativeLiquidGlassDrawable(blurredBackgroundDrawable, allowed);
-        updateNativeLiquidGlassDrawable(underKeyboardBackgroundDrawable, allowed);
-        for (BlurredBackgroundDrawable drawable : compactGlass) updateNativeLiquidGlassDrawable(drawable, allowed);
+    public void updateKyantGlassPolicy(boolean allowed) {
+        updateKyantGlassDrawable(blurredBackgroundDrawable, allowed);
+        updateKyantGlassDrawable(underKeyboardBackgroundDrawable, allowed);
+        for (BlurredBackgroundDrawable drawable : compactGlass) updateKyantGlassDrawable(drawable, allowed);
         if (flexyComposer!=null) flexyComposer.invalidateNativeGlassColors();
         invalidate();
     }
 
-    private static void updateNativeLiquidGlassDrawable(BlurredBackgroundDrawable drawable, boolean allowed) {
+    private static void updateKyantGlassDrawable(BlurredBackgroundDrawable drawable, boolean allowed) {
         if (Build.VERSION.SDK_INT >= 33
                 && drawable instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
-            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)drawable).setLiquidGlassEffectAllowed(allowed);
+            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)drawable).setKyantEffectAllowed(allowed);
         }
         if (drawable!=null) drawable.updateColors();
     }

@@ -2809,7 +2809,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 public void renderNodeCalculateHash(IBlur3Hash hash) {
                     hash.add(getThemedColor(Theme.key_windowBackgroundWhite));
                     hash.add(SharedConfig.chatBlurEnabled());
-                    hash.add(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
+                    hash.add(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS));
 
                     if (SharedConfig.chatBlurEnabled()) {
                         TopicsFragment topicsFragment = null;
@@ -2858,7 +2858,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 public void renderNodeCalculateHash(IBlur3Hash hash) {
                     hash.add(getThemedColor(Theme.key_windowBackgroundWhite));
                     hash.add(SharedConfig.chatBlurEnabled());
-                    hash.add(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
+                    hash.add(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS));
 
                     if (SharedConfig.chatBlurEnabled()) {
                         TopicsFragment topicsFragment = null;
@@ -2903,9 +2903,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             });
 
             iBlur3FactoryFrostedLiquidGlass = new BlurredBackgroundDrawableViewFactory(iBlur3SourceGlassFrosted);
-            iBlur3FactoryFrostedLiquidGlass.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
+            iBlur3FactoryFrostedLiquidGlass.setKyantEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS));
             iBlur3FactoryLiquidGlass = new BlurredBackgroundDrawableViewFactory(iBlur3SourceGlass);
-            iBlur3FactoryLiquidGlass.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
+            iBlur3FactoryLiquidGlass.setKyantEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS));
             iBlur3FactoryBlur = new BlurredBackgroundDrawableViewFactory(iBlur3SourceGlassFrosted);
         } else {
             scrollableViewNoiseSuppressor = null;
@@ -3328,7 +3328,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         menu.getX() + item.getX() + item.getWidth() / 2f,
                         menu.getY() + item.getY() + item.getHeight() / 2f,
                         diameter * Math.min(item.getScaleX(), item.getScaleY()), AndroidUtilities.density,
-                        dark, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS), item.getAlpha() * menu.getAlpha());
+                        dark, LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS), item.getAlpha() * menu.getAlpha());
             }
 
 
@@ -5107,7 +5107,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         searchTabsAndFiltersLayout.setPadding(0, dp(7), 0, dp(7));
         contentView.addView(searchTabsAndFiltersLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, SEARCH_TABS_HEIGHT, Gravity.TOP, 4, 0, 4, 0));
 
-        BlurredBackgroundDrawable searchTabsViewBackground = iBlur3FactoryLiquidGlass.create(searchTabsAndFiltersLayout, BlurredBackgroundProviderImpl.topPanel(resourceProvider));
+        BlurredBackgroundDrawable searchTabsViewBackground = iBlur3FactoryLiquidGlass.createKyant(searchTabsAndFiltersLayout, BlurredBackgroundProviderImpl.topPanel(resourceProvider));
         searchTabsViewBackground.setRadius(dp(18));
         searchTabsViewBackground.setPadding(dp(6.666f));
         searchTabsAndFiltersLayout.setPadding(0, dp(7), 0, dp(7));
@@ -5268,7 +5268,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
             BlurredBackgroundWithFadeDrawable fadeDrawable = new BlurredBackgroundWithFadeDrawable(
                     iBlur3FactoryFade.create(chatInputViewsContainer, null));
-            if (!SharedConfig.chatBlurEnabled() || LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS)) {
+            if (!SharedConfig.chatBlurEnabled() || LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS)) {
                 fadeDrawable.setFadeHeight(dp(72), true);
             }
 
@@ -5540,10 +5540,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         if (filterTabsView != null) {
             if (!org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && isSignatureHome()) filterTabsView.setSignatureGlassFactory(iBlur3FactoryLiquidGlass);
-            // Home paints cheap individual pills; do not even allocate/register
-            // a shared blur drawable that this row will never draw.
-            if (!isSignatureHome()) {
-                BlurredBackgroundDrawable filterTabsViewBackground = iBlur3FactoryLiquidGlass.create(filterTabsView, BlurredBackgroundProviderImpl.topPanel(resourceProvider));
+            // One shared Kyant panel; no per-folder material layers on the optimized base.
+            {
+                BlurredBackgroundDrawable filterTabsViewBackground = iBlur3FactoryLiquidGlass.createKyant(filterTabsView, BlurredBackgroundProviderImpl.topPanel(resourceProvider));
                 filterTabsViewBackground.setRadius(dp(18));
                 filterTabsViewBackground.setPadding(dp(6.666f));
                 filterTabsView.setBlurredBackground(filterTabsViewBackground);
@@ -5553,7 +5552,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         if (fragmentSearchField != null) {
-            fragmentSearchField.setupBlurredBackground(iBlur3FactoryLiquidGlass.create(fragmentSearchField, BlurredBackgroundProviderImpl.topPanel(resourceProvider)));
+            fragmentSearchField.setupBlurredBackground(iBlur3FactoryLiquidGlass.createKyant(fragmentSearchField, BlurredBackgroundProviderImpl.topPanel(resourceProvider)));
         }
 
         dialogStoriesCell = new DialogStoriesCell(context, this, currentAccount, isArchive() ? DialogStoriesCell.TYPE_ARCHIVE : DialogStoriesCell.TYPE_DIALOGS) {
@@ -15024,20 +15023,20 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private final Utilities.Callback<Boolean> nativeGlassPowerListener = ignored -> refreshNativeGlassPolicy();
 
     private void refreshNativeGlassPolicy() {
-        boolean liquid = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
+        boolean liquid = LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS);
         boolean blur = SharedConfig.chatBlurEnabled();
         if (appliedGlassPolicyInitialized && appliedLiquidGlassPolicy == liquid && appliedBlurPolicy == blur) return;
         appliedGlassPolicyInitialized = true;
         appliedLiquidGlassPolicy = liquid;
         appliedBlurPolicy = blur;
         if (Build.VERSION.SDK_INT >= 31 && scrollableViewNoiseSuppressor != null
-                && scrollableViewNoiseSuppressor.isLiquidGlassEnabled != liquid) {
+                && scrollableViewNoiseSuppressor.isKyantGlassEnabled != liquid) {
             // The source callbacks read this field; existing tab/search drawables keep their source.
             scrollableViewNoiseSuppressor = new DownscaleScrollableNoiseSuppressor();
         }
-        iBlur3FactoryLiquidGlass.setLiquidGlassEffectAllowed(liquid);
-        iBlur3FactoryFrostedLiquidGlass.setLiquidGlassEffectAllowed(liquid);
-        iBlur3FactoryBlur.setLiquidGlassEffectAllowed(false);
+        iBlur3FactoryLiquidGlass.setKyantEffectAllowed(liquid);
+        iBlur3FactoryFrostedLiquidGlass.setKyantEffectAllowed(liquid);
+        iBlur3FactoryBlur.setKyantEffectAllowed(false);
         // Invalidate retained tab display lists as well as their backdrop source.
         if (filterTabsView != null) filterTabsView.updateColors();
         if (fragmentView != null) fragmentView.invalidate();
@@ -15088,14 +15087,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (hasMainTabs && MainTabsLayout.isBottomNavigationVisible()
                     && (mainTabsActivityController == null || mainTabsActivityController.hasVisibleTabsSurface())) {
                 app.exteraless.appearance.MainTabsUiHelper.setBlurBounds(iBlur3PositionMainTabs, fragmentView, navigationBarHeight);
-                iBlur3PositionMainTabs.inset(0, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0 : -dp(48));
+                iBlur3PositionMainTabs.inset(0, LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS) ? 0 : -dp(48));
 
                 hasBottomBlur = true;
             } else if (commentView != null && chatInputViewsContainer != null) {
                 iBlur3PositionMainTabs.set(0,
                     fragmentView.getMeasuredHeight() - calculateListViewPaddingBottom(),
                     fragmentView.getMeasuredWidth(), fragmentView.getMeasuredHeight());
-                iBlur3PositionMainTabs.inset(0, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0 : -dp(48));
+                iBlur3PositionMainTabs.inset(0, LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS) ? 0 : -dp(48));
 
                 hasBottomBlur = true;
             }

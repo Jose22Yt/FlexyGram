@@ -1370,9 +1370,9 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
             });
 
             iBlur3FactoryLiquidGlass = new BlurredBackgroundDrawableViewFactory(iBlur3SourceGlass);
-            iBlur3FactoryLiquidGlass.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
+            iBlur3FactoryLiquidGlass.setKyantEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS));
             iBlur3FactoryFrostedLiquidGlass = new BlurredBackgroundDrawableViewFactory(iBlur3SourceGlassFrosted);
-            iBlur3FactoryFrostedLiquidGlass.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
+            iBlur3FactoryFrostedLiquidGlass.setKyantEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS));
         } else {
             scrollableViewNoiseSuppressor = null;
             iBlur3SourceGlassFrosted = null;
@@ -2790,7 +2790,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         };
         bottomFadeDrawable = new BlurredBackgroundWithFadeDrawable(
                 iBlur3FactoryFade.create(bottomFadeView, null));
-        if (!SharedConfig.chatBlurEnabled() || LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) || true) {
+        if (!SharedConfig.chatBlurEnabled() || LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS) || true) {
             bottomFadeDrawable.setFadeHeight(dp(72), true);
         }
 
@@ -4255,7 +4255,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
 
         BlurredBackgroundProvider colorProvider = new BlurredBackgroundProviderBuilder(resourcesProvider)
             .setBackgroundColor((r, isDark) -> {
-                final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
+                final float alpha = LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS) ? 0.85f : 0.76f;
                 final int colorBg = Theme.getColor(isDark ? Theme.key_windowBackgroundGray : Theme.key_dialogBackgroundGray, r);
                 final int colorTarget = Theme.getColor(Theme.key_windowBackgroundWhite, r);
                 if (hasOverridenWebviewBackgroundColor) {
@@ -7543,7 +7543,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
 
         final int bottomBlurHeight = Math.max(AndroidUtilities.navigationBarHeight, getEmojiPadding()) + dp(180);
         iBlur3PositionMainTabs.set(0, containerView.getMeasuredHeight() - bottomBlurHeight, containerView.getMeasuredWidth(), containerView.getMeasuredHeight());
-        iBlur3PositionMainTabs.inset(0, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0 : -dp(48));
+        iBlur3PositionMainTabs.inset(0, LiteMode.isEnabled(LiteMode.FLAG_KYANT_GLASS) ? 0 : -dp(48));
 
         boolean hasFastScroll = false;
         if (currentAttachLayout == photoLayout && photoLayout != null && photoLayout.gridView.getFastScroll() != null) {

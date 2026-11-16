@@ -1,0 +1,5 @@
+AndroidLiquidGlass / Backdrop by Kyant
+https://github.com/Kyant0/AndroidLiquidGlass/tree/kmp
+Apache License 2.0. Catalog files adapted only for package/integration; optics and animation constants retained.
+Library io.github.kyant0:backdrop:2.0.1.
+Native View adapter: unchanged rounded rectangle refraction shader; Kotlin SDF interpolation expanded to AGSL. See native-shader-provenance.json.

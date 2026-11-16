@@ -1,5 +1,6 @@
 plugins {
-    `kotlin-dsl`
+    id("org.jetbrains.kotlin.jvm") version "2.4.10"
+    `java-gradle-plugin`
 }
 
 gradlePlugin {
@@ -23,6 +24,9 @@ repositories {
 
 dependencies {
     implementation(gradleApi())
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.4.10")
     implementation("com.android.tools.build:gradle:9.3.1")
     implementation("com.google.code.gson:gson:2.14.0")
 }
+
+kotlin { jvmToolchain(21) }
