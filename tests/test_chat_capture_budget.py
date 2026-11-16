@@ -40,7 +40,7 @@ def test_home_bar_never_enables_telegram_lens_but_other_surfaces_keep_their_poli
     assert '.setLiquidGlassEffectAllowed(false)' in refresh
     assert 'FLAG_LIQUID_GLASS' not in refresh
     pause=method(home,'public void onPause()')
-    assert 'kyantDockView.onHostPause()' in pause
+    assert 'releaseKyantDock()' in pause
     provider=(JAVA/'org/telegram/ui/Components/blur3/drawable/color/impl/BlurredBackgroundProviderImpl.java').read_text()
     assert 'return mainTabs(resourcesProvider,false)' in method(provider,'public static BlurredBackgroundProvider mainTabsNormal(')
     assert 'return mainTabs(resourcesProvider,true)' in method(provider,'public static BlurredBackgroundProvider mainTabs(')

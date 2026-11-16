@@ -365,11 +365,19 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
                 tabsView.setKyantHost(kyantDockView);
                 tabsViewWrapper.addView(kyantDockView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             }
-        } else if (kyantDockView != null) {
-            tabsViewWrapper.removeView(kyantDockView);
-            tabsView.setKyantHost(null);
-            kyantDockView = null;
+        } else {
+            releaseKyantDock();
         }
+    }
+
+    /** The optical host belongs to these views, never to a retained/rebuilt fragment. */
+    private void releaseKyantDock() {
+        final app.flexygram.kyant.KyantDockView oldHost = kyantDockView;
+        if (oldHost == null) return;
+        kyantDockView = null;
+        if (tabsView != null) tabsView.setKyantHost(null);
+        oldHost.onHostPause();
+        if (tabsViewWrapper != null) tabsViewWrapper.removeView(oldHost);
     }
 
     private void checkContactsTabBadge() {
@@ -388,7 +396,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     @Override
     public void onPause() {
-        if (kyantDockView != null) kyantDockView.onHostPause();
+        releaseKyantDock();
         super.onPause();
         if (accountSwitchHint != null) {
             accountSwitchHint.hide();
@@ -397,6 +405,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     @Override
     public View createView(Context context) {
+        releaseKyantDock();
         super.createView(context);
         contentView.setClipChildren(false);
         Bulletin.addDelegate(contentView, getBulletinDelegate());
@@ -1024,6 +1033,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     @Override
     public void clearViews() {
+        releaseKyantDock();
         final boolean hideContacts = MainTabsHelper.isContactsTabHidden();
         final boolean hideCalls = MainTabsHelper.isCallsTabHidden();
         final boolean hideProfile = MainTabsHelper.isProfileTabHidden();
@@ -1295,7 +1305,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     @Override
     public void onFragmentDestroy() {
-        if (kyantDockView != null) kyantDockView.onHostPause();
+        releaseKyantDock();
         Bulletin.removeDelegate(this);
         Bulletin.removeDelegate(contentView);
 

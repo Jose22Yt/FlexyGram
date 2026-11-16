@@ -136,13 +136,14 @@ public class Probe{static void check(boolean b){if(!b)throw new AssertionError()
 
 def test_disabled_kyant_never_constructs_a_compose_host_and_enable_disable_is_idempotent(tmp_path):
     from test_composer_layout import method
-    body=method((JAVA/'org/telegram/ui/MainTabsActivity.java').read_text(),'private void updateKyantDock()')
+    home=(JAVA/'org/telegram/ui/MainTabsActivity.java').read_text()
+    body=method(home,'private void updateKyantDock()')+'\n'+method(home,'private void releaseKyantDock()')
     probe(tmp_path,{
         'android/os/Build.java':'package android.os;public class Build{public static class VERSION{public static int SDK_INT=33;}}',
         'android/view/ViewGroup.java':'package android.view;public class ViewGroup{public static class LayoutParams{public static int MATCH_PARENT=-1;}}',
         'android/widget/FrameLayout.java':'package android.widget;public class FrameLayout{public static class LayoutParams{public LayoutParams(int x,int y){}}}',
         'app/flexygram/kyant/KyantDockConfig.java':'package app.flexygram.kyant;public class KyantDockConfig{public static boolean on;public static boolean enabled(){return on;}}',
-        'app/flexygram/kyant/KyantDockView.java':'package app.flexygram.kyant;public class KyantDockView{public static int creates;public KyantDockView(Object c,Object d,Object s){creates++;}}',
+        'app/flexygram/kyant/KyantDockView.java':'package app.flexygram.kyant;public class KyantDockView{public static int creates;public KyantDockView(Object c,Object d,Object s){creates++;}public void onHostPause(){}}',
         'Probe.java':'''import android.os.Build;import android.view.ViewGroup;import android.widget.FrameLayout;import app.flexygram.kyant.*;
 public class Probe{
  static class Dock{Object host;Object getContext(){return this;}void setKyantHost(Object v){host=v;}}
