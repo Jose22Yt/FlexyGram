@@ -3,7 +3,6 @@ package org.telegram.lottie
 import com.android.build.api.variant.AndroidComponentsExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.register
 
 class LottieMetaPlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -15,16 +14,16 @@ class LottieMetaPlugin : Plugin<Project> {
 
         androidComponents.onVariants { variant ->
             val suffix = variant.name.replaceFirstChar { it.uppercase() }
-            val task = project.tasks.register<LottieMetaTask>("generate${suffix}LottieMeta") {
-                className.set(extension.className)
-                packageName.set(extension.packageName.orElse(variant.namespace))
-                rPackage.set(variant.namespace)
+            val task = project.tasks.register("generate${suffix}LottieMeta", LottieMetaTask::class.java) { task ->
+                task.className.set(extension.className)
+                task.packageName.set(extension.packageName.orElse(variant.namespace))
+                task.rPackage.set(variant.namespace)
 
                 variant.sources.res?.all?.let { layers ->
-                    rawResources.from(
+                    task.rawResources.from(
                         layers.map { collections ->
                             collections.flatten().map { directory ->
-                                directory.asFileTree.matching { include("raw*/**/*.json") }
+                                directory.asFileTree.matching { patterns -> patterns.include("raw*/**/*.json") }
                             }
                         }
                     )

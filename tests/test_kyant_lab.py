@@ -67,3 +67,19 @@ def test_raw_scene_cache_records_only_on_change_and_never_captures_the_bar(tmp_p
  scene.fail=false;source.draw(canvas,400,128,4,0);check(scene.draws==8);
 }}'''
     },[JAVA/'app/flexygram/kyant/KyantBackdropSource.java'])
+
+
+def test_build_plugins_share_the_kyant_compatible_kotlin_version():
+    import re
+    root=(ROOT/'build.gradle').read_text()
+    helpers=(ROOT/'buildSrc/build.gradle.kts').read_text()
+    app=(ROOT/'TMessagesProj/build.gradle').read_text()
+    versions=[]
+    versions += re.findall(r'kotlin-gradle-plugin:([0-9.]+)',root)
+    versions += re.findall(r'kotlin-gradle-plugin:([0-9.]+)',helpers)
+    versions += re.findall(r'id\("org.jetbrains.kotlin.jvm"\) version "([0-9.]+)"',helpers)
+    versions += re.findall(r"id 'org.jetbrains.kotlin.plugin.compose' version '([0-9.]+)'",app)
+    assert len(versions)==4 and set(versions)=={'2.4.10'},versions
+    # kotlin-dsl in buildSrc otherwise exports its older compiler to the application.
+    assert '`kotlin-dsl`' not in helpers
+    assert '`java-gradle-plugin`' in helpers
