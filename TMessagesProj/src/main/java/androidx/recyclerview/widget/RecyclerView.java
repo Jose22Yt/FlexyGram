@@ -2965,6 +2965,13 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
         return super.onRequestFocusInDescendants(direction, previouslyFocusedRect);
     }
 
+    /** Update this UI thread's prefetch deadline when its display changes refresh rate. */
+    public static void updatePrefetchFrameInterval(float refreshRate) {
+        if (!Float.isFinite(refreshRate) || refreshRate < 30f || refreshRate > 1000f) return;
+        GapWorker worker = GapWorker.sGapWorker.get();
+        if (worker != null) worker.mFrameIntervalNs = (long) (1_000_000_000d / refreshRate);
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();

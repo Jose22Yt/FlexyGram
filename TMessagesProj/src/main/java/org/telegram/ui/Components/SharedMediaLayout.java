@@ -3542,7 +3542,8 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                     if (dy != 0 && (mediaPage.selectedType == TAB_PHOTOVIDEO || isAnyStoryPageType(mediaPage.selectedType))) {
                         showFastScrollHint(mediaPage, sharedMediaData, true);
                     }
-                    mediaPage.listView.checkSection(true);
+                    // The shared listener updates sections after this callback during a drag/fling.
+                    if (!mediaPage.listView.scrollingByUser) mediaPage.listView.checkSection(true);
                     if (mediaPage.fastScrollHintView != null) {
                         mediaPage.invalidate();
                     }

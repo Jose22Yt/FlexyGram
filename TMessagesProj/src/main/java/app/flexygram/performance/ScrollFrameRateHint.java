@@ -27,7 +27,7 @@ public final class ScrollFrameRateHint {
             }
         }
 
-        if (Build.VERSION.SDK_INT >= 30) {
+        if (Build.VERSION.SDK_INT >= 35) {
             try {
                 owner.setFrameContentVelocity(scrolling ? 1000.0f : 0.0f);
             } catch (Throwable ignore) {

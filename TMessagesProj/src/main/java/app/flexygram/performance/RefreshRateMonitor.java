@@ -38,6 +38,7 @@ public final class RefreshRateMonitor implements DisplayManager.DisplayListener 
         if (Float.isFinite(rate) && rate > 0 && rate <= 1000) {
             AndroidUtilities.screenRefreshRate = rate;
             AndroidUtilities.screenRefreshTime = 1000f / rate;
+            androidx.recyclerview.widget.RecyclerView.updatePrefetchFrameInterval(rate);
         }
     }
     @Override public void onDisplayChanged(int displayId) {

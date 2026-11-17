@@ -3611,13 +3611,17 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
      * адаптера, а не по группе на экране: так частично видимая группа не меняет
      * форму строк при прокрутке.
      */
-    private boolean hasSegmentedSectionNeighbor(View child, int delta) {
-        if (child == null || getAdapter() == null || isViewTypeSection == null) return false;
-        final int position = getChildAdapterPosition(child);
-        if (position == NO_POSITION) return false;
-        final int neighbor = position + delta;
-        if (neighbor < 0 || neighbor >= getAdapter().getItemCount()) return false;
-        return isViewTypeSection.run(getAdapter().getItemViewType(neighbor));
+    private int segmentedSectionNeighbors(View child) {
+        Adapter adapter = getAdapter();
+        if (child == null || adapter == null || isViewTypeSection == null) return 0;
+        int position = getChildAdapterPosition(child);
+        if (position < 0) return 0;
+        int count = adapter.getItemCount();
+        if (position >= count) return 0;
+        int neighbors = 0;
+        if (position > 0 && isViewTypeSection.run(adapter.getItemViewType(position - 1))) neighbors |= 1;
+        if (position + 1 < count && isViewTypeSection.run(adapter.getItemViewType(position + 1))) neighbors |= 2;
+        return neighbors;
     }
 
     private boolean setSegmentedSectionRect(View child, RectF rect) {
@@ -3635,18 +3639,18 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         return rect.bottom >= rect.top;
     }
 
-    private float getSegmentedSectionTopRadius(View child, RectF rect) {
-        final boolean above = hasSegmentedSectionNeighbor(child, -1);
-        final boolean below = hasSegmentedSectionNeighbor(child, 1);
+    private float getSegmentedSectionTopRadius(View child, RectF rect, int neighbors) {
+        final boolean above = (neighbors & 1) != 0;
+        final boolean below = (neighbors & 2) != 0;
         if (!above && !below && isRoundSectionView(child)) {
             return getSingleSectionRadius(rect);
         }
         return above ? segmentInnerRadius() : sectionRadius;
     }
 
-    private float getSegmentedSectionBottomRadius(View child, RectF rect) {
-        final boolean above = hasSegmentedSectionNeighbor(child, -1);
-        final boolean below = hasSegmentedSectionNeighbor(child, 1);
+    private float getSegmentedSectionBottomRadius(View child, RectF rect, int neighbors) {
+        final boolean above = (neighbors & 1) != 0;
+        final boolean below = (neighbors & 2) != 0;
         if (!above && !below && isRoundSectionView(child)) {
             return getSingleSectionRadius(rect);
         }
@@ -3656,9 +3660,10 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
     private void drawSegmentedSectionBackground(Canvas canvas, View child) {
         if (child == null || drawSectionBackground == null) return;
         if (!setSegmentedSectionRect(child, AndroidUtilities.rectTmp)) return;
+        final int neighbors = segmentedSectionNeighbors(child);
         drawSectionBackground.run(canvas, AndroidUtilities.rectTmp,
-                getSegmentedSectionTopRadius(child, AndroidUtilities.rectTmp),
-                getSegmentedSectionBottomRadius(child, AndroidUtilities.rectTmp),
+                getSegmentedSectionTopRadius(child, AndroidUtilities.rectTmp, neighbors),
+                getSegmentedSectionBottomRadius(child, AndroidUtilities.rectTmp, neighbors),
                 child.getAlpha());
     }
 
@@ -3678,8 +3683,9 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
 
     private void clipChildWithSegmentedSection(Canvas canvas, View child) {
         if (!setSegmentedSectionRect(child, AndroidUtilities.rectTmp)) return;
-        final float topRadius = getSegmentedSectionTopRadius(child, AndroidUtilities.rectTmp);
-        final float bottomRadius = getSegmentedSectionBottomRadius(child, AndroidUtilities.rectTmp);
+        final int neighbors = segmentedSectionNeighbors(child);
+        final float topRadius = getSegmentedSectionTopRadius(child, AndroidUtilities.rectTmp, neighbors);
+        final float bottomRadius = getSegmentedSectionBottomRadius(child, AndroidUtilities.rectTmp, neighbors);
         segmentRadii[0] = segmentRadii[1] = segmentRadii[2] = segmentRadii[3] = topRadius;
         segmentRadii[4] = segmentRadii[5] = segmentRadii[6] = segmentRadii[7] = bottomRadius;
         clipPath.rewind();
@@ -3975,7 +3981,8 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         }
         final Path clipPath = new Path();
         if (useSegmentedSections() && !forceRound) {
-            float top = getSegmentedSectionTopRadius(child, rect), bottom = getSegmentedSectionBottomRadius(child, rect);
+            final int neighbors = segmentedSectionNeighbors(child);
+            float top = getSegmentedSectionTopRadius(child, rect, neighbors), bottom = getSegmentedSectionBottomRadius(child, rect, neighbors);
             clipPath.addRoundRect(rect, new float[]{top,top,top,top,bottom,bottom,bottom,bottom}, Path.Direction.CW);
         } else if (!prev && !next || forceRound) {
             clipPath.rewind();
