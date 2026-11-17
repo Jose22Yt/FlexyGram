@@ -116,6 +116,7 @@ public class AnimatedEmojiDrawable extends Drawable {
         AnimatedEmojiDrawable drawable = cache.get(documentId);
         if (drawable == null) {
             cache.put(documentId, drawable = new AnimatedEmojiDrawable(cacheType, account, documentId, absolutePath));
+            scheduleCleanup();
         }
         return drawable;
     }
@@ -133,6 +134,7 @@ public class AnimatedEmojiDrawable extends Drawable {
         AnimatedEmojiDrawable drawable = cache.get(document.id);
         if (drawable == null) {
             cache.put(document.id, drawable = new AnimatedEmojiDrawable(cacheType, account, document));
+            scheduleCleanup();
         }
         return drawable;
     }
@@ -445,6 +447,7 @@ public class AnimatedEmojiDrawable extends Drawable {
     }
 
     private boolean attached;
+    private long detachedAt = android.os.SystemClock.uptimeMillis();
     private ArrayList<View> views;
     private ArrayList<AnimatedEmojiSpan.InvalidateHolder> holders;
 
@@ -937,25 +940,64 @@ public class AnimatedEmojiDrawable extends Drawable {
             }
 
             if (!attached) {
-                AndroidUtilities.cancelRunOnUIThread(cleanup);
-                AndroidUtilities.runOnUIThread(cleanup, 5000);
+                detachedAt = android.os.SystemClock.uptimeMillis();
+                scheduleCleanup();
             }
         }
     }
 
+    private static final long UNUSED_CACHE_DELAY_MS = 5000;
+    private static final java.util.concurrent.atomic.AtomicBoolean cleanupScheduled = new java.util.concurrent.atomic.AtomicBoolean();
+
+    private static void scheduleCleanup() {
+        synchronized (cleanupScheduled) {
+            if (!cleanupScheduled.compareAndSet(false, true)) return;
+            AndroidUtilities.runOnUIThread(cleanup, UNUSED_CACHE_DELAY_MS);
+        }
+    }
+
+    private static void cancelCleanup() {
+        synchronized (cleanupScheduled) {
+            cleanupScheduled.set(false);
+            AndroidUtilities.cancelRunOnUIThread(cleanup);
+        }
+    }
+
+    /** Collect keys before removal so indexed reads don't compact after every deleted slot. */
+    private static boolean removeUnused(LongSparseArray<AnimatedEmojiDrawable> cache, boolean keepRecent) {
+        int count = cache.size(), retiredCount = 0;
+        long[] retired = null;
+        boolean youngEntries = false;
+        long now = android.os.SystemClock.uptimeMillis();
+        for (int i = 0; i < count; i++) {
+            AnimatedEmojiDrawable drawable = cache.valueAt(i);
+            if (drawable != null && drawable.attached) continue;
+            if (keepRecent && drawable != null && now >= drawable.detachedAt
+                    && now - drawable.detachedAt < UNUSED_CACHE_DELAY_MS) {
+                youngEntries = true;
+                continue;
+            }
+            if (retired == null) retired = new long[count - i];
+            retired[retiredCount++] = cache.keyAt(i);
+        }
+        for (int i = 0; i < retiredCount; i++) cache.remove(retired[i]);
+        return youngEntries;
+    }
+
+    /** Memory pressure retires unused entries immediately; attached/preloading owners survive. */
+    public static void clearUnused() {
+        cancelCleanup();
+        if (globalEmojiCache == null) return;
+        for (int i = 0; i < globalEmojiCache.size(); i++) removeUnused(globalEmojiCache.valueAt(i), false);
+    }
+
     private static final Runnable cleanup = () -> {
-        AndroidUtilities.cancelRunOnUIThread(AnimatedEmojiDrawable.cleanup);
+        cancelCleanup();
+        boolean youngEntries = false;
         try {
             if (globalEmojiCache != null) {
                 for (int i = 0; i < globalEmojiCache.size(); ++i) {
-                    final LongSparseArray<AnimatedEmojiDrawable> array = globalEmojiCache.valueAt(i);
-                    for (int j = 0; j < array.size(); ++j) {
-                        final AnimatedEmojiDrawable drawable = array.valueAt(j);
-                        if (!drawable.attached) {
-                            array.removeAt(j);
-                            j--;
-                        }
-                    }
+                    youngEntries |= removeUnused(globalEmojiCache.valueAt(i), true);
                 }
             }
         } catch (Exception e) {
@@ -963,6 +1005,8 @@ public class AnimatedEmojiDrawable extends Drawable {
                 FileLog.e(e);
             }
         }
+        // Only finish the warm window of detached entries; no timer when the cache is idle.
+        if (youngEntries) scheduleCleanup();
     };
 
     private Boolean canOverrideColorCached = null;
@@ -1542,6 +1586,7 @@ public class AnimatedEmojiDrawable extends Drawable {
             return;
         }
         updateLiteModeValues();
+        clearUnused();
         for (int i = 0; i < globalEmojiCache.size(); i++) {
             LongSparseArray<AnimatedEmojiDrawable> map = globalEmojiCache.valueAt(i);
             for (int j = 0; j < map.size(); j++) {
@@ -1549,8 +1594,6 @@ public class AnimatedEmojiDrawable extends Drawable {
                 AnimatedEmojiDrawable animatedEmojiDrawable = map.get(documentId);
                 if (animatedEmojiDrawable != null && animatedEmojiDrawable.attached) {
                     animatedEmojiDrawable.initDocument(true);
-                } else {
-                    map.remove(documentId);
                 }
             }
         }

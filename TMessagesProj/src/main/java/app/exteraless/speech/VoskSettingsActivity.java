@@ -17,6 +17,7 @@ import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.BulletinFactory;
 
 import java.util.List;
+import java.lang.ref.WeakReference;
 import java.util.Locale;
 
 import tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity;
@@ -69,6 +70,7 @@ public class VoskSettingsActivity extends BaseNekoSettingsActivity implements Vo
             return;
         }
         VoskModel model = models.get(position - languagesStartRow);
+        if (VoskManager.isDeleting(model.code)) return;
         if (model.code.equals(VoskManager.getDownloadingCode())) {
             VoskManager.cancelDownload();
             return;
@@ -96,17 +98,21 @@ public class VoskSettingsActivity extends BaseNekoSettingsActivity implements Vo
             return false;
         }
         VoskModel model = models.get(position - languagesStartRow);
-        if (!VoskManager.isInstalled(model.code) || getParentActivity() == null) {
+        if (VoskManager.isDeleting(model.code) || !VoskManager.isInstalled(model.code) || getParentActivity() == null) {
             return false;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setTitle(model.language);
         builder.setMessage(getString(R.string.VoskDeleteModelConfirm));
         builder.setPositiveButton(getString(R.string.Delete), (dialog, which) -> {
-            VoskManager.delete(model.code);
-            if (listAdapter != null) {
-                listAdapter.notifyItemRangeChanged(languagesStartRow, models.size());
-            }
+            WeakReference<VoskSettingsActivity> reference = new WeakReference<>(this);
+            VoskManager.delete(model.code, () -> {
+                VoskSettingsActivity owner = reference.get();
+                if (owner != null && !owner.isFinished && owner.listAdapter != null) {
+                    owner.listAdapter.notifyItemRangeChanged(owner.languagesStartRow, owner.models.size());
+                }
+            });
+            if (listAdapter != null) listAdapter.notifyItemChanged(position, PARTIAL);
         });
         builder.setNegativeButton(getString(R.string.Cancel), null);
         AlertDialog dialog = builder.create();
@@ -133,6 +139,17 @@ public class VoskSettingsActivity extends BaseNekoSettingsActivity implements Vo
     }
 
     @Override
+    public void onSizeChanged(String code) {
+        if (isFinished || listAdapter == null) return;
+        for (int i = 0; i < models.size(); i++) {
+            if (models.get(i).code.equals(code)) {
+                listAdapter.notifyItemChanged(languagesStartRow + i, PARTIAL);
+                break;
+            }
+        }
+    }
+
+    @Override
     public void onFinished(VoskModel model, Throwable error) {
         if (error != null && !(error instanceof InterruptedException)) {
             BulletinFactory.of(this).createErrorBulletin(getString(R.string.VoskDownloadFailed)).show();
@@ -145,15 +162,16 @@ public class VoskSettingsActivity extends BaseNekoSettingsActivity implements Vo
     }
 
     private CharSequence stateOf(VoskModel model) {
+        if (VoskManager.isDeleting(model.code)) return getString(R.string.Loading);
         if (model.code.equals(VoskManager.getDownloadingCode())) {
             long total = VoskManager.getTotalBytes();
             int percent = total > 0 ? (int) (VoskManager.getDownloadedBytes() * 100 / total) : 0;
             return String.format(Locale.US, "%d%%", percent);
         }
         if (VoskManager.isInstalled(model.code)) {
-            return model.code.equals(VoskManager.getLanguage())
-                    ? getString(R.string.VoskModelSelected)
-                    : AndroidUtilities.formatFileSize(VoskManager.installedSize(model.code));
+            if (model.code.equals(VoskManager.getLanguage())) return getString(R.string.VoskModelSelected);
+            long size = VoskManager.installedSize(model.code);
+            return size < 0 ? getString(R.string.CalculatingSize) : AndroidUtilities.formatFileSize(size);
         }
         return AndroidUtilities.formatFileSize(model.size);
     }

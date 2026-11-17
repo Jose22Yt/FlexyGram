@@ -10,6 +10,8 @@ def test_ui_hidden_does_not_cold_start_every_cache_and_pressure_still_releases(t
     methods='\n'.join(method(src,s) for s in ['public void onTrimMemory(', 'public void onLowMemory()'])
     probe(tmp_path,{
       'android/content/ComponentCallbacks2.java':CONSTANTS,
+      'org/telegram/ui/Components/AnimatedEmojiDrawable.java':'package org.telegram.ui.Components;public class AnimatedEmojiDrawable{public static int calls;public static void clearUnused(){calls++;}}',
+      'app/exteraless/speech/VoskTranscriber.java':'package app.exteraless.speech;public class VoskTranscriber{public static int calls;public static void releaseModel(){calls++;}}',
       'app/flexygram/bubbles/SignatureWallpaperBlur.java':'package app.flexygram.bubbles;public class SignatureWallpaperBlur{public static int calls;public static void trimMemory(int l){calls++;}}',
       'app/flexygram/performance/TextLayoutPrecompute.java':'package app.flexygram.performance;public class TextLayoutPrecompute{public static int calls;public static void trimMemory(int l){calls++;}}',
       'org/telegram/messenger/MessagesStorage.java':'package org.telegram.messenger;public class MessagesStorage{public static int calls;public static void trimWarmHistories(){calls++;}}',
@@ -23,9 +25,10 @@ public class Probe extends Parent{
  static void check(boolean b){if(!b)throw new AssertionError("UI_HIDDEN must not evict caches or initialize the image loader");}
  public static void main(String[]args){Probe p=new Probe();for(int i=0;i<10000;i++)p.onTrimMemory(20);
  check(ImageLoader.starts==0&&ImageLoader.clears==0&&ImageLoader.trims==0);
+ check(org.telegram.ui.Components.AnimatedEmojiDrawable.calls==0&&app.exteraless.speech.VoskTranscriber.calls==0);
  check(MessagesStorage.calls==0&&app.flexygram.bubbles.SignatureWallpaperBlur.calls==0&&app.flexygram.performance.TextLayoutPrecompute.calls==0);
- p.onTrimMemory(10);check(ImageLoader.trims==1&&MessagesStorage.calls==1);
- p.onLowMemory();check(ImageLoader.trims==2&&ImageLoader.starts==0&&MessagesStorage.calls==2);
+ p.onTrimMemory(10);check(ImageLoader.trims==1&&MessagesStorage.calls==1&&org.telegram.ui.Components.AnimatedEmojiDrawable.calls==1&&app.exteraless.speech.VoskTranscriber.calls==1);
+ p.onLowMemory();check(ImageLoader.trims==2&&ImageLoader.starts==0&&MessagesStorage.calls==2&&org.telegram.ui.Components.AnimatedEmojiDrawable.calls==2&&app.exteraless.speech.VoskTranscriber.calls==2);
  }}'''.replace('METHODS',methods)
     })
 

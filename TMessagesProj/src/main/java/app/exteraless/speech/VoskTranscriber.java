@@ -21,6 +21,11 @@ import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
 public final class VoskTranscriber {
@@ -29,7 +34,18 @@ public final class VoskTranscriber {
     private static final int CHUNK_SAMPLES = 8000;
     private static final long DEQUEUE_TIMEOUT = 10000;
 
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor(task -> {
+        Thread thread = new Thread(() -> {
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+            task.run();
+        }, "FlexyVosk");
+        thread.setDaemon(true);
+        return thread;
+    });
+    private static final int MAX_PENDING_TRANSCRIPTIONS = 4;
+    private static final AtomicInteger pendingTranscriptions = new AtomicInteger();
+    private static final AtomicBoolean releaseQueued = new AtomicBoolean();
+    private static volatile boolean used;
 
     private static Model cachedModel;
     private static String cachedCode;
@@ -42,7 +58,28 @@ public final class VoskTranscriber {
         return VoskManager.isInstalled(VoskManager.getLanguage());
     }
 
-    public static synchronized void releaseModel() {
+    public static void releaseModel() {
+        if (!used || !releaseQueued.compareAndSet(false, true)) return;
+        try {
+            executor.submit(() -> {
+                releaseQueued.set(false);
+                closeCachedModel();
+            });
+        } catch (RejectedExecutionException unavailable) {
+            releaseQueued.set(false);
+            FileLog.e(unavailable);
+        }
+    }
+
+    /** File replacement/deletion shares the recognizer owner; never free an in-use model. */
+    static <T> Future<T> afterModelRelease(String code, Callable<T> action) {
+        return executor.submit(() -> {
+            if (code == null || code.equals(cachedCode)) closeCachedModel();
+            return action.call();
+        });
+    }
+
+    private static void closeCachedModel() {
         if (cachedModel != null) {
             try {
                 cachedModel.close();
@@ -54,11 +91,11 @@ public final class VoskTranscriber {
         }
     }
 
-    private static synchronized Model obtainModel(String code) throws IOException {
+    private static Model obtainModel(String code) throws IOException {
         if (cachedModel != null && code.equals(cachedCode)) {
             return cachedModel;
         }
-        releaseModel();
+        closeCachedModel();
         File dir = VoskManager.getModelDir(code);
         if (dir == null || !dir.exists()) {
             throw new IOException("model not installed");
@@ -77,16 +114,36 @@ public final class VoskTranscriber {
     }
 
     public static void transcribe(String path, BiConsumer<String, Exception> callback) {
-        executor.submit(() -> {
-            try {
-                String text = run(path);
-                callback.accept(text, null);
-            } catch (Exception e) {
-                callback.accept(null, e);
-            } catch (Throwable e) {
-                callback.accept(null, new Exception(e));
-            }
-        });
+        used = true;
+        if (pendingTranscriptions.incrementAndGet() > MAX_PENDING_TRANSCRIPTIONS) {
+            pendingTranscriptions.decrementAndGet();
+            complete(callback, null, new RejectedExecutionException("Transcription queue is full"));
+            return;
+        }
+        try {
+            executor.submit(() -> {
+                String text = null;
+                Exception failure = null;
+                try {
+                    text = run(path);
+                } catch (Exception e) {
+                    failure = e;
+                } catch (Throwable e) {
+                    failure = new Exception(e);
+                } finally {
+                    pendingTranscriptions.decrementAndGet();
+                }
+                complete(callback, text, failure);
+            });
+        } catch (RejectedExecutionException unavailable) {
+            pendingTranscriptions.decrementAndGet();
+            complete(callback, null, unavailable);
+        }
+    }
+
+    private static void complete(BiConsumer<String, Exception> callback, String text, Exception failure) {
+        try { callback.accept(text, failure); }
+        catch (RuntimeException callbackFailure) { FileLog.e(callbackFailure); }
     }
 
     private static String run(String path) throws Exception {

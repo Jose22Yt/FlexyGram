@@ -22210,9 +22210,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
     private void didChangedCompressionLevel(boolean request) {
         SharedPreferences preferences = MessagesController.getGlobalMainSettings();
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(String.format("compress_video_%d", compressionsCount), selectedCompression);
-        editor.commit();
+        String key = String.format("compress_video_%d", compressionsCount);
+        if (preferences.getInt(key, -1) != selectedCompression) {
+            preferences.edit().putInt(key, selectedCompression).apply();
+        }
         updateWidthHeightBitrateForCompression();
         updateVideoInfo();
         if (request) {
@@ -24228,19 +24229,21 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private void chooseSpeed(float speed, boolean isFinal, boolean closeMenu) {
         if (speed != currentVideoSpeed) {
             currentVideoSpeed = speed;
-            if (currentMessageObject != null) {
-                SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("playback_speed", Activity.MODE_PRIVATE);
-                if (Math.abs(currentVideoSpeed - 1.0f) < 0.001f) {
-                    preferences.edit().remove("speed" + currentMessageObject.getDialogId() + "_" + currentMessageObject.getId()).commit();
-                } else {
-                    preferences.edit().putFloat("speed" + currentMessageObject.getDialogId() + "_" + currentMessageObject.getId(), currentVideoSpeed).commit();
-                }
-            }
             if (videoPlayer != null) {
                 videoPlayer.setPlaybackSpeed(currentVideoSpeed);
             }
             if (photoViewerWebView != null) {
                 photoViewerWebView.setPlaybackSpeed(currentVideoSpeed);
+            }
+        }
+        // Preview playback during the gesture; persist once even if the final value is unchanged.
+        if (isFinal && currentMessageObject != null) {
+            SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("playback_speed", Activity.MODE_PRIVATE);
+            String key = "speed" + currentMessageObject.getDialogId() + "_" + currentMessageObject.getId();
+            if (Math.abs(currentVideoSpeed - 1.0f) < 0.001f) {
+                if (preferences.contains(key)) preferences.edit().remove(key).apply();
+            } else if (preferences.getFloat(key, 1.0f) != currentVideoSpeed) {
+                preferences.edit().putFloat(key, currentVideoSpeed).apply();
             }
         }
         setMenuItemIcon(true, isFinal);
