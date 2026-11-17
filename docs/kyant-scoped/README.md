@@ -70,3 +70,16 @@ focalizadas aprobadas. Sintaxis Java, XML, YAML y `git diff --check` correctos.
 El SDK/harness Compose y el APK quedan para el workflow real, no se reportan
 como ejecutados en este entorno. Se recuperaron las fuentes de Media3 y los
 archivos de performance omitidos por el checkout local antes de la pasada final.
+
+## Reparación del plugin de metadatos Lottie
+
+El primer workflow beta64 falló en `buildSrc:compileKotlin`: la migración a
+Kotlin JVM dejó un import de `org.gradle.kotlin.dsl.register` y lambdas con
+receptores implícitos. Se sustituyen por `TaskContainer.register(name, type,
+Action)` y acciones explícitas para el filtro de recursos; se conservan nombres
+de tareas, entradas y registro de fuentes generadas de AGP.
+
+Validación posterior: `compileKotlin` de buildSrc con Gradle 9.7.1/Kotlin 2.4.10
+completado. Ejecución real de LottieMetaTask en un proyecto Gradle aislado produjo
+`pack(R.raw.kyant_probe, 48, 120, false)` a partir de JSON con fr48/ip10/op130.
+No se requiere SDK para esas dos comprobaciones; la APK completa se relanza en CI.
