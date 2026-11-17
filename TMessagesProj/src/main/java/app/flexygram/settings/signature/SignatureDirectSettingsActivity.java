@@ -111,6 +111,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
                 else add(scope(new OpenExteraAyuMomentsActivity(),"ayu","ayu_"+segment));break;
             case "navigation":
                 if(segment.isEmpty()){overview();break;}
+                if(include("kyant_dock"))add(new app.flexygram.kyant.KyantDockSettingsActivity());
                 if(include("tabs"))add(new app.flexygram.navigation.BottomTabsSettingsActivity());
                 if(include("controls"))add(new OpenExteraAppNavigationActivity.NativeControls());
                 if(include("gestures"))add(scope(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_SIGNATURE_MESSAGES),"chats","gestures"));

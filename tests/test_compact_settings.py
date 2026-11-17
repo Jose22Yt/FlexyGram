@@ -270,7 +270,7 @@ def test_native_overviews_omit_retired_pages_and_reject_their_ids(tmp_path):
      'org/telegram/messenger/BuildConfig.java':'package org.telegram.messenger;public class BuildConfig{public static final boolean NATIVE_BASELINE_TEST=true;}',
      'app/flexygram/settings/signature/CompactSettingsPlan.java':plan,
      'app/flexygram/settings/signature/PlanProbe.java':'''package app.flexygram.settings.signature;public class PlanProbe{public static void main(String[]args){
-      if(CompactSettingsPlan.pages("chat").length!=6||CompactSettingsPlan.pages("navigation").length!=3)throw new AssertionError();
+      if(CompactSettingsPlan.pages("chat").length!=6||CompactSettingsPlan.pages("navigation").length!=4)throw new AssertionError();
       for(String[] pair:new String[][]{{"chat","glare"},{"chat","animations"},{"navigation","tabs"}}){
        if(!CompactSettingsPlan.retired(pair[0],pair[1]))throw new AssertionError();
        for(var page:CompactSettingsPlan.pages(pair[0]))if(page.id.equals(pair[1]))throw new AssertionError("retired page visible");

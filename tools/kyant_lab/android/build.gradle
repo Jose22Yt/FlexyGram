@@ -1,0 +1,8 @@
+buildscript { repositories { google(); mavenCentral() }; dependencies { classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.4.10' } }
+plugins { id 'com.android.library'; id 'org.telegram.lottie-meta'; id 'org.jetbrains.kotlin.plugin.compose' version '2.4.10' }
+android { namespace 'org.telegram.messenger'; compileSdk 37; buildToolsVersion '36.0.0'; defaultConfig { minSdk 24 }; buildFeatures { compose true }; compileOptions { sourceCompatibility JavaVersion.VERSION_21; targetCompatibility JavaVersion.VERSION_21 } }
+kotlin { compilerOptions { jvmTarget=org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21 } }
+dependencies { implementation 'io.github.kyant0:backdrop:2.0.1'; implementation 'io.github.kyant0:shapes:1.2.1'; implementation 'org.jetbrains.compose.ui:ui:1.12.0'; implementation 'org.jetbrains.compose.foundation:foundation:1.12.0'; implementation 'org.jetbrains.compose.animation:animation-core:1.12.0' }
+
+android { testOptions { unitTests.includeAndroidResources = true; unitTests.all { systemProperty 'robolectric.dependency.repo.url','https://repo.maven.apache.org/maven2' } } }
+dependencies { testImplementation 'junit:junit:4.13.2'; testImplementation 'org.robolectric:robolectric:4.16'; testImplementation 'org.jetbrains.compose.ui:ui-test-junit4:1.12.0'; debugImplementation 'androidx.compose.ui:ui-test-manifest:1.12.0' }

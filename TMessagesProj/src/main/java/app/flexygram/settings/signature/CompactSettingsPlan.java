@@ -63,6 +63,7 @@ final class CompactSettingsPlan {
     }
     private static Page[] nativePages(Page[] pages) {
         java.util.ArrayList<Page> result = new java.util.ArrayList<>();
+        if (pages == NAVIGATION) result.add(new Page("kyant_dock", R.string.CompactTabs, R.drawable.fg_dm_barra_inferior));
         for (Page page : pages) if (!"glare".equals(page.id) && !"animations".equals(page.id) && !"tabs".equals(page.id)) result.add(page);
         return result.toArray(new Page[0]);
     }

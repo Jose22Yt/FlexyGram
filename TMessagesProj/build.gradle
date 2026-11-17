@@ -2,6 +2,7 @@ import java.nio.file.Paths
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
+    id 'org.jetbrains.kotlin.plugin.compose' version '2.4.10'
     id 'com.android.application'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
@@ -78,6 +79,7 @@ if (nativeTarget == 'SKIP') {
 }
 
 android {
+    buildFeatures { compose true }
     defaultConfig.applicationId = APP_PACKAGE
 
     androidResources {
@@ -442,6 +444,11 @@ configurations.configureEach {
 }
 
 dependencies {
+    implementation 'io.github.kyant0:backdrop:2.0.1'
+    implementation 'io.github.kyant0:shapes:1.2.1'
+    implementation 'org.jetbrains.compose.ui:ui:1.12.0'
+    implementation 'org.jetbrains.compose.foundation:foundation:1.12.0'
+    implementation 'org.jetbrains.compose.animation:animation-core:1.12.0'
     // official
     implementation 'androidx.core:core-ktx:1.19.0'
     implementation 'androidx.palette:palette-ktx:1.0.0'

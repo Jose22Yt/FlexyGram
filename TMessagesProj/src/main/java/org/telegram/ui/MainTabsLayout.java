@@ -43,6 +43,20 @@ import xyz.nextalone.nagram.NaConfig;
 @SuppressLint("ViewConstructor")
 public class MainTabsLayout extends AnimatedLinearLayout {
 
+    private app.flexygram.kyant.KyantDockView kyantHost;
+    public void setKyantHost(app.flexygram.kyant.KyantDockView host) { kyantHost = host; invalidate(); }
+    @Override public void onDescendantInvalidated(@NonNull View child, @NonNull View target) {
+        super.onDescendantInvalidated(child, target);
+        if (kyantHost != null) kyantHost.nativeIconsInvalidated();
+    }
+    @Override protected void onDraw(Canvas canvas) {
+        if (kyantHost == null || !kyantHost.isRendering()) super.onDraw(canvas);
+    }
+    @Override public void draw(Canvas canvas) {
+        // View.draw paints backgrounds before onDraw: skip that old layer as well as its controls.
+        if (kyantHost == null || !kyantHost.isRendering()) super.draw(canvas);
+    }
+
     public static final int BOTTOM_NAVIGATION_MODE_SHOW = 0;
     public static final int BOTTOM_NAVIGATION_MODE_HIDE = 1;
     public static final int BOTTOM_NAVIGATION_MODE_FLOATING = 2;
@@ -310,6 +324,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
+        if (kyantHost != null) kyantHost.syncFromNative();
         checkVisualWidth();
     }
 
@@ -388,6 +403,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
 
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
+        if (kyantHost != null && kyantHost.isRendering()) return;
         if (drawCustomSelector) {
             final float x = animatedLongSelectedViewCenterX + animatedLongSelectedViewOffsetX;
             final float sWidth = getInterpolatedWidthByX(x, this);

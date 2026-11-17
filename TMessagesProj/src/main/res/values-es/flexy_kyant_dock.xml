@@ -1,0 +1,5 @@
+<resources>
+    <string name="FlexyKyantDock">Liquid Glass Kyant</string>
+    <string name="FlexyKyantDockSubtitle">Solo en la barra inferior de la pantalla principal</string>
+    <string name="FlexyKyantDockInfo">Material opcional para esta barra en Android 13 o posterior. Las demás superficies conservan el cristal de Telegram y sus ajustes. El ahorro de energía usa temporalmente el fondo normal.</string>
+</resources>

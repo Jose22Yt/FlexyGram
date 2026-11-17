@@ -1,0 +1,5 @@
+<resources>
+    <string name="FlexyKyantDock">Liquid Glass Kyant</string>
+    <string name="FlexyKyantDockSubtitle">Only on the home screen bottom bar</string>
+    <string name="FlexyKyantDockInfo">Optional material for this bar on Android 13 or later. Other surfaces keep Telegram glass and its settings. Power saving temporarily uses the normal background.</string>
+</resources>

@@ -179,6 +179,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private FrameLayout tabsViewWrapper;
     private MainTabsLayout tabsView;
     private BlurredBackgroundDrawable tabsViewBackground;
+    private app.flexygram.kyant.KyantDockView kyantDockView;
+    private app.flexygram.performance.StartupIdleWork kyantInitWork;
     private View fadeView;
     private boolean lastHideContacts = NaConfig.INSTANCE.getMainTabsHideContacts().Bool();
     private boolean lastHideCalls = MainTabsHelper.isCallsTabHidden();
@@ -273,10 +275,19 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     @Override
     protected FrameLayout createContentView(Context context) {
         return new FrameLayout(context) {
+            @Override protected void dispatchDraw(Canvas canvas) {
+                super.dispatchDraw(canvas);
+                if (kyantInitWork != null) kyantInitWork.afterDraw();
+            }
+            @Override public void onDescendantInvalidated(View child, View target) {
+                super.onDescendantInvalidated(child, target);
+                if (kyantDockView != null) kyantDockView.sourceInvalidated(target);
+            }
             @Override
             protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
                 super.onLayout(changed, left, top, right, bottom);
                 checkUi_tabsPosition();
+                if (kyantDockView != null) kyantDockView.syncFromNative();
                 checkUi_fadeView();
             }
 
@@ -337,6 +348,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     @Override
     public void onResume() {
         super.onResume();
+        if (getContext() != null) ensureKyantDock(getContext());
+        if (kyantDockView != null) { kyantDockView.syncFromNative(); kyantDockView.backdropChanged(); }
         if (miniPlayer != null) {
             miniPlayer.update(true);
         }
@@ -449,11 +462,12 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
         BlurredBackgroundDrawableViewFactory iBlur3FactoryGlass = new BlurredBackgroundDrawableViewFactory(iBlur3SourceTabGlass != null ? iBlur3SourceTabGlass : iBlur3SourceColor);
         iBlur3FactoryGlass.setSourceRootView(viewPositionWatcher, contentView);
-        iBlur3FactoryGlass.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
+        iBlur3FactoryGlass.setLiquidGlassEffectAllowed(false); // This bar never stacks Telegram refraction with Kyant.
 
         tabsViewBackground = iBlur3FactoryGlass.create(tabsView, BlurredBackgroundProviderImpl.mainTabs(resourceProvider));
         tabsViewBackground.setRadius(MainTabsUiHelper.getBackgroundRadius());
         tabsViewBackground.setPadding(MainTabsUiHelper.getBackgroundInset());
+        // Plain fallback only. Kyant owns the sole optical material when its host is ready.
         tabsView.setBackground(tabsViewBackground);
 
         BlurredBackgroundDrawableViewFactory iBlur3FactoryFade = new BlurredBackgroundDrawableViewFactory(iBlur3SourceColor);
@@ -481,12 +495,13 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             }
         });
 
-        tabsViewWrapper = new FrameLayout(context);
+        tabsViewWrapper = new app.flexygram.kyant.KyantDockContainer(context, tabsView);
         tabsViewWrapper.setOnClickListener(v -> {});
         // В M3 панель во всю ширину,
         // высота досчитывается вместе с нижним системным отступом в applyTabsBottomInset
         tabsViewWrapper.addView(tabsView, LayoutHelper.createFrame(MainTabsUiHelper.getTabsViewWidth(), MainTabsUiHelper.getTabsViewHeightDp(), Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
         tabsViewWrapper.setClipToPadding(false);
+        ensureKyantDock(context);
         contentView.addView(tabsViewWrapper, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM));
 
         updateLayoutWrapper = new UpdateLayoutWrapper(context);
@@ -500,6 +515,27 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         updateLayout();
         checkUnreadCount(false);
         return contentView;
+    }
+
+    /** Keep Compose/material initialization out of the first usable native frame. */
+    private void ensureKyantDock(Context context) {
+        if (Build.VERSION.SDK_INT >= 33 && kyantDockView == null && kyantInitWork == null
+                && tabsViewWrapper != null && app.flexygram.kyant.KyantDockConfig.isEnabled()) {
+            kyantInitWork = new app.flexygram.performance.StartupIdleWork(android.os.Looper.myQueue(),
+                    () -> !isPaused() && fragmentView != null && fragmentView.isShown()
+                            && !fragmentView.isLayoutRequested() && tabsView.isHardwareAccelerated()
+                            && app.flexygram.kyant.KyantDockConfig.isEnabled() && !LiteMode.isPowerSaverApplied()
+                            && (!(getCurrentVisibleFragment() instanceof DialogsActivity)
+                            || ((DialogsActivity) getCurrentVisibleFragment()).isStartupContentReady()),
+                    () -> attachKyantDock(context));
+        }
+    }
+
+    private void attachKyantDock(Context context) {
+        kyantDockView = new app.flexygram.kyant.KyantDockView(context, tabsView, viewPager);
+        tabsView.setKyantHost(kyantDockView);
+        tabsViewWrapper.setClipChildren(false);
+        tabsViewWrapper.addView(kyantDockView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
     private void checkUnreadCount(boolean animated) {
@@ -1266,6 +1302,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     @Override
     public void onFragmentDestroy() {
+        if (kyantInitWork != null) kyantInitWork.close();
         Bulletin.removeDelegate(this);
         Bulletin.removeDelegate(contentView);
 
@@ -1370,6 +1407,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         if (tabsView == null) return;
         if (NaConfig.INSTANCE.getHideBottomNavigationBar().Bool()) {
             tabsView.setVisibility(View.GONE);
+            if (kyantDockView != null) kyantDockView.syncFromNative();
             return;
         }
         final boolean isUpdateLayoutVisible = updateLayoutWrapper.isUpdateLayoutVisible();
@@ -1385,6 +1423,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsView.setEnabled(factor > 1);
         tabsView.setAlpha(factor);
         tabsView.setVisibility(factor > 0 ? View.VISIBLE : View.GONE);
+        if (kyantDockView != null) kyantDockView.syncFromNative();
     }
 
     private void checkUi_callTabVisible(boolean callTabsVisible, boolean animated) {
@@ -1554,6 +1593,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     private void blur3_invalidateBlur() {
+        if (kyantDockView != null && kyantDockView.isRendering()) return;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || iBlur3SourceTabGlass == null || fragmentView == null) {
             return;
         }
@@ -1573,6 +1613,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     private void blur3_updateColors() {
+        if (kyantDockView != null) kyantDockView.backdropChanged();
         blur3_updateFadeColors();
         if (tabsViewBackground != null) {
             tabsViewBackground.updateColors();
