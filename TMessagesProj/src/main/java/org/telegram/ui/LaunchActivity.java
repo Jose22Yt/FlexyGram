@@ -431,9 +431,11 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     private IconsResources customResources;
     private Runnable cancelIconPreload;
     private app.flexygram.performance.StartupDrawReporter startupDrawReporter;
+    private app.flexygram.performance.StartupIdleWork startupIdleWork;
     private boolean startupAuxiliaryScheduled;
     private final Runnable startupAuxiliary = () -> {
         if (isFinishing() || isDestroyed()) return;
+        if (BuildConfig.NATIVE_BASELINE_TEST) ApplicationLoader.scheduleOptionalStartupWork();
         Utilities.globalQueue.postRunnable(() -> {
             EmojiHelper.getInstance().checkEmojiPacks();
             PagePreviewRulesHelper.getInstance().checkPagePreviewRules();
@@ -556,6 +558,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         frameLayout = new ActivityContentLayout(this);
         if (BuildConfig.PERFORMANCE_TEST_BUILD) {
             startupDrawReporter = new app.flexygram.performance.StartupDrawReporter(frameLayout, this::isStartupContentReady, this::reportFullyDrawn);
+        }
+        if (BuildConfig.NATIVE_BASELINE_TEST) {
+            startupIdleWork = new app.flexygram.performance.StartupIdleWork(
+                    android.os.Looper.myQueue(), this::isStartupContentReady, startupAuxiliary);
         }
         frameLayout.setClipToPadding(false);
         frameLayout.setClipChildren(false);
@@ -7187,6 +7193,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onDestroy() {
         if (startupDrawReporter != null) startupDrawReporter.close();
+        if (startupIdleWork != null) startupIdleWork.close();
         if (frameLayout != null) frameLayout.removeCallbacks(startupAuxiliary);
         cancelIconPreload();
         cancelStartupStatusRefresh();
@@ -9646,7 +9653,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         protected void dispatchDraw(@NonNull Canvas canvas) {
             super.dispatchDraw(canvas);
             drawRippleAbove(canvas, this);
-            if (!startupAuxiliaryScheduled) {
+            if (startupIdleWork != null) {
+                startupIdleWork.afterDraw();
+            } else if (!startupAuxiliaryScheduled) {
                 startupAuxiliaryScheduled = post(startupAuxiliary);
             }
             if (startupDrawReporter != null) startupDrawReporter.afterDraw();

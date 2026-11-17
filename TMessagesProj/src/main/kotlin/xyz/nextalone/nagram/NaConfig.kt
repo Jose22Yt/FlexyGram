@@ -36,7 +36,7 @@ object NaConfig {
             loadConfig(false)
             updatePreferredTranslateTargetLangList()
             fixConfig()
-            if (!BuildVars.LOGS_ENABLED) {
+            if (!BuildVars.LOGS_ENABLED && showRPCError.Bool()) {
                 showRPCError.setConfigBool(false)
             }
             initialized = true

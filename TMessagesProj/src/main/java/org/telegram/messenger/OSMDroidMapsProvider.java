@@ -40,9 +40,27 @@ import java.util.List;
 
 public class OSMDroidMapsProvider implements IMapsProvider {
 
+    private static boolean configured;
+
+    /** Configure before the first MapView, never speculatively while opening the chat list. */
+    private static synchronized void ensureConfigured(Context context) {
+        if (configured) return;
+        try {
+            org.osmdroid.config.IConfigurationProvider configuration = org.osmdroid.config.Configuration.getInstance();
+            java.io.File base = new java.io.File(context.getApplicationContext().getCacheDir(), "osmdroid");
+            configuration.setUserAgentValue("FlexyGram/" + BuildConfig.VERSION_NAME + " (+https://github.com/Jose22Yt/FlexyGram)");
+            configuration.setOsmdroidBasePath(base);
+            configuration.setOsmdroidTileCache(new java.io.File(base, "tiles"));
+            configured = true;
+        } catch (RuntimeException error) {
+            // Keep the provider's defaults usable if cache configuration is unavailable.
+            FileLog.e(error);
+        }
+    }
+
     @Override
     public void initializeMaps(Context context) {
-
+        ensureConfigured(context);
     }
 
     @Override
@@ -126,6 +144,7 @@ public class OSMDroidMapsProvider implements IMapsProvider {
         private Runnable onLayoutListener;
 
         private OSMDroidMapView(Context context) {
+            ensureConfigured(context);
             mapView = new MapView(context) {
                 @Override
                 public boolean dispatchTouchEvent(MotionEvent ev) {

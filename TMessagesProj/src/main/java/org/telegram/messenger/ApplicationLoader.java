@@ -536,6 +536,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         }
 
         super.onCreate();
+        if (BuildConfig.NATIVE_BASELINE_TEST) preloadStartupPreferences();
         // Native baseline: Android and the original UI own animation timing.
         installCrashReportFilter();
 
@@ -601,25 +602,50 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
 
         applicationHandler = new Handler(applicationContext.getMainLooper());
 
-        Utilities.globalQueue.postRunnable(() -> {
-            try {
-                org.osmdroid.config.Configuration.getInstance().setUserAgentValue("FlexyGram/" + BuildConfig.VERSION_NAME + " (+https://github.com/Jose22Yt/FlexyGram)");
-                final File osmdroidBasePath = new File(ApplicationLoader.applicationContext.getCacheDir(), "osmdroid");
-                org.osmdroid.config.Configuration.getInstance().setOsmdroidBasePath(osmdroidBasePath);
-                org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(new File(osmdroidBasePath, "tiles"));
-            } catch (Throwable ignore) {
-            }
-        });
-
-        // Reconciliation checks every alias via binder; it is not a prerequisite for opening chats.
-        Utilities.globalQueue.postRunnable(LauncherIconController::tryFixLauncherIconIfNeeded);
+        // Native Test warms optional features only after usable content has drawn.
+        if (!BuildConfig.NATIVE_BASELINE_TEST) {
+            Utilities.globalQueue.postRunnable(LauncherIconController::tryFixLauncherIconIfNeeded);
+        }
         ProxyRotationController.init();
-        app.exteraless.links.LinkCleaner.preloadIfEnabled();
-        app.exteraless.appearance.M3CircularProgress.prewarm();
+        if (!BuildConfig.NATIVE_BASELINE_TEST) {
+            app.exteraless.links.LinkCleaner.preloadIfEnabled();
+            app.exteraless.appearance.M3CircularProgress.prewarm();
+        }
 
         //if (BuildConfig.DEBUG_PRIVATE_VERSION) {
         //    Choreographer60FpsContent.getInstance().addFrameCallback(debugEverySecondChecks, 1);
         //}
+    }
+
+    /** Start Android's asynchronous XML loading before JNI work, without waiting for values.
+     * Do not touch NekoConfig here: its static initializer would synchronously load every item.
+     */
+    private static void preloadStartupPreferences() {
+        android.os.Trace.beginSection("Flexy.startup.preference_prefetch");
+        try {
+            applicationContext.getSharedPreferences("nkmrcfg", Context.MODE_PRIVATE);
+            applicationContext.getSharedPreferences("mainconfig", Context.MODE_PRIVATE);
+        } finally { android.os.Trace.endSection(); }
+    }
+
+    private static final java.util.concurrent.atomic.AtomicBoolean optionalStartupScheduled =
+            new java.util.concurrent.atomic.AtomicBoolean();
+
+    /** Optional caches only: push, storage, plugins and account recovery never wait for a UI. */
+    public static void scheduleOptionalStartupWork() {
+        if (!optionalStartupScheduled.compareAndSet(false, true)) return;
+        Utilities.globalQueue.postRunnable(() -> runOptionalStartupWork("Flexy.startup.launcher_repair",
+                LauncherIconController::tryFixLauncherIconIfNeeded));
+        Utilities.globalQueue.postRunnable(() -> runOptionalStartupWork("Flexy.startup.link_warmup",
+                () -> app.exteraless.links.LinkCleaner.preloadIfEnabled()));
+        Utilities.globalQueue.postRunnable(() -> runOptionalStartupWork("Flexy.startup.loader_warmup",
+                () -> app.exteraless.appearance.M3CircularProgress.prewarm()));
+    }
+
+    private static void runOptionalStartupWork(String section, Runnable work) {
+        android.os.Trace.beginSection(section);
+        try { work.run(); }
+        finally { android.os.Trace.endSection(); }
     }
 
     // Local Push Service, TFoss implementation

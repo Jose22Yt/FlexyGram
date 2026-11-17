@@ -285,8 +285,10 @@ public class NekoConfig {
             }
             if (!configLoaded)
                 getPreferences().registerOnSharedPreferenceChangeListener(CloudSettingsHelper.listener);
-            for (int a = 1; a <= 5; a++) {
-                datacenterInfos.add(new DatacenterInfo(a));
+            if (datacenterInfos.isEmpty()) {
+                for (int a = 1; a <= 5; a++) {
+                    datacenterInfos.add(new DatacenterInfo(a));
+                }
             }
             configLoaded = true;
         }

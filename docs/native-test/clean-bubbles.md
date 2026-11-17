@@ -98,3 +98,11 @@ La copia beta.58 sigue separada e intacta.
 La continuación integra R8 optimizador conservando nombres/JNI/plugins, trabajo
 auxiliar tras el primer dibujo y adaptación del laboratorio de perfiles a Native
 Test. Estado real de perfiles, comandos y límites en [STARTUP_BETA61.md](STARTUP_BETA61.md).
+
+### Cambios posteriores de arranque, pendientes de nueva APK
+
+El mantenimiento opcional de Native Test espera ahora contenido utilizable y una
+cola principal idle; mapas se configuran al usarlos y la lectura de preferencias
+se adelanta sin esperar sus valores. Ver
+[STARTUP_IDLE_MAINTENANCE.md](STARTUP_IDLE_MAINTENANCE.md) para alcance, validación y
+límites. Esta continuación de código no inicia una compilación.

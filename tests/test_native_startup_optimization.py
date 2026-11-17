@@ -61,6 +61,7 @@ def test_auxiliary_work_starts_once_after_draw_and_not_after_activity_destructio
  static class Queue{List<Runnable>jobs=new ArrayList<>();void postRunnable(Runnable r){jobs.add(r);}void fire(){jobs.remove(0).run();}}
  static class Utilities{static Queue globalQueue=new Queue();}static class EmojiHelper{static int calls;static EmojiHelper getInstance(){return new EmojiHelper();}void checkEmojiPacks(){calls++;}}
  static class PagePreviewRulesHelper{static int calls;static PagePreviewRulesHelper getInstance(){return new PagePreviewRulesHelper();}void checkPagePreviewRules(){calls++;}}
+ static class BuildConfig{static final boolean NATIVE_BASELINE_TEST=false;}static class ApplicationLoader{static void scheduleOptionalStartupWork(){}}
  boolean destroyed,startupAuxiliaryScheduled;Queue ui=new Queue();boolean isFinishing(){return false;}boolean isDestroyed(){return destroyed;}boolean post(Runnable r){ui.postRunnable(r);return true;}
  FIELD void draw(){BLOCK}
  public static void main(String[]args){Probe p=new Probe();if(!Utilities.globalQueue.jobs.isEmpty())throw new AssertionError();for(int i=0;i<10000;i++)p.draw();if(p.ui.jobs.size()!=1||EmojiHelper.calls!=0)throw new AssertionError();p.ui.fire();if(EmojiHelper.calls!=0)throw new AssertionError();Utilities.globalQueue.fire();if(EmojiHelper.calls!=1||PagePreviewRulesHelper.calls!=1)throw new AssertionError();
