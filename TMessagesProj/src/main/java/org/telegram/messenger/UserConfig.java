@@ -525,8 +525,14 @@ public class UserConfig extends BaseController {
         return getPreferences().getBoolean("2pinnedDialogsLoaded" + folderId, false);
     }
 
+    // These cache checkpoints must be immediately visible, without waiting for disk fsync.
     public void setPinnedDialogsLoaded(int folderId, boolean loaded) {
-        getPreferences().edit().putBoolean("2pinnedDialogsLoaded" + folderId, loaded).commit();
+        synchronized (sync) {
+            SharedPreferences preferences = getPreferences();
+            String key = "2pinnedDialogsLoaded" + folderId;
+            if (preferences.getBoolean(key, false) == loaded) return;
+            preferences.edit().putBoolean(key, loaded).apply();
+        }
     }
 
     public void clearPinnedDialogsLoaded() {
@@ -551,7 +557,12 @@ public class UserConfig extends BaseController {
     }
 
     public void setTotalDialogsCount(int folderId, int totalDialogsLoadCount) {
-        getPreferences().edit().putInt("2totalDialogsLoadCount" + (folderId == 0 ? "" : folderId), totalDialogsLoadCount).commit();
+        synchronized (sync) {
+            SharedPreferences preferences = getPreferences();
+            String key = "2totalDialogsLoadCount" + (folderId == 0 ? "" : folderId);
+            if (preferences.getInt(key, 0) == totalDialogsLoadCount) return;
+            preferences.edit().putInt(key, totalDialogsLoadCount).apply();
+        }
     }
 
     public long[] getDialogLoadOffsets(int folderId) {
@@ -566,15 +577,30 @@ public class UserConfig extends BaseController {
     }
 
     public void setDialogsLoadOffset(int folderId, int dialogsLoadOffsetId, int dialogsLoadOffsetDate, long dialogsLoadOffsetUserId, long dialogsLoadOffsetChatId, long dialogsLoadOffsetChannelId, long dialogsLoadOffsetAccess) {
-        SharedPreferences.Editor editor = getPreferences().edit();
-        editor.putInt("2dialogsLoadOffsetId" + (folderId == 0 ? "" : folderId), dialogsLoadOffsetId);
-        editor.putInt("2dialogsLoadOffsetDate" + (folderId == 0 ? "" : folderId), dialogsLoadOffsetDate);
-        editor.putLong("2dialogsLoadOffsetUserId" + (folderId == 0 ? "" : folderId), dialogsLoadOffsetUserId);
-        editor.putLong("2dialogsLoadOffsetChatId" + (folderId == 0 ? "" : folderId), dialogsLoadOffsetChatId);
-        editor.putLong("2dialogsLoadOffsetChannelId" + (folderId == 0 ? "" : folderId), dialogsLoadOffsetChannelId);
-        editor.putLong("2dialogsLoadOffsetAccess" + (folderId == 0 ? "" : folderId), dialogsLoadOffsetAccess);
-        editor.putBoolean("hasValidDialogLoadIds", true);
-        editor.commit();
+        synchronized (sync) {
+            SharedPreferences preferences = getPreferences();
+            long[] previous = getDialogLoadOffsets(folderId);
+            String suffix = folderId == 0 ? "" : String.valueOf(folderId);
+            if (preferences.getBoolean("hasValidDialogLoadIds", false)
+                    && preferences.contains("2dialogsLoadOffsetId" + suffix)
+                    && preferences.contains("2dialogsLoadOffsetDate" + suffix)
+                    && preferences.contains("2dialogsLoadOffsetUserId" + suffix)
+                    && preferences.contains("2dialogsLoadOffsetChatId" + suffix)
+                    && preferences.contains("2dialogsLoadOffsetChannelId" + suffix)
+                    && preferences.contains("2dialogsLoadOffsetAccess" + suffix)
+                    && previous[0] == dialogsLoadOffsetId && previous[1] == dialogsLoadOffsetDate
+                    && previous[2] == dialogsLoadOffsetUserId && previous[3] == dialogsLoadOffsetChatId
+                    && previous[4] == dialogsLoadOffsetChannelId && previous[5] == dialogsLoadOffsetAccess) return;
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putInt("2dialogsLoadOffsetId" + (folderId == 0 ? "" : folderId), dialogsLoadOffsetId);
+            editor.putInt("2dialogsLoadOffsetDate" + (folderId == 0 ? "" : folderId), dialogsLoadOffsetDate);
+            editor.putLong("2dialogsLoadOffsetUserId" + (folderId == 0 ? "" : folderId), dialogsLoadOffsetUserId);
+            editor.putLong("2dialogsLoadOffsetChatId" + (folderId == 0 ? "" : folderId), dialogsLoadOffsetChatId);
+            editor.putLong("2dialogsLoadOffsetChannelId" + (folderId == 0 ? "" : folderId), dialogsLoadOffsetChannelId);
+            editor.putLong("2dialogsLoadOffsetAccess" + (folderId == 0 ? "" : folderId), dialogsLoadOffsetAccess);
+            editor.putBoolean("hasValidDialogLoadIds", true);
+            editor.apply();
+        }
     }
 
     public void setShowCallsTab(boolean show) {
