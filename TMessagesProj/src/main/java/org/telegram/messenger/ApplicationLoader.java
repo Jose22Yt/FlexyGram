@@ -688,12 +688,11 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     @Override
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
+        if (level == android.content.ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) return;
         app.flexygram.bubbles.SignatureWallpaperBlur.trimMemory(level);
         app.flexygram.performance.TextLayoutPrecompute.trimMemory(level);
         if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) MessagesStorage.trimWarmHistories();
-        if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
-            ImageLoader.getInstance().clearMemory();
-        }
+        ImageLoader.trimMemory(level);
     }
 
     @Override
@@ -702,7 +701,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         app.flexygram.bubbles.SignatureWallpaperBlur.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
         app.flexygram.performance.TextLayoutPrecompute.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
         MessagesStorage.trimWarmHistories();
-        ImageLoader.getInstance().clearMemory();
+        ImageLoader.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
     }
 
     @Override

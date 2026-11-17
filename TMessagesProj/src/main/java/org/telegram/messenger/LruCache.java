@@ -233,9 +233,13 @@ public class LruCache<T> {
         return 1;
     }
 
-    /**
-     * Clear the cache, calling {@link #entryRemoved} on each removed entry.
-     */
+    /** Evict oldest entries to a temporary budget without changing the normal cache limit. */
+    public final void evictToSize(int targetSize) {
+        if (targetSize < 0) throw new IllegalArgumentException("targetSize < 0");
+        trimToSize(targetSize, null);
+    }
+
+    /** Clear the cache, calling {@link #entryRemoved} on each removed entry. */
     public final void evictAll() {
         trimToSize(-1, null); // -1 will evict 0-sized elements
     }

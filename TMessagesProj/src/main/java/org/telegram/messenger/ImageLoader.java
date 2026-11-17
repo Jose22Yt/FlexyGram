@@ -2841,10 +2841,32 @@ public class ImageLoader {
         }
     }
 
+    /** Only real pressure trims bounded caches; hiding the UI is not a memory warning. */
+    public static void trimMemory(int level) {
+        if (level == android.content.ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN
+                || level < android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) return;
+        ImageLoader loader = Instance;
+        // Never start decoder queues just to release memory; stripped thumbnails are static.
+        if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL) {
+            if (loader != null) loader.clearMemory();
+            else inu_strippedCache.evictAll();
+        } else {
+            if (loader != null) {
+                loader.smallImagesMemCache.evictToSize(loader.smallImagesMemCache.size() / 2);
+                loader.memCache.evictToSize(loader.memCache.size() / 2);
+                loader.wallpaperMemCache.evictToSize(loader.wallpaperMemCache.size() / 2);
+                loader.lottieMemCache.evictToSize(loader.lottieMemCache.size() / 2);
+            }
+            inu_strippedCache.trimToSize(inu_strippedCache.size() / 2);
+        }
+    }
+
     public void clearMemory() {
         smallImagesMemCache.evictAll();
         memCache.evictAll();
         lottieMemCache.evictAll();
+        wallpaperMemCache.evictAll();
+        inu_strippedCache.evictAll();
     }
 
     private void removeFromWaitingForThumb(int TAG, ImageReceiver imageReceiver) {
