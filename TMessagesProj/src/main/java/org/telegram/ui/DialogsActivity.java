@@ -10695,6 +10695,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
+    public boolean isStartupContentReady() {
+        return !isPaused() && getMessagesController().dialogsLoaded && viewPages != null && viewPages[0] != null
+                && viewPages[0].listView != null && viewPages[0].listView.isShown() && !viewPages[0].listView.isLayoutRequested();
+    }
+
     protected RecyclerListView getListView() {
         return viewPages[0].listView;
     }

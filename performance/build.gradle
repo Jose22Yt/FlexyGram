@@ -1,4 +1,8 @@
 plugins { id 'com.android.test' }
+def nativeTarget = project.findProperty('flexyStartupOptimization') == 'true'
+if (project.findProperty('flexyPerformanceBuild') != 'true') {
+    throw new GradleException('Device benchmarks require a non-debuggable performance build.')
+}
 android {
     namespace 'com.flexygram.performance'
     compileSdk = 37
@@ -7,6 +11,7 @@ android {
         minSdk = 33
         targetSdk = 37
         testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
+        testInstrumentationRunnerArguments 'flexy.targetPackage': (nativeTarget ? 'com.flexygram.messenger.nativebaseline' : 'io.github.jose22yt.flexygram.alpha')
     }
     buildTypes {
         connectedAlpha {
@@ -21,7 +26,7 @@ android {
     experimentalProperties['android.experimental.self-instrumenting'] = true
 }
 androidComponents {
-    beforeVariants(selector().all()) { builder -> builder.enable = builder.buildType == 'connectedAlpha' }
+    beforeVariants(selector().all()) { builder -> builder.enable = builder.buildType == (nativeTarget ? 'debug' : 'connectedAlpha') }
 }
 dependencies {
     implementation 'androidx.benchmark:benchmark-macro-junit4:1.5.0'

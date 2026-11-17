@@ -1996,6 +1996,10 @@ public class ChatActivity extends BaseFragment implements
         return null;
     }
 
+    public boolean isStartupContentReady() {
+        return !paused && !firstLoading && chatListView != null && chatListView.isShown() && !chatListView.isLayoutRequested();
+    }
+
     public RecyclerListView getChatListView() {
         return chatListView;
     }

@@ -430,6 +430,27 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     private AssetManager iconsAsset;
     private IconsResources customResources;
     private Runnable cancelIconPreload;
+    private app.flexygram.performance.StartupDrawReporter startupDrawReporter;
+    private boolean startupAuxiliaryScheduled;
+    private final Runnable startupAuxiliary = () -> {
+        if (isFinishing() || isDestroyed()) return;
+        Utilities.globalQueue.postRunnable(() -> {
+            EmojiHelper.getInstance().checkEmojiPacks();
+            PagePreviewRulesHelper.getInstance().checkPagePreviewRules();
+        });
+    };
+
+    private boolean isStartupContentReady() {
+        if (!isResumed || isFinishing() || isDestroyed() || SharedConfig.appLocked) return false;
+        BaseFragment current = !sheetFragmentsStack.isEmpty()
+                ? sheetFragmentsStack.get(sheetFragmentsStack.size() - 1).getSafeLastFragment()
+                : actionBarLayout == null ? null : actionBarLayout.getSafeLastFragment();
+        while (current instanceof ViewPagerActivity) current = ((ViewPagerActivity) current).getCurrentVisibleFragment();
+        if (current instanceof DialogsActivity) return ((DialogsActivity) current).isStartupContentReady();
+        if (current instanceof ChatActivity) return ((ChatActivity) current).isStartupContentReady();
+        View view = current == null ? null : current.getFragmentView();
+        return view != null && view.isShown() && !view.isLayoutRequested();
+    }
     private final Runnable startIconPreload = () -> {
         if (!isResumed || customResources == null || !app.flexygram.icons.ExactIcons.isEnabled()) return;
         cancelIconPreload = customResources.preloadOriginalIcons(new int[] {
@@ -533,6 +554,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         actionBarLayout = new ActionBarLayout(this, true);
 
         frameLayout = new ActivityContentLayout(this);
+        if (BuildConfig.PERFORMANCE_TEST_BUILD) {
+            startupDrawReporter = new app.flexygram.performance.StartupDrawReporter(frameLayout, this::isStartupContentReady, this::reportFullyDrawn);
+        }
         frameLayout.setClipToPadding(false);
         frameLayout.setClipChildren(false);
         setContentView(frameLayout);
@@ -808,10 +832,6 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
         AndroidUtilities.enableEdgeToEdge(this);
 
-        Utilities.globalQueue.postRunnable(() -> {
-            EmojiHelper.getInstance().checkEmojiPacks();
-            PagePreviewRulesHelper.getInstance().checkPagePreviewRules();
-        });
         BackupAgent.requestBackup();
 
         RestrictedLanguagesSelectActivity.checkRestrictedLanguages(false);
@@ -7166,6 +7186,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onDestroy() {
+        if (startupDrawReporter != null) startupDrawReporter.close();
+        if (frameLayout != null) frameLayout.removeCallbacks(startupAuxiliary);
         cancelIconPreload();
         cancelStartupStatusRefresh();
         refreshRateMonitor.stop();
@@ -9624,6 +9646,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         protected void dispatchDraw(@NonNull Canvas canvas) {
             super.dispatchDraw(canvas);
             drawRippleAbove(canvas, this);
+            if (!startupAuxiliaryScheduled) {
+                startupAuxiliaryScheduled = post(startupAuxiliary);
+            }
+            if (startupDrawReporter != null) startupDrawReporter.afterDraw();
         }
 
         @Override

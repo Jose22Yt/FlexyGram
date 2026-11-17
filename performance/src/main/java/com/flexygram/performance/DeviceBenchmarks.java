@@ -6,7 +6,7 @@ import kotlin.Unit;
 import org.junit.*;
 import java.util.*;
 
-/** Non-debuggable Alpha target. Macrobenchmark emits traces and measured frame percentiles. */
+/** Non-debuggable Alpha or Native Test target. Macrobenchmark emits traces and measured frame percentiles. */
 public class DeviceBenchmarks {
     @Rule public final MacrobenchmarkRule benchmark=new MacrobenchmarkRule();
     private CompilationMode compilation(){
@@ -18,6 +18,10 @@ public class DeviceBenchmarks {
     @Before public void requireFixture(){Journeys.fixture();}
     @Test public void coldStartup(){
         benchmark.measureRepeated(Journeys.PACKAGE,Arrays.asList(new StartupTimingMetric()),compilation(),StartupMode.COLD,20,
+                scope->{scope.pressHome();return Unit.INSTANCE;},scope->{Journeys.launch(scope);return Unit.INSTANCE;});
+    }
+    @Test public void warmStartup(){
+        benchmark.measureRepeated(Journeys.PACKAGE,Arrays.asList(new StartupTimingMetric()),compilation(),StartupMode.WARM,20,
                 scope->{scope.pressHome();return Unit.INSTANCE;},scope->{Journeys.launch(scope);return Unit.INSTANCE;});
     }
     @Test public void openChatAndKeyboard(){

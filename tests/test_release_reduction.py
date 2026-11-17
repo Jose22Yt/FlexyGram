@@ -28,7 +28,8 @@ def test_ci_reduction_preserves_runtime_resource_and_startup_theme_names():
         assert any(fnmatch.fnmatchcase('@style/'+style.get('name'), pattern) for pattern in keep)
 
 
-def test_real_r8_keeps_reflective_client_and_native_entries_while_removing_unused_code(tmp_path):
+@pytest.mark.parametrize('optimize', [False, True])
+def test_real_r8_keeps_reflective_client_and_native_entries_while_removing_unused_code(tmp_path, optimize):
     jar = os.environ.get('FLEXY_R8_JAR')
     if not jar or not Path(jar).is_file() or not shutil.which('java'):
         pytest.skip('Set FLEXY_R8_JAR for the host shrinker regression; CI also runs the full Android shrinker')
@@ -36,8 +37,10 @@ def test_real_r8_keeps_reflective_client_and_native_entries_while_removing_unuse
         'app/flexygram/probe/DynamicEntry.java':'package app.flexygram.probe;public class DynamicEntry{public static String label(){return "retained";}}',
         'app/exteraless/probe/PluginSurface.java':'package app.exteraless.probe;public class PluginSurface{public static String pluginEntry(){return "plugin";}}',
         'fixture/NativeOnly.java':'package fixture;public class NativeOnly{public static native int nativeProbe();public static String onNativeEvent(){return "callback";}}',
+        'fixture/Work.java':'package fixture;public class Work{public static int plus(int x){return x+2;}}',
         'fixture/Unused.java':'package fixture;public class Unused{public static int discarded(){return 1;}}',
         'fixture/Main.java':'''package fixture;public class Main{public static void main(String[]args)throws Exception{
+ if(Work.plus(1)!=3)throw new AssertionError();
  String name=System.getProperty("entry","app.flexygram.probe.DynamicEntry");
  Object result=Class.forName(name).getMethod("label").invoke(null);
  if(!"retained".equals(result))throw new AssertionError();
@@ -59,7 +62,7 @@ def test_real_r8_keeps_reflective_client_and_native_entries_while_removing_unuse
     config=tmp_path/'test.pro'
     base=(ROOT/'TMessagesProj/proguard-rules.pro').read_text().splitlines()
     # Apply the production global timing/name policy and the complete additional compatibility rules.
-    config.write_text('\n'.join(line for line in base if line.strip() in ['-dontoptimize','-dontobfuscate'])+'\n-keep class fixture.Main { public static void main(java.lang.String[]); }\n')
+    config.write_text('\n'.join(line for line in base if line.strip() in (['-dontobfuscate'] if optimize else ['-dontoptimize','-dontobfuscate']))+'\n-keep class fixture.Main { public static void main(java.lang.String[]); }\n')
     settings=subprocess.run(['java','-XshowSettings:properties','-version'],capture_output=True,text=True)
     java_home=next(line.split('=',1)[1].strip()for line in settings.stderr.splitlines()if 'java.home =' in line)
     output=tmp_path/'output.jar'
@@ -72,5 +75,6 @@ def test_real_r8_keeps_reflective_client_and_native_entries_while_removing_unuse
     assert 'app/exteraless/probe/PluginSurface.class' in names
     assert 'fixture/NativeOnly.class' in names
     assert 'fixture/Unused.class' not in names
+    assert ('fixture/Work.class' not in names) == optimize
     result=subprocess.run(['java','-cp',str(output),'fixture.Main'],capture_output=True,text=True)
     assert result.returncode==0,result.stderr

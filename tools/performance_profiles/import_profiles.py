@@ -28,8 +28,11 @@ def validate_results(path):
     cases=ET.parse(path).getroot().iter('testcase')
     passed=set()
     for case in cases:
-        if case.get('classname','').endswith('ProfileGeneration') and not any(case.find(tag) is not None for tag in ['skipped','failure','error']):
-            passed.add(case.get('name','').split('[')[0])
+        if case.get('classname','').endswith('ProfileGeneration'):
+            name=case.get('name','').split('[')[0]
+            if name in {'startup','chat','settings'} and any(case.find(tag) is not None for tag in ['skipped','failure','error']):
+                raise ValueError('A required profile journey failed or was skipped')
+            passed.add(name)
     if not {'startup','chat','settings'}<=passed:raise ValueError('Successful startup/chat/settings profile journeys are required')
 
 

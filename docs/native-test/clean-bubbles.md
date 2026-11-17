@@ -92,3 +92,9 @@ personalizada en los editores secundarios, para que no reaparezcan en búsqueda.
 La restauración del estado de una sección retirada vuelve a su vista general.
 Los controles nativos de exteraLess, burbujas limpias y hora pequeña se conservan.
 La copia beta.58 sigue separada e intacta.
+
+## beta.61: arranque y optimizador
+
+La continuación integra R8 optimizador conservando nombres/JNI/plugins, trabajo
+auxiliar tras el primer dibujo y adaptación del laboratorio de perfiles a Native
+Test. Estado real de perfiles, comandos y límites en [STARTUP_BETA61.md](STARTUP_BETA61.md).

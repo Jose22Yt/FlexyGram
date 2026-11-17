@@ -2,6 +2,10 @@
 def performanceBuild = project.findProperty('flexyPerformanceBuild') == 'true'
 def optimizeExperiment = project.findProperty('flexyR8Optimization') == 'true'
 def releaseReduction = project.findProperty('flexyReleaseReduction') == 'true'
+def startupOptimization = project.findProperty('flexyStartupOptimization') == 'true'
+if (startupOptimization && (!performanceBuild || !releaseReduction || project.findProperty('APP_PACKAGE') != 'com.flexygram.messenger.nativebaseline')) {
+    throw new GradleException('flexyStartupOptimization requires the isolated Native Test package, flexyPerformanceBuild and flexyReleaseReduction.')
+}
 if (releaseReduction && !performanceBuild) {
     throw new GradleException('flexyReleaseReduction requires flexyPerformanceBuild; retain the non-debuggable native Release configuration.')
 }
@@ -16,6 +20,8 @@ if (performanceBuild) {
     android.sourceSets.debug.manifest.srcFile('src/performance/AndroidManifest.xml')
     android.sourceSets.connectedAlpha.manifest.srcFile('src/performance/AndroidManifest.xml')
 }
+// Explicit AGP profile source: populated only by the device-capture importer.
+android.sourceSets.main.baselineProfiles.srcDir('src/main/generated/baselineProfiles')
 // Use the existing installable variant and signing key, with release-style shrinking.
 // Keep global optimization/name policy and JNI/plugin compatibility rules intact.
 if (releaseReduction) {
@@ -26,7 +32,7 @@ if (releaseReduction) {
                 'proguard-rules.pro', 'performance-shrink.pro'
     }
 }
-if (optimizeExperiment) {
+if (optimizeExperiment || startupOptimization) {
     def rules = layout.buildDirectory.file('generated/performance/optimized-rules.pro')
     def generateRules = tasks.register('prepareFlexyOptimizedRules') {
         inputs.file('proguard-rules.pro')
@@ -42,16 +48,25 @@ if (optimizeExperiment) {
             target.setText(source.findAll { it.trim() != '-dontoptimize' }.join('\n') + '\n', 'UTF-8')
         }
     }
-    tasks.matching { it.name == 'minifyConnectedAlphaWithR8' }.configureEach { dependsOn(generateRules) }
-    android.buildTypes.connectedAlpha {
-        minifyEnabled = true
-        shrinkResources = true
-        proguardFiles android.getDefaultProguardFile('proguard-android-optimize.txt'), rules.get().asFile
+    if (optimizeExperiment) {
+        tasks.matching { it.name == 'minifyConnectedAlphaWithR8' }.configureEach { dependsOn(generateRules) }
+        android.buildTypes.connectedAlpha {
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles android.getDefaultProguardFile('proguard-android-optimize.txt'), rules.get().asFile
+        }
+    }
+    if (startupOptimization) {
+        tasks.matching { it.name == 'minifyDebugWithR8' }.configureEach { dependsOn(generateRules) }
+        android.buildTypes.debug {
+            // Replace the reduction rules; appending would leave -dontoptimize active.
+            setProguardFiles([android.getDefaultProguardFile('proguard-android-optimize.txt'), rules.get().asFile, file('performance-shrink.pro')])
+        }
     }
 }
 dependencies {
     // Profiles are generated on-device; don't ship invented method lists.
-    if (performanceBuild || file('src/main/generated/baselineProfiles/baseline-prof.txt').isFile()) {
+    if (performanceBuild || file('src/main/baseline-prof.txt').isFile() || file('src/main/generated/baselineProfiles/baseline-prof.txt').isFile()) {
         implementation 'androidx.profileinstaller:profileinstaller:1.4.1'
     }
     // Tracking is created only when PERFORMANCE_TEST_BUILD is explicitly true.
