@@ -11,7 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_production_dns_returns_first_answer_closes_losers_and_bounds_aliases(tmp_path):
     maven = shutil.which('mvn')
-    if not maven:
+    java = shutil.which('java')
+    if not maven or not java:
         pytest.skip('Maven and JDK required for Kotlin resolver regression')
     source = tmp_path / 'src/main/kotlin'
     source.mkdir(parents=True)
@@ -126,11 +127,31 @@ fun main(){
 <dependency><groupId>dnsjava</groupId><artifactId>dnsjava</artifactId><version>3.6.5</version></dependency>
 </dependencies><build><sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory><plugins>
 <plugin><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>2.3.20</version><executions><execution><goals><goal>compile</goal></goals></execution></executions></plugin>
-<plugin><groupId>org.codehaus.mojo</groupId><artifactId>exec-maven-plugin</artifactId><version>3.5.0</version><configuration><mainClass>ProbeKt</mainClass></configuration></plugin>
+<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-dependency-plugin</artifactId><version>3.8.1</version></plugin>
 </plugins></build></project>''')
-    command = [maven, '-q', '-B', '-Dkotlin.compiler.daemon=false', '-f', str(tmp_path / 'pom.xml')]
+    # A cold CI runner downloads the compiler/plugins too. That preparation is not
+    # the resolver deadline, and must not hide a stuck probe inside exec:java.
+    classpath = tmp_path / 'classpath.txt'
+    command = [maven, '-B', '--no-transfer-progress', '-Dkotlin.compiler.daemon=false',
+               '-Daether.connector.connectTimeout=30000', '-Daether.connector.requestTimeout=30000',
+               '-f', str(tmp_path / 'pom.xml')]
     if os.environ.get('FLEXY_MAVEN_SETTINGS'):
         command += ['-s', os.environ['FLEXY_MAVEN_SETTINGS']]
-    result = subprocess.run(command + ['compile', 'exec:java'], capture_output=True, text=True, timeout=180)
+    try:
+        prepared = subprocess.run(command + ['compile', 'dependency:build-classpath',
+                                  '-Dmdep.outputFile=' + str(classpath)],
+                                  capture_output=True, text=True, timeout=600)
+    except subprocess.TimeoutExpired as error:
+        pytest.fail('DNS harness preparation timed out (600s); Maven output: ' +
+                    str(error.stdout or '')[-12000:] + str(error.stderr or '')[-12000:])
+    assert prepared.returncode == 0, prepared.stdout + prepared.stderr
+    assert classpath.is_file(), 'Maven did not produce the DNS harness classpath'
+    runtime_classpath = str(tmp_path / 'target/classes') + os.pathsep + classpath.read_text().strip()
+    try:
+        result = subprocess.run([java, '-cp', runtime_classpath, 'ProbeKt'],
+                                capture_output=True, text=True, timeout=30)
+    except subprocess.TimeoutExpired as error:
+        pytest.fail('DNS runtime probe timed out (30s); output: ' +
+                    str(error.stdout or '')[-12000:] + str(error.stderr or '')[-12000:])
     assert result.returncode == 0, result.stdout + result.stderr
     assert 'network invalidation passed' in result.stdout
