@@ -275,10 +275,6 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     @Override
     protected FrameLayout createContentView(Context context) {
         return new FrameLayout(context) {
-            @Override protected void dispatchDraw(Canvas canvas) {
-                super.dispatchDraw(canvas);
-                if (kyantInitWork != null) kyantInitWork.afterDraw();
-            }
             @Override public void onDescendantInvalidated(View child, View target) {
                 super.onDescendantInvalidated(child, target);
                 if (kyantDockView != null) kyantDockView.sourceInvalidated(target);
@@ -304,6 +300,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
                 super.dispatchDraw(canvas);
                 blur3_invalidateBlur();
                 blur3_updateFadeColors();
+                if (kyantInitWork != null) kyantInitWork.afterDraw();
             }
         };
     }

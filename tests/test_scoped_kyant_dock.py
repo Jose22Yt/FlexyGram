@@ -75,3 +75,32 @@ def test_scope_preserves_telegram_engine_and_disables_it_only_for_home_bar():
         source=(ROOT/'TMessagesProj/src/main/kotlin/app/flexygram/kyant'/path).read_text()
         normalized=source.split('\n',1)[1].replace('app.flexygram.kyant','com.kyant.backdrop.catalog')
         assert hashlib.sha256(normalized.encode()).hexdigest()==sha
+
+
+def test_real_content_container_compiles_and_draws_once_before_optional_initialization(tmp_path):
+    # Compile the complete production anonymous class, not just one selected method:
+    # duplicate overrides are valid syntax but must be rejected by the Java compiler.
+    host=(JAVA/'org/telegram/ui/MainTabsActivity.java').read_text()
+    create=method(host,'protected FrameLayout createContentView(Context context)')
+    probe(tmp_path,{'Probe.java':'''import java.util.*;
+@interface NonNull{}class Context{}class View{}class Canvas{
+ void drawRect(int l,int t,int r,int b,Object paint){Probe.events.add(l==0?"left":"right");}}
+class FrameLayout extends View{
+ FrameLayout(Context c){}protected void dispatchDraw(Canvas c){Probe.events.add("children");}
+ public void onDescendantInvalidated(View child,View target){}
+ protected void onLayout(boolean c,int l,int t,int r,int b){}
+ int getWidth(){return 200;}int getHeight(){return 100;}}
+class Base{protected FrameLayout createContentView(Context c){return null;}}
+class Theme{static Object fillingPaint(int color){return color;}}
+public class Probe extends Base{
+ static List<String>events=new ArrayList<>();int insetLeft=5,insetRight=6;
+ static class Dock{void sourceInvalidated(View v){}void syncFromNative(){}}
+ static class Work{void afterDraw(){events.add("kyant");}}
+ Dock kyantDockView=new Dock();Work kyantInitWork=new Work();
+ int getEstBackgroundColor(){return 0;}void checkUi_tabsPosition(){}void checkUi_fadeView(){}
+ void blur3_invalidateBlur(){events.add("blur");}void blur3_updateFadeColors(){events.add("fade");}
+ CREATE
+ public static void main(String[]args){Probe p=new Probe();FrameLayout view=p.createContentView(new Context());
+ view.dispatchDraw(new Canvas());if(!events.equals(List.of("left","right","children","blur","fade","kyant")))throw new AssertionError(events.toString());
+ events.clear();p.kyantInitWork=null;view.dispatchDraw(new Canvas());if(!events.equals(List.of("left","right","children","blur","fade")))throw new AssertionError(events.toString());}
+}'''.replace('CREATE',create)})

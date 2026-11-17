@@ -83,3 +83,10 @@ Validación posterior: `compileKotlin` de buildSrc con Gradle 9.7.1/Kotlin 2.4.1
 completado. Ejecución real de LottieMetaTask en un proyecto Gradle aislado produjo
 `pack(R.raw.kyant_probe, 48, 120, false)` a partir de JSON con fr48/ip10/op130.
 No se requiere SDK para esas dos comprobaciones; la APK completa se relanza en CI.
+
+La segunda pasada superó Lottie/Kotlin, pero Java detectó un `dispatchDraw(Canvas)`
+duplicado en el contenedor de MainTabsActivity. Se integra la solicitud idle de
+Kyant al final del override nativo ya existente, conservando insets, dibujo y
+actualización de fondos. La nueva regresión compila el contenedor anónimo completo
+con dobles Android y comprueba una sola ejecución del dibujo antes de la solicitud
+opcional. Resultado focalizado: 10 pruebas aprobadas; APK completa pendiente de CI.
