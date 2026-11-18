@@ -90,3 +90,11 @@ Kyant al final del override nativo ya existente, conservando insets, dibujo y
 actualización de fondos. La nueva regresión compila el contenedor anónimo completo
 con dobles Android y comprueba una sola ejecución del dibujo antes de la solicitud
 opcional. Resultado focalizado: 10 pruebas aprobadas; APK completa pendiente de CI.
+
+## Mejoras de fuente posteriores, sin nueva APK
+
+La inicialización de FileLoader se hace ahora por cuenta solicitada, sin crear
+los diez slots desde ImageLoader. Se agrupan comprobaciones multimedia sin
+callback y se conservan las barreras de las llamadas con callback. Ver
+[IMAGE_STARTUP_LAZY.md](../native-test/IMAGE_STARTUP_LAZY.md). No cambia el material
+Kyant ni las superficies de Telegram; no se inicia compilación en esta entrega.

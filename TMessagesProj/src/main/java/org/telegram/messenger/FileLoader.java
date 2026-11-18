@@ -225,12 +225,25 @@ public class FileLoader extends BaseController {
     private String forceLoadingFile;
 
     private static SparseArray<File> mediaDirs = null;
-    private FileLoaderDelegate delegate = null;
+    private volatile FileLoaderDelegate delegate = null;
 
     private int lastReferenceId;
     private final ConcurrentHashMap<Integer, Object> parentObjectReferences = new ConcurrentHashMap<>();
 
     private static final FileLoader[] Instance = new FileLoader[UserConfig.MAX_ACCOUNT_COUNT];
+    interface DelegateFactory { FileLoaderDelegate create(int account); }
+    private static DelegateFactory delegateFactory;
+
+    /** Install without constructing empty account slots; shares getInstance's creation lock. */
+    static void setDelegateFactory(DelegateFactory factory) {
+        synchronized (FileLoader.class) {
+            delegateFactory = factory;
+            for (int account = 0; account < Instance.length; account++) {
+                FileLoader loader = Instance[account];
+                if (loader != null) loader.setDelegate(factory.create(account));
+            }
+        }
+    }
 
     public static FileLoader getInstance(int num) {
         FileLoader localInstance = Instance[num];
@@ -238,7 +251,9 @@ public class FileLoader extends BaseController {
             synchronized (FileLoader.class) {
                 localInstance = Instance[num];
                 if (localInstance == null) {
-                    Instance[num] = localInstance = new FileLoader(num);
+                    localInstance = new FileLoader(num);
+                    if (delegateFactory != null) localInstance.setDelegate(delegateFactory.create(num));
+                    Instance[num] = localInstance;
                 }
             }
         }

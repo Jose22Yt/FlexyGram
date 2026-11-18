@@ -131,6 +131,9 @@ public class ImageLoader {
     private LinkedList<HttpImageTask> httpTasks = new LinkedList<>();
     private LinkedList<ArtworkLoadTask> artworkTasks = new LinkedList<>();
     private DispatchQueuePriority cacheOutQueue = new DispatchQueuePriority("cacheOutQueue");
+    private final app.flexygram.performance.CoalescedTask mediaPathRefresh =
+            new app.flexygram.performance.CoalescedTask(
+                    task -> cacheOutQueue.postRunnable(task), () -> refreshMediaPaths(null));
     private DispatchQueue cacheThumbOutQueue = new DispatchQueue("cacheThumbOutQueue");
     private DispatchQueue thumbGeneratingQueue = new DispatchQueue("thumbGeneratingQueue");
     private DispatchQueue imageLoadQueue = new DispatchQueue("imageLoadQueue");
@@ -2224,9 +2227,51 @@ public class ImageLoader {
         AndroidUtilities.createEmptyFile(new File(cachePath, ".nomedia"));
         mediaDirs.put(FileLoader.MEDIA_DIR_CACHE, cachePath);
 
-        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
-            final int currentAccount = a;
-            FileLoader.getInstance(a).setDelegate(new FileLoader.FileLoaderDelegate() {
+        FileLoader.setMediaDirs(mediaDirs);
+        FileLoader.setDelegateFactory(this::createFileLoaderDelegate);
+
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context arg0, Intent intent) {
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.d("file system changed");
+                }
+                Runnable r = () -> checkMediaPaths();
+                if (Intent.ACTION_MEDIA_UNMOUNTED.equals(intent.getAction())) {
+                    AndroidUtilities.runOnUIThread(r, 1000);
+                } else {
+                    r.run();
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_MEDIA_BAD_REMOVAL);
+        filter.addAction(Intent.ACTION_MEDIA_CHECKING);
+        filter.addAction(Intent.ACTION_MEDIA_EJECT);
+        filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+        filter.addAction(Intent.ACTION_MEDIA_NOFS);
+        filter.addAction(Intent.ACTION_MEDIA_REMOVED);
+        filter.addAction(Intent.ACTION_MEDIA_SHARED);
+        filter.addAction(Intent.ACTION_MEDIA_UNMOUNTABLE);
+        filter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+        filter.addDataScheme("file");
+        try {
+            if (Build.VERSION.SDK_INT >= 33) {
+                ApplicationLoader.applicationContext.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED);
+            } else {
+                ApplicationLoader.applicationContext.registerReceiver(receiver, filter);
+            }
+        } catch (Throwable ignore) {
+
+        }
+
+        checkMediaPaths();
+    }
+
+    /** Bind callbacks only when FileLoader is actually needed for this account. */
+    private FileLoader.FileLoaderDelegate createFileLoaderDelegate(final int currentAccount) {
+        return new FileLoader.FileLoaderDelegate() {
                 @Override
                 public void fileUploadProgressChanged(FileUploadOperation operation, final String location, long uploadedSize, long totalSize, final boolean isEncrypted) {
                     fileProgresses.put(location, new long[]{uploadedSize, totalSize});
@@ -2359,47 +2404,7 @@ public class ImageLoader {
                         AndroidUtilities.runOnUIThread(() -> NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.fileLoadProgressChanged, location, uploadedSize, totalSize));
                     }
                 }
-            });
-        }
-        FileLoader.setMediaDirs(mediaDirs);
-
-        BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context arg0, Intent intent) {
-                if (BuildVars.LOGS_ENABLED) {
-                    FileLog.d("file system changed");
-                }
-                Runnable r = () -> checkMediaPaths();
-                if (Intent.ACTION_MEDIA_UNMOUNTED.equals(intent.getAction())) {
-                    AndroidUtilities.runOnUIThread(r, 1000);
-                } else {
-                    r.run();
-                }
-            }
-        };
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_MEDIA_BAD_REMOVAL);
-        filter.addAction(Intent.ACTION_MEDIA_CHECKING);
-        filter.addAction(Intent.ACTION_MEDIA_EJECT);
-        filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
-        filter.addAction(Intent.ACTION_MEDIA_NOFS);
-        filter.addAction(Intent.ACTION_MEDIA_REMOVED);
-        filter.addAction(Intent.ACTION_MEDIA_SHARED);
-        filter.addAction(Intent.ACTION_MEDIA_UNMOUNTABLE);
-        filter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
-        filter.addDataScheme("file");
-        try {
-            if (Build.VERSION.SDK_INT >= 33) {
-                ApplicationLoader.applicationContext.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED);
-            } else {
-                ApplicationLoader.applicationContext.registerReceiver(receiver, filter);
-            }
-        } catch (Throwable ignore) {
-
-        }
-
-        checkMediaPaths();
+            };
     }
 
     private int sizeOfBitmapDrawable(BitmapDrawable value) {
@@ -2412,18 +2417,20 @@ public class ImageLoader {
     }
 
     public void checkMediaPaths() {
-        checkMediaPaths(null);
+        // Broadcast/permission bursts need one queued scan, plus one follow-up if
+        // storage changes during a running scan. The callback overload keeps its barrier.
+        mediaPathRefresh.request();
     }
 
     public void checkMediaPaths(Runnable after) {
-        cacheOutQueue.postRunnable(() -> {
-            final SparseArray<File> paths = createMediaPaths();
-            AndroidUtilities.runOnUIThread(() -> {
-                FileLoader.setMediaDirs(paths);
-                if (after != null) {
-                    after.run();
-                }
-            });
+        cacheOutQueue.postRunnable(() -> refreshMediaPaths(after));
+    }
+
+    private void refreshMediaPaths(Runnable after) {
+        final SparseArray<File> paths = createMediaPaths();
+        AndroidUtilities.runOnUIThread(() -> {
+            FileLoader.setMediaDirs(paths);
+            if (after != null) after.run();
         });
     }
 
