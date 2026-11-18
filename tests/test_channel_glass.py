@@ -41,6 +41,8 @@ public class ChannelGlassRegression {
     }
     static class Color {static int WHITE=-1;}
     static class ColorUtils {static double calculateLuminance(int c){return 1;}static int setAlphaComponent(int c,int a){return (c&0xffffff)|(a<<24);}}
+    static class Colors {boolean isBlurEnabled(){return SharedConfig.enabled;}}
+    final Colors compactGlassColors=new Colors();
     static class AndroidUtilities {static float density=1;}
     static class LiteMode {static final int FLAG_CHAT_BLUR=1;static boolean enabled=true;static boolean isEnabled(int flag){return enabled;}}
     static class SharedConfig {static boolean enabled=true;static boolean chatBlurEnabled(){return enabled;}}
@@ -52,7 +54,7 @@ public class ChannelGlassRegression {
     static class Channels extends View {
         boolean left=true,right=true;
         void getSignatureBounds(RectF m,RectF l,RectF r){m.left=60;m.right=440;m.bottom=44;l.right=left?44:0;l.bottom=44;r.left=456;r.right=right?500:456;r.bottom=44;}
-        int getSignatureVisualInset(){return 0;}int getSignatureSurfaceColor(){return -1;}float getSignatureAlpha(){return 1;}
+        int getSignatureVisualInset(){return 0;}boolean isSignatureDarkTheme(){return false;}float getSignatureAlpha(){return 1;}
     }
     final RectF signatureChannelMiddle=new RectF(),signatureChannelLeft=new RectF(),signatureChannelRight=new RectF();
     final RectF signatureChannelLastMiddle=new RectF(),signatureChannelLastLeft=new RectF(),signatureChannelLastRight=new RectF();
@@ -61,6 +63,9 @@ public class ChannelGlassRegression {
     final Drawable blurredBackgroundDrawable=new Drawable();Drawable[] compactGlass={new Drawable()};
     final Channels flexyChannels=new Channels();final View inputIslandBubbleContainer=new View();boolean flexyPearlGlass;
     int dp(float n){return Math.round(n);}
+    boolean canDrawCompactGlass(Canvas c){return c.hardware && compactGlass[0]!=null && compactGlassColors.isBlurEnabled();}
+    void prepareSolidSurface(boolean dark,float alpha){}
+    void drawSolidSurface(Canvas c,RectF r,float radius){if(!r.isEmpty())c.drawRoundRect(r,radius,radius,flexySurface);}
     void drawCompactGlass(Canvas canvas,int index,RectF r,float radius){canvas.draws.add("native"+index);}
     DRAW
     static void require(boolean ok,String message){if(!ok)throw new AssertionError(message);}

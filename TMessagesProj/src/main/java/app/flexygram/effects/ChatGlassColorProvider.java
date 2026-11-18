@@ -5,26 +5,41 @@ import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProviderThemed;
 import org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl;
 
-/** Shared material policy for chat header, pinned panel and input islands.
- * Keeps the existing input opacity, native glass contours and power-saving fallback. */
+/** Theme-aware tint for the native chat header and composer materials. */
 public final class ChatGlassColorProvider extends BlurredBackgroundColorProviderThemed {
     private final int account;
     private final Theme.ResourcesProvider provider;
-    private final int backgroundKey;
+    private final java.util.function.IntSupplier opacity;
 
     public ChatGlassColorProvider(int account, Theme.ResourcesProvider provider, int backgroundKey) {
+        this(account, provider, backgroundKey, null);
+    }
+
+    public ChatGlassColorProvider(int account, Theme.ResourcesProvider provider, int backgroundKey,
+            java.util.function.IntSupplier opacity) {
         super(provider, backgroundKey);
+        this.opacity = opacity;
         this.account = account;
         this.provider = provider;
-        this.backgroundKey = backgroundKey;
+    }
+
+    public boolean isBlurEnabled() {
+        return BlurredBackgroundProviderImpl.checkBlurEnabled(account, provider);
+    }
+
+    @Override public int getStrokeColorFull() {
+        if (isBlurEnabled()) return super.getStrokeColorFull();
+        return ChatChromePalette.outline(provider != null ? provider.isDark() : Theme.isCurrentThemeDark());
     }
 
     @Override public int getBackgroundColor() {
-        if (!BlurredBackgroundProviderImpl.checkBlurEnabled(account, provider)) {
-            return ColorUtils.setAlphaComponent(Theme.getColor(backgroundKey, provider), 255);
-        }
-        int color = super.getBackgroundColor();
-        boolean dark = provider != null ? provider.isDark() : Theme.isCurrentThemeDark();
-        return dark ? color : ColorUtils.setAlphaComponent(color, 140);
+        final boolean dark = provider != null ? provider.isDark() : Theme.isCurrentThemeDark();
+        if (!isBlurEnabled()) return ChatChromePalette.surface(dark);
+        final int color = super.getBackgroundColor();
+        final int alpha = dark ? color >>> 24 : 140;
+        final int channels = color & 0x00f0f0f0;
+        final boolean nearBackgroundExtreme = dark ? channels == 0 : channels == 0x00f0f0f0;
+        final int tint = nearBackgroundExtreme ? ChatChromePalette.surface(dark) : color;
+        return ColorUtils.setAlphaComponent(tint, opacity == null ? alpha : Math.round(alpha * opacity.getAsInt() / 100f));
     }
 }

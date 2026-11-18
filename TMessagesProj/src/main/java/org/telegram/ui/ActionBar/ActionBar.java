@@ -235,7 +235,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         glassMode = true;
         glassModeIsForum = isForum;
         signatureGlassFactory=factory;
-        signatureGlassColorProvider=colorProvider;
+        signatureGlassColorProvider = colorProvider;
         signatureGlassCall=null;
         signatureGlassUnread=null;
         signatureGlassGeometryApplied=false;
@@ -1523,10 +1523,12 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         signatureGlassRadius=-1;
         // Native padding INSETS painted bounds. Signature geometry already describes the visible pill.
         int padding=signature ? 0 : dp(6);
-        if(glassDrawable!=null)glassDrawable.setPadding(padding);
-        if(glassDrawableBack!=null)glassDrawableBack.setPadding(padding);
-        if(glassDrawableMenu!=null)glassDrawableMenu.setPadding(padding);
+        if (glassDrawable != null) glassDrawable.setPadding(padding);
+        if (glassDrawableBack != null) glassDrawableBack.setPadding(padding);
+        if (glassDrawableMenu != null) glassDrawableMenu.setPadding(padding);
         if(!signature){
+            clearGlassBounds(signatureGlassCall);
+            clearGlassBounds(signatureGlassUnread);
             if(glassDrawable!=null)glassDrawable.setRadius(glassDrawableLeftRadius,dp(23),dp(23),glassDrawableLeftRadius);
             if(glassDrawableBack!=null)glassDrawableBack.setRadius(dp(23));
             if(glassDrawableMenu!=null)glassDrawableMenu.setRadius(dp(23));
@@ -1573,6 +1575,14 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         requestLayout();
         invalidate();
     }
+    public void updateSignatureChatGlassColors() {
+        if (glassDrawable != null) glassDrawable.updateColors();
+        if (glassDrawableBack != null) glassDrawableBack.updateColors();
+        if (glassDrawableMenu != null) glassDrawableMenu.updateColors();
+        if (signatureGlassCall != null) signatureGlassCall.updateColors();
+        if (signatureGlassUnread != null) signatureGlassUnread.updateColors();
+    }
+
     private static void updateSignatureNativeGlassDrawable(
             org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable drawable, boolean allowed) {
         if (android.os.Build.VERSION.SDK_INT >= 33
@@ -1584,16 +1594,16 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
     public boolean drawSignatureNativeGlass(Canvas canvas,
             app.flexygram.header.SignatureChatHeader header) {
-        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return false;
-        if (header == null || !header.active() || !glassMode || !canvas.isHardwareAccelerated()
-                || !org.telegram.messenger.SharedConfig.chatBlurEnabled()
+        if (header == null || !header.active() || !glassMode
+                || android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S || !canvas.isHardwareAccelerated()
+                || !(signatureGlassColorProvider instanceof app.flexygram.effects.ChatGlassColorProvider)
+                || !((app.flexygram.effects.ChatGlassColorProvider) signatureGlassColorProvider).isBlurEnabled()
                 || glassDrawable == null || glassDrawableBack == null || glassDrawableMenu == null) return false;
-        glassDrawable.setAlpha(255);
-        glassDrawableBack.setAlpha(255);
-        glassDrawableMenu.setAlpha(255);
         if (header.fusionActive()) {
             var g = header.fusionGeometry();
-            if (g == null || !g.fits || g.mattePortrait && g.callAvailable && signatureGlassCall==null) return false;
+            if (g == null || !g.fits || g.mattePortrait && g.callAvailable && signatureGlassCall == null
+                    || g.separateUnread && signatureGlassUnread == null) return false;
+            glassDrawableMenu.setAlpha(255);
             setSignatureGlassRadius((g.center.bottom-g.center.top)*.5f);
             final int offset = Math.round(header.fusionTop);
 
@@ -1601,11 +1611,13 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                     Math.round(g.backVisual.top) + offset, Math.round(g.backVisual.right),
                     Math.round(g.backVisual.bottom) + offset);
             glassDrawableBack.draw(canvas);
-            if (g.separateUnread && signatureGlassUnread != null) {
+            if (g.separateUnread) {
                 setSignatureUnreadGlassRadius(g.unread.height()*.5f);
                 signatureGlassUnread.setBounds(Math.round(g.unread.left),Math.round(g.unread.top)+offset,
                         Math.round(g.unread.right),Math.round(g.unread.bottom)+offset);
                 signatureGlassUnread.draw(canvas);
+            } else {
+                clearGlassBounds(signatureGlassUnread);
             }
 
             glassDrawable.setBounds(Math.round(g.center.left),
@@ -1615,8 +1627,6 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             // Portrait layout has two distinct action circles; keep both native hit targets.
             if (g.mattePortrait) {
                 if (g.callAvailable) {
-                    if (signatureGlassCall==null) return false;
-                    signatureGlassCall.setAlpha(255);
 
                     signatureGlassCall.setBounds(Math.round(g.callVisual.left),
                         Math.round(g.callVisual.top) + offset, Math.round(g.callVisual.right),
@@ -1632,22 +1642,27 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                     Math.round(g.actionsVisual.top) + offset, Math.round(g.actionsVisual.right),
                     Math.round(g.actionsVisual.bottom) + offset);
             }
+            if (!g.mattePortrait || !g.callAvailable) clearGlassBounds(signatureGlassCall);
             glassDrawableMenu.draw(canvas);
             return true;
         }
         var g = header.geometry;
+        if (g.separateCount && signatureGlassUnread == null) return false;
+        glassDrawableMenu.setAlpha(255);
+        clearGlassBounds(signatureGlassCall);
         setSignatureGlassRadius(g.back.height()*.5f);
         // Adaptive back pill, centered text pill and avatar island are kept independent.
 
         float backLeft = g.back.left, backRight = g.back.right;
         if (g.separateCount) {
-            if (signatureGlassUnread == null) return false;
             if (org.telegram.messenger.LocaleController.isRTL) backLeft = backRight - g.back.height();
             else backRight = backLeft + g.back.height();
             setSignatureUnreadGlassRadius(g.badge.height() * .5f);
             signatureGlassUnread.setBounds(Math.round(g.badge.left), Math.round(g.badge.top),
                     Math.round(g.badge.right), Math.round(g.badge.bottom));
             signatureGlassUnread.draw(canvas);
+        } else {
+            clearGlassBounds(signatureGlassUnread);
         }
         glassDrawableBack.setBounds(Math.round(backLeft), Math.round(g.back.top),
                 Math.round(backRight), Math.round(g.back.bottom));
@@ -1663,6 +1678,18 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         return true;
     }
 
+
+    public void clearSignatureGlassBounds() {
+        clearGlassBounds(glassDrawable);
+        clearGlassBounds(glassDrawableBack);
+        clearGlassBounds(glassDrawableMenu);
+        clearGlassBounds(signatureGlassCall);
+        clearGlassBounds(signatureGlassUnread);
+    }
+
+    private static void clearGlassBounds(BlurredBackgroundDrawable drawable) {
+        if (drawable != null && !drawable.getBounds().isEmpty()) drawable.setBounds(0, 0, 0, 0);
+    }
 
     private int centeredTitleAvailableWidth(int width) {
         final int titleLeft = centerTitleLeft();

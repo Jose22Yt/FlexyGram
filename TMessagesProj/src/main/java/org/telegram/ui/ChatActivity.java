@@ -545,6 +545,8 @@ public class ChatActivity extends BaseFragment implements
     private BlurredBackgroundColorProviderThemed blurredBackgroundColorProvider;
     private BlurredBackgroundColorProviderThemed blurredBackgroundColorProviderWhite;
     private BlurredBackgroundColorProviderThemed blurredBackgroundColorProviderTop;
+    private app.flexygram.effects.ChatGlassColorProvider headerGlassColors;
+    private app.flexygram.effects.ChatGlassColorProvider composerGlassColors;
 
     private int performanceOpenTransitionCookie, performanceCloseTransitionCookie;
     private boolean signatureNativeGlassAllowed;
@@ -5434,10 +5436,11 @@ public class ChatActivity extends BaseFragment implements
 
         contentView.setOccupyStatusBar(!inBubbleMode && !isInsideContainer && !inPreviewMode);
 
-        actionBar.setupGlass(
-            glassBackgroundDrawableFactory,
-            blurredBackgroundColorProviderTop,
-            ChatObject.isForum(currentChat));
+        headerGlassColors = new app.flexygram.effects.ChatGlassColorProvider(
+                currentAccount, themeDelegate, Theme.key_chat_topPanelBackground,
+                () -> app.flexygram.header.HeaderConfig.signature() && !app.flexygram.header.HeaderConfig.portrait()
+                        ? app.flexygram.header.HeaderConfig.opacity() : 100);
+        actionBar.setupGlass(glassBackgroundDrawableFactory, headerGlassColors, ChatObject.isForum(currentChat));
         app.exteraless.appearance.ChatHeaderUiHelper.applyChatHeaderGlassStyle(actionBar);
         //actionBar.setChatAvatarContainer(avatarContainer);
         //avatarContainer.setActionBar(actionBar);
@@ -5460,9 +5463,11 @@ public class ChatActivity extends BaseFragment implements
         chatInputViewsContainer.setClipChildren(false);
         chatInputViewsContainer.drawInputBackground = !isFeedSearch();
         chatInputViewsContainer.setWindowInsetsProvider(windowInsetsStateHolder);
+        composerGlassColors = new app.flexygram.effects.ChatGlassColorProvider(
+                currentAccount, themeDelegate, Theme.key_chat_messagePanelBackground);
         chatInputViewsContainer.setInputIslandBubbleDrawable(
-            glassBackgroundDrawableFactory.create(chatInputViewsContainer, blurredBackgroundColorProvider));
-        chatInputViewsContainer.setCompactGlassFactory(glassBackgroundDrawableFactory, blurredBackgroundColorProvider);
+            glassBackgroundDrawableFactory.create(chatInputViewsContainer, composerGlassColors));
+        chatInputViewsContainer.setCompactGlassFactory(glassBackgroundDrawableFactory, composerGlassColors);
         chatInputViewsContainer.setUnderKeyboardBackgroundDrawable(
             glassBackgroundDrawableFactoryFrosted.create(chatInputViewsContainer, blurredBackgroundColorProvider));
 
@@ -32336,6 +32341,7 @@ public class ChatActivity extends BaseFragment implements
             params.rightMargin = usesSignatureHeader() || isTitleCentered() ? 0 : AndroidUtilities.dp(52);
             avatarContainer.setLayoutParams(params);
             signatureChatHeader.changed();
+            actionBar.updateSignatureChatGlassColors();
             if (audioCallIconItem != null && usesSignatureHeader()) audioCallIconItem.setVisibility(View.GONE);
         }
         app.flexygram.bubbles.BubbleConfig.load();
@@ -46946,6 +46952,8 @@ public class ChatActivity extends BaseFragment implements
             if (blurredBackgroundColorProviderTop != null) {
                 blurredBackgroundColorProviderTop.updateColors();
             }
+            if (headerGlassColors != null) headerGlassColors.updateColors();
+            if (composerGlassColors != null) composerGlassColors.updateColors();
 
             if (chatActivityEnterView != null) {
                 chatActivityEnterView.updateColors();
@@ -47997,6 +48005,11 @@ public class ChatActivity extends BaseFragment implements
         private int glassInkSurface = Integer.MIN_VALUE;
         private int glassInkBaseColor = Integer.MIN_VALUE;
         private int glassInkOpacity = -1;
+
+        @Override
+        public boolean isDark() {
+            return chatTheme != null ? isDark : Theme.isCurrentThemeDark();
+        }
 
         @Override
         public int getColor(int key) {

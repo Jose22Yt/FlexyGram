@@ -1,6 +1,8 @@
 package app.flexygram.header;
 
 import android.graphics.Canvas;
+
+import app.flexygram.effects.ChatChromePalette;
 import android.util.TypedValue;
 import android.view.View;
 import org.telegram.messenger.AndroidUtilities;
@@ -151,22 +153,20 @@ public final class SignatureChatHeader {
         }
     }
     public void draw(Canvas canvas) {
-        // Native Liquid Glass is a Telegram power-saving flag, not a new Flexy master switch.
-        // Use the existing ActionBar blur3 sources only when they are ready.
-        // Solid Signature rendering remains bit-for-bit unchanged when the flag is off.
         nativeGlassDrawn = bar.drawSignatureNativeGlass(canvas, this);
         if (nativeGlassDrawn) {
             drawUnread(canvas);
             return;
         }
+        if (canvas.isHardwareAccelerated()) bar.clearSignatureGlassBounds();
         if (!fusionActive()) {
             surface.draw(canvas, geometry, AndroidUtilities.density, provider);
             drawUnread(canvas);
             return;
         }
-        int fill = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
-        fill = (fill & 0xffffff) | ((HeaderConfig.portrait() ? 255 : Math.round(HeaderConfig.opacity() * 2.55f)) << 24);
-        int border = (Theme.getColor(Theme.key_divider, provider) & 0xffffff) | 0x66000000;
+        final boolean dark = provider != null ? provider.isDark() : Theme.isCurrentThemeDark();
+        final int fill = ChatChromePalette.surface(dark);
+        final int border = ChatChromePalette.outline(dark);
         int save = canvas.save(); canvas.translate(0, fusionTop);
         fusion.surface.drawBackdrop(canvas, fusion.layout, fill, border, border, AndroidUtilities.density);
         canvas.restoreToCount(save);
@@ -223,7 +223,8 @@ public final class SignatureChatHeader {
     /** One final center contour, after the real avatar; no double edge under the fading image. */
     public void drawForeground(Canvas canvas) {
         if (!fusionActive() || nativeGlassDrawn) return;
-        int border = (Theme.getColor(Theme.key_divider, provider) & 0xffffff) | 0x66000000;
+        final boolean dark = provider != null ? provider.isDark() : Theme.isCurrentThemeDark();
+        final int border = ChatChromePalette.outline(dark);
         int save = canvas.save(); canvas.translate(0, fusionTop);
         fusion.surface.drawCenterBorder(canvas, fusion.layout, border, AndroidUtilities.density);
         canvas.restoreToCount(save);

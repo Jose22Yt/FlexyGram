@@ -133,6 +133,10 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
         return renderNode.hasDisplayList();
     }
 
+    public boolean samplesBackdrop() {
+        return Color.alpha(backgroundColor) != 255;
+    }
+
     @Override
     public void updateDisplayList() {
         final float offsetX = sourceOffsetX;
@@ -147,7 +151,7 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
 
         // An opaque surface never samples the backdrop. Keep the previous fill node
         // available; a later transparent color change invalidates and records it again.
-        if (Color.alpha(backgroundColor) != 255) {
+        if (samplesBackdrop()) {
             c = renderNodeFill.beginRecording();
             c.save();
             c.translate(-sL, -sT);
@@ -202,7 +206,11 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
 
     @Override
     public void updateColors() {
+        final boolean sampledBackdrop = samplesBackdrop();
         super.updateColors();
+        if (sampledBackdrop != samplesBackdrop() && renderNode.hasDisplayList()) {
+            source.dispatchOnDrawablesRelativePositionChange();
+        }
 
         updateShadowLayer(shadowColor);
         if (boundProps.useFullStroke) {

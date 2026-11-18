@@ -70,7 +70,7 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
     private static final int[] signatureLeft={BUTTON_DIRECT,BUTTON_GIFT,BUTTON_GIGA_GROUP_INFO,BUTTON_RECENT_ACTIONS_INFO};
     private static final int[] signatureRight={BUTTON_SEARCH};
     private boolean signatureCompact,signatureRtl,signaturePresentation;
-    private int signatureInset,signatureGap,signatureSurface,signaturePosition;
+    private int signatureInset,signatureGap,signaturePosition;
     private int[] leftOrder(){return signatureCompact?(signatureRtl?signatureRight:signatureLeft):buttonsOrderLeft;}
     private int[] rightOrder(){return signatureCompact?(signatureRtl?signatureLeft:signatureRight):buttonsOrderRight;}
     private int step(){return signatureCompact?48:54;}
@@ -86,7 +86,6 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
         signatureGap=dp(app.flexygram.composer.FlexyComposerConfig.gap());
         signaturePosition=dp(app.flexygram.composer.ComposerStyle.offset(app.flexygram.composer.FlexyComposerConfig.position()));
         container.setTranslationY(0);
-        signatureSurface=Theme.getColor(Theme.key_chat_messagePanelBackground,resourcesProvider);
         for(ButtonHolder holder:buttonHolders)if(holder!=null){
             holder.button.setDrawSurface(!compact);
             holder.button.getLayoutParams().width=dp(compact?48:56);
@@ -96,7 +95,9 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
     public boolean isSignatureCompactPresentation(){return signatureCompact&&getVisibility()==VISIBLE;}
     public int getSignatureVerticalOffset(){return isSignatureCompactPresentation()?signaturePosition:0;}
     public int getSignatureVisualInset(){return signatureInset;}
-    public int getSignatureSurfaceColor(){return signatureSurface;}
+    public boolean isSignatureDarkTheme() {
+        return resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
+    }
     public float getSignatureAlpha(){return totalVisibilityFactor;}
     /** Bounds in this layout's coordinates; actual native permission/visibility factors decide slots. */
     public void getSignatureBounds(RectF middle,RectF left,RectF right){

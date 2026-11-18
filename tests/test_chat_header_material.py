@@ -22,7 +22,7 @@ def test_shared_material_tracks_light_dark_flags_account_and_theme(tmp_path):
  public static int multAlpha(int c,float a){return(c&0xffffff)|((int)((c>>>24)*a)<<24);}}''',
         'org/telegram/ui/Components/blur3/drawable/color/impl/BlurredBackgroundProviderImpl.java':'''package org.telegram.ui.Components.blur3.drawable.color.impl;
  import org.telegram.ui.ActionBar.Theme;import org.telegram.messenger.*;public class BlurredBackgroundProviderImpl{GATE}'''.replace('GATE',gate),
-        'Probe.java':'''import app.flexygram.effects.ChatGlassColorProvider;import org.telegram.ui.ActionBar.Theme;import org.telegram.messenger.*;
+        'Probe.java':'''import app.flexygram.effects.ChatGlassColorProvider;import app.flexygram.effects.ChatChromePalette;import org.telegram.ui.ActionBar.Theme;import org.telegram.messenger.*;
  public class Probe{static void check(boolean v){if(!v)throw new AssertionError();}
  static class Palette implements Theme.ResourcesProvider{boolean dark;int bottom,top,white;public boolean isDark(){return dark;}public int getColor(int k){return k==1?bottom:k==2?top:white;}}
  public static void main(String[]args){Palette palette=new Palette();
@@ -43,18 +43,27 @@ def test_shared_material_tracks_light_dark_flags_account_and_theme(tmp_path):
  LiteMode.liquid=false;int frost=header.getBackgroundColor();LiteMode.liquid=true;int glass=header.getBackgroundColor();check((frost>>>24)==193&&(glass>>>24)==216);
  palette.top=0xff223344;palette.bottom=0xff556677;header.updateColors();input.updateColors();check((header.getBackgroundColor()&0xffffff)==0x223344&&(input.getBackgroundColor()&0xffffff)==0x556677);
  // Master off is opaque and uses the newest palette even before a theme refresh callback.
- palette.top=0xffabcdef;SharedConfig.enabled=false;check(header.getBackgroundColor()==0xffabcdef);
+ palette.top=0xffabcdef;SharedConfig.enabled=false;check(header.getBackgroundColor()==0xff26272a);
+ check(header.getStrokeColorFull()==0x30ffffff);
+ palette.dark=false;check(header.getBackgroundColor()==0xfff4f5f7&&header.getStrokeColorFull()==0x26000000);
  Theme.dark=false;Theme.color=-1;SharedConfig.enabled=true;MessagesController.accounts[1].config.disableBlurInLightTheme.value=false;
- check((new ChatGlassColorProvider(1,null,1).getBackgroundColor()>>>24)==140);
+ check(new ChatGlassColorProvider(1,null,1).getBackgroundColor()==0x8cf4f5f7);
+ palette.dark=true;palette.bottom=0xff000000;input.updateColors();
+ check(input.getBackgroundColor()==0xd826272a);
+ ChatGlassColorProvider adjustable=new ChatGlassColorProvider(1,palette,1,()->50);
+ check(adjustable.getBackgroundColor()==0x6c26272a);
  }}''',
     }, [JAVA/'app/flexygram/effects/ChatGlassColorProvider.java',
+        JAVA/'app/flexygram/effects/ChatChromePalette.java',
         JAVA/'org/telegram/ui/Components/blur3/drawable/color/BlurredBackgroundColorProviderThemed.java',
         JAVA/'org/telegram/ui/Components/blur3/drawable/color/BlurredBackgroundColorProvider.java'])
 
 
-def test_trial_chat_surfaces_use_original_material_without_flexy_provider():
+def test_chat_chrome_material_is_scoped_to_header_and_composer():
     text=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
-    assert 'new app.flexygram.effects.ChatGlassColorProvider' not in text
+    assert text.count('new app.flexygram.effects.ChatGlassColorProvider') == 2
+    assert 'setupGlass(glassBackgroundDrawableFactory, headerGlassColors' in text
+    assert 'setCompactGlassFactory(glassBackgroundDrawableFactory, composerGlassColors)' in text
     for key in ['key_chat_messagePanelBackground','key_windowBackgroundWhite','key_chat_topPanelBackground']:
         assert 'new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.'+key+')' in text
     assert 'super.getBackgroundColor(), 216' in text

@@ -19,6 +19,7 @@ def test_composer_native_islands_do_not_overpaint_the_native_material(tmp_path):
         static class BlurredBackgroundDrawable {
             int alpha=255,material,radiusChanges,draws;float radius;int l,t,r,b,index;
             BlurredBackgroundDrawable(int index){this.index=index;}
+            BlurredBackgroundDrawable setPadding(int p){return this;}
             void setRadius(float r){radius=r;radiusChanges++;}void setAlpha(int a){alpha=a;}int getAlpha(){return alpha;}
             void setBounds(int l,int t,int r,int b){this.l=l;this.t=t;this.r=r;this.b=b;}
             void draw(Canvas c){draws++;c.calls++;c.material[index]=material;}
@@ -30,6 +31,11 @@ def test_composer_native_islands_do_not_overpaint_the_native_material(tmp_path):
         final Composer flexyComposer=new Composer();
         final BlurredBackgroundDrawable blurredBackgroundDrawable=new BlurredBackgroundDrawable(0);
         final BlurredBackgroundDrawable[] compactGlass={new BlurredBackgroundDrawable(0),new BlurredBackgroundDrawable(1),new BlurredBackgroundDrawable(2),new BlurredBackgroundDrawable(3)};
+        static class Factory {
+            BlurredBackgroundDrawable create(Probe p, Object colors){return new BlurredBackgroundDrawable(0);}
+        }
+        final Factory compactGlassFactory=new Factory();
+        final Object compactGlassColors=new Object();
         final boolean[] compactGlassDrawn=new boolean[4];final float[] compactGlassRadius={-1,-1,-1,-1};
         RectF flexyPill=new RectF(52,2,230,42),flexyAttach=new RectF(2,2,42,42),flexyVoice=new RectF(),flexySend=new RectF(),flexyLastPill=new RectF();
         boolean flexySendDrawn,flexyVoiceDrawn,flexyNativeGlassDrawn;
@@ -57,10 +63,10 @@ def test_composer_native_islands_do_not_overpaint_the_native_material(tmp_path):
 def test_composer_keeps_native_policy_and_solid_fallback():
     source = (JAVA/'org/telegram/ui/Components/chat/ChatInputViewsContainer.java').read_text()
     draw = method(source, 'private void drawFlexyCompactBackground(')
-    assert 'canvas.isHardwareAccelerated()' in draw
+    assert 'canDrawCompactGlass(canvas)' in draw
     assert 'flexyComposer.flexyNativeGlassIslandsAvailable()' in draw
     assert draw.index('drawFlexyNativeGlassIslands(') < draw.index('if (flexyPearlGlass')
-    assert 'ComposerStyle.surface(' in draw
+    assert 'prepareSolidSurface(' in draw and 'drawSolidSurface(' in draw
     assert 'drawFlexyComposerTint' not in source
     policy = method(source, 'public void updateNativeLiquidGlassPolicy(')
     assert 'for (BlurredBackgroundDrawable drawable : compactGlass)' in policy

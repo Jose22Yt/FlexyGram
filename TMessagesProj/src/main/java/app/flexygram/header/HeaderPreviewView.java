@@ -166,8 +166,11 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         var g=fusion.geometry;float d=AndroidUtilities.density;
         int color=Theme.getColor(Theme.key_actionBarDefaultTitle);
         if(fusion.color!=color){fusion.color=color;iconColor=color;fusion.phone.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);fusion.more.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);back.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);}
-        int fill=(Theme.getColor(Theme.key_windowBackgroundWhite)&0xffffff)|((previewPortrait()?255:Math.round(HeaderConfig.opacity()*2.55f))<<24);
-        int edge=(Theme.getColor(Theme.key_divider)&0xffffff)|0x66000000;
+        final boolean dark = Theme.isCurrentThemeDark();
+        final boolean translucent = org.telegram.messenger.SharedConfig.chatBlurEnabled() && !previewPortrait();
+        int fill = app.flexygram.effects.ChatChromePalette.surface(dark);
+        if (translucent) fill = Theme.multAlpha(fill, HeaderConfig.opacity() / 100f);
+        final int edge = app.flexygram.effects.ChatChromePalette.outline(dark);
         int outer=canvas.save();canvas.translate(0,fusionTop);
         fusion.surface.drawBackdrop(canvas,g,fill,edge,edge,d);
         int clip=canvas.save();canvas.clipPath(fusion.clip);

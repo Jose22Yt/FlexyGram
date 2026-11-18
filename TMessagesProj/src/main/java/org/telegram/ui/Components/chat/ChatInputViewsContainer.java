@@ -26,6 +26,9 @@ import org.telegram.ui.ActionBar.Theme;
 import androidx.core.graphics.ColorUtils;
 import org.telegram.messenger.AndroidUtilities;
 import app.flexygram.composer.FlexyComposerConfig;
+import app.flexygram.effects.ChatChromePalette;
+import app.flexygram.effects.ChatGlassColorProvider;
+import org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory;
 import org.telegram.ui.Components.blur3.BlurredBackgroundWithFadeDrawable;
 import org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable;
 import org.telegram.ui.Components.inset.InAppKeyboardInsetView;
@@ -143,18 +146,26 @@ public class ChatInputViewsContainer extends FrameLayout {
     private boolean flexySendDrawn;
     private boolean flexyNativeGlassDrawn;
     private final float[] compactGlassRadius = {-1, -1, -1, -1};
-    public void setCompactGlassFactory(org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory factory,
-            org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProvider colors) {
-        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return;
-        for (int i = 0; i < compactGlass.length; i++) {
-            compactGlass[i] = factory.create(this, colors).setPadding(0);
-            compactGlass[i].setAlpha(0);
-        }
+    private BlurredBackgroundDrawableViewFactory compactGlassFactory;
+    private ChatGlassColorProvider compactGlassColors;
+
+    public void setCompactGlassFactory(BlurredBackgroundDrawableViewFactory factory, ChatGlassColorProvider colors) {
+        compactGlassFactory = factory;
+        compactGlassColors = colors;
+    }
+
+    private boolean canDrawCompactGlass(Canvas canvas) {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && canvas.isHardwareAccelerated()
+                && compactGlassFactory != null && compactGlassColors.isBlurEnabled();
     }
 
     private void drawCompactGlass(Canvas canvas, int index, RectF bounds, float radius) {
         compactGlassDrawn[index] = true;
         BlurredBackgroundDrawable drawable = compactGlass[index];
+        if (drawable == null) {
+            drawable = compactGlassFactory.create(this, compactGlassColors).setPadding(0);
+            compactGlass[index] = drawable;
+        }
         if (compactGlassRadius[index] != radius) {
             compactGlassRadius[index] = radius;
             drawable.setRadius(radius);
@@ -398,7 +409,10 @@ public class ChatInputViewsContainer extends FrameLayout {
             }
 
             for (int i = 0; i < compactGlass.length; i++) {
-                if (!snapshotPass && !compactGlassDrawn[i] && compactGlass[i] != null) compactGlass[i].setAlpha(0);
+                if (!snapshotPass && !compactGlassDrawn[i] && compactGlass[i] != null) {
+                    compactGlass[i].setAlpha(0);
+                    compactGlass[i].setBounds(0, 0, 0, 0);
+                }
             }
             if (flexyComposer != null) {
                 flexyComposer.setFlexyNativeGlassBackdropDrawn(flexyNativeGlassDrawn);
@@ -439,39 +453,42 @@ public class ChatInputViewsContainer extends FrameLayout {
         if(!signatureChannelLeft.isEmpty())signatureChannelLeft.offset(x,y);
         if(!signatureChannelRight.isEmpty())signatureChannelRight.offset(x,y);
         float radius=(dp(44)-2*flexyChannels.getSignatureVisualInset())/2f;
-        if(!signatureChannelMiddle.equals(signatureChannelLastMiddle)||!signatureChannelLeft.equals(signatureChannelLastLeft)||!signatureChannelRight.equals(signatureChannelLastRight)){
-            signatureChannelMask.rewind();signatureChannelMask.addRoundRect(signatureChannelMiddle,radius,radius,Path.Direction.CW);
-            if(!signatureChannelLeft.isEmpty())signatureChannelMask.addRoundRect(signatureChannelLeft,radius,radius,Path.Direction.CW);
-            if(!signatureChannelRight.isEmpty())signatureChannelMask.addRoundRect(signatureChannelRight,radius,radius,Path.Direction.CW);
-            signatureChannelLastMiddle.set(signatureChannelMiddle);signatureChannelLastLeft.set(signatureChannelLeft);signatureChannelLastRight.set(signatureChannelRight);
-        }
         // Channels use the same retained native blur/border surfaces as contacts.
         // Do not gate them on the legacy pearl preset or paint an opaque surface over them.
-        if (compactGlass[0] != null && canvas.isHardwareAccelerated()
-                && org.telegram.messenger.SharedConfig.chatBlurEnabled()) {
+        if (canDrawCompactGlass(canvas)) {
             drawCompactGlass(canvas, 0, signatureChannelMiddle, radius);
             if (!signatureChannelLeft.isEmpty()) drawCompactGlass(canvas, 1, signatureChannelLeft, radius);
             if (!signatureChannelRight.isEmpty()) drawCompactGlass(canvas, 2, signatureChannelRight, radius);
             return;
         }
-        int panel=flexyChannels.getSignatureSurfaceColor();boolean dark=ColorUtils.calculateLuminance(panel)<.4;
-        if(flexyPearlGlass && org.telegram.messenger.SharedConfig.chatBlurEnabled()){
+        final boolean dark = flexyChannels.isSignatureDarkTheme();
+        if(flexyPearlGlass && canvas.isHardwareAccelerated() && compactGlassColors != null && compactGlassColors.isBlurEnabled()){
+            if(!signatureChannelMiddle.equals(signatureChannelLastMiddle)||!signatureChannelLeft.equals(signatureChannelLastLeft)||!signatureChannelRight.equals(signatureChannelLastRight)){
+                signatureChannelMask.rewind();signatureChannelMask.addRoundRect(signatureChannelMiddle,radius,radius,Path.Direction.CW);
+                if(!signatureChannelLeft.isEmpty())signatureChannelMask.addRoundRect(signatureChannelLeft,radius,radius,Path.Direction.CW);
+                if(!signatureChannelRight.isEmpty())signatureChannelMask.addRoundRect(signatureChannelRight,radius,radius,Path.Direction.CW);
+                signatureChannelLastMiddle.set(signatureChannelMiddle);signatureChannelLastLeft.set(signatureChannelLeft);signatureChannelLastRight.set(signatureChannelRight);
+            }
             tmpRectF.set(signatureChannelMiddle);if(!signatureChannelLeft.isEmpty())tmpRectF.union(signatureChannelLeft);if(!signatureChannelRight.isEmpty())tmpRectF.union(signatureChannelRight);
             tmpRectF.inset(-dp(7),-dp(7));tmpRectF.round(tmpRect);blurredBackgroundDrawable.setBounds(tmpRect);
             canvas.save();canvas.clipPath(signatureChannelMask);blurredBackgroundDrawable.draw(canvas);canvas.restore();
             flexySurface.setColor(ColorUtils.setAlphaComponent(app.flexygram.composer.ComposerStyle.surface(dark,false),(dark?80:60)*blurredBackgroundDrawable.getAlpha()/255));
-        }else flexySurface.setColor(app.flexygram.composer.ComposerStyle.surface(dark,false));
+        } else {
+            prepareSolidSurface(dark, flexyChannels.getSignatureAlpha());
+            drawSolidSurface(canvas, signatureChannelMiddle, radius);
+            drawSolidSurface(canvas, signatureChannelLeft, radius);
+            drawSolidSurface(canvas, signatureChannelRight, radius);
+            return;
+        }
         flexySurface.setAlpha(Math.round(flexySurface.getAlpha()*flexyChannels.getSignatureAlpha()));
         canvas.drawRoundRect(signatureChannelMiddle,radius,radius,flexySurface);
         if(!signatureChannelLeft.isEmpty())canvas.drawRoundRect(signatureChannelLeft,radius,radius,flexySurface);
         if(!signatureChannelRight.isEmpty())canvas.drawRoundRect(signatureChannelRight,radius,radius,flexySurface);
-        if(flexyPearlGlass && org.telegram.messenger.SharedConfig.chatBlurEnabled()){
-            flexyPearl.setColor(ColorUtils.setAlphaComponent(Color.WHITE,(dark?28:76)*blurredBackgroundDrawable.getAlpha()/255));
-            flexyPearl.setStyle(Paint.Style.STROKE);flexyPearl.setStrokeWidth(.65f*AndroidUtilities.density);
-            canvas.drawRoundRect(signatureChannelMiddle,radius,radius,flexyPearl);
-            if(!signatureChannelLeft.isEmpty())canvas.drawRoundRect(signatureChannelLeft,radius,radius,flexyPearl);
-            if(!signatureChannelRight.isEmpty())canvas.drawRoundRect(signatureChannelRight,radius,radius,flexyPearl);
-        }
+        flexyPearl.setColor(ColorUtils.setAlphaComponent(Color.WHITE,(dark?28:76)*blurredBackgroundDrawable.getAlpha()/255));
+        flexyPearl.setStyle(Paint.Style.STROKE);flexyPearl.setStrokeWidth(.65f*AndroidUtilities.density);
+        canvas.drawRoundRect(signatureChannelMiddle,radius,radius,flexyPearl);
+        if(!signatureChannelLeft.isEmpty())canvas.drawRoundRect(signatureChannelLeft,radius,radius,flexyPearl);
+        if(!signatureChannelRight.isEmpty())canvas.drawRoundRect(signatureChannelRight,radius,radius,flexyPearl);
     }
 
     private final RectF flexyPill = new RectF();
@@ -525,13 +542,11 @@ public class ChatInputViewsContainer extends FrameLayout {
         final boolean attach = flexyComposer.getFlexyAttachmentBounds(flexyAttach);
         if (attach) flexyAttach.offset(offsetX, offsetY);
         final float radius = flexyComposer.getFlexyActionDiameter() / 2f;
-        final boolean nativeGlass = !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && compactGlass[0] != null && canvas.isHardwareAccelerated()
-                && flexyComposer.flexyNativeGlassIslandsAvailable();
-        if (nativeGlass) {
+        if (canDrawCompactGlass(canvas) && flexyComposer.flexyNativeGlassIslandsAvailable()) {
             drawFlexyNativeGlassIslands(canvas, offsetX, offsetY, radius, attach);
             return;
         }
-        if (flexyPearlGlass && org.telegram.messenger.SharedConfig.chatBlurEnabled()) {
+        if (flexyPearlGlass && canvas.isHardwareAccelerated() && compactGlassColors != null && compactGlassColors.isBlurEnabled()) {
             final boolean voice = flexyComposer.getFlexyVoiceBounds(flexyVoice);
             if (voice) flexyVoice.offset(offsetX, offsetY);
             // One native backdrop pass for the pill, attachment and settled microphone.
@@ -570,12 +585,30 @@ public class ChatInputViewsContainer extends FrameLayout {
             if (voice) canvas.drawRoundRect(flexyVoice, radius, radius, flexyPearl);
             flexyVoiceDrawn = voice;
         } else {
-            // Opaque, legible off-white/charcoal surfaces without a full-width backing.
-            final int panel = flexyComposer.getThemedColor(Theme.key_chat_messagePanelBackground);
-            flexySurface.setColor(app.flexygram.composer.ComposerStyle.surface(ColorUtils.calculateLuminance(panel) < 0.4, false));
-            canvas.drawRoundRect(flexyPill, radius, radius, flexySurface);
-            if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexySurface);
+            prepareSolidSurface(flexyComposer.isFlexyDarkTheme(), blurredBackgroundDrawable.getAlpha() / 255f);
+            drawSolidSurface(canvas, flexyPill, radius);
+            if (attach) drawSolidSurface(canvas, flexyAttach, radius);
+            if (flexyComposer.getFlexyVoiceBounds(flexyVoice)) {
+                flexyVoice.offset(offsetX, offsetY);
+                drawSolidSurface(canvas, flexyVoice, radius);
+                flexyVoiceDrawn = true;
+            }
         }
+    }
+
+    private void prepareSolidSurface(boolean dark, float alpha) {
+        flexySurface.setColor(ChatChromePalette.surface(dark));
+        flexySurface.setAlpha(Math.round(255 * alpha));
+        flexyPearl.setColor(ChatChromePalette.outline(dark));
+        flexyPearl.setAlpha(Math.round(flexyPearl.getAlpha() * alpha));
+        flexyPearl.setStyle(Paint.Style.STROKE);
+        flexyPearl.setStrokeWidth(.65f * AndroidUtilities.density);
+    }
+
+    private void drawSolidSurface(Canvas canvas, RectF bounds, float radius) {
+        if (bounds.isEmpty()) return;
+        canvas.drawRoundRect(bounds, radius, radius, flexySurface);
+        canvas.drawRoundRect(bounds, radius, radius, flexyPearl);
     }
 
     @Override

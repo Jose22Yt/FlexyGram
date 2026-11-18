@@ -3360,12 +3360,9 @@ public class ChatActivityEnterView extends FrameLayout implements
                     // Signature compositor: use one restrained, separate native action circle.
                     // Preserve upstream accent and all native microphone gestures in Classic.
                     if (flexyCompactLayout) {
-                        final int panel = getThemedColor(Theme.key_chat_messagePanelBackground);
-                        final boolean dark = ColorUtils.calculateLuminance(panel) < 0.4;
-                        paint.setColor(flexyNativeGlassIslandsAvailable()
-                            ? app.flexygram.composer.ComposerStyle.nativeGlassButton(dark)
-                            : app.flexygram.composer.ComposerStyle.surface(dark,
-                                app.flexygram.composer.FlexyComposerConfig.glass()));
+                        paint.setColor(flexyNativeGlassBackdropDrawn
+                            ? app.flexygram.composer.ComposerStyle.nativeGlassButton(isFlexyDarkTheme())
+                            : app.flexygram.effects.ChatChromePalette.surface(isFlexyDarkTheme()));
                     } else {
                         paint.setColor(getThemedColor(Theme.key_chat_messagePanelSend));
                     }
@@ -4932,6 +4929,10 @@ public class ChatActivityEnterView extends FrameLayout implements
         if (sendButton != null) sendButton.invalidate();
         if (audioVideoButtonContainer != null) audioVideoButtonContainer.invalidate();
         invalidate();
+    }
+
+    public boolean isFlexyDarkTheme() {
+        return resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
     }
 
     public boolean flexyNativeGlassIslandsAvailable() {

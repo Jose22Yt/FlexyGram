@@ -2024,7 +2024,6 @@ public class SharedConfig {
 
     public static boolean chatBlurEnabled() {
         // Liquid Glass includes its own blur; it does not require the separate frosted toggle.
-        if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST) return canBlurChat() && LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR);
         return canBlurChat() && LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR | LiteMode.FLAG_LIQUID_GLASS);
     }
 

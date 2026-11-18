@@ -193,6 +193,7 @@ public class Probe implements IBlur3Hash {
 def test_opaque_native_material_skips_backdrop_recording_and_transparency_restores_it(tmp_path):
     source = (JAVA/'org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawableRenderNode.java').read_text()
     update = method(source, 'public void updateDisplayList()')
+    samples = method(source, 'public boolean samplesBackdrop()')
     probe(tmp_path, {'Probe.java': '''public class Probe {
  static int dp(int n){return n;}static class Color{static int alpha(int c){return c>>>24;}}
  static class Build {static class VERSION{static int SDK_INT=33;}}
@@ -204,13 +205,14 @@ def test_opaque_native_material_skips_backdrop_recording_and_transparency_restor
  static class Liquid {int updates;void update(Object...args){updates++;}}
  float sourceOffsetX,sourceOffsetY;Props boundProps=new Props();Node renderNode=new Node(),renderNodeFill=new Node();Source source=new Source();Liquid liquidGlassEffect=new Liquid();int backgroundColor,strokeColorTop,strokeColorBottom,strokeColorFull;Object paintStrokeTop,paintStrokeBottom,paintStrokeFull;
  void drawStrokeRaw(Object...args){}
+ SAMPLES
  UPDATE
- public static void main(String[]args){Probe p=new Probe();p.backgroundColor=0xff123456;
+ public static void main(String[]args){Probe p=new Probe();p.backgroundColor=0xff123456;if(p.samplesBackdrop())throw new AssertionError();
  for(int i=0;i<1000;i++)p.updateDisplayList();
  if(p.source.draws!=0||p.renderNodeFill.records!=0||p.liquidGlassEffect.updates!=0||p.renderNode.records!=1000)throw new AssertionError();
- p.backgroundColor=0x80123456;p.updateDisplayList();if(p.source.draws!=1||p.liquidGlassEffect.updates!=1)throw new AssertionError();
+ p.backgroundColor=0x80123456;if(!p.samplesBackdrop())throw new AssertionError();p.updateDisplayList();if(p.source.draws!=1||p.liquidGlassEffect.updates!=1)throw new AssertionError();
  p.liquidGlassEffect=null;p.updateDisplayList();if(p.source.draws!=2)throw new AssertionError();
- }}'''.replace('UPDATE', update)})
+ }}'''.replace('UPDATE', update).replace('SAMPLES', samples)})
 
 
 def test_position_watcher_owns_and_releases_external_window_observers(tmp_path):
