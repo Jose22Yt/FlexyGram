@@ -123,8 +123,12 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         alpha = dock.alpha
         if (geometry.update(dock.x, dock.y, dock.width, dock.height, dock.paddingTop, dock.paddingBottom,
                 LocaleController.isRTL, Theme.isCurrentThemeDark())) geometryRevision++
-        dock.importantForAccessibility = if (ready && dock.visibility == VISIBLE && dock.alpha > 0f && (KyantDockConfig.isEnabled() && !LiteMode.isPowerSaverApplied())) View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS else View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
-        available = isShown && dock.isShown && dock.visibility == VISIBLE && dock.alpha > 0f && windowVisibility == VISIBLE && isHardwareAccelerated && (KyantDockConfig.isEnabled() && !LiteMode.isPowerSaverApplied())
+        available = isShown && dock.isShown && dock.visibility == VISIBLE && dock.alpha > 0f &&
+            windowVisibility == VISIBLE && isHardwareAccelerated &&
+            KyantDockConfig.isEnabled() && !LiteMode.isPowerSaverApplied()
+        val importance = if (isRendering()) View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+            else View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+        if (dock.importantForAccessibility != importance) dock.importantForAccessibility = importance
         visible.forEach { it.setSkipDrawSelector(available && visible.size >= 2) }
         if (!available) {
             ready = false

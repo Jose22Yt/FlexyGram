@@ -109,16 +109,30 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
             runAlphaEnterTransition();
         }
 
-        ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1f);
-        valueAnimator.addUpdateListener(animation -> {
-            if (activity != null) {
-                activity.onListItemAnimatorTick();
-            } else {
-                recyclerListView.invalidate();
-            }
-        });
-        valueAnimator.setDuration(getRemoveDuration() + getMoveDuration());
-        valueAnimator.start();
+        startListRedraw();
+    }
+
+    private ValueAnimator listRedrawAnimator;
+
+    private void startListRedraw() {
+        final long duration = getRemoveDuration() + getMoveDuration();
+        if (listRedrawAnimator != null && listRedrawAnimator.isStarted()) {
+            final long remaining = listRedrawAnimator.getDuration() - listRedrawAnimator.getCurrentPlayTime();
+            if (remaining >= duration) return;
+            listRedrawAnimator.cancel();
+        }
+        if (listRedrawAnimator == null) {
+            listRedrawAnimator = ValueAnimator.ofFloat(0, 1f);
+            listRedrawAnimator.addUpdateListener(animation -> {
+                if (activity != null) {
+                    activity.onListItemAnimatorTick();
+                } else {
+                    recyclerListView.invalidate();
+                }
+            });
+        }
+        listRedrawAnimator.setDuration(duration);
+        listRedrawAnimator.start();
     }
 
     long alphaEnterDelay;
@@ -1232,6 +1246,7 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
 
     @Override
     public void endAnimations() {
+        if (listRedrawAnimator != null) listRedrawAnimator.cancel();
         app.flexygram.bubbles.deletion.DeleteMotionOverlay.cancelAll(recyclerListView);
         flexyPendingDeletes.clear();
         if (BuildVars.LOGS_ENABLED) {

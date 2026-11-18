@@ -38225,9 +38225,6 @@ public class ChatActivity extends BaseFragment implements
 
     public void onListItemAnimatorTick() {
         invalidateMessagesVisiblePart();
-        if (scrimView != null) {
-            fragmentView.invalidate();
-        }
     }
 
     public void setSavedDialog(long savedDialogId) {
