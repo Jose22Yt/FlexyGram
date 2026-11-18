@@ -103,3 +103,100 @@ def test_scheduled_read_waits_for_a_usable_chat_including_empty_history(tmp_path
         if (p.canLoadInitialScheduledMessages()) throw new AssertionError("closed");
     }
 }'''.replace('IMPLEMENTATION', implementation)})
+
+
+def test_folder_sort_matches_legacy_and_reuses_priority_and_date_within_each_pass(tmp_path):
+    import subprocess
+    from test_render_work_reuse import ROOT
+
+    path = JAVA / 'org/telegram/messenger/MessagesController.java'
+    source = path.read_text()
+    legacy = subprocess.check_output(
+        ['git', 'show', '9b305e3ee7ee16097576d60af07f6ed9f105de9c:' + str(path.relative_to(ROOT))],
+        cwd=ROOT, text=True)
+    previous = method(legacy, 'private final Comparator<TLRPC.Dialog> dialogDateComparator =') + ';'
+    current = method(source, 'private static final class FolderActivity') + '\n' + method(
+        source, 'private Comparator<TLRPC.Dialog> createFolderComparator(DialogFilter filter)')
+    probe(tmp_path, {'Probe.java': '''import java.util.*;
+
+class TLRPC {
+    static class Dialog {
+        long id;
+        int date;
+        boolean unread;
+        Dialog(long id, int date, boolean unread) { this.id = id; this.date = date; this.unread = unread; }
+    }
+    static class TL_dialogFolder extends Dialog { TL_dialogFolder(long id) { super(id, 0, false); } }
+}
+class MediaDataController {
+    final Map<Long, Integer> drafts = new HashMap<>();
+    int reads;
+    Integer getDraft(long id, int thread) { reads++; return drafts.get(id); }
+}
+class DialogObject {
+    static long getLastMessageOrDraftDate(TLRPC.Dialog dialog, Integer draft) {
+        return draft == null ? dialog.date : Math.max(dialog.date, draft);
+    }
+}
+class ChatsHelper {
+    static final ChatsHelper INSTANCE = new ChatsHelper();
+    int reads;
+    static ChatsHelper getInstance(int account) { return INSTANCE; }
+    boolean isUnreadSortPriority(TLRPC.Dialog dialog) { reads++; return dialog.unread; }
+}
+class NaConfig {
+    static final NaConfig INSTANCE = new NaConfig();
+    boolean enabled;
+    NaConfig getSortByUnread() { return this; }
+    boolean Bool() { return enabled; }
+}
+class DialogFilter {
+    final Pins pinnedDialogs = new Pins();
+    static class Pins extends HashMap<Long, Integer> {
+        int get(long key, int fallback) { return getOrDefault(key, fallback); }
+    }
+}
+public class Probe {
+    final int currentAccount = 0;
+    final MediaDataController media = new MediaDataController();
+    MediaDataController getMediaDataController() { return media; }
+    DialogFilter sortingDialogFilter;
+    PREVIOUS
+    CURRENT
+    void checkOrder(List<TLRPC.Dialog> dialogs, DialogFilter filter, boolean unread) {
+        NaConfig.INSTANCE.enabled = unread;
+        sortingDialogFilter = filter;
+        var previous = new ArrayList<>(dialogs);
+        previous.sort(dialogDateComparator);
+        int previousDateReads = media.reads;
+        int previousUnreadReads = ChatsHelper.INSTANCE.reads;
+        media.reads = 0;
+        ChatsHelper.INSTANCE.reads = 0;
+        dialogs.sort(createFolderComparator(filter));
+        if (!dialogs.equals(previous)) throw new AssertionError("order, ties or pins changed");
+        if (media.reads > dialogs.size() || ChatsHelper.INSTANCE.reads > dialogs.size()
+                || media.reads >= previousDateReads
+                || (unread && ChatsHelper.INSTANCE.reads >= previousUnreadReads))
+            throw new AssertionError("repeated draft or unread work");
+    }
+    public static void main(String[] args) {
+        Probe p = new Probe();
+        Random random = new Random(12);
+        List<TLRPC.Dialog> dialogs = new ArrayList<>();
+        dialogs.add(new TLRPC.TL_dialogFolder(-99));
+        for (int i = 1; i <= 500; i++)
+            dialogs.add(new TLRPC.Dialog(i, random.nextInt(25), random.nextBoolean()));
+        var first = new DialogFilter();
+        var second = new DialogFilter();
+        first.pinnedDialogs.put(44L, Integer.MAX_VALUE);
+        first.pinnedDialogs.put(31L, 3);
+        first.pinnedDialogs.put(42L, 3);
+        second.pinnedDialogs.put(10L, -1);
+        p.checkOrder(dialogs, first, true);
+        p.media.drafts.put(8L, Integer.MAX_VALUE);
+        p.media.reads = 0;
+        ChatsHelper.INSTANCE.reads = 0;
+        p.checkOrder(dialogs, second, false);
+        if (dialogs.get(2).id != 8) throw new AssertionError("stale draft ordering");
+    }
+}'''.replace('PREVIOUS', previous).replace('CURRENT', current)})

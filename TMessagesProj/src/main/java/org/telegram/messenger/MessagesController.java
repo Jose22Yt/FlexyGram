@@ -1449,44 +1449,41 @@ public class MessagesController extends BaseController implements NotificationCe
         }
     }
 
-    private DialogFilter sortingDialogFilter;
-    private final Comparator<TLRPC.Dialog> dialogDateComparator = (dialog1, dialog2) -> {
-        int pinnedNum1 = sortingDialogFilter == null ? Integer.MIN_VALUE : sortingDialogFilter.pinnedDialogs.get(dialog1.id, Integer.MIN_VALUE);
-        int pinnedNum2 = sortingDialogFilter == null ? Integer.MIN_VALUE : sortingDialogFilter.pinnedDialogs.get(dialog2.id, Integer.MIN_VALUE);
-        if (dialog1 instanceof TLRPC.TL_dialogFolder && !(dialog2 instanceof TLRPC.TL_dialogFolder)) {
-            return -1;
-        } else if (!(dialog1 instanceof TLRPC.TL_dialogFolder) && dialog2 instanceof TLRPC.TL_dialogFolder) {
-            return 1;
-        } else if (pinnedNum1 == Integer.MIN_VALUE && pinnedNum2 != Integer.MIN_VALUE) {
-            return 1;
-        } else if (pinnedNum1 != Integer.MIN_VALUE && pinnedNum2 == Integer.MIN_VALUE) {
-            return -1;
-        } else if (pinnedNum1 != Integer.MIN_VALUE) {
-            if (pinnedNum1 > pinnedNum2) {
-                return 1;
-            } else if (pinnedNum1 < pinnedNum2) {
-                return -1;
-            } else {
-                return 0;
+    private static final class FolderActivity {
+        final boolean unreadPriority;
+        final long date;
+
+        FolderActivity(boolean unreadPriority, long date) {
+            this.unreadPriority = unreadPriority;
+            this.date = date;
+        }
+    }
+
+    private Comparator<TLRPC.Dialog> createFolderComparator(DialogFilter filter) {
+        final boolean sortByUnread = NaConfig.INSTANCE.getSortByUnread().Bool();
+        // Keep the cache local to this sort. Draft edits and unread/topic updates
+        // must be reflected the next time the folder is sorted.
+        final java.util.IdentityHashMap<TLRPC.Dialog, FolderActivity> activity = new java.util.IdentityHashMap<>();
+        final java.util.function.Function<TLRPC.Dialog, FolderActivity> computeActivity = dialog ->
+                new FolderActivity(sortByUnread && ChatsHelper.getInstance(currentAccount).isUnreadSortPriority(dialog),
+                        DialogObject.getLastMessageOrDraftDate(dialog, getMediaDataController().getDraft(dialog.id, 0)));
+        return (dialog1, dialog2) -> {
+            boolean folder1 = dialog1 instanceof TLRPC.TL_dialogFolder;
+            boolean folder2 = dialog2 instanceof TLRPC.TL_dialogFolder;
+            if (folder1 != folder2) return folder1 ? -1 : 1;
+            int pin1 = filter.pinnedDialogs.get(dialog1.id, Integer.MIN_VALUE);
+            int pin2 = filter.pinnedDialogs.get(dialog2.id, Integer.MIN_VALUE);
+            if (pin1 != Integer.MIN_VALUE || pin2 != Integer.MIN_VALUE) {
+                if (pin1 == Integer.MIN_VALUE) return 1;
+                if (pin2 == Integer.MIN_VALUE) return -1;
+                return Integer.compare(pin1, pin2);
             }
-        }
-        if (NaConfig.INSTANCE.getSortByUnread().Bool()) {
-            boolean priority1 = ChatsHelper.getInstance(currentAccount).isUnreadSortPriority(dialog1);
-            boolean priority2 = ChatsHelper.getInstance(currentAccount).isUnreadSortPriority(dialog2);
-            if (priority1 != priority2) {
-                return priority1 ? -1 : 1;
-            }
-        }
-        MediaDataController mediaDataController = getMediaDataController();
-        long date1 = DialogObject.getLastMessageOrDraftDate(dialog1, mediaDataController.getDraft(dialog1.id, 0));
-        long date2 = DialogObject.getLastMessageOrDraftDate(dialog2, mediaDataController.getDraft(dialog2.id, 0));
-        if (date1 < date2) {
-            return 1;
-        } else if (date1 > date2) {
-            return -1;
-        }
-        return 0;
-    };
+            FolderActivity first = activity.computeIfAbsent(dialog1, computeActivity);
+            FolderActivity second = activity.computeIfAbsent(dialog2, computeActivity);
+            if (first.unreadPriority != second.unreadPriority) return first.unreadPriority ? -1 : 1;
+            return Long.compare(second.date, first.date);
+        };
+    }
 
     public void sortDialogsList(ArrayList<TLRPC.Dialog> dialogs) {
         if (dialogs == null) {
@@ -22793,13 +22790,19 @@ public class MessagesController extends BaseController implements NotificationCe
         if (filter == null) {
             return;
         }
+        rebuildFilterDialogs(filter);
+        try {
+            Collections.sort(allDialogs, dialogComparator);
+        } catch (Exception e) {}
+    }
+
+    private void rebuildFilterDialogs(DialogFilter filter) {
         ArrayList<TLRPC.Dialog> dialogs = filter.dialogs;
         ArrayList<TLRPC.Dialog> dialogsForward = filter.dialogsForward;
         dialogs.clear();
         dialogsForward.clear();
-        sortingDialogFilter = filter;
         try {
-            Collections.sort(allDialogs, dialogDateComparator);
+            Collections.sort(allDialogs, createFolderComparator(filter));
         } catch (Exception e) {
             FileLog.e(e);
         }
@@ -22828,9 +22831,6 @@ public class MessagesController extends BaseController implements NotificationCe
                 }
             }
         }
-        try {
-            Collections.sort(allDialogs, dialogComparator);
-        } catch (Exception e) {}
     }
 
     public boolean canAddToForward(TLRPC.Dialog d) {
@@ -23003,48 +23003,8 @@ public class MessagesController extends BaseController implements NotificationCe
         unreadUnmutedDialogs = 0;
         boolean selfAdded = false;
         long selfId = getUserConfig().getClientUserId();
-        if (selectedDialogFilter[0] != null || selectedDialogFilter[1] != null) {
-            for (int b = 0; b < selectedDialogFilter.length; b++) {
-                sortingDialogFilter = selectedDialogFilter[b];
-                if (sortingDialogFilter == null) {
-                    continue;
-                }
-                ArrayList<TLRPC.Dialog> dialogs = sortingDialogFilter.dialogs;
-                ArrayList<TLRPC.Dialog> dialogsForward = sortingDialogFilter.dialogsForward;
-                dialogs.clear();
-                dialogsForward.clear();
-                try {
-                    Collections.sort(allDialogs, dialogDateComparator);
-                } catch (Exception e) {
-                    FileLog.e(e);
-                }
-                for (int a = 0, N = allDialogs.size(); a < N; a++) {
-                    final TLRPC.Dialog d = allDialogs.get(a);
-                    final boolean isCommunity = d instanceof TLRPC.TL_dialogCommunity;
-                    if (d instanceof TLRPC.TL_dialog || isCommunity) {
-                        long dialogId = d.id;
-                        if (isCommunity) {
-                            TLRPC.Chat community = getChat(-dialogId);
-                            if (community != null && !community.collapsed_in_dialogs) {
-                                continue;
-                            }
-                        }
-
-                        if (DialogObject.isEncryptedDialog(dialogId)) {
-                            TLRPC.EncryptedChat encryptedChat = getEncryptedChat(DialogObject.getEncryptedChatId(dialogId));
-                            if (encryptedChat != null) {
-                                dialogId = encryptedChat.user_id;
-                            }
-                        }
-                        if (sortingDialogFilter.includesDialog(getAccountInstance(), dialogId, d)) {
-                            if (canAddToForward(d)) {
-                                dialogsForward.add(d);
-                            }
-                            dialogs.add(d);
-                        }
-                    }
-                }
-            }
+        for (DialogFilter filter : selectedDialogFilter) {
+            if (filter != null) rebuildFilterDialogs(filter);
         }
 
         try {

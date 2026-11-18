@@ -137,6 +137,11 @@ def test_storage_matches_native_backup_outside_dialog_startup_changes():
         'MessagesController.java': [
             'public void putAllNeededDraftDialogs()',
             'public void processLoadedDialogs(',
+            'private static final class FolderActivity',
+            'private Comparator<TLRPC.Dialog> createFolderComparator(',
+            'private void rebuildFilterDialogs(',
+            'public void updateFilterDialogs(',
+            'public void sortDialogs(LongSparseArray<TLRPC.Chat> chatsDict)',
         ],
         'DatabaseMigrationHelper.java': [],
     }
@@ -149,7 +154,12 @@ def test_storage_matches_native_backup_outside_dialog_startup_changes():
         for signature in signatures:
             if signature in original:
                 original = original.replace(method(original, signature), '', 1)
-            current = current.replace(method(current, signature), '', 1)
+            if signature in current:
+                current = current.replace(method(current, signature), '', 1)
+        if name == 'MessagesController.java':
+            old_comparator = method(original, 'private final Comparator<TLRPC.Dialog> dialogDateComparator =')
+            original = original.replace(old_comparator + ';', '', 1)
+            original = original.replace('    private DialogFilter sortingDialogFilter;\n', '', 1)
         if name == 'MessagesStorage.java':
             current = current.replace('import java.util.Arrays;\n', '', 1)
         assert '\n'.join(line for line in current.splitlines() if line.strip()) == '\n'.join(

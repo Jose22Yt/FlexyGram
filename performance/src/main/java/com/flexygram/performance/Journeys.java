@@ -37,14 +37,16 @@ final class Journeys {
         Assert.assertTrue("Composer not visible",device.wait(Until.hasObject(By.pkg(PACKAGE).clazz(java.util.regex.Pattern.compile(".*EditText.*"))),TIMEOUT));
     }
     static void openChatToVisibleHistory(String message) {
-        Assert.assertFalse("The fixture message must be absent from the home screen",
-                device.hasObject(By.pkg(PACKAGE).text(message)));
+        // ChatMessageCell appends accessible metadata to the message text.
+        BySelector visibleMessage = By.pkg(PACKAGE).textContains(message);
+        Assert.assertFalse("Choose a fixture message absent from the home screen",
+                device.hasObject(visibleMessage));
         UiObject2 chat = fixtureChatRow();
         android.os.Trace.beginSection("Flexy.benchmark.open_chat_to_visible_history");
         try {
             chat.click();
             Assert.assertTrue("Synthetic history did not become visible",
-                    device.wait(Until.hasObject(By.pkg(PACKAGE).text(message)), TIMEOUT));
+                    device.wait(Until.hasObject(visibleMessage), TIMEOUT));
         } finally {
             android.os.Trace.endSection();
         }
