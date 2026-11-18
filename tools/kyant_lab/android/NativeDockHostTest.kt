@@ -78,6 +78,21 @@ class NativeDockHostTest {
         } finally { f.close() }
     }
 
+    @Test fun opticalHeadroomKeepsNativeAnchorAndPassesTouchesThrough() {
+        val f = Fixture(true, 24)
+        try {
+            val nativeTop = f.wrapper.top + f.dock.top
+            (f.wrapper as KyantDockContainer).setOpticalTopInset(24)
+            f.measure()
+            assertEquals(120, f.wrapper.measuredHeight)
+            assertEquals(nativeTop, f.wrapper.top + f.dock.top)
+            f.touch(MotionEvent.ACTION_DOWN, 250f, nativeTop - 8f)
+            f.touch(MotionEvent.ACTION_MOVE, 250f, nativeTop - 30f, 20)
+            f.touch(MotionEvent.ACTION_UP, 250f, nativeTop - 30f, 40)
+            assertTrue("The drawing-only margin must pass through scroll gestures", f.moves > 0)
+        } finally { f.close() }
+    }
+
     @Test fun boundedOverlayPreservesNativeBarBoundsAndPassesHeaderChatsAndScroll() {
         val f=Fixture(true,24)
         try {

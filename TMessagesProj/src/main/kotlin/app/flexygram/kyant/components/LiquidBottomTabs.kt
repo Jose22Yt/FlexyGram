@@ -1,4 +1,4 @@
-// Adapted from Kyant AndroidLiquidGlass catalog; Apache-2.0, see third_party/kyant-backdrop.
+// Modified from the Kyant AndroidLiquidGlass catalog to remove dock shadows. Apache-2.0.
 package app.flexygram.kyant.components
 
 import androidx.compose.animation.core.Animatable
@@ -48,8 +48,6 @@ import com.kyant.backdrop.effects.blur
 import com.kyant.backdrop.effects.lens
 import com.kyant.backdrop.effects.vibrancy
 import com.kyant.backdrop.highlight.Highlight
-import com.kyant.backdrop.shadow.InnerShadow
-import com.kyant.backdrop.shadow.Shadow
 import com.kyant.shapes.Capsule
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
@@ -167,6 +165,7 @@ fun LiquidBottomTabs(
                 .drawBackdrop(
                     backdrop = backdrop,
                     shape = { Capsule() },
+                    shadow = null,
                     effects = {
                         vibrancy()
                         blur(8f.dp.toPx())
@@ -204,6 +203,7 @@ fun LiquidBottomTabs(
                     .drawBackdrop(
                         backdrop = backdrop,
                         shape = { Capsule() },
+                        shadow = null,
                         effects = {
                             val progress = dampedDragAnimation.pressProgress
                             vibrancy()
@@ -242,6 +242,7 @@ fun LiquidBottomTabs(
                 .drawBackdrop(
                     backdrop = rememberCombinedBackdrop(backdrop, tabsBackdrop),
                     shape = { Capsule() },
+                    shadow = null,
                     effects = {
                         val progress = dampedDragAnimation.pressProgress
                         lens(
@@ -253,17 +254,6 @@ fun LiquidBottomTabs(
                     highlight = {
                         val progress = dampedDragAnimation.pressProgress
                         Highlight.Default.copy(alpha = progress)
-                    },
-                    shadow = {
-                        val progress = dampedDragAnimation.pressProgress
-                        Shadow(alpha = progress)
-                    },
-                    innerShadow = {
-                        val progress = dampedDragAnimation.pressProgress
-                        InnerShadow(
-                            radius = 8f.dp * progress,
-                            alpha = progress
-                        )
                     },
                     layerBlock = {
                         scaleX = dampedDragAnimation.scaleX

@@ -71,6 +71,8 @@ def test_scope_preserves_telegram_engine_and_disables_it_only_for_home_bar():
     assert (JAVA/'org/telegram/ui/Components/blur3/LiquidGlassEffect.java').exists()
     assert (ROOT/'TMessagesProj/src/main/res/raw/liquid_glass_shader.agsl').exists()
     original=json.loads((ROOT/'third_party/kyant-backdrop/provenance.json').read_text())
+    # The upstream provenance stays intact. Pin the locally adapted component separately.
+    original['components/LiquidBottomTabs.kt'] = 'b3b64e85c1e853644fa2071b0433c610461e73232410fa7fc7442fe98691bdf9'
     for path,sha in original.items():
         source=(ROOT/'TMessagesProj/src/main/kotlin/app/flexygram/kyant'/path).read_text()
         normalized=source.split('\n',1)[1].replace('app.flexygram.kyant','com.kyant.backdrop.catalog')
@@ -104,3 +106,69 @@ public class Probe extends Base{
  view.dispatchDraw(new Canvas());if(!events.equals(List.of("left","right","children","blur","fade","kyant")))throw new AssertionError(events.toString());
  events.clear();p.kyantInitWork=null;view.dispatchDraw(new Canvas());if(!events.equals(List.of("left","right","children","blur","fade")))throw new AssertionError(events.toString());}
 }'''.replace('CREATE',create)})
+
+
+def test_optical_headroom_keeps_native_height_and_touch_boundary(tmp_path):
+    probe(tmp_path, {
+        'android/content/Context.java': 'package android.content; public class Context {}',
+        'android/view/MotionEvent.java': '''package android.view; public class MotionEvent {
+            public static final int ACTION_DOWN = 0;
+            final int action; final float y;
+            public MotionEvent(int action, float y) { this.action = action; this.y = y; }
+            public int getActionMasked() { return action; }
+            public float getY() { return y; }
+        }''',
+        'android/view/View.java': '''package android.view; public class View {
+            public static final int VISIBLE = 0, GONE = 8;
+            public int visibility = VISIBLE;
+            public Object params;
+            public int getVisibility() { return visibility; }
+            public Object getLayoutParams() { return params; }
+            public int getMeasuredHeight() { return 72; }
+        }''',
+        'android/widget/FrameLayout.java': '''package android.widget;
+        import android.content.Context;
+        import android.view.*;
+        public class FrameLayout extends View {
+            public static class LayoutParams { public int height = 72, topMargin, bottomMargin; }
+            public static class MeasureSpec {
+                public static final int EXACTLY = 1;
+                public static int makeMeasureSpec(int size, int mode) { return size; }
+            }
+            public int measured, layoutRequests, touches;
+            public FrameLayout(Context c) {}
+            protected void onMeasure(int w, int h) { measured = h; }
+            public void measure(int w, int h) { onMeasure(w, h); }
+            protected void measureChildWithMargins(View v, int w, int x, int h, int y) {}
+            public static int resolveSize(int size, int spec) { return Math.min(size, spec); }
+            public int getSuggestedMinimumHeight() { return 0; }
+            public int getPaddingTop() { return 0; }
+            public int getPaddingBottom() { return 24; }
+            public void requestLayout() { layoutRequests++; }
+            public boolean dispatchTouchEvent(MotionEvent event) { touches++; return true; }
+        }''',
+        'Probe.java': '''import android.content.Context;
+        import android.view.*;
+        import android.widget.FrameLayout;
+        import app.flexygram.kyant.KyantDockContainer;
+        public class Probe {
+            public static void main(String[] args) {
+                View dock = new View();
+                dock.params = new FrameLayout.LayoutParams();
+                KyantDockContainer p = new KyantDockContainer(new Context(), dock);
+                p.measure(360, 800);
+                if (p.measured != 96) throw new AssertionError("native height");
+                p.setOpticalTopInset(24);
+                p.setOpticalTopInset(24);
+                p.measure(360, 800);
+                if (p.measured != 120 || p.layoutRequests != 1) throw new AssertionError("bounded headroom");
+                if (p.dispatchTouchEvent(new MotionEvent(0, 23))) throw new AssertionError("intercepted list");
+                if (!p.dispatchTouchEvent(new MotionEvent(0, 24))) throw new AssertionError("lost bar input");
+                if (!p.dispatchTouchEvent(new MotionEvent(2, 10))) throw new AssertionError("lost active drag");
+                dock.visibility = View.GONE;
+                p.measure(360, 800);
+                if (p.measured != 24 || p.dispatchTouchEvent(new MotionEvent(0, 0)))
+                    throw new AssertionError("hidden dock owns space or touch");
+            }
+        }'''
+    }, [JAVA / 'app/flexygram/kyant/KyantDockContainer.java'])

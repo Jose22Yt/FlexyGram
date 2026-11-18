@@ -43,11 +43,11 @@ Las demás superficies conservan el comportamiento de Telegram de la base Native
 - Listener de configuración y callbacks se retiran al desprenderse; el trabajo
   de inicialización pendiente se cancela al destruir el fragmento.
 
-El componente óptico y sus animaciones originales de Kyant no se simplifican:
-se conservan las seis fuentes y sus SHA256/licencia Apache2. El ahorro elimina
-trabajo repetido de integración. No se afirma costo cero ni una mejora medida
-sin Android físico: blur, refracción y composición aún consumen GPU cuando
-cambia la escena o durante un gesto. El vídeo es referencia visual, no una traza.
+El componente de la barra conserva la refracción, el brillo y los gestos de
+Kyant. Se desactivan las sombras que rodeaban la barra y el selector. El host
+reserva 24 dp de dibujo por encima de la barra cuando monta Kyant, con paso de
+toques hacia la lista en esa franja. La captura del fondo conserva su tamaño.
+Se conservan la procedencia SHA256 y la licencia Apache2.
 
 ## Validación
 

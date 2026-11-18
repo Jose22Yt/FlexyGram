@@ -121,7 +121,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         val index = visible.indexOfFirst { it.isTabSelected }
         if (index >= 0 && selectedIndex != index) selectedIndex = index
         alpha = dock.alpha
-        if (geometry.update(dock.x, dock.y, dock.width, dock.height, dock.paddingTop, dock.paddingBottom,
+        if (geometry.update(dock.x - x, dock.y - y, dock.width, dock.height, dock.paddingTop, dock.paddingBottom,
                 LocaleController.isRTL, Theme.isCurrentThemeDark())) geometryRevision++
         available = isShown && dock.isShown && dock.visibility == VISIBLE && dock.alpha > 0f &&
             windowVisibility == VISIBLE && isHardwareAccelerated &&
@@ -168,15 +168,16 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         if (!isRendering()) return false
         val density = resources.displayMetrics.density
-        val top = dock.y + KyantDockGeometry.panelInset(dock.height, dock.paddingTop, dock.paddingBottom, 64 * density)
+        val left = dock.x - x
+        val top = dock.y - y + KyantDockGeometry.panelInset(dock.height, dock.paddingTop, dock.paddingBottom, 64 * density)
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-            gesture = event.x >= dock.x && event.x < dock.x + dock.width && event.y >= top && event.y < top + 64 * density
+            gesture = event.x >= left && event.x < left + dock.width && event.y >= top && event.y < top + 64 * density
         }
         if (!gesture) return false
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
             removeCallbacks(longPress)
             downX = event.x; downY = event.y; downTime = event.downTime; longPressConsumed = false
-            val index = (((event.x - dock.x - 4 * density) / (dock.width - 8 * density).coerceAtLeast(1f)) * tabs.size).toInt().coerceIn(0, tabs.lastIndex)
+            val index = (((event.x - left - 4 * density) / (dock.width - 8 * density).coerceAtLeast(1f)) * tabs.size).toInt().coerceIn(0, tabs.lastIndex)
             longPressTab = tabs[if (LocaleController.isRTL) tabs.lastIndex - index else index]
             postDelayed(longPress, ViewConfiguration.getLongPressTimeout().toLong())
         }
@@ -207,7 +208,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
             LocalConfiguration provides configuration,
             LocalLayoutDirection provides if (LocaleController.isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
         ) {
-            NativeDockBoundsLayout(dock.x.toInt(), (dock.y + verticalInset).toInt(), width) {
+            NativeDockBoundsLayout((dock.x - x).toInt(), (dock.y - y + verticalInset).toInt(), width) {
                 // Match Kyant's hidden source-layer technique. The source contains only the native
                 // page, so the dock can never capture itself or recursively sample its own glass.
                 Canvas(Modifier.fillMaxSize().alpha(0f).layerBackdrop(background)) {

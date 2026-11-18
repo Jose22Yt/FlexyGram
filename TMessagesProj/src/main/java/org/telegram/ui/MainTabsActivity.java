@@ -531,6 +531,9 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         kyantDockView = new app.flexygram.kyant.KyantDockView(context, tabsView, viewPager);
         tabsView.setKyantHost(kyantDockView);
         tabsViewWrapper.setClipChildren(false);
+        // The 56dp pill grows vertically during press and drag. Keep the native
+        // bottom anchor and reserve room above the panel for its transformed pixels.
+        ((app.flexygram.kyant.KyantDockContainer) tabsViewWrapper).setOpticalTopInset(dp(24));
         tabsViewWrapper.addView(kyantDockView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
