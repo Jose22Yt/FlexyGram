@@ -28,6 +28,22 @@ public class DeviceBenchmarks {
         benchmark.measureRepeated(Journeys.PACKAGE,Arrays.asList(new FrameTimingMetric()),compilation(),StartupMode.WARM,20,
                 scope->{Journeys.launch(scope);return Unit.INSTANCE;},scope->{Journeys.openChat();Journeys.keyboard();Journeys.back();return Unit.INSTANCE;});
     }
+    @Test public void homeScroll() {
+        benchmark.measureRepeated(Journeys.PACKAGE, Arrays.asList(new FrameTimingMetric()), compilation(), StartupMode.WARM, 20,
+                scope -> { Journeys.launch(scope); return Unit.INSTANCE; },
+                scope -> { Journeys.scroll(); return Unit.INSTANCE; });
+    }
+    @Test public void openChatToVisibleHistory() {
+        String message = androidx.test.platform.app.InstrumentationRegistry.getArguments().getString("flexy.fixtureMessage");
+        Assume.assumeTrue("Supply a visible message in the synthetic chat as flexy.fixtureMessage",
+                message != null && !message.isBlank() && !message.equals(Journeys.fixture()));
+        benchmark.measureRepeated(Journeys.PACKAGE, Arrays.asList(new FrameTimingMetric(),
+                        new TraceSectionMetric("Flexy.benchmark.open_chat_to_visible_history",
+                                TraceSectionMetric.Mode.First.INSTANCE, "openChatToVisibleHistory", false)),
+                compilation(), StartupMode.WARM, 20,
+                scope -> { Journeys.launch(scope); return Unit.INSTANCE; },
+                scope -> { Journeys.openChatToVisibleHistory(message); return Unit.INSTANCE; });
+    }
     @Test public void messageScroll(){
         benchmark.measureRepeated(Journeys.PACKAGE,Arrays.asList(new FrameTimingMetric()),compilation(),StartupMode.WARM,20,
                 scope->{Journeys.launch(scope);Journeys.openChat();return Unit.INSTANCE;},scope->{Journeys.scroll();return Unit.INSTANCE;});

@@ -67,6 +67,7 @@ import org.telegram.ui.Stories.StoriesController;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17279,26 +17280,20 @@ public class MessagesStorage extends BaseController {
         }
     }
 
-    public void getDialogs(int folderId, int offset, int count, boolean loadDraftsPeersAndFolders) {
-        long[] draftsDialogIds;
-        if (loadDraftsPeersAndFolders) {
-            LongSparseArray<LongSparseArray<TLRPC.DraftMessage>> drafts = getMediaDataController().getDrafts();
-            int draftsCount = drafts.size();
-            if (draftsCount > 0) {
-                draftsDialogIds = new long[draftsCount];
-                for (int i = 0; i < draftsCount; i++) {
-                    LongSparseArray<TLRPC.DraftMessage> threads = drafts.valueAt(i);
-                    if (threads.get(0) == null) {
-                        continue;
-                    }
-                    draftsDialogIds[i] = drafts.keyAt(i);
-                }
-            } else {
-                draftsDialogIds = null;
-            }
-        } else {
-            draftsDialogIds = null;
+    private long[] getTopLevelDraftDialogIds() {
+        LongSparseArray<LongSparseArray<TLRPC.DraftMessage>> drafts = getMediaDataController().getDrafts();
+        long[] ids = null;
+        int count = 0;
+        for (int i = 0, size = drafts.size(); i < size; i++) {
+            if (drafts.valueAt(i).get(0) == null) continue;
+            if (ids == null) ids = new long[size];
+            ids[count++] = drafts.keyAt(i);
         }
+        return ids == null || count == ids.length ? ids : Arrays.copyOf(ids, count);
+    }
+
+    public void getDialogs(int folderId, int offset, int count, boolean loadDraftsPeersAndFolders) {
+        final long[] draftsDialogIds = loadDraftsPeersAndFolders ? getTopLevelDraftDialogIds() : null;
         final int storageTrace = PerformanceTrace.beginAsync("Flexy.dialogs.storage_queue");
         storageQueue.postRunnable(() -> {
             PerformanceTrace.endAsync("Flexy.dialogs.storage_queue", storageTrace);
@@ -17312,7 +17307,7 @@ public class MessagesStorage extends BaseController {
                 usersToLoad.add(getUserConfig().getClientUserId());
                 ArrayList<Long> chatsToLoad = new ArrayList<>();
                 ArrayList<Integer> encryptedToLoad = new ArrayList<>();
-                ArrayList<Long> loadedDialogs = new ArrayList<>();
+                HashSet<Long> loadedDialogs = draftsDialogIds != null ? new HashSet<>() : null;
                 ArrayList<Long> emojiToLoad = new ArrayList<>();
                 LongSparseArray<SparseArray<ArrayList<TLRPC.Message>>> replyMessageOwners = new LongSparseArray<>();
                 LongSparseArray<ArrayList<Integer>> dialogReplyMessagesIds = new LongSparseArray<>();
@@ -17392,7 +17387,7 @@ public class MessagesStorage extends BaseController {
                         dialog.unread_poll_votes_count = cursor.intValue(22);
                         dialogs.dialogs.add(dialog);
 
-                        if (draftsDialogIds != null) {
+                        if (loadedDialogs != null) {
                             loadedDialogs.add(dialogId);
                         }
 
@@ -17555,8 +17550,8 @@ public class MessagesStorage extends BaseController {
                                 chatsToLoad.add(-dialogId);
                             }
                         }
-                        if (!loadedDialogs.contains(draftsDialogIds[i])) {
-                            unloadedDialogs.add(draftsDialogIds[i]);
+                        if (!loadedDialogs.contains(dialogId)) {
+                            unloadedDialogs.add(dialogId);
                         }
                     }
 

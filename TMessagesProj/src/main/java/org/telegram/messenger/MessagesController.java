@@ -10139,9 +10139,11 @@ public class MessagesController extends BaseController implements NotificationCe
 
     public void putAllNeededDraftDialogs() {
         LongSparseArray<LongSparseArray<TLRPC.DraftMessage>> drafts = getMediaDataController().getDrafts();
+        final int size = drafts.size();
+        if (size == 0) return;
         final long minDate = getMinDraftDialogDate();
         boolean added = false;
-        for (int i = 0, size = drafts.size(); i < size; i++) {
+        for (int i = 0; i < size; i++) {
             LongSparseArray<TLRPC.DraftMessage> threads = drafts.valueAt(i);
             TLRPC.DraftMessage draftMessage = threads.get(0);
             if (draftMessage == null || draftMessage.date < minDate) {
@@ -14065,9 +14067,12 @@ public class MessagesController extends BaseController implements NotificationCe
                 }
 
                 allDialogs.clear();
-                for (int a = 0, size = dialogs_dict.size(); a < size; a++) {
+                final int dialogCount = dialogs_dict.size();
+                final boolean hasDeletingDialogs = deletingDialogs.size() != 0;
+                allDialogs.ensureCapacity(dialogCount);
+                for (int a = 0; a < dialogCount; a++) {
                     TLRPC.Dialog dialog = dialogs_dict.valueAt(a);
-                    if (deletingDialogs.indexOfKey(dialog.id) >= 0) {
+                    if (hasDeletingDialogs && deletingDialogs.indexOfKey(dialog.id) >= 0) {
                         continue;
                     }
                     allDialogs.add(dialog);

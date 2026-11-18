@@ -234,19 +234,21 @@ public class DownscaleScrollableNoiseSuppressor {
         }
 
         public void onScrolled(float dx, float dy) {
-            scrollX = scaleX >= 2 ? ((scrollX + dx) % scaleX) : 0;
-            scrollY = scaleY >= 2 ? ((scrollY + dy) % scaleY) : 0;
-
-            if (allowNoiseSuppress) {
+            if (!allowNoiseSuppress) return;
+            final float nextX = scaleX >= 2 ? ((scrollX + dx) % scaleX) : 0;
+            final float nextY = scaleY >= 2 ? ((scrollY + dy) % scaleY) : 0;
+            if (nextX != scrollX) {
+                scrollX = nextX;
                 renderNodeOriginalWithOffset.setTranslationX(scrollX);
+                for (RenderNode node : renderNodeRestored) node.setTranslationX(-scrollX);
+            }
+            if (nextY != scrollY) {
+                scrollY = nextY;
                 renderNodeOriginalWithOffset.setTranslationY(scrollY);
-
-                for (RenderNode renderNode : renderNodeRestored) {
-                    renderNode.setTranslationX(-scrollX);
-                    renderNode.setTranslationY(-scrollY);
-                }
+                for (RenderNode node : renderNodeRestored) node.setTranslationY(-scrollY);
             }
         }
+
     }
 
 

@@ -283,7 +283,6 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
                 super.onLayout(changed, left, top, right, bottom);
                 checkUi_tabsPosition();
-                if (kyantDockView != null) kyantDockView.syncFromNative();
                 checkUi_fadeView();
             }
 
@@ -1603,7 +1602,9 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     private void blur3_updateFadeColors() {
-        iBlur3SourceColor.setColor(getEstBackgroundColor());
+        final int color = getEstBackgroundColor();
+        if (iBlur3SourceColor.getColor() == color) return;
+        iBlur3SourceColor.setColor(color);
         if (fadeView != null) {
             fadeView.invalidate();
         }

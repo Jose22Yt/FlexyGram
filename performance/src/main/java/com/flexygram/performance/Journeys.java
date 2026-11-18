@@ -27,10 +27,27 @@ final class Journeys {
         home();
     }
     static void home(){Assert.assertTrue("The synthetic chat list is not ready; refusing to measure a login or splash screen.",device.wait(Until.hasObject(By.pkg(PACKAGE).text(fixture())),TIMEOUT)&&!composerVisible());}
+    private static UiObject2 fixtureChatRow() {
+        UiObject2 chat = device.wait(Until.findObject(By.pkg(PACKAGE).text(fixture())), TIMEOUT);
+        Assert.assertNotNull("Synthetic fixture missing", chat);
+        return chat;
+    }
     static void openChat(){
-        UiObject2 chat=device.wait(Until.findObject(By.pkg(PACKAGE).text(fixture())),TIMEOUT);
-        Assert.assertNotNull("Synthetic fixture missing",chat);chat.click();
+        fixtureChatRow().click();
         Assert.assertTrue("Composer not visible",device.wait(Until.hasObject(By.pkg(PACKAGE).clazz(java.util.regex.Pattern.compile(".*EditText.*"))),TIMEOUT));
+    }
+    static void openChatToVisibleHistory(String message) {
+        Assert.assertFalse("The fixture message must be absent from the home screen",
+                device.hasObject(By.pkg(PACKAGE).text(message)));
+        UiObject2 chat = fixtureChatRow();
+        android.os.Trace.beginSection("Flexy.benchmark.open_chat_to_visible_history");
+        try {
+            chat.click();
+            Assert.assertTrue("Synthetic history did not become visible",
+                    device.wait(Until.hasObject(By.pkg(PACKAGE).text(message)), TIMEOUT));
+        } finally {
+            android.os.Trace.endSection();
+        }
     }
     static void scroll(){
         int x=device.getDisplayWidth()/2,high=device.getDisplayHeight()*3/10,low=device.getDisplayHeight()*7/10;

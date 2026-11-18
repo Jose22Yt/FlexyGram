@@ -884,6 +884,7 @@ public class ChatActivity extends BaseFragment implements
     public String quickReplyShortcut;
     private int chatMode;
     private int scheduledMessagesCount = -1;
+    private app.flexygram.performance.StartupIdleWork scheduledMessagesStartupWork;
     public boolean isSubscriberSuggestions;
 
     private String reportTitle;
@@ -3749,11 +3750,31 @@ public class ChatActivity extends BaseFragment implements
                 }
             }
             if ((chatMode == 0 || chatMode == MODE_SAVED && getSavedDialogId() == getUserConfig().getClientUserId()) && (!isThreadChat() || isTopic)) {
-                waitingForLoad.add(lastLoadIndex);
-                getMessagesController().loadMessages(dialog_id, mergeDialogId, false, 1, 0, 0, true, 0, classGuid, 2, 0, MODE_SCHEDULED, chatMode == MODE_SAVED ? 0 : threadMessageId, replyMaxReadId, lastLoadIndex++, isTopic);
+                if (chatMode == 0 && !isTopic && !isThreadChat() && startLoadFromMessageId == 0 && startLoadFromDate == 0
+                        && android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+                    scheduledMessagesStartupWork = new app.flexygram.performance.StartupIdleWork(
+                            android.os.Looper.myQueue(), this::canLoadInitialScheduledMessages, this::loadInitialScheduledMessages);
+                } else {
+                    loadInitialScheduledMessages();
+                }
             }
         };
         getMessagesController().checkSensitive(this, dialog_id, load, this::finishFragment);
+    }
+
+    private boolean canLoadInitialScheduledMessages() {
+        // Empty chats can hide the RecyclerView while leaving the composer usable.
+        return !isFinished && !paused && !firstLoading && contentView != null
+                && contentView.isAttachedToWindow() && contentView.isShown() && !contentView.isLayoutRequested();
+    }
+
+    private void loadInitialScheduledMessages() {
+        scheduledMessagesStartupWork = null;
+        if (isFinished) return;
+        waitingForLoad.add(lastLoadIndex);
+        getMessagesController().loadMessages(dialog_id, mergeDialogId, false, 1, 0, 0, true, 0,
+                classGuid, 2, 0, MODE_SCHEDULED, chatMode == MODE_SAVED ? 0 : threadMessageId,
+                replyMaxReadId, lastLoadIndex++, isTopic);
     }
 
     private void fillInviterId(boolean load) {
@@ -3847,6 +3868,10 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onFragmentDestroy() {
+        if (scheduledMessagesStartupWork != null) {
+            scheduledMessagesStartupWork.close();
+            scheduledMessagesStartupWork = null;
+        }
         flexyStickerExport.cancel();
         cancelFolderUnreadBadgeUpdate();
         LiteMode.removeOnPowerSaverAppliedListener(signatureGlassPowerListener);
@@ -19459,6 +19484,9 @@ public class ChatActivity extends BaseFragment implements
                 canvas.scale(s, s, getMeasuredWidth() / 2f, getMeasuredHeight() / 2f);
             }
             super.dispatchDraw(canvas);
+            if (scheduledMessagesStartupWork != null && isAttachedToWindow()) {
+                scheduledMessagesStartupWork.afterDraw();
+            }
             //if (fragmentContextView != null && fragmentContextView.isCallStyle()) {
             //    float alpha = (blurredView != null && blurredView.getVisibility() == View.VISIBLE) ? 1f - blurredView.getAlpha() : 1f;
             //    if (alpha > 0) {

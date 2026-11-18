@@ -211,16 +211,26 @@ public class MediaDataController extends BaseController {
                 //igonre
             }
         }
-        loadRepliesOfDraftReplies(replyMessageOwners);
+        ringtoneDataStore = new RingtoneDataStore(currentAccount);
+        menuBotsUpdateDate = getMessagesController().getMainSettings().getInt("menuBotsUpdateDate", 0);
 
+        // The first cached dialog page is requested in the same UI callback as draft
+        // restoration. Dispatch ancillary work after that request has entered storage.
+        if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()
+                && ApplicationLoader.applicationHandler != null) {
+            AndroidUtilities.runOnUIThread(() -> preloadAfterDraftRestore(replyMessageOwners));
+        } else {
+            preloadAfterDraftRestore(replyMessageOwners);
+        }
+    }
+
+    private void preloadAfterDraftRestore(ArrayList<TLRPC.Message> replyMessageOwners) {
+        loadRepliesOfDraftReplies(replyMessageOwners);
         loadStickersByEmojiOrName(AndroidUtilities.STICKERS_PLACEHOLDER_PACK_NAME, false, true);
         loadEmojiThemes();
         loadRecentAndTopReactions(false);
         loadAvatarConstructor(false);
         loadAvatarConstructor(true);
-        ringtoneDataStore = new RingtoneDataStore(currentAccount);
-
-        menuBotsUpdateDate = getMessagesController().getMainSettings().getInt("menuBotsUpdateDate", 0);
     }
 
     private void loadRepliesOfDraftReplies(final ArrayList<TLRPC.Message> messages) {
