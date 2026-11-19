@@ -51,13 +51,13 @@ def test_effect_is_opt_in_and_confined_to_live_drawing_of_two_surfaces():
     toggle = (JAVA/'app/flexygram/home/HomeListSettingsActivity.java').read_text()
     settings = (JAVA/'app/flexygram/scroll/DirectionalScrollSettings.java').read_text()
 
-    assert 'getBoolean(KEY, false)' in settings
+    assert 'getBoolean(LEGACY_KEY, false) ? CURVE : OFF' in settings
     assert toggle.count('addRow("flexyDirectionalScrollEdge")') == 1
     assert home.count('enableDirectionalScrollEdge(') == chat.count('enableDirectionalScrollEdge(') == 1
     assert 'instanceof DialogCell' in home[home.index('public class DialogsRecyclerView'):]
     assert 'getCurrentMessagesGroup() == null' in chat
     assert '!ignoreClipChild' in method(common, 'protected final boolean isDirectionalScrollEdgeDrawing()')
-    assert 'clearDirectionalScrollEdge();' in method(common, 'public boolean dispatchTouchEvent(MotionEvent ev)')
+    assert 'clearDirectionalScrollEdge();' not in method(common, 'public boolean dispatchTouchEvent(MotionEvent ev)')
     assert 'getScrollState() == SCROLL_STATE_IDLE' in method(common, 'public void onScrolled(int dx, int dy)')
     assert 'drawingScrollEdge = DirectionalScrollEdge.NONE;' in method(common, 'protected void dispatchDraw(@NonNull Canvas canvas)')
     assert 'isAccessibilityScreenReaderEnabled()' in method(common, 'private void prepareDirectionalScrollEdge()')
@@ -70,4 +70,54 @@ def test_active_rows_are_projected_without_cutting_them_at_the_dock():
     assert 'canvas.concat(scrollEdgeProjection)' in draw
     assert 'clipRect' not in draw and 'saveLayer' not in draw
     assert draw.index('if (top == 0f && bottom == 0f') < draw.index('new Matrix()')
+    assert draw.index('switch (drawingScrollStyle)') < draw.index('new Matrix()')
     assert draw.index('if (scrollEdgeProjection == null)') < draw.index('new float[8]')
+
+
+def test_direction_changes_release_before_handoff_and_resume_from_visible_intensity(tmp_path):
+    probe(tmp_path, {'Probe.java': '''
+import app.flexygram.scroll.DirectionalScrollEdge;
+import app.flexygram.scroll.DirectionalScrollMotion;
+public class Probe {
+    static void check(boolean valid) { if (!valid) throw new AssertionError(); }
+    public static void main(String[] args) {
+        final var m = new DirectionalScrollMotion();
+        final int bottom = DirectionalScrollEdge.BOTTOM, top = DirectionalScrollEdge.TOP;
+        m.scroll(bottom, 36, 36, 0);
+        check(m.edge() == bottom && m.intensity() == 1 && !m.needsFrame());
+        m.stop(100);
+        m.advance(215);
+        check(m.edge() == bottom && Math.abs(m.intensity() - .5f) < .001f);
+        final float beforeResume = m.intensity();
+        m.scroll(bottom, 1, 36, 215);
+        check(m.intensity() == beforeResume && m.needsFrame());
+        m.advance(300);
+        check(m.intensity() == 1 && !m.needsFrame());
+
+        m.scroll(top, 27, 36, 300);
+        m.advance(345);
+        check(m.edge() == bottom && Math.abs(m.intensity() - .5f) < .001f);
+        m.scroll(top, 11, 36, 348);
+        m.advance(390);
+        check(m.edge() == top && m.intensity() == 0 && m.needsFrame());
+        m.advance(475);
+        check(m.edge() == top && m.intensity() == 1 && !m.needsFrame());
+
+        m.scroll(bottom, 36, 36, 500);
+        m.stop(520);
+        m.advance(700);
+        check(m.edge() == DirectionalScrollEdge.NONE && m.intensity() == 0 && !m.needsFrame());
+        m.scroll(bottom, 7, 36, 702);
+        m.reset();
+        check(m.edge() == DirectionalScrollEdge.NONE && !m.needsFrame());
+
+        check(DirectionalScrollEdge.twist(0, 14, .68f) == 0);
+        check(DirectionalScrollEdge.twist(1, 14, .68f) > 9f);
+        check(DirectionalScrollEdge.counterOffset(.25f, 28, .68f) < -6f);
+        check(DirectionalScrollEdge.counterOffset(.75f, 28, .68f) > 6f);
+        check(DirectionalScrollEdge.counterOffset(1, 28, .68f) == 0f);
+        check(DirectionalScrollEdge.lensScale(0, 7, 390, .68f) == 1f);
+        check(DirectionalScrollEdge.lensScale(1, 7, 390, .68f) > 1.02f);
+    }
+}'''}, [JAVA/'app/flexygram/scroll/DirectionalScrollEdge.java',
+        JAVA/'app/flexygram/scroll/DirectionalScrollMotion.java'])

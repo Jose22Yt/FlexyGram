@@ -29,7 +29,7 @@ def test_no_style_selector_or_iphone_home_routes_remain():
     assert 'filterTabsView.setSignatureHome(isSignatureHome())' in native
     assert 'return getControllerDialogsArray(' in method(native,'public ArrayList<TLRPC.Dialog> getDialogsArray(')
     settings=(JAVA/'app/flexygram/home/HomeListSettingsActivity.java').read_text()
-    assert 'styleRow' not in settings and 'setItems(' not in settings and 'TYPE_SETTINGS' not in settings
+    assert 'styleRow' not in settings and 'setItems(' not in settings
     assert 'FlexyHomeChatDividers' in settings
     assert not (JAVA/'app/flexygram/home/IosHomeHeader.java').exists()
     registry=(JAVA/'app/flexygram/settings/signature/Settings3Registry.java').read_text()
@@ -39,7 +39,11 @@ def test_no_style_selector_or_iphone_home_routes_remain():
         assert names == {
             'FlexyHomeChatDividers',
             'FlexyHomeDirectionalScrollEdge',
-            'FlexyHomeDirectionalScrollEdgeHint',
+            'FlexyHomeDirectionalScrollOff',
+            'FlexyHomeDirectionalScrollCurve',
+            'FlexyHomeDirectionalScrollTwist',
+            'FlexyHomeDirectionalScrollCounterCurve',
+            'FlexyHomeDirectionalScrollLens',
         }
     rows=(JAVA/'org/telegram/ui/Cells/DialogCell.java').read_text()
     assert 'isIosHome' not in rows and 'useForceThreeLines = forceThreeLines;' in rows

@@ -951,9 +951,6 @@ public class CustomEmojiReactionsWindow {
             if (type == TYPE_STORY || (reactionsContainerLayout.getDelegate() != null && reactionsContainerLayout.getDelegate().drawBackground())) {
                 reactionsContainerLayout.getDelegate().drawRoundRect(canvas, drawingRect, radius, getX(), getBlurOffset(), 255, true);
             } else {
-                shadow.setAlpha((int) (Utilities.clamp(progressClpamped / 0.05f, 1f, 0f) * 255));
-                shadow.setBounds((int) drawingRect.left - shadowPad.left, (int) drawingRect.top - shadowPad.top, (int) drawingRect.right + shadowPad.right, (int) drawingRect.bottom + shadowPad.bottom);
-
                 if (blurredBackgroundDrawable != null) {
                     AndroidUtilities.rectTmp.set(drawingRect);
                     AndroidUtilities.rectTmp.round(AndroidUtilities.rectTmp2);
@@ -964,6 +961,9 @@ public class CustomEmojiReactionsWindow {
                     blurredBackgroundDrawable.setRadius(radius);
                     blurredBackgroundDrawable.draw(canvas);
                 } else {
+                    shadow.setAlpha((int) (Utilities.clamp(progressClpamped / .05f, 1f, 0f) * 255));
+                    shadow.setBounds((int) drawingRect.left - shadowPad.left, (int) drawingRect.top - shadowPad.top,
+                            (int) drawingRect.right + shadowPad.right, (int) drawingRect.bottom + shadowPad.bottom);
                     shadow.draw(canvas);
                     canvas.drawRoundRect(drawingRect, radius, radius, backgroundPaint);
                 }

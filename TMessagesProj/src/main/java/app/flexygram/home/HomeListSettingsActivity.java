@@ -8,6 +8,8 @@ import app.flexygram.scroll.DirectionalScrollSettings;
 import app.flexygram.settings.SignatureMatteSettingsActivity;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
+import org.telegram.ui.Cells.TextSettingsCell;
+import org.telegram.ui.Components.AlertsCreator;
 
 /** Home list controls; there is no layout selector. */
 public final class HomeListSettingsActivity extends SignatureMatteSettingsActivity {
@@ -22,25 +24,41 @@ public final class HomeListSettingsActivity extends SignatureMatteSettingsActivi
         dividerRow = addRow("dividerStyle");
         scrollEdgeRow = addRow("flexyDirectionalScrollEdge");
     }
+    private static String[] scrollStyles() {
+        return new String[]{
+                LocaleController.getString(R.string.FlexyHomeDirectionalScrollOff),
+                LocaleController.getString(R.string.FlexyHomeDirectionalScrollCurve),
+                LocaleController.getString(R.string.FlexyHomeDirectionalScrollTwist),
+                LocaleController.getString(R.string.FlexyHomeDirectionalScrollCounterCurve),
+                LocaleController.getString(R.string.FlexyHomeDirectionalScrollLens),
+        };
+    }
+
     @Override protected BaseListAdapter createAdapter(Context context){return new MatteListAdapter(context){
-        @Override public int getItemViewType(int position){return TYPE_CHECK;}
+        @Override public int getItemViewType(int position) {
+            return position == dividerRow ? TYPE_CHECK : TYPE_SETTINGS;
+        }
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder,int position,boolean partial){
-            org.telegram.ui.Cells.TextCheckCell cell = (org.telegram.ui.Cells.TextCheckCell) holder.itemView;
             if (position == dividerRow) {
-                cell.setTextAndCheck(LocaleController.getString(R.string.FlexyHomeChatDividers), chatDividersEnabled(), false);
+                ((org.telegram.ui.Cells.TextCheckCell) holder.itemView).setTextAndCheck(
+                        LocaleController.getString(R.string.FlexyHomeChatDividers), chatDividersEnabled(), false);
             } else if (position == scrollEdgeRow) {
-                cell.setTextAndValueAndCheck(
+                ((TextSettingsCell) holder.itemView).setTextAndValue(
                         LocaleController.getString(R.string.FlexyHomeDirectionalScrollEdge),
-                        LocaleController.getString(R.string.FlexyHomeDirectionalScrollEdgeHint),
-                        DirectionalScrollSettings.enabled(), true, false);
+                        scrollStyles()[DirectionalScrollSettings.style()], false);
             }
         }
         @Override public boolean isEnabled(RecyclerView.ViewHolder holder){return true;}
     };}
     @Override protected void onItemClick(View view,int position,float x,float y){
         if (position == scrollEdgeRow) {
-            DirectionalScrollSettings.setEnabled(!DirectionalScrollSettings.enabled());
-            ((org.telegram.ui.Cells.TextCheckCell) view).setChecked(DirectionalScrollSettings.enabled());
+            if (getParentActivity() == null) return;
+            showDialog(AlertsCreator.createSingleChoiceDialog(getParentActivity(), scrollStyles(),
+                    LocaleController.getString(R.string.FlexyHomeDirectionalScrollEdge),
+                    DirectionalScrollSettings.style(), (dialog, which) -> {
+                        DirectionalScrollSettings.setStyle(which);
+                        if (listAdapter != null) listAdapter.notifyItemChanged(scrollEdgeRow);
+                    }));
         } else if(position==dividerRow){
             boolean enabled=!chatDividersEnabled();
             xyz.nextalone.nagram.NaConfig.INSTANCE.getHideDividers().setConfigBool(!enabled);

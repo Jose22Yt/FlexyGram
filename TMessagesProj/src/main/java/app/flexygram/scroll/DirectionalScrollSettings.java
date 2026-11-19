@@ -1,21 +1,35 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 package app.flexygram.scroll;
 
+import android.content.SharedPreferences;
 import tw.nekomimi.nekogram.NekoConfig;
 
 public final class DirectionalScrollSettings {
-    private static final String KEY = "FlexyDirectionalScrollEdge";
-    private static boolean enabled = NekoConfig.getPreferences().getBoolean(KEY, false);
+    public static final int OFF = 0, CURVE = 1, TWIST = 2, COUNTER_CURVE = 3, LENS = 4;
+    private static final String KEY = "FlexyDirectionalScrollStyle";
+    private static final String LEGACY_KEY = "FlexyDirectionalScrollEdge";
+    private static int style = load();
 
     private DirectionalScrollSettings() {}
 
-    public static boolean enabled() {
-        return enabled;
+    private static int load() {
+        final SharedPreferences preferences = NekoConfig.getPreferences();
+        final int fallback = preferences.getBoolean(LEGACY_KEY, false) ? CURVE : OFF;
+        return sanitize(preferences.getInt(KEY, fallback));
     }
 
-    public static void setEnabled(boolean value) {
-        if (enabled == value) return;
-        enabled = value;
-        NekoConfig.getPreferences().edit().putBoolean(KEY, value).apply();
+    private static int sanitize(int choice) {
+        return choice >= OFF && choice <= LENS ? choice : OFF;
+    }
+
+    public static int style() {
+        return style;
+    }
+
+    public static void setStyle(int choice) {
+        final int value = sanitize(choice);
+        if (style == value) return;
+        style = value;
+        NekoConfig.getPreferences().edit().putInt(KEY, value).apply();
     }
 }
