@@ -3203,6 +3203,27 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
     }
 
     protected void captureChildren(Canvas canvas, RectF position, long drawingTime) {
+        captureDecorations(canvas, position);
+        captureChildViews(canvas, position, null, drawingTime);
+    }
+
+    /** Both regions are in list coordinates and are vertically disjoint. */
+    public boolean captureDisjointRegions(Canvas canvas, RectF first, RectF second) {
+        if (hasActiveEdgeEffects() && getOverScrollMode() != OVER_SCROLL_NEVER) return false;
+
+        int save = canvas.save();
+        canvas.clipRect(first);
+        captureDecorations(canvas, first);
+        canvas.restoreToCount(save);
+        save = canvas.save();
+        canvas.clipRect(second);
+        captureDecorations(canvas, second);
+        canvas.restoreToCount(save);
+        captureChildViews(canvas, first, second, SystemClock.uptimeMillis());
+        return true;
+    }
+
+    private void captureDecorations(Canvas canvas, RectF position) {
         for (int a = 0, N = getItemDecorationCount(); a < N; a++) {
             ItemDecoration itemDecoration = getItemDecorationAt(a);
             if (itemDecoration instanceof IBlur3Capture) {
@@ -3213,6 +3234,9 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
                 capture.capture(canvas, position);
             }
         }
+    }
+
+    private void captureChildViews(Canvas canvas, RectF first, RectF second, long drawingTime) {
         for (int i = 0, N = getChildCount(); i < N; i++) {
             final View child = getChildAt(i);
 
@@ -3221,7 +3245,8 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
             final float right = left + child.getWidth();
             final float bottom = top + child.getHeight();
 
-            if (!position.intersects(left, top, right, bottom)) {
+            if (!first.intersects(left, top, right, bottom)
+                    && (second == null || !second.intersects(left, top, right, bottom))) {
                 continue;
             }
 

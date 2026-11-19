@@ -92,9 +92,10 @@ def test_blur_capture_reuses_static_content_but_refreshes_moved_regions_and_empt
  static class Canvas {void save(){}void restore(){}void translate(float x,float y){}}
  interface IBlur3Capture {void capture(Canvas c,RectF r);void captureCalculateHash(Hash h,RectF r);}
  static class Hash {long h;void start(){h=0;}void add(long v){h=h*31+v;}long get(){return h;}boolean isUnsupported(){return false;}}
- static class Node {boolean hasDisplayList(){return true;}}
- static class SourcePart {Rect position=new Rect();Node renderNode=new Node();long lastHash;}
+ static class Node {boolean hasDisplayList(){return true;}void discardDisplayList(){}}
+ static class SourcePart {Rect position=new Rect();Node renderNode=new Node();long lastHash;boolean usesSharedCapture;}
  List<SourcePart>rectRenderNodes=new ArrayList<>();int rectRenderNodesCount=1,composites;RectF tmpRectF=new RectF();Hash builder=new Hash();
+ Node sharedCapture;
  Canvas beginRecordingRect(int a){return new Canvas();}void endRecordingRect(){}
  boolean invalidateResultRenderNodes(int w,int h){composites++;return true;}
  CAPTURE

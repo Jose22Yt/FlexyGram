@@ -177,3 +177,26 @@ public class Probe {
   p.recyclerView.positions=new int[]{-1,-1};p.scroll();check(p.first==-1&&p.last==-1);
  }
 }'''.replace('SCAN',scan).replace('GUARDS',load[load.index('load &='):load.index('if (load || loadArchived)')])})
+def test_selector_pagination_uses_the_adapter_snapshot_without_rebuilding_the_list(tmp_path):
+    source = (JAVA/'org/telegram/ui/DialogsActivity.java').read_text()
+    count = method(source, 'private int getPaginationDialogCount(ViewPage page)')
+    probe(tmp_path, {'Probe.java': '''
+import java.util.*;
+public class Probe {
+ static final int DIALOGS_TYPE_ADD_USERS_TO=2,DIALOGS_TYPE_BOT_REQUEST_PEER=15;
+ static class Adapter {int getDialogsCount(){return 27;}}
+ static class ViewPage {int dialogsType;Adapter dialogsAdapter=new Adapter();}
+ int currentAccount,folderId,controllerReads;boolean dialogsListFrozen;
+ List<Integer> getDialogsArray(int account,int type,int folder,boolean frozen){controllerReads++;return List.of(1,2,3);}
+ COUNT
+ public static void main(String[]args){
+  Probe p=new Probe();ViewPage page=new ViewPage();
+  for(int type:new int[]{DIALOGS_TYPE_ADD_USERS_TO,DIALOGS_TYPE_BOT_REQUEST_PEER}){
+   page.dialogsType=type;
+   for(int i=0;i<10000;i++)if(p.getPaginationDialogCount(page)!=27)throw new AssertionError();
+  }
+  if(p.controllerReads!=0)throw new AssertionError();
+  page.dialogsType=0;
+  if(p.getPaginationDialogCount(page)!=3||p.controllerReads!=1)throw new AssertionError();
+ }
+}'''.replace('COUNT',count)})

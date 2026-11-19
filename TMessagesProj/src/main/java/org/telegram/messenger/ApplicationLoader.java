@@ -601,6 +601,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
 
         applicationHandler = new Handler(applicationContext.getMainLooper());
 
+        Utilities.globalQueue.postRunnable(UserConfig::preloadStartupConfigs);
         Utilities.globalQueue.postRunnable(() -> {
             try {
                 org.osmdroid.config.Configuration.getInstance().setUserAgentValue("FlexyGram/" + BuildConfig.VERSION_NAME + " (+https://github.com/Jose22Yt/FlexyGram)");

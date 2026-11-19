@@ -33,6 +33,17 @@ public class UserConfig extends BaseController {
     private final Object sync = new Object();
     private volatile boolean configLoaded;
     private TLRPC.User currentUser;
+    private StartupUser preloadedStartupUser;
+
+    private static final class StartupUser {
+        final String serialized;
+        final TLRPC.User user;
+
+        StartupUser(String serialized, TLRPC.User user) {
+            this.serialized = serialized;
+            this.user = user;
+        }
+    }
     public boolean registeredForPush;
     public int lastSendMessageId = -210000;
     public int lastBroadcastId = -1;
@@ -300,8 +311,51 @@ public class UserConfig extends BaseController {
         }
     }
 
-    public void
-    loadConfig() {
+    /** Starts Android's preference reads early and prepares users without publishing account state. */
+    static void preloadStartupConfigs() {
+        android.os.Trace.beginSection("Flexy.startup.preload_account_configs");
+        try {
+            SharedPreferences[] preferences = new SharedPreferences[MAX_ACCOUNT_COUNT];
+            preferences[0] = getInstance(0).getPreferences();
+            final int selected = preferences[0].getInt("selectedAccount", 0);
+            for (int position = 1; position < MAX_ACCOUNT_COUNT; position++) {
+                final int account = app.flexygram.performance.StartupAccounts.accountAt(position, selected, MAX_ACCOUNT_COUNT);
+                preferences[account] = getInstance(account).getPreferences();
+            }
+            for (int position = 0; position < MAX_ACCOUNT_COUNT; position++) {
+                final int account = app.flexygram.performance.StartupAccounts.accountAt(position, selected, MAX_ACCOUNT_COUNT);
+                UserConfig config = getInstance(account);
+                if (config.configLoaded) continue;
+                try {
+                    String serialized = preferences[account].getString("user", null);
+                    if (serialized == null || config.configLoaded) continue;
+                    TLRPC.User user = deserializeUser(serialized);
+                    synchronized (config.sync) {
+                        if (!config.configLoaded) config.preloadedStartupUser = new StartupUser(serialized, user);
+                    }
+                } catch (RuntimeException ignored) {
+                    // The authoritative load keeps its original behavior for unreadable data.
+                }
+            }
+        } catch (RuntimeException ignored) {
+            // Speculative reads must not prevent the normal configuration load.
+        } finally {
+            android.os.Trace.endSection();
+        }
+    }
+
+    private static TLRPC.User deserializeUser(String serialized) {
+        byte[] bytes = Base64.decode(serialized, Base64.DEFAULT);
+        if (bytes == null) return null;
+        SerializedData data = new SerializedData(bytes);
+        try {
+            return TLRPC.User.TLdeserialize(data, data.readInt32(false), false);
+        } finally {
+            data.cleanup();
+        }
+    }
+
+    public void loadConfig() {
         synchronized (sync) {
             if (configLoaded) {
                 return;
@@ -376,13 +430,11 @@ public class UserConfig extends BaseController {
             }
 
             string = preferences.getString("user", null);
+            StartupUser preparedUser = preloadedStartupUser;
+            preloadedStartupUser = null;
             if (string != null) {
-                byte[] bytes = Base64.decode(string, Base64.DEFAULT);
-                if (bytes != null) {
-                    SerializedData data = new SerializedData(bytes);
-                    currentUser = TLRPC.User.TLdeserialize(data, data.readInt32(false), false);
-                    data.cleanup();
-                }
+                currentUser = preparedUser != null && string.equals(preparedUser.serialized)
+                        ? preparedUser.user : deserializeUser(string);
             }
             if (currentUser != null) {
                 checkPremiumSelf(null, currentUser);

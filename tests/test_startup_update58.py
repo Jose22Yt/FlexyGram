@@ -5,6 +5,58 @@ from test_composer_layout import method
 from test_render_work_reuse import JAVA, probe
 
 
+def test_account_preload_prioritizes_selected_and_never_publishes_stale_users(tmp_path):
+    source = (JAVA/'org/telegram/messenger/UserConfig.java').read_text()
+    startup_user = method(source, 'private static final class StartupUser')
+    preload = method(source, 'static void preloadStartupConfigs()')
+    load = method(source, 'public void loadConfig()')
+    tail = load[load.index('            string = preferences.getString("user", null);'):]
+    probe(tmp_path, {
+        'android/os/Trace.java': 'package android.os;public class Trace{public static void beginSection(String s){}public static void endSection(){}}',
+        'Probe.java': 'public class Probe{public static void main(String[] args)throws Exception{UserConfig.main(args);}}',
+        'UserConfig.java': '''
+import java.util.*;
+public class UserConfig {
+ static final int MAX_ACCOUNT_COUNT=4;
+ static class TLRPC {static class User {long id;User(long id){this.id=id;}}}
+ static class SharedPreferences {
+  String user;int getInt(String k,int d){return 3;}
+  String getString(String k,String d){return user;}
+ }
+ static final List<Integer> reads=new ArrayList<>();
+ static final UserConfig[] configs={new UserConfig(0),new UserConfig(1),new UserConfig(2),new UserConfig(3)};
+ final int account;final Object sync=new Object();final SharedPreferences prefs=new SharedPreferences();
+ volatile boolean configLoaded;
+ TLRPC.User currentUser;long clientUserId;int callbacks;
+ StartupUser preloadedStartupUser;
+ static int decodes;
+ UserConfig(int account){this.account=account;}
+ static UserConfig getInstance(int account){return configs[account];}
+ SharedPreferences getPreferences(){reads.add(account);return prefs;}
+ static TLRPC.User deserializeUser(String s){decodes++;return new TLRPC.User(Long.parseLong(s));}
+ void checkPremiumSelf(TLRPC.User previous,TLRPC.User user){callbacks++;}
+ STARTUP_USER
+ PRELOAD
+ void loadConfig(){synchronized(sync){if(configLoaded)return;SharedPreferences preferences=getPreferences();String string;
+ LOAD_TAIL
+ static void check(boolean value){if(!value)throw new AssertionError();}
+ public static void main(String[] args)throws Exception {
+  configs[0].prefs.user="10";configs[1].prefs.user="20";configs[2].prefs.user="broken";configs[3].prefs.user="30";
+  Thread worker=new Thread(UserConfig::preloadStartupConfigs);worker.start();worker.join();
+  check(reads.equals(List.of(0,3,1,2))&&decodes==4);
+  for(var c:configs)check(c.currentUser==null&&!c.configLoaded&&c.callbacks==0);
+  configs[1].prefs.user="21";configs[2].prefs.user=null;
+  for(var c:configs)c.loadConfig();
+  check(decodes==5&&configs[0].clientUserId==10&&configs[3].clientUserId==30);
+  check(configs[1].clientUserId==21&&configs[2].currentUser==null);
+  check(configs[0].callbacks==1&&configs[3].callbacks==1&&configs[2].callbacks==0);
+  for(var c:configs)check(c.preloadedStartupUser==null);
+  preloadStartupConfigs();check(decodes==5);
+ }
+}'''.replace('STARTUP_USER', startup_user).replace('PRELOAD', preload).replace('LOAD_TAIL', tail)
+    }, [JAVA/'app/flexygram/performance/StartupAccounts.java'])
+
+
 def test_selected_cache_precedes_auxiliary_work_for_both_database_open_races(tmp_path):
     source = (JAVA/'org/telegram/messenger/MessagesStorage.java').read_text()
     methods = '\n'.join(method(source, signature) for signature in [

@@ -35,8 +35,8 @@ public class Probe {
  static class FileLog{static int errors;static void e(Exception e){errors++;}}
  static class Timer{static class Task{}static Task start(Timer t,String name){return new Task();}static void done(Task t){}}
  static class DialogObject{static boolean isUserDialog(long id){return id>0;}static boolean isChatDialog(long id){return id<0;}}
- static class SQLiteCursor{static int disposed;long value;int remaining=1;boolean failStep;SQLiteCursor(long v){value=v;}boolean next() throws SQLiteException{if(failStep)throw new SQLiteException("step failed");return remaining-->0;}long longValue(int col){return value;}void dispose(){disposed++;}}
- static class Database{long changes=10,external=1;int warmRows=25,scans;boolean failWarmQuery,failWarmStep;SQLiteCursor queryFinalized(String sql) throws SQLiteException{SQLiteCursor c=new SQLiteCursor(sql.contains("total_changes")?changes:external);if(sql.contains("LIMIT 257")){if(failWarmQuery)throw new SQLiteException("prepare failed");c.remaining=Math.min(warmRows,257);c.failStep=failWarmStep;scans++;}return c;}}
+ static class SQLiteCursor{static int disposed,warmSteps;long value;int remaining=1;boolean warmScan,failStep;SQLiteCursor(long v){value=v;}boolean next() throws SQLiteException{if(warmScan)warmSteps++;if(failStep)throw new SQLiteException("step failed");return remaining-->0;}long longValue(int col){return value;}void dispose(){disposed++;}}
+ static class Database{long changes=10,external=1;int warmRows=25,scans;boolean failWarmQuery,failWarmStep;SQLiteCursor queryFinalized(String sql) throws SQLiteException{SQLiteCursor c=new SQLiteCursor(sql.contains("total_changes")?changes:external);if(sql.contains("LIMIT 1 OFFSET 256")){if(failWarmQuery)throw new SQLiteException("prepare failed");c.remaining=warmRows>256?1:0;c.warmScan=true;c.failStep=failWarmStep;scans++;}return c;}}
  static class Config{long owner=50;boolean active=true;long getClientUserId(){return owner;}boolean isClientActivated(){return active;}}
  static class Res{List<Integer>messages=new ArrayList<>(List.of(5,6));int getObjectSize(){return 100;}}
  static class Controller{int deliveries;Object[] last;void processLoadedMessages(Object...args){deliveries++;last=args;}}
@@ -117,8 +117,10 @@ def test_large_history_skips_speculative_reader_but_foreground_still_loads(tmp_p
     storage_probe(tmp_path,'''Probe p=new Probe();int[]done={0};p.database.warmRows=100000;
  p.warmChatHistory(100,25,()->done[0]++);p.storageQueue.fire();AndroidUtilities.ui.fire();
  check(p.database.scans==1&&p.sqlReads==0&&p.warmHistory.isEmpty()&&done[0]==1);
+ check(SQLiteCursor.warmSteps==1);
  p.open(100,25,0,0);check(p.sqlReads==1&&p.controller.deliveries==1);
  p.database.warmRows=256;p.warmChatHistory(100,25,()->{});p.storageQueue.fire();AndroidUtilities.ui.fire();check(p.sqlReads==2);
+ check(SQLiteCursor.warmSteps==2);
  ''')
 
 
