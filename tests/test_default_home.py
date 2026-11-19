@@ -36,7 +36,11 @@ def test_no_style_selector_or_iphone_home_routes_remain():
     assert 'flexyHomeStyle' not in registry and 'HomeListSettingsActivity' in registry
     for locale in ['values','values-es','values-ru']:
         names={n.attrib.get('name') for n in ET.parse(ROOT/f'TMessagesProj/src/main/res/{locale}/flexy_home_list.xml').getroot()}
-        assert names=={'FlexyHomeChatDividers'}
+        assert names == {
+            'FlexyHomeChatDividers',
+            'FlexyHomeDirectionalScrollEdge',
+            'FlexyHomeDirectionalScrollEdgeHint',
+        }
     rows=(JAVA/'org/telegram/ui/Cells/DialogCell.java').read_text()
     assert 'isIosHome' not in rows and 'useForceThreeLines = forceThreeLines;' in rows
     nav=(JAVA/'app/flexygram/navigation/LiquidNavigationConfig.java').read_text()

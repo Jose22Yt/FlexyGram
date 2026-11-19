@@ -73,7 +73,8 @@ def test_glossy_is_the_only_fresh_install_alias_and_remembered_default(tmp_path)
 
 def test_settings_reuses_existing_divider_and_plain_chat_rows():
     setting=(JAVA/'app/flexygram/home/HomeListSettingsActivity.java').read_text()
-    assert 'dividerRow=addRow(' in setting and 'styleRow' not in setting
+    assert 'dividerRow=addRow("dividerStyle");' in ''.join(setting.split())
+    assert 'styleRow' not in setting
     assert 'getHideDividers().setConfigBool' in setting and 'AppearanceConfig.invalidateDividerStyle()' in setting
     assert 'Theme.applyCommonTheme()' in setting
     rows=(JAVA/'org/telegram/ui/Cells/DialogCell.java').read_text()
