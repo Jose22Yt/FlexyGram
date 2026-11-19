@@ -1,3 +1,5 @@
 <resources>
     <string name="FlexyHomeChatDividers">Líneas divisorias entre chats</string>
+    <string name="FlexyHomeDirectionalScrollEdge">Efecto de borde al desplazar</string>
+    <string name="FlexyHomeDirectionalScrollEdgeHint">En la lista de chats y dentro de las conversaciones</string>
 </resources>

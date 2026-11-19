@@ -1804,6 +1804,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             super(context);
             parentPage = page;
             additionalClipBottom = dp(200);
+            if (!onlySelect && folderId == 0 && communityId == 0) enableDirectionalScrollEdge(.24f);
         }
 
         public void prepareSelectorForAnimation() {
@@ -2107,7 +2108,25 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (drawMovingViewsOverlayed() && child instanceof DialogCell && ((DialogCell) child).isMoving()) {
                 return true;
             }
-            return super.drawChild(canvas, child, drawingTime);
+            final int save = isDirectionalScrollEdgeDrawing() && child instanceof DialogCell
+                    ? beginDirectionalScrollEdge(canvas, child) : -1;
+            try {
+                return super.drawChild(canvas, child, drawingTime);
+            } finally {
+                if (save >= 0) canvas.restoreToCount(save);
+            }
+        }
+
+        @Override
+        protected float directionalScrollTop() {
+            return getPaddingTop() + scrollYOffset;
+        }
+
+        @Override
+        protected boolean canDrawDirectionalScrollEdge() {
+            return !startedTracking && !tabsAnimationInProgress && rightFragmentOpenedProgress == 0f
+                    && animationSupportListView == null && !searching && !searchIsShowed
+                    && (actionBar == null || !actionBar.isActionModeShowed());
         }
 
         @Override

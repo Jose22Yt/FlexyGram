@@ -6867,6 +6867,26 @@ public class ChatActivity extends BaseFragment implements
 
             @Override
             public boolean drawChild(Canvas canvas, View child, long drawingTime) {
+                final int save = isDirectionalScrollEdgeDrawing() && child instanceof ChatMessageCell cell
+                        && cell.getCurrentMessagesGroup() == null
+                        && !cell.transitionParams.animateBackgroundBoundsInner && !cell.hasOutboundsContent()
+                        && !cell.needDelayRoundProgressDraw() && !hasSeparateVideoSurface(cell)
+                        ? beginDirectionalScrollEdge(canvas, child) : -1;
+                try {
+                    return drawMessageChild(canvas, child, drawingTime);
+                } finally {
+                    if (save >= 0) canvas.restoreToCount(save);
+                }
+            }
+
+            private boolean hasSeparateVideoSurface(ChatMessageCell cell) {
+                if (videoPlayerContainer == null) return false;
+                final MessageObject message = cell.getMessageObject();
+                return message != null && (message.isVideo() || message.isRoundVideo())
+                        && MediaController.getInstance().isPlayingMessage(message);
+            }
+
+            private boolean drawMessageChild(Canvas canvas, View child, long drawingTime) {
                 if (isSkeletonVisible()) {
                     invalidated = false;
                     invalidate();
@@ -53156,6 +53176,26 @@ public class ChatActivity extends BaseFragment implements
 
         public ChatListRecyclerView(Context context, ThemeDelegate themeDelegate) {
             super(context, themeDelegate);
+            if (!inPreviewMode && !inBubbleMode && !isInsideContainer && chatMode == MODE_DEFAULT) {
+                enableDirectionalScrollEdge(.16f);
+            }
+        }
+
+        @Override
+        protected float directionalScrollTop() {
+            return chatListViewPaddingTop - chatListViewPaddingVisibleOffset - dp(4);
+        }
+
+        @Override
+        protected float directionalScrollBottom() {
+            return getHeight() - getPaddingBottom() + blurredViewBottomOffset;
+        }
+
+        @Override
+        protected boolean canDrawDirectionalScrollEdge() {
+            return pullingDownOffset == 0f && fragmentTransition == null && scrimView == null
+                    && !fastScrollAnimationRunning && !isSkeletonVisible()
+                    && (actionBar == null || !actionBar.isActionModeShowed());
         }
 
         void drawChatBackgroundElements(Canvas canvas) {
