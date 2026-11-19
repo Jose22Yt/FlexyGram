@@ -133,6 +133,8 @@ def test_storage_matches_native_backup_outside_dialog_startup_changes():
         'MessagesStorage.java': [
             'private long[] getTopLevelDraftDialogIds()',
             'public void getDialogs(int folderId',
+            # The bounded speculative read is exercised by test_warm_history_storage.
+            'private boolean warmHistoryReadIsBounded(',
         ],
         'MessagesController.java': [
             'public void putAllNeededDraftDialogs()',
