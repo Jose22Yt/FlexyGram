@@ -12,15 +12,28 @@ public final class DirectionalScrollEdge {
         return dy > 0 ? BOTTOM : TOP;
     }
 
-    public static float fold(int edge, float start, float end, float rowTop, float rowBottom, float band) {
-        if (edge == NONE || end <= start || rowBottom <= start || rowTop >= end || band <= 0f) return 0f;
-        final float distance = edge == TOP ? rowBottom - start : end - rowTop;
-        final float t = Math.max(0f, 1f - distance / band);
-        return t * t * (3f - 2f * t);
+    public static float proximity(float y, float edge, float band) {
+        return Math.max(0f, 1f - Math.abs(y - edge) / band);
+    }
+
+    // Identity and its slope match the native list at either end of the band.
+    // Both rows sharing a boundary therefore use the same projected Y.
+    public static float projectY(float y, float edge, float proximity, float strength) {
+        return y - (y - edge) * strength * proximity * proximity;
+    }
+
+    public static float projectX(float x, float center, float proximity, float strength) {
+        final float taper = proximity * proximity * (3f - 2f * proximity);
+        return x + (center - x) * (strength * .24f) * taper;
+    }
+
+    public static float engagement(float travel, float threshold) {
+        final float progress = Math.min(1f, travel / threshold);
+        return .45f + .55f * progress * (2f - progress);
     }
 
     public static float settle(float elapsed, float duration) {
         final float remaining = Math.max(0f, 1f - elapsed / duration);
-        return remaining * remaining;
+        return remaining * remaining * (3f - 2f * remaining);
     }
 }

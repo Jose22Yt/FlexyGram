@@ -2711,11 +2711,15 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
     private float scrollEdgeStrength;
     private int scrollEdge, drawingScrollEdge;
     private long scrollEdgeSettleStart;
+    private int scrollEdgeTravel, scrollEdgeEngagementDistance;
     private float scrollEdgeTop, scrollEdgeBottom, scrollEdgeBand, drawingScrollEdgeStrength;
     private boolean drewScrollEdge;
+    private Matrix scrollEdgeProjection;
+    private float[] scrollEdgeSource, scrollEdgeTarget;
 
     protected final void enableDirectionalScrollEdge(float strength) {
         scrollEdgeStrength = strength;
+        scrollEdgeEngagementDistance = dp(36);
         // Load the shared toggle at view setup, outside the scroll callback.
         DirectionalScrollSettings.enabled();
     }
@@ -2732,8 +2736,11 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         if (edge != scrollEdge || scrollEdgeSettleStart != 0) {
             scrollEdge = edge;
             scrollEdgeSettleStart = 0;
+            scrollEdgeTravel = 0;
             invalidate();
         }
+        scrollEdgeTravel = Math.min(scrollEdgeEngagementDistance,
+                scrollEdgeTravel + Math.min(scrollEdgeEngagementDistance, Math.abs(dy)));
     }
 
     @Override
@@ -2778,9 +2785,10 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
             clearDirectionalScrollEdge();
             return;
         }
-        drawingScrollEdgeStrength = scrollEdgeStrength;
+        drawingScrollEdgeStrength = scrollEdgeStrength
+                * DirectionalScrollEdge.engagement(scrollEdgeTravel, scrollEdgeEngagementDistance);
         if (scrollEdgeSettleStart != 0) {
-            drawingScrollEdgeStrength *= DirectionalScrollEdge.settle(SystemClock.uptimeMillis() - scrollEdgeSettleStart, 120f);
+            drawingScrollEdgeStrength *= DirectionalScrollEdge.settle(SystemClock.uptimeMillis() - scrollEdgeSettleStart, 140f);
             if (drawingScrollEdgeStrength <= .001f) {
                 clearDirectionalScrollEdge();
                 return;
@@ -2788,8 +2796,8 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         }
         scrollEdgeTop = Math.max(0f, directionalScrollTop());
         scrollEdgeBottom = Math.min(getHeight(), directionalScrollBottom());
-        scrollEdgeBand = Math.min(dp(64), (scrollEdgeBottom - scrollEdgeTop) * .25f);
-        drawingScrollEdge = scrollEdge;
+        scrollEdgeBand = Math.min(dp(136), (scrollEdgeBottom - scrollEdgeTop) * .34f);
+        if (scrollEdgeBand > 0f) drawingScrollEdge = scrollEdge;
     }
 
     protected final boolean isDirectionalScrollEdgeDrawing() {
@@ -2799,16 +2807,49 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
     protected final int beginDirectionalScrollEdge(Canvas canvas, View child) {
         final float rowTop = child.getY();
         final float rowBottom = rowTop + child.getHeight();
-        final float fold = DirectionalScrollEdge.fold(
-                drawingScrollEdge, scrollEdgeTop, scrollEdgeBottom, rowTop, rowBottom, scrollEdgeBand)
-                * drawingScrollEdgeStrength;
-        if (fold <= .001f) return -1;
         final float edgeY = drawingScrollEdge == DirectionalScrollEdge.TOP ? scrollEdgeTop : scrollEdgeBottom;
+        final float top = DirectionalScrollEdge.proximity(rowTop, edgeY, scrollEdgeBand);
+        final float bottom = DirectionalScrollEdge.proximity(rowBottom, edgeY, scrollEdgeBand);
+        if (top == 0f && bottom == 0f || child.getWidth() <= 0 || rowBottom <= rowTop
+                || !canvas.isHardwareAccelerated()) return -1;
+
+        if (scrollEdgeProjection == null) {
+            scrollEdgeProjection = new Matrix();
+            scrollEdgeSource = new float[8];
+            scrollEdgeTarget = new float[8];
+        }
+
+        final float left = child.getX(), right = left + child.getWidth();
+        final float center = (left + right) * .5f;
+        final float strength = drawingScrollEdgeStrength;
+        setScrollEdgeQuad(scrollEdgeSource, left, right, rowTop, left, right, rowBottom);
+        setScrollEdgeQuad(scrollEdgeTarget,
+                DirectionalScrollEdge.projectX(left, center, top, strength),
+                DirectionalScrollEdge.projectX(right, center, top, strength),
+                DirectionalScrollEdge.projectY(rowTop, edgeY, top, strength),
+                DirectionalScrollEdge.projectX(left, center, bottom, strength),
+                DirectionalScrollEdge.projectX(right, center, bottom, strength),
+                DirectionalScrollEdge.projectY(rowBottom, edgeY, bottom, strength));
+        if (!scrollEdgeProjection.setPolyToPoly(scrollEdgeSource, 0, scrollEdgeTarget, 0, 4)) return -1;
+
+        // The native parent still clips the list. Cutting the projected row at the
+        // viewport padding would split avatars and make a seam under the glass dock.
         final int save = canvas.save();
-        canvas.clipRect(0f, scrollEdgeTop, getWidth(), scrollEdgeBottom);
-        canvas.scale(1f - fold * .30f, 1f - fold, child.getX() + child.getWidth() * .5f, edgeY);
+        canvas.concat(scrollEdgeProjection);
         drewScrollEdge = true;
         return save;
+    }
+
+    private static void setScrollEdgeQuad(float[] quad, float topLeft, float topRight, float top,
+            float bottomLeft, float bottomRight, float bottom) {
+        quad[0] = topLeft;
+        quad[1] = top;
+        quad[2] = topRight;
+        quad[3] = top;
+        quad[4] = bottomRight;
+        quad[5] = bottom;
+        quad[6] = bottomLeft;
+        quad[7] = bottom;
     }
 
     @Override
