@@ -52,8 +52,29 @@ final class Journeys {
         }
     }
     static void scroll(){
-        int x=device.getDisplayWidth()/2,high=device.getDisplayHeight()*3/10,low=device.getDisplayHeight()*7/10;
-        for(int i=0;i<3;i++){Assert.assertTrue(device.swipe(x,low,x,high,24));Assert.assertTrue(device.swipe(x,high,x,low,24));}
+        for (int i = 0; i < 3; i++) {
+            swipeList(true);
+            swipeList(false);
+        }
+    }
+    static void scrollDialogs() {
+        BySelector anchor = By.pkg(PACKAGE).text(fixture());
+        UiObject2 before = device.findObject(anchor);
+        Assert.assertNotNull("Place the synthetic fixture near the start of the dialog list.", before);
+        int initialTop = before.getVisibleBounds().top;
+        swipeList(true);
+        device.waitForIdle();
+        UiObject2 after = device.findObject(anchor);
+        Assert.assertTrue("Provision a dialog list with enough rows to scroll.",
+                after == null || after.getVisibleBounds().top != initialTop);
+        swipeList(false);
+        scroll();
+    }
+    private static void swipeList(boolean forward) {
+        int x = device.getDisplayWidth() / 2;
+        int high = device.getDisplayHeight() * 3 / 10;
+        int low = device.getDisplayHeight() * 7 / 10;
+        Assert.assertTrue(device.swipe(x, forward ? low : high, x, forward ? high : low, 24));
     }
     static void keyboard(){
         UiObject2 edit=device.wait(Until.findObject(By.pkg(PACKAGE).clazz(java.util.regex.Pattern.compile(".*EditText.*"))),TIMEOUT);

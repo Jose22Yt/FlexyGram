@@ -9085,17 +9085,13 @@ public class MessagesStorage extends BaseController {
 
     /** Read-only, local and cancellable; no controller processing or network requests until consumed. */
     private boolean warmHistoryReadIsBounded(long dialogId, java.util.concurrent.atomic.AtomicBoolean cancelled) throws SQLiteException {
+        if (cancelled.get()) return false;
         SQLiteCursor cursor = null;
         try {
-            // LIMIT applies before any aggregate/filter scan in the full reader.
-            // Large histories stay demand-loaded so speculative work cannot scan
-            // thousands of rows ahead of a foreground chat/storage operation.
-            cursor = database.queryFinalized("SELECT mid FROM messages_v2 WHERE uid = " + dialogId + " LIMIT 257");
-            int rows = 0;
-            while (cursor.next()) {
-                if (cancelled.get() || ++rows > 256) return false;
-            }
-            return !cancelled.get();
+            // Only the existence of the 257th row matters. Keep the bounded
+            // scan inside SQLite so the storage queue makes a single JNI step.
+            cursor = database.queryFinalized("SELECT 1 FROM messages_v2 WHERE uid = " + dialogId + " LIMIT 1 OFFSET 256");
+            return !cursor.next() && !cancelled.get();
         } finally {
             if (cursor != null) cursor.dispose();
         }

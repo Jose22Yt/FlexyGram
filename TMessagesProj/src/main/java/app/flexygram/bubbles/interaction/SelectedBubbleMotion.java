@@ -39,11 +39,11 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
         if (p <= 1f) return distance * p;
         return distance + maxOvershoot * (float)Math.tanh(distance * (p - 1f) / maxOvershoot);
     }
-    public static final float PANEL_START_SCALE = .32f;
+    public static final float PANEL_START_SCALE = .82f;
     public static final float OPEN_MESSAGE_SCALE = 1.012f;
     public float panelScale() { return Math.max(PANEL_START_SCALE, Math.min(1.025f,
             PANEL_START_SCALE + (1f - PANEL_START_SCALE) * phase.value)); }
-    public float panelOffset() { return 10f * Math.max(-.15f, 1f - phase.value); }
+    public float panelOffset() { return 8f * Math.max(-.15f, 1f - phase.value); }
     public float scale() { return (x.value + y.value) * .5f; }
     public float scaleX() { return x.value; }
     public float scaleY() { return y.value; }

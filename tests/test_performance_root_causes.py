@@ -91,12 +91,13 @@ def test_home_blur_reuses_clean_content_and_refreshes_scroll_animation_search_an
     hash_relative=method(utils,'public static void calculateHashRelativeParent(')
     suppress=(JAVA/'org/telegram/ui/Components/blur3/DownscaleScrollableNoiseSuppressor.java').read_text()
     update=method(suppress,'public boolean invalidateResultRenderNodes(IBlur3Capture capture, int width, int height)')
+    shared=method(suppress,'public boolean captureDisjointRegions(CaptureDisjointRegions capture, int width, int height)')
     probe(tmp_path, {'Probe.java': '''import java.util.*;
 public class Probe {
  static class PointF {float x,y;}
  static class RectF {float left,top,right,bottom;RectF(){}RectF(float l,float t,float r,float b){left=l;top=t;right=r;bottom=b;}void set(RectF r){left=r.left;top=r.top;right=r.right;bottom=r.bottom;}void set(Rect r){left=r.left;top=r.top;right=r.right;bottom=r.bottom;}void offset(float x,float y){left+=x;right+=x;top+=y;bottom+=y;}}
- static class Rect {int left,top,right,bottom;Rect(int l,int t,int r,int b){left=l;top=t;right=r;bottom=b;}}
- static class Canvas {void save(){}void restore(){}void clipRect(RectF r){}void translate(float x,float y){}void saveLayerAlpha(RectF r,int a){}}
+ static class Rect {int left,top,right,bottom;Rect(int l,int t,int r,int b){left=l;top=t;right=r;bottom=b;}int width(){return right-left;}int height(){return bottom-top;}}
+ static class Canvas {void save(){}void restore(){}void clipRect(RectF r){}void translate(float x,float y){}void saveLayerAlpha(RectF r,int a){}void drawRenderNode(RenderNode n){if(!n.display)throw new AssertionError();}}
  static class View {static final int VISIBLE=0;int visibility;float x,y,alpha=1;boolean dirty;boolean isDirty(){return dirty;}boolean isLayoutRequested(){return false;}float getAlpha(){return alpha;}int getVisibility(){return visibility;}}
  static class ViewGroup extends View {}
  static class RecyclerView {static final int SCROLL_STATE_IDLE=0;}
@@ -108,11 +109,19 @@ public class Probe {
  static class ViewPage extends View {ListView listView=new ListView();Object animationSupportListView;}
  static class ViewPositionWatcher {static boolean computeRectInParent(View v,ViewGroup p,RectF r){r.left=v.x;r.top=v.y;return true;}static boolean computeCoordinatesInParent(View v,ViewGroup p,PointF f){f.x=v.x;f.y=v.y;return true;}}
  static class Blur3Utils {static final RectF captureTmpRectF=new RectF(),captureTmpChildPos=new RectF();RELATIVE HASH_RELATIVE}
- static class RenderNode {boolean display;boolean hasDisplayList(){return display;}}
- static class SourcePart {Rect position;long lastHash;RenderNode renderNode=new RenderNode();SourcePart(Rect p){position=p;}}
+ static class RenderNode {
+  boolean display;int width,height;RenderNode(){}RenderNode(String name){}
+  boolean hasDisplayList(){return display;}int getWidth(){return width;}int getHeight(){return height;}
+  void setPosition(int l,int t,int r,int b){width=r-l;height=b-t;}Canvas beginRecording(){return new Canvas();}void endRecording(){display=true;}void discardDisplayList(){display=false;}
+ }
+ static class SourcePart {Rect position;long lastHash;boolean usesSharedCapture;int sharedX,sharedY,invalidations;RenderNode renderNode=new RenderNode();SourcePart(Rect p){position=p;}void invalidate(){invalidations++;}}
+ interface CaptureDisjointRegions {boolean capture(Canvas c,RectF first,RectF second);}
  static class Suppressor {final RectF tmpRectF=new RectF();final Blur3HashImpl builder=new Blur3HashImpl();List<SourcePart> rectRenderNodes=List.of(new SourcePart(new Rect(0,0,400,100)),new SourcePart(new Rect(0,700,400,800)));int rectRenderNodesCount=2,recording,records;
- Canvas beginRecordingRect(int a){recording=a;records++;return new Canvas();}void endRecordingRect(){rectRenderNodes.get(recording).renderNode.display=true;}boolean invalidateResultRenderNodes(int w,int h){return false;}
- UPDATE
+ int k=1;RenderNode sharedCapture;RectF sharedFirst=new RectF(),sharedSecond=new RectF();
+ Canvas beginRecordingRect(int a){recording=a;records++;var part=rectRenderNodes.get(a);part.renderNode.setPosition(0,0,part.position.width()/k,part.position.height()/k);return new Canvas();}
+ void endRecordingRect(){var part=rectRenderNodes.get(recording);part.renderNode.endRecording();part.invalidate();}
+ boolean invalidateResultRenderNodes(int w,int h){return false;}
+ UPDATE SHARED
  }
  ViewPage[] viewPages={new ViewPage()};Search searchViewPager;float sliding;float getRightSlidingProgress(){return sliding;}
  IBlur3Capture iBlur3Capture;
@@ -143,5 +152,19 @@ public class Probe {
   s.invalidateResultRenderNodes(p.iBlur3Capture,400,800);check(s.records==records);
   s.rectRenderNodes.get(0).renderNode.display=false;s.invalidateResultRenderNodes(p.iBlur3Capture,400,800);check(s.records==records+1);
   p.viewPages[0].visibility=8;s.invalidateResultRenderNodes(p.iBlur3Capture,400,800);check(s.records==records+3);
+  p.viewPages[0].visibility=0;
+  s=new Suppressor();s.invalidateResultRenderNodes(p.iBlur3Capture,400,800);check(s.records==2);
+  int[] sharedPasses={0};
+  CaptureDisjointRegions shared=(canvas,top,bottom)->{check(top.bottom<=bottom.top);sharedPasses[0]++;return true;};
+  for(int i=0;i<10000;i++)check(s.captureDisjointRegions(shared,400,800));
+  check(sharedPasses[0]==10000&&s.records==4);
+  s.rectRenderNodes.get(1).position.top=696;
+  check(s.captureDisjointRegions(shared,400,800)&&s.records==5);
+  s.rectRenderNodes.get(1).renderNode.display=false;
+  check(s.captureDisjointRegions(shared,400,800)&&s.records==6);
+  s.invalidateResultRenderNodes(p.iBlur3Capture,400,800);check(s.records==8&&!s.sharedCapture.display);
+  s.invalidateResultRenderNodes(p.iBlur3Capture,400,800);check(s.records==8);
+  s.rectRenderNodes.get(1).position.top=50;
+  check(!s.captureDisjointRegions(shared,400,800)&&sharedPasses[0]==10002);
  }
-}'''.replace('HASH_RELATIVE',hash_relative).replace('RELATIVE',relative).replace('UPDATE',update).replace('CAPTURE',capture)})
+}'''.replace('HASH_RELATIVE',hash_relative).replace('RELATIVE',relative).replace('UPDATE',update).replace('SHARED',shared).replace('CAPTURE',capture)})

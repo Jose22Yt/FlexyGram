@@ -916,7 +916,8 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
         canvas.restoreToCount(s);
 
         drawBubbles(canvas, br, cPr, sr, 255);
-        invalidate();
+        // Chat reactions are driven by the entrance, gesture and emoji invalidations.
+        if (type != TYPE_DEFAULT) invalidate();
     }
 
     public void drawBubbles(Canvas canvas) {
@@ -2022,12 +2023,14 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
                 @Override
                 protected void dispatchDraw(Canvas canvas) {
                     super.dispatchDraw(canvas);
-                    if (imageReceiver.getLottieAnimation() != null && !waitingAnimation && (transitionProgress >= 0.75f || !signatureTransitionOpening)) {
-                        imageReceiver.getLottieAnimation().start();
+                    final RLottieDrawable enter = imageReceiver.getLottieAnimation();
+                    final RLottieDrawable loop = loopImageView == null ? null : loopImageView.imageReceiver.getLottieAnimation();
+                    if (enter != null && !waitingAnimation && (transitionProgress >= 0.75f || !signatureTransitionOpening)) {
+                        enter.start();
                     }
-                    if (shouldSwitchToLoopView && !switchedToLoopView && imageReceiver.getLottieAnimation() != null && imageReceiver.getLottieAnimation().isLastFrame() && loopImageView.imageReceiver.getLottieAnimation() != null && loopImageView.imageReceiver.getLottieAnimation().hasBitmap()) {
+                    if (shouldSwitchToLoopView && !switchedToLoopView && enter != null && enter.isLastFrame() && loop != null && loop.hasBitmap()) {
                         switchedToLoopView = true;
-                        loopImageView.imageReceiver.getLottieAnimation().setCurrentFrame(0, false, true);
+                        loop.setCurrentFrame(0, false, true);
                         loopImageView.setVisibility(View.VISIBLE);
                         if (onSwitchedToLoopView != null) {
                             onSwitchedToLoopView.run();
@@ -2036,7 +2039,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
                             enterImageView.setVisibility(View.INVISIBLE);
                         });
                     }
-                    invalidate();
+                    if (type != TYPE_DEFAULT || enter != null && enter.isRunning()) invalidate();
                 }
 
                 @Override
@@ -2098,6 +2101,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
                         return;
                     }
                     super.invalidate();
+                    invalidatePendingEnterHandoff();
                 }
 
                 @Override
@@ -2106,6 +2110,13 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
                         return;
                     }
                     super.invalidate(l, t, r, b);
+                    invalidatePendingEnterHandoff();
+                }
+
+                private void invalidatePendingEnterHandoff() {
+                    if (type == TYPE_DEFAULT && shouldSwitchToLoopView && !switchedToLoopView) {
+                        enterImageView.invalidate();
+                    }
                 }
             };
             enterImageView.getImageReceiver().setAutoRepeat(0);

@@ -19,13 +19,14 @@ public class Probe {
  static class DialogStoriesCell{static final int HEIGHT_IN_DP=100;}
  static class Rect{float left,top,right,bottom;void set(float l,float t,float r,float b){left=l;top=t;right=r;bottom=b;}void inset(float x,float y){left+=x;right-=x;top+=y;bottom-=y;}}
  static class Animator{float getFloatValue(){return .5f;}}
- static class Suppressor{int setups,captures,regions;void setupRenderNodes(Object p,int n){setups++;regions=n;}void invalidateResultRenderNodes(Object c,int w,int h){captures++;}}
+ static class Suppressor{int setups,captures,regions,shared;boolean shareResult=true;void setupRenderNodes(Object p,int n){setups++;regions=n;}void invalidateResultRenderNodes(Object c,int w,int h){captures++;}boolean captureDisjointRegions(Object c,int w,int h){shared++;return shareResult;}}
  static class Source{int updates,width,height;void setSize(int w,int h){width=w;height=h;}void updateDisplayListIfNeeded(){updates++;}}
  Suppressor scrollableViewNoiseSuppressor=new Suppressor();View fragmentView=new View(),actionBar=new View(),filterTabsView,topPanelLayout,searchTabsAndFiltersLayout,commentView,chatInputViewsContainer;
  static class Controller{boolean visible=true;boolean hasVisibleTabsSurface(){return visible;}}
  Controller mainTabsActivityController;
  boolean hasStories,hasMainTabs;int navigationBarHeight;float scrollYOffset;Object iBlur3Positions=new Object(),iBlur3Capture=new Object();
  Rect iBlur3PositionActionBar=new Rect(),iBlur3PositionMainTabs=new Rect();Animator animatorSearchVisible=new Animator();
+ Object scrollingBlurCapture=new Object();boolean canShare;boolean canShareScrollingBlur(){return canShare;}
  Source iBlur3SourceGlassFrosted=new Source(),iBlur3SourceGlass=new Source();
  static int dp(int n){return n;}static float lerp(float a,float b,float f){return a+(b-a)*f;}
  int getIdleSearchFieldHeight(){return 40;}int calculateListViewPaddingBottom(){return 100;}
@@ -43,6 +44,107 @@ public class Probe {
   check(p.scrollableViewNoiseSuppressor.captures==3&&p.scrollableViewNoiseSuppressor.regions==2&&p.iBlur3PositionMainTabs.top==1180);
   Build.VERSION.SDK_INT=30;p.blur3_UpdateBlur();check(p.scrollableViewNoiseSuppressor.captures==3);
   Build.VERSION.SDK_INT=31;p.fragmentView=null;p.blur3_UpdateBlur();check(p.scrollableViewNoiseSuppressor.captures==3);
+  p.fragmentView=new View();p.canShare=true;p.blur3_UpdateBlur();
+  check(p.scrollableViewNoiseSuppressor.shared==1&&p.scrollableViewNoiseSuppressor.captures==3);
+  p.scrollableViewNoiseSuppressor.shareResult=false;p.blur3_UpdateBlur();
+  check(p.scrollableViewNoiseSuppressor.shared==2&&p.scrollableViewNoiseSuppressor.captures==4);
  }
 }'''.replace('UPDATE', update)
     })
+
+
+def test_shared_scrolling_capture_scans_children_once_and_skips_the_gap(tmp_path):
+    source = (JAVA / 'org/telegram/ui/Components/RecyclerListView.java').read_text()
+    pair = method(source, 'public boolean captureDisjointRegions(Canvas canvas, RectF first, RectF second)')
+    views = method(source, 'private void captureChildViews(Canvas canvas, RectF first, RectF second, long drawingTime)')
+    probe(tmp_path, {'Probe.java': '''
+import java.util.*;
+public class Probe {
+ record RectF(float top,float bottom) {
+  boolean intersects(float l,float t,float r,float b){return t<bottom&&b>top;}
+ }
+ static class Canvas {int depth;int save(){return depth++;}void restoreToCount(int d){depth=d;}void clipRect(RectF rect){}}
+ static class SystemClock {static long uptimeMillis(){return 1;}}
+ record View(float y,int height) {
+  float getX(){return 0;}float getY(){return y;}int getWidth(){return 200;}int getHeight(){return height;}
+ }
+ final List<View> children=List.of(new View(-20,50),new View(5,90),new View(60,10),new View(85,30),new View(120,10));
+ final List<View> drawn=new ArrayList<>();
+ int visits,decorations;boolean edge,ignoreClipChild;
+ static final int OVER_SCROLL_NEVER=2;
+ boolean hasActiveEdgeEffects(){return edge;}int getOverScrollMode(){return 0;}
+ int getChildCount(){return children.size();}
+ View getChildAt(int index){visits++;return children.get(index);}
+ void captureDecorations(Canvas canvas,RectF region){if(canvas.depth!=1)throw new AssertionError();decorations++;}
+ void drawChild(Canvas canvas,View view,long time){if(!ignoreClipChild)throw new AssertionError();drawn.add(view);}
+ CAPTURE_PAIR
+ CHILD_VIEWS
+ public static void main(String[] args){
+  Probe p=new Probe();Canvas canvas=new Canvas();RectF top=new RectF(0,20),bottom=new RectF(90,110);
+  if(!p.captureDisjointRegions(canvas,top,bottom)||p.visits!=5||p.decorations!=2||canvas.depth!=0
+      ||!p.drawn.equals(List.of(p.children.get(0),p.children.get(1),p.children.get(3))))throw new AssertionError();
+  p.edge=true;
+  if(p.captureDisjointRegions(canvas,top,bottom)||p.visits!=5)throw new AssertionError();
+ }
+}'''.replace('CAPTURE_PAIR', pair).replace('CHILD_VIEWS', views)})
+
+
+def test_blurred_list_captures_rows_under_the_header_in_both_routes(tmp_path):
+    base = (JAVA/'org/telegram/ui/Components/RecyclerListView.java').read_text()
+    blurred = (JAVA/'org/telegram/ui/Components/BlurredRecyclerView.java').read_text()
+    methods = {
+        'CAPTURE_PAIR': method(base, 'public boolean captureDisjointRegions('),
+        'CHILDREN': method(base, 'private void captureChildViews('),
+        'BLUR_SINGLE': method(blurred, 'public void capture(Canvas canvas, RectF position)'),
+        'BLUR_PAIR': method(blurred, 'public boolean captureDisjointRegions('),
+        'BLUR_DRAW': method(blurred, 'public boolean drawChild(Canvas canvas, View child, long drawingTime)'),
+    }
+    source = '''public class Probe {
+        static class Canvas {
+            int rows; boolean fail;
+            int save(){return 0;} void clipRect(RectF r){} void restoreToCount(int save){}
+        }
+        record RectF(float top, float bottom) {
+            boolean intersects(float l,float t,float r,float b){return t<bottom&&b>top;}
+        }
+        static class SystemClock {static long uptimeMillis(){return 1;}}
+        static class View {
+            float getX(){return 0;} float getY(){return 10;}
+            int getWidth(){return 200;} int getHeight(){return 20;} int getMeasuredHeight(){return 20;}
+        }
+        static class Parent {
+            static final int OVER_SCROLL_NEVER=2;
+            final View row = new View(); boolean ignoreClipChild;
+            boolean hasActiveEdgeEffects(){return false;} int getOverScrollMode(){return 0;}
+            int getChildCount(){return 1;} View getChildAt(int index){return row;}
+            void captureDecorations(Canvas canvas, RectF region){}
+            public boolean drawChild(Canvas canvas, View view, long time){
+                if(canvas.fail)throw new IllegalStateException();
+                canvas.rows++;
+                return true;
+            }
+            public void capture(Canvas canvas, RectF region){captureChildViews(canvas,region,null,1);}
+            CAPTURE_PAIR
+            CHILDREN
+        }
+        static class Blurred extends Parent {
+            int blurTopPadding=48; boolean alwaysDrawChild;
+            BLUR_SINGLE
+            BLUR_PAIR
+            BLUR_DRAW
+        }
+        public static void main(String[] args){
+            Blurred list=new Blurred();
+            RectF header=new RectF(0,48),footer=new RectF(800,880);
+            Canvas individual=new Canvas(), shared=new Canvas();
+            list.capture(individual,header);
+            if(!list.captureDisjointRegions(shared,header,footer))throw new AssertionError();
+            if(individual.rows!=1||shared.rows!=1||list.alwaysDrawChild)throw new AssertionError();
+            shared.fail=true;
+            try{list.captureDisjointRegions(shared,header,footer);throw new AssertionError();}
+            catch(IllegalStateException expected){if(list.alwaysDrawChild||list.ignoreClipChild)throw new AssertionError();}
+        }
+    }'''
+    for key, body in methods.items():
+        source = source.replace(key, body)
+    probe(tmp_path, {'Probe.java': source})

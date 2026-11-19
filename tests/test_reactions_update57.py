@@ -194,3 +194,20 @@ def test_queued_emoji_animation_start_ignores_detached_or_replaced_owner(tmp_pat
  p.showAnimator=expected;p.isAttached=false;p.fire(expected);check(expected.starts==1);p.isAttached=true;HwEmojis.owner=new Object();p.fire(expected);check(expected.starts==1);
  }
 }'''.replace('GUARD',guard)})
+
+
+def test_chat_emoji_panel_builds_once_starts_at_layout_and_stops_drawing_the_morph():
+    popup = (JAVA/'org/telegram/ui/Components/Reactions/CustomEmojiReactionsWindow.java').read_text()
+    dialog = (JAVA/'org/telegram/ui/SelectAnimatedEmojiDialog.java').read_text()
+    constructor = method(popup, 'public CustomEmojiReactionsWindow(')
+    assert 'OneShotPreDrawListener.add(windowView, startTransition)' in constructor
+    assert 'if (dismissed || transitionResourcesReleased) return;' in constructor
+    assert 'usesChatReactionTransition() ? reactions : null' in constructor
+    assert 'if (!usesChatReactionTransition()) selectAnimatedEmojiDialog.setRecentReactions(reactions);' in constructor
+    dialog_init = method(dialog, 'private SelectAnimatedEmojiDialog(')
+    assert dialog_init.index('recentReactionsToSet = initialReactions;') < dialog_init.index('updateRows(true, false);')
+    transition = method(popup, 'private void createTransition(')
+    assert 'cascadeAnimation = !usesChatReactionTransition()' in transition
+    draw = method(popup, 'protected void dispatchDraw(Canvas canvas)')
+    assert '|| !enterTransitionFinished || transition;' in draw
+    assert 'if (drawMorph && reactionsContainerLayout != null)' in draw

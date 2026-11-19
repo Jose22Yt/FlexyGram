@@ -362,6 +362,68 @@ public class DownscaleScrollableNoiseSuppressor {
 
     private final RectF tmpRectF = new RectF();
     private final Blur3HashImpl builder = new Blur3HashImpl();
+    private RenderNode sharedCapture;
+    private final RectF sharedFirst = new RectF();
+    private final RectF sharedSecond = new RectF();
+
+    @FunctionalInterface
+    public interface CaptureDisjointRegions {
+        boolean capture(Canvas canvas, RectF first, RectF second);
+    }
+
+    /**
+     * Record the scrolling list once. The two effect sources still keep their own
+     * bounds, sampling, and blur so the area in between is never blurred.
+     */
+    public boolean captureDisjointRegions(CaptureDisjointRegions capture, int width, int height) {
+        if (rectRenderNodesCount != 2 || width <= 0 || height <= 0) return false;
+        final Rect first = rectRenderNodes.get(0).position;
+        final Rect second = rectRenderNodes.get(1).position;
+        if (first.bottom > second.top) return false;
+
+        final int left = Math.min(first.left, second.left);
+        final int top = first.top;
+        final int right = Math.max(first.right, second.right);
+        final int bottom = second.bottom;
+        sharedFirst.set(first);
+        sharedSecond.set(second);
+        if (sharedCapture == null) sharedCapture = new RenderNode("DialogsBlurCapture");
+        sharedCapture.setPosition(0, 0, right - left, bottom - top);
+        final Canvas canvas = sharedCapture.beginRecording();
+        final boolean captured;
+        try {
+            canvas.translate(-left, -top);
+            captured = capture.capture(canvas, sharedFirst, sharedSecond);
+        } finally {
+            sharedCapture.endRecording();
+        }
+        if (!captured) return false;
+
+        for (int index = 0; index < 2; index++) {
+            final SourcePart part = rectRenderNodes.get(index);
+            final int x = left - part.position.left;
+            final int y = top - part.position.top;
+            if (part.usesSharedCapture && part.renderNode.hasDisplayList()
+                    && part.sharedX == x && part.sharedY == y
+                    && part.renderNode.getWidth() == part.position.width() / k
+                    && part.renderNode.getHeight() == part.position.height() / k) {
+                part.invalidate();
+                continue;
+            }
+            final Canvas region = beginRecordingRect(index);
+            try {
+                region.translate(x, y);
+                region.drawRenderNode(sharedCapture);
+            } finally {
+                endRecordingRect();
+            }
+            part.usesSharedCapture = true;
+            part.sharedX = x;
+            part.sharedY = y;
+        }
+        invalidateResultRenderNodes(width, height);
+        return true;
+    }
 
     public boolean invalidateResultRenderNodes(IBlur3Capture capture, int width, int height) {
         if (width <= 0 || height <= 0) return false;
@@ -379,7 +441,8 @@ public class DownscaleScrollableNoiseSuppressor {
             capture.captureCalculateHash(builder, tmpRectF);
             final long hash = builder.get();
 
-            if (!builder.isUnsupported() && sourcePart.lastHash == hash && sourcePart.renderNode.hasDisplayList()) {
+            if (!sourcePart.usesSharedCapture && !builder.isUnsupported()
+                    && sourcePart.lastHash == hash && sourcePart.renderNode.hasDisplayList()) {
                 continue;
             }
 
@@ -393,9 +456,13 @@ public class DownscaleScrollableNoiseSuppressor {
                 endRecordingRect();
             }
             sourcePart.lastHash = hash;
+            sourcePart.usesSharedCapture = false;
 
         }
 
+        // Individual regions now own their current list again. Release the
+        // last shared list so it does not keep older row display lists alive.
+        if (sharedCapture != null && sharedCapture.hasDisplayList()) sharedCapture.discardDisplayList();
         // Resizes and removal of the last region must rebuild the composite too.
         return invalidateResultRenderNodes(width, height);
     }
@@ -406,6 +473,8 @@ public class DownscaleScrollableNoiseSuppressor {
         final @Nullable DownscaledRenderNode renderNodesForGlass;
         final Rect position = new Rect();
         long lastHash;
+        boolean usesSharedCapture;
+        int sharedX, sharedY;
 
         private SourcePart() {
             if (isLiquidGlassEnabled) {

@@ -602,6 +602,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
 
         applicationHandler = new Handler(applicationContext.getMainLooper());
 
+        Utilities.globalQueue.postRunnable(UserConfig::preloadStartupConfigs);
         // Native Test warms optional features only after usable content has drawn.
         if (!BuildConfig.NATIVE_BASELINE_TEST) {
             Utilities.globalQueue.postRunnable(LauncherIconController::tryFixLauncherIconIfNeeded);
@@ -625,6 +626,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         try {
             applicationContext.getSharedPreferences("nkmrcfg", Context.MODE_PRIVATE);
             applicationContext.getSharedPreferences("mainconfig", Context.MODE_PRIVATE);
+            applicationContext.getSharedPreferences("userconfing", Context.MODE_PRIVATE);
         } finally { android.os.Trace.endSection(); }
     }
 

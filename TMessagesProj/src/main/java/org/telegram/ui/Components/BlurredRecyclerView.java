@@ -73,9 +73,24 @@ public class BlurredRecyclerView extends RecyclerListView {
 
     @Override
     public void capture(Canvas canvas, RectF position) {
+        final boolean old = alwaysDrawChild;
         alwaysDrawChild = true;
-        super.capture(canvas, position);
-        alwaysDrawChild = false;
+        try {
+            super.capture(canvas, position);
+        } finally {
+            alwaysDrawChild = old;
+        }
+    }
+
+    @Override
+    public boolean captureDisjointRegions(Canvas canvas, RectF first, RectF second) {
+        final boolean old = alwaysDrawChild;
+        alwaysDrawChild = true;
+        try {
+            return super.captureDisjointRegions(canvas, first, second);
+        } finally {
+            alwaysDrawChild = old;
+        }
     }
 
     @Override

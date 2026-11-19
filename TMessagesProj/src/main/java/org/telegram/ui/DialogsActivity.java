@@ -8364,7 +8364,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
             }
         }
-        if (loadAll || visibleItemCount > 0 && lastVisibleItem >= getDialogsArray(currentAccount, viewPage.dialogsType, folderId, dialogsListFrozen).size() - 10 ||
+        if (loadAll || visibleItemCount > 0 && lastVisibleItem >= getPaginationDialogCount(viewPage) - 10 ||
                 visibleItemCount == 0 && (viewPage.dialogsType == 7 || viewPage.dialogsType == 8) && !getMessagesController().isDialogsEndReached(folderId)) {
             loadFromCache = !getMessagesController().isDialogsEndReached(folderId);
             if (loadFromCache || !getMessagesController().isServerDialogsEndReached(folderId)) {
@@ -8392,6 +8392,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
             });
         }
+    }
+
+    private int getPaginationDialogCount(ViewPage page) {
+        if (page.dialogsType == DIALOGS_TYPE_ADD_USERS_TO || page.dialogsType == DIALOGS_TYPE_BOT_REQUEST_PEER) {
+            // The adapter already built this selector's filtered rows, including its headers.
+            return page.dialogsAdapter.getDialogsCount();
+        }
+        return getDialogsArray(currentAccount, page.dialogsType, folderId, dialogsListFrozen).size();
     }
 
     private void onItemClick(View view, int position, RecyclerListView.Adapter adapter, float x, float y) {
@@ -15053,6 +15061,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     private final ArrayList<RectF> iBlur3Positions = new ArrayList<>();
     private final RectF iBlur3PositionActionBar = new RectF();
+    private final RectF scrollingBlurListPosition = new RectF();
+    private final DownscaleScrollableNoiseSuppressor.CaptureDisjointRegions scrollingBlurCapture =
+            this::captureScrollingBlurRegions;
     private final RectF iBlur3PositionMainTabs = new RectF(); {
         iBlur3Positions.add(iBlur3PositionActionBar);
         iBlur3Positions.add(iBlur3PositionMainTabs);
@@ -15065,6 +15076,34 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         // Scroll, tabs and header changes can all arrive before a single frame.
         // Only request that frame here; the root dispatchDraw updates the shared capture once.
         fragmentView.invalidate();
+    }
+
+    private boolean canShareScrollingBlur() {
+        if (viewPages == null || getRightSlidingProgress() > 0
+                || searchViewPager != null && searchViewPager.getAlpha() > 0f) return false;
+        final ViewPage page = viewPages[0];
+        if (page == null || page.getVisibility() != View.VISIBLE || page.getAlpha() <= 0f
+                || page.listView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE
+                || page.listView.hasActiveEdgeEffects() && page.listView.getOverScrollMode() != View.OVER_SCROLL_NEVER) {
+            return false;
+        }
+        return viewPages.length == 1 || viewPages[1] == null
+                || viewPages[1].getVisibility() != View.VISIBLE || viewPages[1].getAlpha() <= 0f;
+    }
+
+    private boolean captureScrollingBlurRegions(Canvas canvas, RectF first, RectF second) {
+        final DialogsRecyclerView list = viewPages[0].listView;
+        if (!ViewPositionWatcher.computeRectInParent(list, (ViewGroup) fragmentView, scrollingBlurListPosition)) return false;
+        final float x = scrollingBlurListPosition.left, y = scrollingBlurListPosition.top;
+        first.offset(-x, -y);
+        second.offset(-x, -y);
+        final int save = canvas.save();
+        canvas.translate(x, y);
+        try {
+            return list.captureDisjointRegions(canvas, first, second);
+        } finally {
+            canvas.restoreToCount(save);
+        }
     }
 
     private void blur3_UpdateBlur() {
@@ -15106,7 +15145,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
 
             scrollableViewNoiseSuppressor.setupRenderNodes(iBlur3Positions, hasBottomBlur ? 2 : 1);
-            scrollableViewNoiseSuppressor.invalidateResultRenderNodes(iBlur3Capture, fragmentView.getMeasuredWidth(), fragmentView.getMeasuredHeight());
+            final int width = fragmentView.getMeasuredWidth(), height = fragmentView.getMeasuredHeight();
+            if (!hasBottomBlur || !canShareScrollingBlur()
+                    || !scrollableViewNoiseSuppressor.captureDisjointRegions(scrollingBlurCapture, width, height)) {
+                scrollableViewNoiseSuppressor.invalidateResultRenderNodes(iBlur3Capture, width, height);
+            }
         }
 
         if (iBlur3SourceGlassFrosted != null) {

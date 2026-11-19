@@ -31,7 +31,7 @@ public class DeviceBenchmarks {
     @Test public void homeScroll() {
         benchmark.measureRepeated(Journeys.PACKAGE, Arrays.asList(new FrameTimingMetric()), compilation(), StartupMode.WARM, 20,
                 scope -> { Journeys.launch(scope); return Unit.INSTANCE; },
-                scope -> { Journeys.scroll(); return Unit.INSTANCE; });
+                scope -> { Journeys.scrollDialogs(); return Unit.INSTANCE; });
     }
     @Test public void openChatToVisibleHistory() {
         String message = androidx.test.platform.app.InstrumentationRegistry.getArguments().getString("flexy.fixtureMessage");
