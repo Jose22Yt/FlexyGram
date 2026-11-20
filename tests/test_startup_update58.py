@@ -59,47 +59,6 @@ public class UserConfig {
     }, [JAVA/'app/flexygram/performance/StartupAccounts.java'])
 
 
-def test_message_paint_sizes_are_written_only_when_font_size_or_density_changes(tmp_path):
-    source = (JAVA/'org/telegram/ui/ActionBar/Theme.java').read_text()
-    create = method(source, 'public static void createCommonMessageResources()')
-    paints = sorted(set(re.findall(r'\b(chat_\w+)\s*=\s*new TextPaint\(', create)))
-    fields = 'static TextPaint ' + ', '.join(paints) + ';'
-    config = source[source.index('    private static int commonMessageFontSize'):source.index(create)]
-    probe(tmp_path, {'Probe.java': '''
-public class Probe {
-    static final Object sync = new Object();
-    static final float[] CHAT_EMOJI_SIZE_PERCENTS = {.9f,.8f,.7f,.6f,.5f,.4f};
-    static class SharedConfig {static int fontSize=16;}
-    static class AndroidUtilities {static float density=2;static Object bold(){return null;}static Object mono(){return null;}}
-    static class Paint {static final int ANTI_ALIAS_FLAG=1;}
-    static class TextPaint extends Paint {
-        static int writes;
-        int size;
-        TextPaint(int flags){}
-        void setTypeface(Object value){}
-        void setTextSize(int value){size=value;writes++;}
-    }
-    static int dp(float value){return (int)Math.ceil(value*AndroidUtilities.density);}
-    static TextPaint[] chat_msgTextPaintEmoji;
-    FIELDS
-    CONFIG
-    CREATE
-    static void check(boolean value){if(!value)throw new AssertionError();}
-    public static void main(String[] args){
-        createCommonMessageResources();
-        int initialWrites=TextPaint.writes;
-        TextPaint identity=chat_msgTextPaint;
-        check(initialWrites>20 && identity.size==32);
-        for(int i=0;i<1000;i++)createCommonMessageResources();
-        check(TextPaint.writes==initialWrites);
-        SharedConfig.fontSize=20;createCommonMessageResources();
-        check(TextPaint.writes==2*initialWrites && identity==chat_msgTextPaint && identity.size==40);
-        AndroidUtilities.density=1.25f;createCommonMessageResources();
-        check(TextPaint.writes==3*initialWrites && identity.size==25 && chat_msgTextPaintEmoji[0].size!=0);
-    }
-}'''.replace('FIELDS', fields).replace('CONFIG', config).replace('CREATE', create)})
-
-
 def test_selected_cache_precedes_auxiliary_work_for_both_database_open_races(tmp_path):
     source = (JAVA/'org/telegram/messenger/MessagesStorage.java').read_text()
     methods = '\n'.join(method(source, signature) for signature in [

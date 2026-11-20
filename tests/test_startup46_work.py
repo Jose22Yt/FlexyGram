@@ -9,22 +9,27 @@ def test_message_paints_reuse_identity_but_apply_font_and_density_updates(tmp_pa
     body=method(source,'public static void createCommonMessageResources()')
     names=sorted(set(re.findall(r'\b(chat_\w+)\s*=\s*new TextPaint\(',body)))
     constant=re.search(r'private static final float\[\] CHAT_EMOJI_SIZE_PERCENTS = [^;]+;',source).group()
+    cache_fields=source[source.index('    private static int commonMessageFontSize'):source.index(body)]
     probe(tmp_path,{'Probe.java':'''class Paint{static final int ANTI_ALIAS_FLAG=1;static int allocations;Paint(int f){allocations++;}}
-class TextPaint extends Paint{float size;TextPaint(int f){super(f);}void setTypeface(Object t){}void setTextSize(float s){size=s;}}
-class SharedConfig{static int fontSize=16;}class AndroidUtilities{static Object bold(){return null;}static Object mono(){return null;}}
+class TextPaint extends Paint{static int writes;float size;TextPaint(int f){super(f);}void setTypeface(Object t){}void setTextSize(float s){size=s;writes++;}}
+class SharedConfig{static int fontSize=16;}class AndroidUtilities{static float density=1;static Object bold(){return null;}static Object mono(){return null;}}
 public class Probe{
- static Object sync=new Object();static float density=1;static float dp(float n){return n*density;}
+ static Object sync=new Object();static float dp(float n){return n*AndroidUtilities.density;}
  static TextPaint[] chat_msgTextPaintEmoji;FIELDS
  CONSTANT
+ CACHE_FIELDS
  BODY
  public static void main(String[]args){
  createCommonMessageResources();TextPaint[] original=chat_msgTextPaintEmoji.clone();int count=Paint.allocations;
+ int writes=TextPaint.writes;
  for(int n=0;n<1000;n++){createCommonMessageResources();for(int i=0;i<6;i++)if(chat_msgTextPaintEmoji[i]!=original[i])throw new AssertionError("emoji paint recreated");}
- if(Paint.allocations!=count)throw new AssertionError("warm resource setup allocated paints");
- SharedConfig.fontSize=28;density=2;createCommonMessageResources();
+ if(Paint.allocations!=count||TextPaint.writes!=writes)throw new AssertionError("warm resource setup repeated work");
+ SharedConfig.fontSize=28;createCommonMessageResources();
+ if(chat_msgTextPaint.size!=28||TextPaint.writes!=2*writes)throw new AssertionError("font update lost");
+ AndroidUtilities.density=2;createCommonMessageResources();
  if(chat_msgTextPaint.size!=56||chat_msgGameTextPaint.size!=28||Math.abs(original[0].size-163.2f)>.001f)throw new AssertionError("font/density update lost");
- if(Paint.allocations!=count)throw new AssertionError();
- }}'''.replace('FIELDS','static TextPaint '+','.join(names)+';').replace('CONSTANT',constant).replace('BODY',body)})
+ if(Paint.allocations!=count||TextPaint.writes!=3*writes)throw new AssertionError();
+ }}'''.replace('CACHE_FIELDS',cache_fields).replace('FIELDS','static TextPaint '+','.join(names)+';').replace('CONSTANT',constant).replace('BODY',body)})
 
 
 def test_webview_preferences_are_lazy_singleton_and_cold_logout_still_cleans_disk(tmp_path):
