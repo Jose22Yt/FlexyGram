@@ -64,7 +64,13 @@ final class CompactSettingsPlan {
     private static Page[] nativePages(Page[] pages) {
         java.util.ArrayList<Page> result = new java.util.ArrayList<>();
         if (pages == NAVIGATION) result.add(new Page("kyant_dock", R.string.CompactTabs, R.drawable.fg_dm_barra_inferior));
-        for (Page page : pages) if (!"glare".equals(page.id) && !"animations".equals(page.id) && !"tabs".equals(page.id)) result.add(page);
+        for (Page page : pages) {
+            if ("glare".equals(page.id)) {
+                result.add(new Page("chat_edges", R.string.FlexyChatEdgeStyle, page.icon));
+            } else if (!"animations".equals(page.id) && !"tabs".equals(page.id)) {
+                result.add(page);
+            }
+        }
         return result.toArray(new Page[0]);
     }
     static boolean hasOverview(String category){return category.equals("home")||category.equals("chat")||category.equals("universal")||category.equals("navigation")||category.equals("ayu")||category.equals("plugins");}

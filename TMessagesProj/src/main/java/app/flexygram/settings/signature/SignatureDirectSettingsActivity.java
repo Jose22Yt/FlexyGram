@@ -62,6 +62,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
         switch(category){
             case "chat":
                 if(segment.isEmpty()){overview();break;}
+                if(include("chat_edges")||include("glare"))add(new app.flexygram.effects.ChatEdgeSettingsSection());
                 if(include("glare"))add(new app.flexygram.effects.GlareSettingsSection());
                 if(include("members"))add(new app.flexygram.memberlens.MemberLensSettingsSection());
                 if(include("conversion"))add(new app.flexygram.inlineconverter.InlineConversionSettingsSection());

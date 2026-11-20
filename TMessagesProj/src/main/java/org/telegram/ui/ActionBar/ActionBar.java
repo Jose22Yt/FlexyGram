@@ -1599,6 +1599,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                 || !(signatureGlassColorProvider instanceof app.flexygram.effects.ChatGlassColorProvider)
                 || !((app.flexygram.effects.ChatGlassColorProvider) signatureGlassColorProvider).isBlurEnabled()
                 || glassDrawable == null || glassDrawableBack == null || glassDrawableMenu == null) return false;
+        final app.flexygram.effects.ChatEdgeReflection reflection = header.selectedEdgeReflection();
+        final boolean dark = reflection != null &&
+                ((app.flexygram.effects.ChatGlassColorProvider) signatureGlassColorProvider).isChatThemeDark();
         if (header.fusionActive()) {
             var g = header.fusionGeometry();
             if (g == null || !g.fits || g.mattePortrait && g.callAvailable && signatureGlassCall == null
@@ -1610,12 +1613,12 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             glassDrawableBack.setBounds(Math.round(g.backVisual.left),
                     Math.round(g.backVisual.top) + offset, Math.round(g.backVisual.right),
                     Math.round(g.backVisual.bottom) + offset);
-            glassDrawableBack.draw(canvas);
+            glassDrawableBack.drawWithChatEdge(canvas, reflection, dark);
             if (g.separateUnread) {
                 setSignatureUnreadGlassRadius(g.unread.height()*.5f);
                 signatureGlassUnread.setBounds(Math.round(g.unread.left),Math.round(g.unread.top)+offset,
                         Math.round(g.unread.right),Math.round(g.unread.bottom)+offset);
-                signatureGlassUnread.draw(canvas);
+                signatureGlassUnread.drawWithChatEdge(canvas, reflection, dark);
             } else {
                 clearGlassBounds(signatureGlassUnread);
             }
@@ -1623,7 +1626,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             glassDrawable.setBounds(Math.round(g.center.left),
                     Math.round(g.center.top) + offset, Math.round(g.center.right),
                     Math.round(g.center.bottom) + offset);
-            glassDrawable.draw(canvas);
+            glassDrawable.drawWithChatEdge(canvas, reflection, dark);
             // Portrait layout has two distinct action circles; keep both native hit targets.
             if (g.mattePortrait) {
                 if (g.callAvailable) {
@@ -1631,7 +1634,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                     signatureGlassCall.setBounds(Math.round(g.callVisual.left),
                         Math.round(g.callVisual.top) + offset, Math.round(g.callVisual.right),
                         Math.round(g.callVisual.bottom) + offset);
-                    signatureGlassCall.draw(canvas);
+                    signatureGlassCall.drawWithChatEdge(canvas, reflection, dark);
                 }
                 glassDrawableMenu.setBounds(Math.round(g.moreVisual.left),
                     Math.round(g.moreVisual.top) + offset, Math.round(g.moreVisual.right),
@@ -1643,7 +1646,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                     Math.round(g.actionsVisual.bottom) + offset);
             }
             if (!g.mattePortrait || !g.callAvailable) clearGlassBounds(signatureGlassCall);
-            glassDrawableMenu.draw(canvas);
+            glassDrawableMenu.drawWithChatEdge(canvas, reflection, dark);
             return true;
         }
         var g = header.geometry;
@@ -1660,24 +1663,39 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             setSignatureUnreadGlassRadius(g.badge.height() * .5f);
             signatureGlassUnread.setBounds(Math.round(g.badge.left), Math.round(g.badge.top),
                     Math.round(g.badge.right), Math.round(g.badge.bottom));
-            signatureGlassUnread.draw(canvas);
+            signatureGlassUnread.drawWithChatEdge(canvas, reflection, dark);
         } else {
             clearGlassBounds(signatureGlassUnread);
         }
         glassDrawableBack.setBounds(Math.round(backLeft), Math.round(g.back.top),
                 Math.round(backRight), Math.round(g.back.bottom));
-        glassDrawableBack.draw(canvas);
+        glassDrawableBack.drawWithChatEdge(canvas, reflection, dark);
 
         glassDrawable.setBounds(Math.round(g.title.left), Math.round(g.title.top),
                 Math.round(g.title.right), Math.round(g.title.bottom));
-        glassDrawable.draw(canvas);
+        glassDrawable.drawWithChatEdge(canvas, reflection, dark);
 
         glassDrawableMenu.setBounds(Math.round(g.avatar.left), Math.round(g.avatar.top),
                 Math.round(g.avatar.right), Math.round(g.avatar.bottom));
-        glassDrawableMenu.draw(canvas);
+        glassDrawableMenu.drawWithChatEdge(canvas, reflection, dark);
         return true;
     }
 
+
+    private app.flexygram.effects.ChatEdgeReflection nativeChatEdgeReflection;
+
+    private void drawNativeChatEdge(Canvas canvas, BlurredBackgroundDrawable drawable) {
+        if (!(signatureGlassColorProvider instanceof app.flexygram.effects.ChatGlassColorProvider colors)) {
+            drawable.draw(canvas);
+            return;
+        }
+        final boolean reflective = app.flexygram.effects.ChatEdgeStyle.isReflective();
+        if (reflective && nativeChatEdgeReflection == null) {
+            nativeChatEdgeReflection = new app.flexygram.effects.ChatEdgeReflection();
+        }
+        drawable.drawWithChatEdge(canvas, reflective ? nativeChatEdgeReflection : null,
+                reflective && colors.isChatThemeDark());
+    }
 
     public void clearSignatureGlassBounds() {
         clearGlassBounds(glassDrawable);
@@ -2689,11 +2707,11 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             }
 
             glassDrawable.setBounds(left, t, right, b);
-            glassDrawable.draw(canvas);
+            drawNativeChatEdge(canvas, glassDrawable);
         }
         if (!signature && glassDrawableBack != null && hasBackButton) {
             glassDrawableBack.setBounds(0, t, s + p * 2, b);
-            glassDrawableBack.draw(canvas);
+            drawNativeChatEdge(canvas, glassDrawableBack);
         }
         if (!signature && glassDrawableMenu != null && menuWidth > 0 && !glassOnlyBack && !doNotDrawGlassMenu) {
             int menuLeft = getWidth() - Math.max(s, menuWidth) - p * 2;
@@ -2731,7 +2749,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             }
             glassDrawableMenu.setBounds(menuLeft, menuTop, menuRight, menuBottom);
             glassDrawableMenu.setAlpha(hasForcedMenuWidth ? 255 : (int) (255 * animatorHasMenuItems.getFloatValue()));
-            glassDrawableMenu.draw(canvas);
+            drawNativeChatEdge(canvas, glassDrawableMenu);
         }
 
         if (!signature && blurredBackground && actionBarColor != Color.TRANSPARENT) {

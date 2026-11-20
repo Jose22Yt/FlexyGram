@@ -3,6 +3,8 @@ package app.flexygram.header;
 import android.graphics.Canvas;
 
 import app.flexygram.effects.ChatChromePalette;
+import app.flexygram.effects.ChatEdgeReflection;
+import app.flexygram.effects.ChatEdgeStyle;
 import android.util.TypedValue;
 import android.view.View;
 import org.telegram.messenger.AndroidUtilities;
@@ -152,6 +154,14 @@ public final class SignatureChatHeader {
             bar.backButtonImageView.setPadding(AndroidUtilities.dp(1), 0, 0, 0);
         }
     }
+    private ChatEdgeReflection edgeReflection;
+
+    public ChatEdgeReflection selectedEdgeReflection() {
+        if (!ChatEdgeStyle.isReflective()) return null;
+        if (edgeReflection == null) edgeReflection = new ChatEdgeReflection();
+        return edgeReflection;
+    }
+
     public void draw(Canvas canvas) {
         nativeGlassDrawn = bar.drawSignatureNativeGlass(canvas, this);
         if (nativeGlassDrawn) {
@@ -160,7 +170,7 @@ public final class SignatureChatHeader {
         }
         if (canvas.isHardwareAccelerated()) bar.clearSignatureGlassBounds();
         if (!fusionActive()) {
-            surface.draw(canvas, geometry, AndroidUtilities.density, provider);
+            surface.draw(canvas, geometry, AndroidUtilities.density, provider, selectedEdgeReflection());
             drawUnread(canvas);
             return;
         }
@@ -168,7 +178,19 @@ public final class SignatureChatHeader {
         final int fill = ChatChromePalette.surface(dark);
         final int border = ChatChromePalette.outline(dark);
         int save = canvas.save(); canvas.translate(0, fusionTop);
-        fusion.surface.drawBackdrop(canvas, fusion.layout, fill, border, border, AndroidUtilities.density);
+        final ChatEdgeReflection reflection = selectedEdgeReflection();
+        final var g = fusion.layout;
+        fusion.surface.drawBackdrop(canvas, g, fill, reflection == null ? border : 0, border, AndroidUtilities.density);
+        if (reflection != null) {
+            drawReflection(canvas, reflection, g.backVisual, dark);
+            if (g.separateUnread) drawReflection(canvas, reflection, g.unread, dark);
+            if (g.mattePortrait) {
+                if (g.callAvailable) drawReflection(canvas, reflection, g.callVisual, dark);
+                drawReflection(canvas, reflection, g.moreVisual, dark);
+            } else {
+                drawReflection(canvas, reflection, g.actionsVisual, dark);
+            }
+        }
         canvas.restoreToCount(save);
         drawUnread(canvas);
     }
@@ -226,8 +248,19 @@ public final class SignatureChatHeader {
         final boolean dark = provider != null ? provider.isDark() : Theme.isCurrentThemeDark();
         final int border = ChatChromePalette.outline(dark);
         int save = canvas.save(); canvas.translate(0, fusionTop);
-        fusion.surface.drawCenterBorder(canvas, fusion.layout, border, AndroidUtilities.density);
+        final ChatEdgeReflection reflection = selectedEdgeReflection();
+        if (reflection == null) {
+            fusion.surface.drawCenterBorder(canvas, fusion.layout, border, AndroidUtilities.density);
+        } else {
+            drawReflection(canvas, reflection, fusion.layout.center, dark);
+        }
         canvas.restoreToCount(save);
     }
+    private static void drawReflection(Canvas canvas, ChatEdgeReflection reflection,
+            app.flexygram.header.fusion.SignatureFusionGeometry.Rect bounds, boolean dark) {
+        reflection.draw(canvas, bounds.left, bounds.top, bounds.right, bounds.bottom,
+                bounds.height() * .5f, dark, 255);
+    }
+
     private static int exact(float size) { return View.MeasureSpec.makeMeasureSpec(Math.max(0, Math.round(size)), View.MeasureSpec.EXACTLY); }
 }

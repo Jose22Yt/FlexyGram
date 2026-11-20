@@ -237,6 +237,32 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         updateColors();
     }
 
+    private boolean strokeVisible = true;
+
+    public final void setStrokeVisible(boolean visible) {
+        if (strokeVisible == visible) return;
+        strokeVisible = visible;
+        updateColors();
+    }
+
+    public final void drawWithChatEdge(Canvas canvas, app.flexygram.effects.ChatEdgeReflection reflection,
+            boolean dark) {
+        setStrokeVisible(reflection == null);
+        draw(canvas);
+        if (reflection != null) {
+            final Rect bounds = boundProps.boundsWithPadding;
+            if (boundProps.radiiAreSame) {
+                reflection.draw(canvas, bounds.left, bounds.top, bounds.right, bounds.bottom,
+                        boundProps.radii[0], dark, getAlpha());
+            } else {
+                final int save = canvas.save();
+                canvas.clipPath(boundProps.path);
+                reflection.draw(canvas, bounds.left, bounds.top, bounds.right, bounds.bottom, 0, dark, getAlpha());
+                canvas.restoreToCount(save);
+            }
+        }
+    }
+
     /**
      * При GLARE (дефолт) — ровно прежнее поведение; SOLID гасит блик и тень и включает
      * сплошную обводку, HIDDEN гасит и обводку, и тень.
@@ -266,9 +292,10 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
             backgroundColor = app.exteraless.appearance.GlassContrastPolicy.frostedSurface(backgroundColor);
         }
         shadowColor = glare ? colorProvider.getShadowColor() : 0;
-        strokeColorTop = glare ? colorProvider.getStrokeColorTop() : 0;
-        strokeColorBottom = glare ? colorProvider.getStrokeColorBottom() : 0;
-        strokeColorFull = micro ? org.telegram.ui.Components.blur3.MicroContourStroke.COLOR : solid ? colorProvider.getStrokeColorFull() : 0;
+        strokeColorTop = strokeVisible && glare ? colorProvider.getStrokeColorTop() : 0;
+        strokeColorBottom = strokeVisible && glare ? colorProvider.getStrokeColorBottom() : 0;
+        strokeColorFull = !strokeVisible ? 0 :
+                micro ? org.telegram.ui.Components.blur3.MicroContourStroke.COLOR : solid ? colorProvider.getStrokeColorFull() : 0;
 
         if (colorProvider instanceof BlurredBackgroundProvider) {
             final BlurredBackgroundProvider provider = (BlurredBackgroundProvider) colorProvider;
@@ -783,8 +810,8 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
             return;
         }
 
-        final boolean withStroke = boundProps.useFullStroke ||
-                GlassOutlineStyle.current() == GlassOutlineStyle.GLARE;
+        final boolean withStroke = strokeVisible &&
+                (boundProps.useFullStroke || GlassOutlineStyle.current() == GlassOutlineStyle.GLARE);
         final NinePatchDrawable ninePatchDrawable = checkNinePatchDrawable(fillColor, withStroke);
         ninePatchDrawable.setBounds(
             boundProps.boundsWithPadding.left - ninePatchDrawablePadding.left,
@@ -840,6 +867,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
     }
 
     private void drawStrokeInternalIfNeeded(Canvas canvas) {
+        if (!strokeVisible) return;
         if (!boundProps.useFullStroke &&
                 GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;
 

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyChatEdgeStyle">Chat control edges</string>
+    <string name="FlexyChatEdgeCurrent">Current outline</string>
+    <string name="FlexyChatEdgeReflection">Edge reflection</string>
+</resources>

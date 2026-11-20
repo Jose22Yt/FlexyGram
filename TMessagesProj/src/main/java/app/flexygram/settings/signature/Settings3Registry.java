@@ -75,6 +75,8 @@ public final class Settings3Registry {
         if(original instanceof tw.nekomimi.nekogram.settings.GhostModeActivity)return new SignatureDirectSettingsActivity("ayu","ghost");
         if(original instanceof app.flexygram.inlineconverter.InlineConversionSettingsSection)return new SignatureDirectSettingsActivity("chat","conversion");
         if(original instanceof app.flexygram.memberlens.MemberLensSettingsSection)return new SignatureDirectSettingsActivity("chat","members");
+        if(original instanceof app.flexygram.effects.ChatEdgeSettingsSection)return new SignatureDirectSettingsActivity("chat",
+                org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? "chat_edges" : "glare");
         if(original instanceof app.flexygram.effects.GlareSettingsSection)return new SignatureDirectSettingsActivity("chat","glare");
         if(original instanceof SignatureLauncherSettingsActivity)return new SignatureDirectSettingsActivity("universal","launcher");
         return original;

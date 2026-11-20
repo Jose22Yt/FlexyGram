@@ -27,13 +27,17 @@ public final class ChatGlassColorProvider extends BlurredBackgroundColorProvider
         return BlurredBackgroundProviderImpl.checkBlurEnabled(account, provider);
     }
 
+    public boolean isChatThemeDark() {
+        return provider != null ? provider.isDark() : Theme.isCurrentThemeDark();
+    }
+
     @Override public int getStrokeColorFull() {
         if (isBlurEnabled()) return super.getStrokeColorFull();
-        return ChatChromePalette.outline(provider != null ? provider.isDark() : Theme.isCurrentThemeDark());
+        return ChatChromePalette.outline(isChatThemeDark());
     }
 
     @Override public int getBackgroundColor() {
-        final boolean dark = provider != null ? provider.isDark() : Theme.isCurrentThemeDark();
+        final boolean dark = isChatThemeDark();
         if (!isBlurEnabled()) return ChatChromePalette.surface(dark);
         final int color = super.getBackgroundColor();
         final int alpha = dark ? color >>> 24 : 140;

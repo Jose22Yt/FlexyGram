@@ -3378,7 +3378,13 @@ public class ChatActivityEnterView extends FrameLayout implements
 
                     canvas.save();
                     canvas.scale(s, s, backgroundRect.centerX(), backgroundRect.centerY());
-                    if (!flexyVoiceBackdropDrawn) canvas.drawRoundRect(backgroundRect, r, r, paint);
+                    if (!flexyVoiceBackdropDrawn) {
+                        canvas.drawRoundRect(backgroundRect, r, r, paint);
+                        if (parentFragment != null && flexyCompactLayout && app.flexygram.effects.ChatEdgeStyle.isReflective()) {
+                            if (compactVoiceReflection == null) compactVoiceReflection = new app.flexygram.effects.ChatEdgeReflection();
+                            compactVoiceReflection.draw(canvas, backgroundRect, r, isFlexyDarkTheme(), 255);
+                        }
+                    }
                     canvas.restore();
                 }
                 super.dispatchDraw(canvas);
@@ -4930,6 +4936,8 @@ public class ChatActivityEnterView extends FrameLayout implements
         if (audioVideoButtonContainer != null) audioVideoButtonContainer.invalidate();
         invalidate();
     }
+
+    private app.flexygram.effects.ChatEdgeReflection compactVoiceReflection;
 
     public boolean isFlexyDarkTheme() {
         return resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
@@ -17274,6 +17282,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         }
 
         private Drawable ephemeralOutlineDrawable;
+        private app.flexygram.effects.ChatEdgeReflection compactSendReflection;
 
         @Override
         protected void onDraw(@NonNull Canvas canvas) {
@@ -17285,7 +17294,13 @@ public class ChatActivityEnterView extends FrameLayout implements
             updateColors();
             checkBackgroundRect();
             if (isNewDesignSendButton && !compactBackdropDrawn) {
-                canvas.drawRoundRect(backgroundRect, compactVisualInset >= 0 ? backgroundRect.height() / 2f : dp(RADIUS), compactVisualInset >= 0 ? backgroundRect.height() / 2f : dp(RADIUS), backgroundPaint);
+                final float radius = compactVisualInset >= 0 ? backgroundRect.height() / 2f : dp(RADIUS);
+                canvas.drawRoundRect(backgroundRect, radius, radius, backgroundPaint);
+                if (compactVisualInset >= 0 && app.flexygram.effects.ChatEdgeStyle.isReflective()) {
+                    if (compactSendReflection == null) compactSendReflection = new app.flexygram.effects.ChatEdgeReflection();
+                    final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
+                    compactSendReflection.draw(canvas, backgroundRect, radius, dark, backgroundPaint.getAlpha());
+                }
             }
 
             final boolean inactive = isInactive();

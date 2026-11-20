@@ -27,6 +27,8 @@ import androidx.core.graphics.ColorUtils;
 import org.telegram.messenger.AndroidUtilities;
 import app.flexygram.composer.FlexyComposerConfig;
 import app.flexygram.effects.ChatChromePalette;
+import app.flexygram.effects.ChatEdgeReflection;
+import app.flexygram.effects.ChatEdgeStyle;
 import app.flexygram.effects.ChatGlassColorProvider;
 import org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory;
 import org.telegram.ui.Components.blur3.BlurredBackgroundWithFadeDrawable;
@@ -148,6 +150,14 @@ public class ChatInputViewsContainer extends FrameLayout {
     private final float[] compactGlassRadius = {-1, -1, -1, -1};
     private BlurredBackgroundDrawableViewFactory compactGlassFactory;
     private ChatGlassColorProvider compactGlassColors;
+    private ChatEdgeReflection edgeReflection;
+    private boolean solidSurfaceDark;
+
+    private ChatEdgeReflection selectedEdgeReflection() {
+        if (!ChatEdgeStyle.isReflective()) return null;
+        if (edgeReflection == null) edgeReflection = new ChatEdgeReflection();
+        return edgeReflection;
+    }
 
     public void setCompactGlassFactory(BlurredBackgroundDrawableViewFactory factory, ChatGlassColorProvider colors) {
         compactGlassFactory = factory;
@@ -172,7 +182,13 @@ public class ChatInputViewsContainer extends FrameLayout {
         }
         drawable.setAlpha(blurredBackgroundDrawable.getAlpha());
         drawable.setBounds(Math.round(bounds.left), Math.round(bounds.top), Math.round(bounds.right), Math.round(bounds.bottom));
-        drawable.draw(canvas);
+        drawChatBackground(canvas, drawable);
+    }
+
+    private void drawChatBackground(Canvas canvas, BlurredBackgroundDrawable drawable) {
+        final ChatEdgeReflection reflection = selectedEdgeReflection();
+        drawable.drawWithChatEdge(canvas, reflection, reflection != null &&
+                (compactGlassColors != null ? compactGlassColors.isChatThemeDark() : Theme.isCurrentThemeDark()));
     }
 
     public void updateNativeLiquidGlassPolicy(boolean allowed) {
@@ -404,7 +420,7 @@ public class ChatInputViewsContainer extends FrameLayout {
                 } else if(flexyChannels!=null&&flexyChannels.isSignatureCompactPresentation()){
                     drawSignatureChannelBackground(canvas);
                 } else {
-                    blurredBackgroundDrawable.draw(canvas);
+                    drawChatBackground(canvas, blurredBackgroundDrawable);
                 }
             }
 
@@ -471,6 +487,7 @@ public class ChatInputViewsContainer extends FrameLayout {
             }
             tmpRectF.set(signatureChannelMiddle);if(!signatureChannelLeft.isEmpty())tmpRectF.union(signatureChannelLeft);if(!signatureChannelRight.isEmpty())tmpRectF.union(signatureChannelRight);
             tmpRectF.inset(-dp(7),-dp(7));tmpRectF.round(tmpRect);blurredBackgroundDrawable.setBounds(tmpRect);
+            blurredBackgroundDrawable.setStrokeVisible(!ChatEdgeStyle.isReflective());
             canvas.save();canvas.clipPath(signatureChannelMask);blurredBackgroundDrawable.draw(canvas);canvas.restore();
             flexySurface.setColor(ColorUtils.setAlphaComponent(app.flexygram.composer.ComposerStyle.surface(dark,false),(dark?80:60)*blurredBackgroundDrawable.getAlpha()/255));
         } else {
@@ -486,9 +503,10 @@ public class ChatInputViewsContainer extends FrameLayout {
         if(!signatureChannelRight.isEmpty())canvas.drawRoundRect(signatureChannelRight,radius,radius,flexySurface);
         flexyPearl.setColor(ColorUtils.setAlphaComponent(Color.WHITE,(dark?28:76)*blurredBackgroundDrawable.getAlpha()/255));
         flexyPearl.setStyle(Paint.Style.STROKE);flexyPearl.setStrokeWidth(.65f*AndroidUtilities.density);
-        canvas.drawRoundRect(signatureChannelMiddle,radius,radius,flexyPearl);
-        if(!signatureChannelLeft.isEmpty())canvas.drawRoundRect(signatureChannelLeft,radius,radius,flexyPearl);
-        if(!signatureChannelRight.isEmpty())canvas.drawRoundRect(signatureChannelRight,radius,radius,flexyPearl);
+        final int reflectionAlpha = Math.round(blurredBackgroundDrawable.getAlpha() * flexyChannels.getSignatureAlpha());
+        drawSurfaceEdge(canvas, signatureChannelMiddle, radius, dark, reflectionAlpha);
+        drawSurfaceEdge(canvas, signatureChannelLeft, radius, dark, reflectionAlpha);
+        drawSurfaceEdge(canvas, signatureChannelRight, radius, dark, reflectionAlpha);
     }
 
     private final RectF flexyPill = new RectF();
@@ -563,6 +581,7 @@ public class ChatInputViewsContainer extends FrameLayout {
                 flexyLastAttach.set(flexyAttach);
                 flexyLastHasAttach = attach;
             }
+            blurredBackgroundDrawable.setStrokeVisible(!ChatEdgeStyle.isReflective());
             canvas.save();
             canvas.clipPath(flexyMask);
             blurredBackgroundDrawable.draw(canvas);
@@ -580,9 +599,10 @@ public class ChatInputViewsContainer extends FrameLayout {
                 (dark ? 28 : 76) * blurredBackgroundDrawable.getAlpha() / 255));
             flexyPearl.setStyle(Paint.Style.STROKE);
             flexyPearl.setStrokeWidth(0.65f * AndroidUtilities.density);
-            canvas.drawRoundRect(flexyPill, radius, radius, flexyPearl);
-            if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexyPearl);
-            if (voice) canvas.drawRoundRect(flexyVoice, radius, radius, flexyPearl);
+            final int alpha = blurredBackgroundDrawable.getAlpha();
+            drawSurfaceEdge(canvas, flexyPill, radius, dark, alpha);
+            if (attach) drawSurfaceEdge(canvas, flexyAttach, radius, dark, alpha);
+            if (voice) drawSurfaceEdge(canvas, flexyVoice, radius, dark, alpha);
             flexyVoiceDrawn = voice;
         } else {
             prepareSolidSurface(flexyComposer.isFlexyDarkTheme(), blurredBackgroundDrawable.getAlpha() / 255f);
@@ -597,6 +617,7 @@ public class ChatInputViewsContainer extends FrameLayout {
     }
 
     private void prepareSolidSurface(boolean dark, float alpha) {
+        solidSurfaceDark = dark;
         flexySurface.setColor(ChatChromePalette.surface(dark));
         flexySurface.setAlpha(Math.round(255 * alpha));
         flexyPearl.setColor(ChatChromePalette.outline(dark));
@@ -608,7 +629,17 @@ public class ChatInputViewsContainer extends FrameLayout {
     private void drawSolidSurface(Canvas canvas, RectF bounds, float radius) {
         if (bounds.isEmpty()) return;
         canvas.drawRoundRect(bounds, radius, radius, flexySurface);
-        canvas.drawRoundRect(bounds, radius, radius, flexyPearl);
+        drawSurfaceEdge(canvas, bounds, radius, solidSurfaceDark, flexySurface.getAlpha());
+    }
+
+    private void drawSurfaceEdge(Canvas canvas, RectF bounds, float radius, boolean dark, int alpha) {
+        if (bounds.isEmpty()) return;
+        final ChatEdgeReflection reflection = selectedEdgeReflection();
+        if (reflection == null) {
+            canvas.drawRoundRect(bounds, radius, radius, flexyPearl);
+        } else {
+            reflection.draw(canvas, bounds, radius, dark, alpha);
+        }
     }
 
     @Override

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyChatEdgeStyle">Borde de los controles</string>
+    <string name="FlexyChatEdgeCurrent">Contorno actual</string>
+    <string name="FlexyChatEdgeReflection">Reflejo de borde</string>
+</resources>

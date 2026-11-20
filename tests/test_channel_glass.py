@@ -46,10 +46,11 @@ public class ChannelGlassRegression {
     static class AndroidUtilities {static float density=1;}
     static class LiteMode {static final int FLAG_CHAT_BLUR=1;static boolean enabled=true;static boolean isEnabled(int flag){return enabled;}}
     static class SharedConfig {static boolean enabled=true;static boolean chatBlurEnabled(){return enabled;}}
+    static class ChatEdgeStyle {static boolean reflective;static boolean isReflective(){return reflective;}}
     static class app {
         static class flexygram {static class composer {static class ComposerStyle {static int surface(boolean dark,boolean glass){return -1;}}}}
     }
-    static class Drawable {int getAlpha(){return 255;}void setBounds(Rect r){}void draw(Canvas c){c.draws.add("legacy");}}
+    static class Drawable {boolean strokeVisible=true;int getAlpha(){return 255;}void setBounds(Rect r){}void draw(Canvas c){c.draws.add("legacy");}void setStrokeVisible(boolean value){strokeVisible=value;}}
     static class View {float getX(){return 0;}float getY(){return 0;}}
     static class Channels extends View {
         boolean left=true,right=true;
@@ -66,6 +67,7 @@ public class ChannelGlassRegression {
     boolean canDrawCompactGlass(Canvas c){return c.hardware && compactGlass[0]!=null && compactGlassColors.isBlurEnabled();}
     void prepareSolidSurface(boolean dark,float alpha){}
     void drawSolidSurface(Canvas c,RectF r,float radius){if(!r.isEmpty())c.drawRoundRect(r,radius,radius,flexySurface);}
+    void drawSurfaceEdge(Canvas c,RectF r,float radius,boolean dark,int alpha){if(!r.isEmpty())c.draws.add(ChatEdgeStyle.reflective?"reflection":"outline");}
     void drawCompactGlass(Canvas canvas,int index,RectF r,float radius){canvas.draws.add("native"+index);}
     DRAW
     static void require(boolean ok,String message){if(!ok)throw new AssertionError(message);}
@@ -81,6 +83,12 @@ public class ChannelGlassRegression {
         require(software.draws.contains("fill")&&!software.draws.contains("native0"),"software rendering keeps readable fallback");
         c.compactGlass[0]=null;Canvas missing=new Canvas();c.drawSignatureChannelBackground(missing);
         require(missing.draws.contains("fill"),"safe fallback before native source is prepared");
+        c.flexyPearlGlass=true;ChatEdgeStyle.reflective=true;
+        Canvas reflective=new Canvas();c.drawSignatureChannelBackground(reflective);
+        require(!c.blurredBackgroundDrawable.strokeVisible && reflective.draws.contains("reflection"),"reflections replace the old stroke");
+        ChatEdgeStyle.reflective=false;
+        Canvas original=new Canvas();c.drawSignatureChannelBackground(original);
+        require(c.blurredBackgroundDrawable.strokeVisible && original.draws.contains("outline"),"the original outline returns");
     }
 }
 '''.replace('DRAW', draw)

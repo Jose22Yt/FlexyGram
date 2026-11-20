@@ -27,6 +27,7 @@ class Host extends Base{
  boolean flexyNativeGlassDrawn,flexyVoiceDrawn,flexySendDrawn,drawInputBackground=true,needDrawInAppKeyboard;
  int getMeasuredWidth(){return 400;}int getMeasuredHeight(){return 800;}
  void drawFlexyCompactBackground(Canvas c){if(c.hardware){flexyNativeGlassDrawn=flexyVoiceDrawn=flexySendDrawn=true;for(int i=0;i<4;i++){compactGlassDrawn[i]=true;compactGlass[i].alpha=255;}}}
+ void drawChatBackground(Canvas c, Drawable d){d.draw(c);}
  void drawSignatureChannelBackground(Canvas c){if(c.hardware){compactGlassDrawn[0]=true;compactGlass[0].alpha=255;}}
  DRAW
 }

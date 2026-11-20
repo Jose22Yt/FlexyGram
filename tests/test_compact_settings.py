@@ -73,7 +73,8 @@ public class Probe{
  p.open("chat","messages");p.expect("chats:messages|post_appearance");p.expect("nc:messages_extra");
  p.open("chat","menus");p.expect("chats:menus");
  for(String route:new String[]{"media","stickers"}){p.open("chat",route);p.expect("chats:"+route);for(String source:new String[]{"ng","nc","nx"})p.expect(source+":"+route+"_extra");}
- String[][] special={{"glare","GlareSettingsSection"},{"members","MemberLensSettingsSection"},{"conversion","InlineConversionSettingsSection"},{"animations","MessageAnimationsActivity"}};
+ p.open("chat","glare");p.expect("ChatEdgeSettingsSection");p.expect("GlareSettingsSection");
+ String[][] special={{"members","MemberLensSettingsSection"},{"conversion","InlineConversionSettingsSection"},{"animations","MessageAnimationsActivity"}};
  for(String[] c:special){p.open("chat",c[0]);if(!p.rows.equals(List.of(c[1])))throw new AssertionError("wrong special editor");}
  for(String[] c:new String[][]{{"general","general_behavior"},{"network","general_network"},{"notifications","general_notifications"},{"maps","general_maps"},{"profile","profile"},{"archive","archive"}}){p.open("universal",c[0]);p.expect("general:"+c[1]);}
  for(String route:new String[]{"fonts","effects"}){p.open("universal",route);p.expect("appearance:"+route);}
@@ -270,12 +271,13 @@ def test_native_overviews_omit_retired_pages_and_reject_their_ids(tmp_path):
      'org/telegram/messenger/BuildConfig.java':'package org.telegram.messenger;public class BuildConfig{public static final boolean NATIVE_BASELINE_TEST=true;}',
      'app/flexygram/settings/signature/CompactSettingsPlan.java':plan,
      'app/flexygram/settings/signature/PlanProbe.java':'''package app.flexygram.settings.signature;public class PlanProbe{public static void main(String[]args){
-      if(CompactSettingsPlan.pages("chat").length!=6||CompactSettingsPlan.pages("navigation").length!=4)throw new AssertionError();
+      if(CompactSettingsPlan.pages("chat").length!=7||CompactSettingsPlan.pages("navigation").length!=4)throw new AssertionError();
       for(String[] pair:new String[][]{{"chat","glare"},{"chat","animations"},{"navigation","tabs"}}){
        if(!CompactSettingsPlan.retired(pair[0],pair[1]))throw new AssertionError();
        for(var page:CompactSettingsPlan.pages(pair[0]))if(page.id.equals(pair[1]))throw new AssertionError("retired page visible");
        try{CompactSettingsPlan.page(pair[0],pair[1]);throw new AssertionError();}catch(IllegalArgumentException expected){}
       }
+      if(!CompactSettingsPlan.segment("chat","chat_edges").equals("chat_edges"))throw new AssertionError("chat edge selector missing");
       if(CompactSettingsPlan.retired("chat","messages")||CompactSettingsPlan.retired("navigation","controls"))throw new AssertionError("native controls hidden");
      }}''',
      'Probe.java':'public class Probe{public static void main(String[]args){app.flexygram.settings.signature.PlanProbe.main(args);}}'}

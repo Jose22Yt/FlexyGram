@@ -39,6 +39,7 @@ def test_composer_native_islands_do_not_overpaint_the_native_material(tmp_path):
         final boolean[] compactGlassDrawn=new boolean[4];final float[] compactGlassRadius={-1,-1,-1,-1};
         RectF flexyPill=new RectF(52,2,230,42),flexyAttach=new RectF(2,2,42,42),flexyVoice=new RectF(),flexySend=new RectF(),flexyLastPill=new RectF();
         boolean flexySendDrawn,flexyVoiceDrawn,flexyNativeGlassDrawn;
+        void drawChatBackground(Canvas c, BlurredBackgroundDrawable d){d.draw(c);}
         COMPACT
         DRAW
         static void check(boolean v){if(!v)throw new AssertionError();}
