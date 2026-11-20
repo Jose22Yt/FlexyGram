@@ -1,5 +1,8 @@
 # FlexyGram Native Test — beta.59 (1348)
 
+Para la referencia beta.71 y los recorridos de fiabilidad y lanzamiento, ver
+[Validación de Native Test](READINESS.md).
+
 Prueba solicitada para comparar el coste conjunto de las personalizaciones de
 FlexyGram. Rama: `codex/flexygram-native-performance-test`.
 

@@ -235,7 +235,7 @@ public class SharedConfig {
     public static long pushStringGetTimeStart;
     public static long pushStringGetTimeEnd;
     public static boolean pushStatSent;
-    public static long pushLastReceivedTime;
+    public static volatile long pushLastReceivedTime;
     public static byte[] pushAuthKey;
     public static byte[] pushAuthKeyId;
     public static boolean forceForumTabs;
@@ -560,6 +560,18 @@ public class SharedConfig {
 
     private static boolean proxyListLoaded;
     public static ProxyInfo currentProxy;
+
+    static void recordPushReceived() {
+        synchronized (sync) {
+            pushLastReceivedTime = System.currentTimeMillis();
+            try {
+                ApplicationLoader.applicationContext.getSharedPreferences("userconfing", Context.MODE_PRIVATE)
+                        .edit().putLong("pushLastReceivedTime", pushLastReceivedTime).apply();
+            } catch (Exception e) {
+                FileLog.e(e);
+            }
+        }
+    }
 
     public static void saveConfig() {
         synchronized (sync) {

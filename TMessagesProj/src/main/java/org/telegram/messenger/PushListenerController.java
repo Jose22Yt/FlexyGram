@@ -24,7 +24,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 import xyz.nextalone.nagram.NaConfig;
@@ -100,14 +99,13 @@ public class PushListenerController {
         String tag = pushType == PUSH_TYPE_FIREBASE ? "FCM" : (pushType == PUSH_TYPE_HUAWEI ? "HCM" : "UP");
         CountDownLatch countDownLatch = new CountDownLatch(1);
         FileLog.d(tag + " PRE START PROCESSING");
-        SharedConfig.pushLastReceivedTime = System.currentTimeMillis();
-        SharedConfig.saveConfig();
+        SharedConfig.recordPushReceived();
         long receiveTime = SystemClock.elapsedRealtime();
         AndroidUtilities.runOnUIThread(() -> {
             if (BuildVars.LOGS_ENABLED) {
                 FileLog.d(tag + " PRE INIT APP");
             }
-            ApplicationLoader.postInitApplication();
+            ApplicationLoader.postInitApplicationForPush();
             if (BuildVars.LOGS_ENABLED) {
                 FileLog.d(tag + " POST INIT APP");
             }
@@ -117,7 +115,6 @@ public class PushListenerController {
                 }
                 int currentAccount = -1;
                 String loc_key = null;
-                String jsonString = null;
                 try {
                     byte[] bytes = Base64.decode(data, Base64.URL_SAFE);
                     NativeByteBuffer buffer = new NativeByteBuffer(bytes.length);
@@ -134,7 +131,7 @@ public class PushListenerController {
                     if (!Arrays.equals(SharedConfig.pushAuthKeyId, inAuthKeyId)) {
                         onDecryptError(countDownLatch);
                         if (BuildVars.LOGS_ENABLED) {
-                            FileLog.d(String.format(Locale.US, tag + " DECRYPT ERROR 2 k1=%s k2=%s, key=%s", Utilities.bytesToHex(SharedConfig.pushAuthKeyId), Utilities.bytesToHex(inAuthKeyId), Utilities.bytesToHex(SharedConfig.pushAuthKey)));
+                            FileLog.d(tag + " push key identifier mismatch");
                         }
                         return;
                     }
@@ -149,7 +146,7 @@ public class PushListenerController {
                     if (!Utilities.arraysEquals(messageKey, 0, messageKeyFull, 8)) {
                         onDecryptError(countDownLatch);
                         if (BuildVars.LOGS_ENABLED) {
-                            FileLog.d(String.format(tag + " DECRYPT ERROR 3, key = %s", Utilities.bytesToHex(SharedConfig.pushAuthKey)));
+                            FileLog.d(tag + " push message authentication failed");
                         }
                         return;
                     }
@@ -157,8 +154,7 @@ public class PushListenerController {
                     int len = buffer.readInt32(true);
                     byte[] strBytes = new byte[len];
                     buffer.readBytes(strBytes, true);
-                    jsonString = new String(strBytes);
-                    JSONObject json = new JSONObject(jsonString);
+                    JSONObject json = new JSONObject(new String(strBytes));
 
                     if (ApplicationLoader.applicationLoaderInstance != null && ApplicationLoader.applicationLoaderInstance.consumePush(currentAccount, json)) {
                         countDownLatch.countDown();
@@ -1542,10 +1538,8 @@ public class PushListenerController {
                     } else {
                         onDecryptError(countDownLatch);
                     }
-                    if (BuildVars.LOGS_ENABLED) {
-                        FileLog.e("error in loc_key = " + loc_key + " json " + jsonString);
-                    }
-                    FileLog.e(e);
+                    // JSON parser exceptions may contain parts of the decrypted notification.
+                    FileLog.e(tag + " push processing failed (" + e.getClass().getSimpleName() + ")");
                 }
             });
         });

@@ -38,7 +38,7 @@ final class Journeys {
     }
     static void openChatToVisibleHistory(String message) {
         // ChatMessageCell appends accessible metadata to the message text.
-        BySelector visibleMessage = By.pkg(PACKAGE).textContains(message);
+        BySelector visibleMessage = messageSelector(message);
         Assert.assertFalse("Choose a fixture message absent from the home screen",
                 device.hasObject(visibleMessage));
         UiObject2 chat = fixtureChatRow();
@@ -51,24 +51,44 @@ final class Journeys {
             android.os.Trace.endSection();
         }
     }
+    static String fixtureMessage() {
+        String message = InstrumentationRegistry.getArguments().getString("flexy.fixtureMessage");
+        Assume.assumeTrue("Supply a visible, unique message in the synthetic chat as flexy.fixtureMessage",
+                message != null && !message.isBlank() && !message.equals(fixture()));
+        return message;
+    }
+    private static BySelector messageSelector(String message) {
+        return By.pkg(PACKAGE).textContains(message);
+    }
     static void scroll(){
         for (int i = 0; i < 3; i++) {
             swipeList(true);
             swipeList(false);
         }
     }
-    static void scrollDialogs() {
-        BySelector anchor = By.pkg(PACKAGE).text(fixture());
-        UiObject2 before = device.findObject(anchor);
-        Assert.assertNotNull("Place the synthetic fixture near the start of the dialog list.", before);
+    static void verifyDialogsCanScroll() {
+        verifyScrollMovement(By.pkg(PACKAGE).text(fixture()));
+    }
+    static void verifyMessagesCanScroll(String message) {
+        verifyScrollMovement(messageSelector(message));
+    }
+    private static void verifyScrollMovement(BySelector anchor) {
+        UiObject2 before = device.wait(Until.findObject(anchor), TIMEOUT);
+        Assert.assertNotNull("The synthetic scroll anchor must be visible before measurement.", before);
         int initialTop = before.getVisibleBounds().top;
         swipeList(true);
         device.waitForIdle();
         UiObject2 after = device.findObject(anchor);
-        Assert.assertTrue("Provision a dialog list with enough rows to scroll.",
-                after == null || after.getVisibleBounds().top != initialTop);
+        boolean movedForward = after == null || after.getVisibleBounds().top != initialTop;
         swipeList(false);
-        scroll();
+        device.waitForIdle();
+        if (!movedForward) {
+            after = device.findObject(anchor);
+            Assert.assertTrue("Provision enough synthetic rows to scroll.",
+                    after == null || after.getVisibleBounds().top != initialTop);
+            swipeList(true);
+            device.waitForIdle();
+        }
     }
     private static void swipeList(boolean forward) {
         int x = device.getDisplayWidth() / 2;

@@ -6,9 +6,9 @@ from test_composer_layout import method
 
 def test_selected_account_precedes_deferred_sessions_and_headless_never_waits_for_frame(tmp_path):
     source=(JAVA/'org/telegram/messenger/ApplicationLoader.java').read_text()
-    start=source.index('        for (int position = 0;',source.index('final int startupAccount ='))
-    end=source.index('\n\n        // Queue the selected account',start)
-    loop=source[start:end]
+    startup=method(source,'public static void postInitApplication(boolean prepareDialogs)')
+    account_phase=startup[startup.index('final int startupAccount ='):]
+    loop=method(account_phase,'for (int position = 0;')
     helpers='\n'.join(method(source,s)for s in [
         'private static void initializeStartupAccount(int a, boolean prepareDialogs)',
         'private static void initializeStartupAccount(int a, boolean prepareDialogs, boolean uiStartup)',

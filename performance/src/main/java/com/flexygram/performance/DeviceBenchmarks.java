@@ -9,6 +9,7 @@ import java.util.*;
 /** Non-debuggable Alpha or Native Test target. Macrobenchmark emits traces and measured frame percentiles. */
 public class DeviceBenchmarks {
     @Rule public final MacrobenchmarkRule benchmark=new MacrobenchmarkRule();
+    private boolean scrollFixtureChecked;
     private CompilationMode compilation(){
         String mode=androidx.test.platform.app.InstrumentationRegistry.getArguments().getString("flexy.compilation","baseline");
         if(mode.equals("none"))return new CompilationMode.None();
@@ -30,13 +31,18 @@ public class DeviceBenchmarks {
     }
     @Test public void homeScroll() {
         benchmark.measureRepeated(Journeys.PACKAGE, Arrays.asList(new FrameTimingMetric()), compilation(), StartupMode.WARM, 20,
-                scope -> { Journeys.launch(scope); return Unit.INSTANCE; },
-                scope -> { Journeys.scrollDialogs(); return Unit.INSTANCE; });
+                scope -> {
+                    Journeys.launch(scope);
+                    if (!scrollFixtureChecked) {
+                        Journeys.verifyDialogsCanScroll();
+                        scrollFixtureChecked = true;
+                    }
+                    return Unit.INSTANCE;
+                },
+                scope -> { Journeys.scroll(); return Unit.INSTANCE; });
     }
     @Test public void openChatToVisibleHistory() {
-        String message = androidx.test.platform.app.InstrumentationRegistry.getArguments().getString("flexy.fixtureMessage");
-        Assume.assumeTrue("Supply a visible message in the synthetic chat as flexy.fixtureMessage",
-                message != null && !message.isBlank() && !message.equals(Journeys.fixture()));
+        String message = Journeys.fixtureMessage();
         benchmark.measureRepeated(Journeys.PACKAGE, Arrays.asList(new FrameTimingMetric(),
                         new TraceSectionMetric("Flexy.benchmark.open_chat_to_visible_history",
                                 TraceSectionMetric.Mode.First.INSTANCE, "openChatToVisibleHistory", false)),
@@ -45,8 +51,18 @@ public class DeviceBenchmarks {
                 scope -> { Journeys.openChatToVisibleHistory(message); return Unit.INSTANCE; });
     }
     @Test public void messageScroll(){
-        benchmark.measureRepeated(Journeys.PACKAGE,Arrays.asList(new FrameTimingMetric()),compilation(),StartupMode.WARM,20,
-                scope->{Journeys.launch(scope);Journeys.openChat();return Unit.INSTANCE;},scope->{Journeys.scroll();return Unit.INSTANCE;});
+        String message = Journeys.fixtureMessage();
+        benchmark.measureRepeated(Journeys.PACKAGE, Arrays.asList(new FrameTimingMetric()), compilation(), StartupMode.WARM, 20,
+                scope -> {
+                    Journeys.launch(scope);
+                    Journeys.openChat();
+                    if (!scrollFixtureChecked) {
+                        Journeys.verifyMessagesCanScroll(message);
+                        scrollFixtureChecked = true;
+                    }
+                    return Unit.INSTANCE;
+                },
+                scope -> { Journeys.scroll(); return Unit.INSTANCE; });
     }
     @Test public void settings(){
         benchmark.measureRepeated(Journeys.PACKAGE,Arrays.asList(new FrameTimingMetric()),compilation(),StartupMode.WARM,20,

@@ -238,6 +238,14 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         postInitApplication(false);
     }
 
+    @androidx.annotation.MainThread
+    static void postInitApplicationForPush() {
+        // The stage queue can process the push immediately after this call returns.
+        // Complete pending UI-owned account startup before handing it any messages.
+        if (deferredStartupAccountCount != 0) initializePendingStartupAccounts();
+        postInitApplication();
+    }
+
     /** Launch requests local dialogs early; background push initialization does not prefetch UI data. */
     public static void postInitApplication(boolean prepareDialogs) {
         if (applicationContext == null) return;
@@ -347,14 +355,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
             }
         }
 
-        // Queue the selected account's local dialogs before Python/storage startup competes for I/O.
-        app.exteraless.plugins.PluginsController.getInstance().init(applicationContext);
-
-        app.exteraless.proxy.ProxyPingController.init();
-        PushListenerController.reconcilePushRegistration();
-
-        // init fcm
-        initPushServices();
+        initializeStartupIntegrations();
         FileLog.d("app initied");
 
         if (prepareDialogs && android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
@@ -368,6 +369,25 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
             // Push/service entry points still initialize without waiting for an Activity or frame.
             initializeAccountServices();
         }
+        } finally {
+            android.os.Trace.endSection();
+        }
+    }
+
+    private static void initializeStartupIntegrations() {
+        android.os.Trace.beginSection("Flexy.startup.plugins");
+        try {
+            // Local dialogs are already queued before the Python worker can compete for I/O.
+            app.exteraless.plugins.PluginsController.getInstance().init(applicationContext);
+        } finally {
+            android.os.Trace.endSection();
+        }
+
+        app.exteraless.proxy.ProxyPingController.init();
+        android.os.Trace.beginSection("Flexy.startup.push_registration");
+        try {
+            PushListenerController.reconcilePushRegistration();
+            initPushServices();
         } finally {
             android.os.Trace.endSection();
         }
@@ -627,6 +647,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
             applicationContext.getSharedPreferences("nkmrcfg", Context.MODE_PRIVATE);
             applicationContext.getSharedPreferences("mainconfig", Context.MODE_PRIVATE);
             applicationContext.getSharedPreferences("userconfing", Context.MODE_PRIVATE);
+            applicationContext.getSharedPreferences(app.exteraless.plugins.PluginsConstants.PREFS_NAME, Context.MODE_PRIVATE);
         } finally { android.os.Trace.endSection(); }
     }
 

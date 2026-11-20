@@ -83,10 +83,11 @@ def test_preference_prefetch_opens_only_required_files_without_waiting_for_value
     app=(JAVA/'org/telegram/messenger/ApplicationLoader.java').read_text()
     body=method(app,'private static void preloadStartupPreferences()')
     probe(tmp_path, {
+        'app/exteraless/plugins/PluginsConstants.java': (JAVA/'app/exteraless/plugins/PluginsConstants.java').read_text(),
         'android/os/Trace.java': 'package android.os;public class Trace{public static int depth;public static void beginSection(String s){depth++;}public static void endSection(){depth--;}}',
         'Probe.java': '''import java.util.*;public class Probe{static class Context{static final int MODE_PRIVATE=0;List<String>opened=new ArrayList<>();Object getSharedPreferences(String name,int mode){if(mode!=0)throw new AssertionError();opened.add(name);return new Object();}}static Context applicationContext=new Context();
  BODY
- public static void main(String[]a){preloadStartupPreferences();if(!applicationContext.opened.equals(List.of("nkmrcfg","mainconfig","userconfing"))||android.os.Trace.depth!=0)throw new AssertionError();}
+ public static void main(String[]a){preloadStartupPreferences();if(!applicationContext.opened.equals(List.of("nkmrcfg","mainconfig","userconfing","exteraless_plugins"))||android.os.Trace.depth!=0)throw new AssertionError();}
 }'''.replace('BODY',body)
     })
     create=method(app,'public void onCreate()')

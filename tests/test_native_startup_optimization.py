@@ -85,6 +85,27 @@ def test_native_optimizer_wiring_replaces_global_disable_and_preserves_identity(
     assert '"flexy_startup",true,true' in producer
 
 
+def test_benchmark_comparison_keeps_signed_frame_deadline_deltas_and_requires_real_samples():
+    compare = load('compare_benchmarks').compare
+    def report(value, model='Poco'):
+        return {
+            'context': {'build': {'model': model, 'fingerprint': 'fixture', 'version': {'sdk': 37}}},
+            'benchmarks': [
+                {'name': 'homeScroll[mode=None]', 'sampledMetrics': {'frameOverrunMs': {'P95': value}}},
+                {'name': 'openChatToVisibleHistory', 'metrics': {'openChatToVisibleHistoryFirstMs': {'median': 65}}},
+            ],
+        }
+    rows = compare(report(3.5), report(-0.5), ['homeScroll', 'openChatToVisibleHistory'])
+    assert rows == [('homeScroll', 'frameOverrunMs', 'P95', 3.5, -0.5, -4.0),
+                    ('openChatToVisibleHistory', 'openChatToVisibleHistoryFirstMs', 'median', 65, 65, 0)]
+    with pytest.raises(ValueError):
+        compare(report(3.5), report(0, model='Other'), ['homeScroll'])
+    with pytest.raises(ValueError):
+        compare(report(3.5), report(0), ['messageScroll'])
+    with pytest.raises(ValueError):
+        compare(report(3.5), report(float('nan')), ['homeScroll'])
+
+
 def test_apk_verifier_distinguishes_optimizer_from_packaged_profiles_and_device_aot(tmp_path):
     module=load('verify_apk');apk=tmp_path/'app.apk';config=tmp_path/'rules.pro';profiles=tmp_path/'profiles';profiles.mkdir()
     with zipfile.ZipFile(apk,'w')as z:z.writestr('classes.dex',b'fixture')
