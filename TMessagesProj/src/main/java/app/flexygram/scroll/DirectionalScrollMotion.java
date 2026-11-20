@@ -14,6 +14,10 @@ public final class DirectionalScrollMotion {
     public float intensity() { return intensity; }
     public boolean needsFrame() { return duration != 0f; }
 
+    public boolean isFullyEngaged(int direction) {
+        return edge == direction && intensity == 1f && !needsFrame();
+    }
+
     public void scroll(int next, float distance, float engagementDistance, long now) {
         advance(now);
         if (edge == DirectionalScrollEdge.NONE) {
@@ -25,7 +29,12 @@ public final class DirectionalScrollMotion {
             pendingEdge = DirectionalScrollEdge.NONE;
             if (duration != 0f) {
                 // Resume from the current deformation, even halfway through a return.
-                if (target == 0f) animateTo(1f, RESUME_MS, now);
+                if (target == 0f) {
+                    animateTo(1f, RESUME_MS, now);
+                } else {
+                    final float engagement = DirectionalScrollEdge.engagement(travel, engagementDistance);
+                    if (engagement > target) animateTo(engagement, RESUME_MS, now);
+                }
             } else {
                 intensity = Math.max(intensity, DirectionalScrollEdge.engagement(travel, engagementDistance));
             }

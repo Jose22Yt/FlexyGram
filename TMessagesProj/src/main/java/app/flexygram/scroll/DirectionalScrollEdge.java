@@ -14,8 +14,8 @@ public final class DirectionalScrollEdge {
         return dy > 0 ? BOTTOM : TOP;
     }
 
-    public static float proximity(float y, float edge, float band) {
-        return Math.max(0f, 1f - Math.abs(y - edge) / band);
+    public static float proximity(float y, float edge, float inverseBand) {
+        return Math.max(0f, 1f - Math.abs(y - edge) * inverseBand);
     }
 
     // Identity and its slope match the native list at either end of the band.

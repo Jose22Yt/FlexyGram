@@ -16,20 +16,20 @@ public class Probe {
         final float band = DirectionalScrollEdge.BAND_DP, strength = DirectionalScrollEdge.STRENGTH, yEdge = 500f;
         final float testY = 440f;
         final float oldDisplacement = DirectionalScrollEdge.projectY(testY, yEdge,
-                DirectionalScrollEdge.proximity(testY, yEdge, 136f), .68f) - testY;
+                DirectionalScrollEdge.proximity(testY, yEdge, 1f / 136f), .68f) - testY;
         final float newDisplacement = DirectionalScrollEdge.projectY(testY, yEdge,
-                DirectionalScrollEdge.proximity(testY, yEdge, band), strength) - testY;
+                DirectionalScrollEdge.proximity(testY, yEdge, 1f / band), strength) - testY;
         require(newDisplacement / oldDisplacement > 1.8f && newDisplacement / oldDisplacement < 2.2f);
         float previous = Float.NEGATIVE_INFINITY;
         for (int y = 300; y <= 700; y++) {
-            float proximity = DirectionalScrollEdge.proximity(y, yEdge, band);
+            float proximity = DirectionalScrollEdge.proximity(y, yEdge, 1f / band);
             float projectedY = DirectionalScrollEdge.projectY(y, yEdge, proximity, strength);
             require(projectedY > previous);
             if (Math.abs(y - yEdge) >= band) require(projectedY == y);
             previous = projectedY;
         }
-        float before = DirectionalScrollEdge.proximity(490, yEdge, band);
-        float after = DirectionalScrollEdge.proximity(510, yEdge, band);
+        float before = DirectionalScrollEdge.proximity(490, yEdge, 1f / band);
+        float after = DirectionalScrollEdge.proximity(510, yEdge, 1f / band);
         require(before == after);
         float topY = DirectionalScrollEdge.projectY(490, yEdge, before, strength);
         float bottomY = DirectionalScrollEdge.projectY(510, yEdge, after, strength);
@@ -67,7 +67,9 @@ def test_effect_is_opt_in_and_confined_to_live_drawing_of_two_surfaces():
     assert 'getCurrentMessagesGroup() == null' in chat
     assert '!ignoreClipChild' in method(common, 'protected final boolean isDirectionalScrollEdgeDrawing()')
     assert 'clearDirectionalScrollEdge();' not in method(common, 'public boolean dispatchTouchEvent(MotionEvent ev)')
-    assert 'getScrollState() == SCROLL_STATE_IDLE' in method(common, 'public void onScrolled(int dx, int dy)')
+    on_scroll = method(common, 'public void onScrolled(int dx, int dy)')
+    assert 'getScrollState() == SCROLL_STATE_IDLE' in on_scroll
+    assert on_scroll.index('isFullyEngaged(nextEdge)') < on_scroll.index('SystemClock.uptimeMillis()')
     assert 'drawingScrollEdge = DirectionalScrollEdge.NONE;' in method(common, 'protected void dispatchDraw(@NonNull Canvas canvas)')
     assert 'isAccessibilityScreenReaderEnabled()' in method(common, 'private void prepareDirectionalScrollEdge()')
 
@@ -79,6 +81,7 @@ def test_active_rows_are_projected_without_cutting_them_at_the_dock():
     assert 'canvas.concat(scrollEdgeProjection)' in draw
     assert 'clipRect' not in draw and 'saveLayer' not in draw
     assert draw.index('if (top == 0f && bottom == 0f') < draw.index('new Matrix()')
+    assert draw.index('rowTop >= scrollEdgeBandEnd') < draw.index('canProjectDirectionalScrollChild(child)')
     assert 'switch (drawingScrollStyle)' not in draw
     assert draw.index('if (scrollEdgeProjection == null)') < draw.index('new float[8]')
 
@@ -94,7 +97,9 @@ public class Probe {
         final int bottom = DirectionalScrollEdge.BOTTOM, top = DirectionalScrollEdge.TOP;
         m.scroll(bottom, 36, 36, 0);
         check(m.edge() == bottom && m.intensity() == 1 && !m.needsFrame());
+        check(m.isFullyEngaged(bottom) && !m.isFullyEngaged(top));
         m.stop(100);
+        check(!m.isFullyEngaged(bottom));
         m.advance(237);
         check(m.edge() == bottom && Math.abs(m.intensity() - .5f) < .005f);
         final float beforeResume = m.intensity();
@@ -122,6 +127,29 @@ public class Probe {
         check(m.intensity() == .5f);
         m.reset();
         check(m.edge() == DirectionalScrollEdge.NONE && !m.needsFrame());
+
+        // A short reversal can keep gathering travel while the new edge is appearing.
+        m.scroll(bottom, 36, 36, 1000);
+        m.scroll(top, 9, 36, 1010);
+        m.advance(1115);
+        m.advance(1165);
+        final float beforeAcceleration = m.intensity();
+        check(m.edge() == top && beforeAcceleration > 0f && beforeAcceleration < .1f);
+        m.scroll(top, 27, 36, 1165);
+        check(m.intensity() == beforeAcceleration && m.needsFrame());
+        m.advance(1175);
+        check(m.intensity() > beforeAcceleration && m.intensity() < beforeAcceleration + .03f);
+        m.advance(1265);
+        check(m.isFullyEngaged(top));
+
+        m.stop(1265);
+        float previous = m.intensity();
+        for (long now = 1273; now < 1550; now += 8) {
+            m.advance(now);
+            check(m.intensity() <= previous);
+            previous = m.intensity();
+        }
+        check(m.edge() == DirectionalScrollEdge.NONE && m.intensity() == 0f && !m.needsFrame());
     }
 }'''}, [JAVA/'app/flexygram/scroll/DirectionalScrollEdge.java',
         JAVA/'app/flexygram/scroll/DirectionalScrollMotion.java'])

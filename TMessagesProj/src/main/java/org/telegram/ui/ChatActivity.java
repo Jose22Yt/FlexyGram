@@ -6867,16 +6867,20 @@ public class ChatActivity extends BaseFragment implements
 
             @Override
             public boolean drawChild(Canvas canvas, View child, long drawingTime) {
-                final int save = isDirectionalScrollEdgeDrawing() && child instanceof ChatMessageCell cell
-                        && cell.getCurrentMessagesGroup() == null
-                        && !cell.transitionParams.animateBackgroundBoundsInner
-                        && !cell.needDelayRoundProgressDraw() && !hasSeparateVideoSurface(cell)
+                final int save = isDirectionalScrollEdgeDrawing()
                         ? beginDirectionalScrollEdge(canvas, child) : -1;
                 try {
                     return drawMessageChild(canvas, child, drawingTime);
                 } finally {
                     if (save >= 0) canvas.restoreToCount(save);
                 }
+            }
+
+            @Override
+            protected boolean canProjectDirectionalScrollChild(View child) {
+                return child instanceof ChatMessageCell cell && cell.getCurrentMessagesGroup() == null
+                        && !cell.transitionParams.animateBackgroundBoundsInner
+                        && !cell.needDelayRoundProgressDraw() && !hasSeparateVideoSurface(cell);
             }
 
             private boolean hasSeparateVideoSurface(ChatMessageCell cell) {

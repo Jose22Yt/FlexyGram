@@ -2711,7 +2711,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
     private boolean directionalScrollEdgeSupported;
     private DirectionalScrollMotion scrollEdgeMotion;
     private int drawingScrollEdge, scrollEdgeEngagementDistance, maxScrollEdgeBand;
-    private float scrollEdgeTop, scrollEdgeBottom, scrollEdgeBand, drawingScrollEdgeStrength;
+    private float scrollEdgeY, scrollEdgeBandStart, scrollEdgeBandEnd, inverseScrollEdgeBand, drawingScrollEdgeStrength;
     private Matrix scrollEdgeProjection;
     private float[] scrollEdgeSource, scrollEdgeTarget;
 
@@ -2727,10 +2727,14 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         super.onScrolled(dx, dy);
         if (!directionalScrollEdgeSupported || dy == 0 || getScrollState() == SCROLL_STATE_IDLE
                 || !DirectionalScrollSettings.enabled()) return;
+        final int previousEdge = scrollEdgeMotion == null ? DirectionalScrollEdge.NONE : scrollEdgeMotion.edge();
+        if (previousEdge == DirectionalScrollEdge.NONE && (!SharedConfig.animationsEnabled()
+                || AndroidUtilities.isAccessibilityScreenReaderEnabled())) return;
         if (scrollEdgeMotion == null) scrollEdgeMotion = new DirectionalScrollMotion();
-        final int previousEdge = scrollEdgeMotion.edge();
+        final int nextEdge = DirectionalScrollEdge.forDelta(previousEdge, dy);
+        if (scrollEdgeMotion.isFullyEngaged(nextEdge)) return;
         final boolean needsFrame = scrollEdgeMotion.needsFrame();
-        scrollEdgeMotion.scroll(DirectionalScrollEdge.forDelta(previousEdge, dy),
+        scrollEdgeMotion.scroll(nextEdge,
                 Math.abs((float) dy), scrollEdgeEngagementDistance, SystemClock.uptimeMillis());
         if (previousEdge != scrollEdgeMotion.edge() || !needsFrame && scrollEdgeMotion.needsFrame()) invalidate();
     }
@@ -2767,44 +2771,52 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
             clearDirectionalScrollEdge();
             return;
         }
-        final long now = SystemClock.uptimeMillis();
-        if (hasActiveEdgeEffects()) scrollEdgeMotion.stop(now);
-        else scrollEdgeMotion.advance(now);
+        if (hasActiveEdgeEffects()) {
+            scrollEdgeMotion.stop(SystemClock.uptimeMillis());
+        } else if (scrollEdgeMotion.needsFrame()) {
+            scrollEdgeMotion.advance(SystemClock.uptimeMillis());
+        }
         drawingScrollEdgeStrength = DirectionalScrollEdge.STRENGTH * scrollEdgeMotion.intensity();
         if (drawingScrollEdgeStrength <= .001f) return;
-        scrollEdgeTop = Math.max(0f, directionalScrollTop());
-        scrollEdgeBottom = Math.min(getHeight(), directionalScrollBottom());
-        scrollEdgeBand = Math.min(maxScrollEdgeBand, (scrollEdgeBottom - scrollEdgeTop) * .40f);
-        if (scrollEdgeBand <= 0f) {
+        final float top = Math.max(0f, directionalScrollTop());
+        final float bottom = Math.min(getHeight(), directionalScrollBottom());
+        final float band = Math.min(maxScrollEdgeBand, (bottom - top) * .40f);
+        if (band <= 0f) {
             clearDirectionalScrollEdge();
             return;
         }
         drawingScrollEdge = scrollEdgeMotion.edge();
+        scrollEdgeY = drawingScrollEdge == DirectionalScrollEdge.TOP ? top : bottom;
+        scrollEdgeBandStart = scrollEdgeY - band;
+        scrollEdgeBandEnd = scrollEdgeY + band;
+        inverseScrollEdgeBand = 1f / band;
     }
 
     protected final boolean isDirectionalScrollEdgeDrawing() {
         return drawingScrollEdge != DirectionalScrollEdge.NONE && !ignoreClipChild;
     }
 
+    protected boolean canProjectDirectionalScrollChild(View child) {
+        return true;
+    }
+
     protected final int beginDirectionalScrollEdge(Canvas canvas, View child) {
         final float rowTop = child.getY();
         final float rowBottom = rowTop + child.getHeight();
-        final float edgeY = drawingScrollEdge == DirectionalScrollEdge.TOP ? scrollEdgeTop : scrollEdgeBottom;
+        if (rowTop >= scrollEdgeBandEnd || rowBottom <= scrollEdgeBandStart || rowBottom <= rowTop) return -1;
+        final float edgeY = scrollEdgeY;
+        final float top = DirectionalScrollEdge.proximity(rowTop, edgeY, inverseScrollEdgeBand);
+        final float bottom = DirectionalScrollEdge.proximity(rowBottom, edgeY, inverseScrollEdgeBand);
         final float width = child.getWidth();
-        if (width <= 0f || rowBottom <= rowTop
-                || rowTop >= edgeY + scrollEdgeBand || rowBottom <= edgeY - scrollEdgeBand
-                || child.getAlpha() != 1f || !canvas.isHardwareAccelerated()) return -1;
-
-        final float strength = drawingScrollEdgeStrength;
-        final float top = DirectionalScrollEdge.proximity(rowTop, edgeY, scrollEdgeBand);
-        final float bottom = DirectionalScrollEdge.proximity(rowBottom, edgeY, scrollEdgeBand);
-        if (top == 0f && bottom == 0f) return -1;
+        if (top == 0f && bottom == 0f || width <= 0f || child.getAlpha() != 1f
+                || !canProjectDirectionalScrollChild(child)) return -1;
         if (scrollEdgeProjection == null) {
             scrollEdgeProjection = new Matrix();
             scrollEdgeSource = new float[8];
             scrollEdgeTarget = new float[8];
         }
 
+        final float strength = drawingScrollEdgeStrength;
         final float left = child.getX(), right = left + width;
         final float center = (left + right) * .5f;
         setScrollEdgeQuad(scrollEdgeSource, left, right, rowTop, left, right, rowBottom);
