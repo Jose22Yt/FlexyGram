@@ -3,12 +3,12 @@ package app.flexygram.scroll;
 
 /** One active edge. A reversal hands off only after the previous edge reaches zero. */
 public final class DirectionalScrollMotion {
-    private static final float RETURN_MS = 230f, HANDOFF_MS = 90f, RESUME_MS = 85f;
+    private static final float RETURN_MS = 275f, HANDOFF_MS = 105f, RESUME_MS = 100f;
     private static final float MIN_INTENSITY = .002f;
     private int edge, pendingEdge;
     private float intensity, from, target, pendingIntensity;
     private long started;
-    private float duration;
+    private float duration, travel, pendingTravel;
 
     public int edge() { return edge; }
     public float intensity() { return intensity; }
@@ -18,23 +18,25 @@ public final class DirectionalScrollMotion {
         advance(now);
         if (edge == DirectionalScrollEdge.NONE) {
             edge = next;
-            intensity = DirectionalScrollEdge.engagement(distance, engagementDistance);
+            travel = distance;
+            intensity = DirectionalScrollEdge.engagement(travel, engagementDistance);
         } else if (next == edge) {
+            travel = Math.min(engagementDistance, travel + distance);
             pendingEdge = DirectionalScrollEdge.NONE;
             if (duration != 0f) {
                 // Resume from the current deformation, even halfway through a return.
                 if (target == 0f) animateTo(1f, RESUME_MS, now);
             } else {
-                intensity = Math.min(1f, intensity + distance / engagementDistance);
+                intensity = Math.max(intensity, DirectionalScrollEdge.engagement(travel, engagementDistance));
             }
         } else {
             if (pendingEdge != next) {
                 pendingEdge = next;
-                pendingIntensity = DirectionalScrollEdge.engagement(distance, engagementDistance);
+                pendingTravel = 0f;
                 animateTo(0f, HANDOFF_MS, now);
-            } else {
-                pendingIntensity = Math.min(1f, pendingIntensity + distance / engagementDistance);
             }
+            pendingTravel = Math.min(engagementDistance, pendingTravel + distance);
+            pendingIntensity = DirectionalScrollEdge.engagement(pendingTravel, engagementDistance);
         }
     }
 
@@ -57,7 +59,10 @@ public final class DirectionalScrollMotion {
         if (intensity == 0f) {
             edge = pendingEdge;
             pendingEdge = DirectionalScrollEdge.NONE;
-            if (edge != DirectionalScrollEdge.NONE) animateTo(pendingIntensity, RESUME_MS, now);
+            if (edge != DirectionalScrollEdge.NONE) {
+                travel = pendingTravel;
+                animateTo(pendingIntensity, RESUME_MS, now);
+            }
         }
     }
 

@@ -1,9 +1,5 @@
 <resources>
     <string name="FlexyHomeChatDividers">Líneas divisorias entre chats</string>
-    <string name="FlexyHomeDirectionalScrollEdge">Efecto de borde al desplazar</string>
-    <string name="FlexyHomeDirectionalScrollOff">Desactivado</string>
-    <string name="FlexyHomeDirectionalScrollCurve">Curvatura</string>
-    <string name="FlexyHomeDirectionalScrollTwist">Torsión</string>
-    <string name="FlexyHomeDirectionalScrollCounterCurve">Contracurva</string>
-    <string name="FlexyHomeDirectionalScrollLens">Lente invertida</string>
+    <string name="FlexyHomeDirectionalScrollEdge">Curvatura al desplazar</string>
+    <string name="FlexyHomeDirectionalScrollEdgeHint">En la lista de chats y dentro de las conversaciones</string>
 </resources>

@@ -2708,31 +2708,26 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
 
     private boolean ignoreClipChild;
 
-    private float scrollEdgeStrength;
+    private boolean directionalScrollEdgeSupported;
     private DirectionalScrollMotion scrollEdgeMotion;
-    private int drawingScrollEdge, drawingScrollStyle, scrollEdgeStyle, scrollEdgeEngagementDistance;
+    private int drawingScrollEdge, scrollEdgeEngagementDistance, maxScrollEdgeBand;
     private float scrollEdgeTop, scrollEdgeBottom, scrollEdgeBand, drawingScrollEdgeStrength;
-    private float scrollEdgeLateralLimit, scrollEdgeTwistLimit, scrollEdgeLensLimit;
     private Matrix scrollEdgeProjection;
     private float[] scrollEdgeSource, scrollEdgeTarget;
 
-    protected final void enableDirectionalScrollEdge(float strength) {
-        scrollEdgeStrength = strength;
+    protected final void enableDirectionalScrollEdge() {
+        directionalScrollEdgeSupported = true;
         scrollEdgeEngagementDistance = dp(36);
-        DirectionalScrollSettings.style();
+        maxScrollEdgeBand = dp(DirectionalScrollEdge.BAND_DP);
+        DirectionalScrollSettings.enabled();
     }
 
     @Override
     public void onScrolled(int dx, int dy) {
         super.onScrolled(dx, dy);
-        if (scrollEdgeStrength == 0f || dy == 0 || getScrollState() == SCROLL_STATE_IDLE) return;
-        final int style = DirectionalScrollSettings.style();
-        if (style == DirectionalScrollSettings.OFF) return;
+        if (!directionalScrollEdgeSupported || dy == 0 || getScrollState() == SCROLL_STATE_IDLE
+                || !DirectionalScrollSettings.enabled()) return;
         if (scrollEdgeMotion == null) scrollEdgeMotion = new DirectionalScrollMotion();
-        if (scrollEdgeStyle != style) {
-            scrollEdgeStyle = style;
-            scrollEdgeMotion.reset();
-        }
         final int previousEdge = scrollEdgeMotion.edge();
         final boolean needsFrame = scrollEdgeMotion.needsFrame();
         scrollEdgeMotion.scroll(DirectionalScrollEdge.forDelta(previousEdge, dy),
@@ -2767,28 +2762,24 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
 
     private void prepareDirectionalScrollEdge() {
         drawingScrollEdge = DirectionalScrollEdge.NONE;
-        if (DirectionalScrollSettings.style() != scrollEdgeStyle || !SharedConfig.animationsEnabled()
-                || AndroidUtilities.isAccessibilityScreenReaderEnabled()
-                || hasActiveEdgeEffects() || !canDrawDirectionalScrollEdge()
-                || getItemAnimator() != null && getItemAnimator().isRunning()) {
+        if (!DirectionalScrollSettings.enabled() || !SharedConfig.animationsEnabled()
+                || AndroidUtilities.isAccessibilityScreenReaderEnabled() || !canDrawDirectionalScrollEdge()) {
             clearDirectionalScrollEdge();
             return;
         }
-        scrollEdgeMotion.advance(SystemClock.uptimeMillis());
-        drawingScrollEdgeStrength = scrollEdgeStrength * scrollEdgeMotion.intensity();
+        final long now = SystemClock.uptimeMillis();
+        if (hasActiveEdgeEffects()) scrollEdgeMotion.stop(now);
+        else scrollEdgeMotion.advance(now);
+        drawingScrollEdgeStrength = DirectionalScrollEdge.STRENGTH * scrollEdgeMotion.intensity();
         if (drawingScrollEdgeStrength <= .001f) return;
         scrollEdgeTop = Math.max(0f, directionalScrollTop());
         scrollEdgeBottom = Math.min(getHeight(), directionalScrollBottom());
-        scrollEdgeBand = Math.min(dp(136), (scrollEdgeBottom - scrollEdgeTop) * .34f);
+        scrollEdgeBand = Math.min(maxScrollEdgeBand, (scrollEdgeBottom - scrollEdgeTop) * .40f);
         if (scrollEdgeBand <= 0f) {
             clearDirectionalScrollEdge();
             return;
         }
         drawingScrollEdge = scrollEdgeMotion.edge();
-        drawingScrollStyle = scrollEdgeStyle;
-        scrollEdgeLateralLimit = dp(28);
-        scrollEdgeTwistLimit = dp(14);
-        scrollEdgeLensLimit = dp(7);
     }
 
     protected final boolean isDirectionalScrollEdgeDrawing() {
@@ -2802,38 +2793,9 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         final float width = child.getWidth();
         if (width <= 0f || rowBottom <= rowTop
                 || rowTop >= edgeY + scrollEdgeBand || rowBottom <= edgeY - scrollEdgeBand
-                || !canvas.isHardwareAccelerated()) return -1;
+                || child.getAlpha() != 1f || !canvas.isHardwareAccelerated()) return -1;
 
-        final float centerY = (rowTop + rowBottom) * .5f;
         final float strength = drawingScrollEdgeStrength;
-        if (drawingScrollStyle != DirectionalScrollSettings.CURVE) {
-            final float t = DirectionalScrollEdge.proximity(centerY, edgeY, scrollEdgeBand);
-            if (t == 0f) return -1;
-            final float centerX = child.getX() + width * .5f;
-            final int save;
-            switch (drawingScrollStyle) {
-                case DirectionalScrollSettings.TWIST:
-                    final float shear = DirectionalScrollEdge.twist(t, scrollEdgeTwistLimit, strength) / width;
-                    save = canvas.save();
-                    canvas.translate(centerX, centerY);
-                    canvas.skew(0f, drawingScrollEdge == DirectionalScrollEdge.TOP ? -shear : shear);
-                    canvas.translate(-centerX, -centerY);
-                    return save;
-                case DirectionalScrollSettings.COUNTER_CURVE:
-                    final float shift = DirectionalScrollEdge.counterOffset(t, scrollEdgeLateralLimit, strength);
-                    if (Math.abs(shift) < .01f) return -1;
-                    save = canvas.save();
-                    canvas.translate(LocaleController.isRTL ? -shift : shift, 0f);
-                    return save;
-                case DirectionalScrollSettings.LENS:
-                    save = canvas.save();
-                    canvas.scale(DirectionalScrollEdge.lensScale(t, scrollEdgeLensLimit, width, strength), 1f, centerX, centerY);
-                    return save;
-                default:
-                    return -1;
-            }
-        }
-
         final float top = DirectionalScrollEdge.proximity(rowTop, edgeY, scrollEdgeBand);
         final float bottom = DirectionalScrollEdge.proximity(rowBottom, edgeY, scrollEdgeBand);
         if (top == 0f && bottom == 0f) return -1;
@@ -2843,7 +2805,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
             scrollEdgeTarget = new float[8];
         }
 
-        final float left = child.getX(), right = left + child.getWidth();
+        final float left = child.getX(), right = left + width;
         final float center = (left + right) * .5f;
         setScrollEdgeQuad(scrollEdgeSource, left, right, rowTop, left, right, rowBottom);
         setScrollEdgeQuad(scrollEdgeTarget,

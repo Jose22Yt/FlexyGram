@@ -1,9 +1,5 @@
 <resources>
     <string name="FlexyHomeChatDividers">Разделители чатов</string>
-    <string name="FlexyHomeDirectionalScrollEdge">Эффект края при прокрутке</string>
-    <string name="FlexyHomeDirectionalScrollOff">Выключено</string>
-    <string name="FlexyHomeDirectionalScrollCurve">Изгиб</string>
-    <string name="FlexyHomeDirectionalScrollTwist">Скручивание</string>
-    <string name="FlexyHomeDirectionalScrollCounterCurve">Контризгиб</string>
-    <string name="FlexyHomeDirectionalScrollLens">Обратная линза</string>
+    <string name="FlexyHomeDirectionalScrollEdge">Изгиб при прокрутке</string>
+    <string name="FlexyHomeDirectionalScrollEdgeHint">В списке чатов и внутри бесед</string>
 </resources>

@@ -13,7 +13,13 @@ public class Probe {
         int top = DirectionalScrollEdge.forDelta(bottom, -1);
         require(bottom == DirectionalScrollEdge.BOTTOM && top == DirectionalScrollEdge.TOP);
         require(DirectionalScrollEdge.forDelta(top, 0) == top);
-        final float band = 136f, strength = .68f, yEdge = 500f;
+        final float band = DirectionalScrollEdge.BAND_DP, strength = DirectionalScrollEdge.STRENGTH, yEdge = 500f;
+        final float testY = 440f;
+        final float oldDisplacement = DirectionalScrollEdge.projectY(testY, yEdge,
+                DirectionalScrollEdge.proximity(testY, yEdge, 136f), .68f) - testY;
+        final float newDisplacement = DirectionalScrollEdge.projectY(testY, yEdge,
+                DirectionalScrollEdge.proximity(testY, yEdge, band), strength) - testY;
+        require(newDisplacement / oldDisplacement > 1.8f && newDisplacement / oldDisplacement < 2.2f);
         float previous = Float.NEGATIVE_INFINITY;
         for (int y = 300; y <= 700; y++) {
             float proximity = DirectionalScrollEdge.proximity(y, yEdge, band);
@@ -35,8 +41,8 @@ public class Probe {
         require(DirectionalScrollEdge.projectY(460, yEdge, 1f, 0f) == 460f);
         require(DirectionalScrollEdge.settle(0, 120) == 1f);
         require(DirectionalScrollEdge.settle(60, 120) == .5f);
-        require(DirectionalScrollEdge.engagement(0, 36) == .45f);
-        require(DirectionalScrollEdge.engagement(18, 36) > .8f);
+        require(DirectionalScrollEdge.engagement(0, 36) == 0f);
+        require(DirectionalScrollEdge.engagement(18, 36) == .5f);
         require(DirectionalScrollEdge.engagement(36, 36) == 1f);
         require(DirectionalScrollEdge.settle(120, 120) == 0f);
         require(DirectionalScrollEdge.settle(150, 120) == 0f);
@@ -51,7 +57,10 @@ def test_effect_is_opt_in_and_confined_to_live_drawing_of_two_surfaces():
     toggle = (JAVA/'app/flexygram/home/HomeListSettingsActivity.java').read_text()
     settings = (JAVA/'app/flexygram/scroll/DirectionalScrollSettings.java').read_text()
 
-    assert 'getBoolean(LEGACY_KEY, false) ? CURVE : OFF' in settings
+    assert 'getBoolean(LEGACY_KEY, false) ? 1 : 0' in settings
+    assert 'return style >= 1 && style <= 4;' in settings
+    assert 'DirectionalScrollSettings.setEnabled(!DirectionalScrollSettings.enabled())' in toggle
+    assert 'createSingleChoiceDialog' not in toggle
     assert toggle.count('addRow("flexyDirectionalScrollEdge")') == 1
     assert home.count('enableDirectionalScrollEdge(') == chat.count('enableDirectionalScrollEdge(') == 1
     assert 'instanceof DialogCell' in home[home.index('public class DialogsRecyclerView'):]
@@ -70,7 +79,7 @@ def test_active_rows_are_projected_without_cutting_them_at_the_dock():
     assert 'canvas.concat(scrollEdgeProjection)' in draw
     assert 'clipRect' not in draw and 'saveLayer' not in draw
     assert draw.index('if (top == 0f && bottom == 0f') < draw.index('new Matrix()')
-    assert draw.index('switch (drawingScrollStyle)') < draw.index('new Matrix()')
+    assert 'switch (drawingScrollStyle)' not in draw
     assert draw.index('if (scrollEdgeProjection == null)') < draw.index('new float[8]')
 
 
@@ -86,38 +95,33 @@ public class Probe {
         m.scroll(bottom, 36, 36, 0);
         check(m.edge() == bottom && m.intensity() == 1 && !m.needsFrame());
         m.stop(100);
-        m.advance(215);
-        check(m.edge() == bottom && Math.abs(m.intensity() - .5f) < .001f);
+        m.advance(237);
+        check(m.edge() == bottom && Math.abs(m.intensity() - .5f) < .005f);
         final float beforeResume = m.intensity();
-        m.scroll(bottom, 1, 36, 215);
+        m.scroll(bottom, 1, 36, 237);
         check(m.intensity() == beforeResume && m.needsFrame());
-        m.advance(300);
+        m.advance(337);
         check(m.intensity() == 1 && !m.needsFrame());
 
-        m.scroll(top, 27, 36, 300);
-        m.advance(345);
-        check(m.edge() == bottom && Math.abs(m.intensity() - .5f) < .001f);
-        m.scroll(top, 11, 36, 348);
-        m.advance(390);
+        m.scroll(top, 27, 36, 337);
+        m.advance(389);
+        check(m.edge() == bottom && Math.abs(m.intensity() - .5f) < .01f);
+        m.scroll(top, 11, 36, 392);
+        m.advance(442);
         check(m.edge() == top && m.intensity() == 0 && m.needsFrame());
-        m.advance(475);
+        m.advance(542);
         check(m.edge() == top && m.intensity() == 1 && !m.needsFrame());
 
-        m.scroll(bottom, 36, 36, 500);
-        m.stop(520);
-        m.advance(700);
+        m.scroll(bottom, 36, 36, 550);
+        m.stop(570);
+        m.advance(800);
         check(m.edge() == DirectionalScrollEdge.NONE && m.intensity() == 0 && !m.needsFrame());
-        m.scroll(bottom, 7, 36, 702);
+        m.scroll(bottom, 1, 36, 802);
+        check(m.intensity() < .005f);
+        m.scroll(bottom, 17, 36, 811);
+        check(m.intensity() == .5f);
         m.reset();
         check(m.edge() == DirectionalScrollEdge.NONE && !m.needsFrame());
-
-        check(DirectionalScrollEdge.twist(0, 14, .68f) == 0);
-        check(DirectionalScrollEdge.twist(1, 14, .68f) > 9f);
-        check(DirectionalScrollEdge.counterOffset(.25f, 28, .68f) < -6f);
-        check(DirectionalScrollEdge.counterOffset(.75f, 28, .68f) > 6f);
-        check(DirectionalScrollEdge.counterOffset(1, 28, .68f) == 0f);
-        check(DirectionalScrollEdge.lensScale(0, 7, 390, .68f) == 1f);
-        check(DirectionalScrollEdge.lensScale(1, 7, 390, .68f) > 1.02f);
     }
 }'''}, [JAVA/'app/flexygram/scroll/DirectionalScrollEdge.java',
         JAVA/'app/flexygram/scroll/DirectionalScrollMotion.java'])

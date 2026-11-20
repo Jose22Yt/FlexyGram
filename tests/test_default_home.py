@@ -39,11 +39,7 @@ def test_no_style_selector_or_iphone_home_routes_remain():
         assert names == {
             'FlexyHomeChatDividers',
             'FlexyHomeDirectionalScrollEdge',
-            'FlexyHomeDirectionalScrollOff',
-            'FlexyHomeDirectionalScrollCurve',
-            'FlexyHomeDirectionalScrollTwist',
-            'FlexyHomeDirectionalScrollCounterCurve',
-            'FlexyHomeDirectionalScrollLens',
+            'FlexyHomeDirectionalScrollEdgeHint',
         }
     rows=(JAVA/'org/telegram/ui/Cells/DialogCell.java').read_text()
     assert 'isIosHome' not in rows and 'useForceThreeLines = forceThreeLines;' in rows

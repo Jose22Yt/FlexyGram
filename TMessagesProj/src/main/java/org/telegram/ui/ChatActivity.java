@@ -6869,7 +6869,7 @@ public class ChatActivity extends BaseFragment implements
             public boolean drawChild(Canvas canvas, View child, long drawingTime) {
                 final int save = isDirectionalScrollEdgeDrawing() && child instanceof ChatMessageCell cell
                         && cell.getCurrentMessagesGroup() == null
-                        && !cell.transitionParams.animateBackgroundBoundsInner && !cell.hasOutboundsContent()
+                        && !cell.transitionParams.animateBackgroundBoundsInner
                         && !cell.needDelayRoundProgressDraw() && !hasSeparateVideoSurface(cell)
                         ? beginDirectionalScrollEdge(canvas, child) : -1;
                 try {
@@ -53177,7 +53177,7 @@ public class ChatActivity extends BaseFragment implements
         public ChatListRecyclerView(Context context, ThemeDelegate themeDelegate) {
             super(context, themeDelegate);
             if (!inPreviewMode && !inBubbleMode && !isInsideContainer && chatMode == MODE_DEFAULT) {
-                enableDirectionalScrollEdge(.58f);
+                enableDirectionalScrollEdge();
             }
         }
 

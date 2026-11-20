@@ -1,9 +1,5 @@
 <resources>
     <string name="FlexyHomeChatDividers">Chat divider lines</string>
-    <string name="FlexyHomeDirectionalScrollEdge">Edge effect while scrolling</string>
-    <string name="FlexyHomeDirectionalScrollOff">Off</string>
-    <string name="FlexyHomeDirectionalScrollCurve">Curvature</string>
-    <string name="FlexyHomeDirectionalScrollTwist">Twist</string>
-    <string name="FlexyHomeDirectionalScrollCounterCurve">Countercurve</string>
-    <string name="FlexyHomeDirectionalScrollLens">Inverted lens</string>
+    <string name="FlexyHomeDirectionalScrollEdge">Curvature while scrolling</string>
+    <string name="FlexyHomeDirectionalScrollEdgeHint">On the chat list and inside conversations</string>
 </resources>

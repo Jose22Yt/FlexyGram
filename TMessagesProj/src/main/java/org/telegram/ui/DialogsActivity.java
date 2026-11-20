@@ -1804,7 +1804,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             super(context);
             parentPage = page;
             additionalClipBottom = dp(200);
-            if (!onlySelect && folderId == 0 && communityId == 0) enableDirectionalScrollEdge(.68f);
+            if (!onlySelect && folderId == 0 && communityId == 0) enableDirectionalScrollEdge();
         }
 
         public void prepareSelectorForAnimation() {
