@@ -96,6 +96,12 @@ public class Probe {
         final var m = new DirectionalScrollMotion();
         final int bottom = DirectionalScrollEdge.BOTTOM, top = DirectionalScrollEdge.TOP;
         m.scroll(bottom, 36, 36, 0);
+        check(m.edge() == bottom && m.intensity() == 0 && m.needsFrame());
+        m.advance(16);
+        check(m.intensity() > 0 && m.intensity() < .25f);
+        m.advance(34);
+        check(Math.abs(m.intensity() - .5f) < .005f);
+        m.advance(68);
         check(m.edge() == bottom && m.intensity() == 1 && !m.needsFrame());
         check(m.isFullyEngaged(bottom) && !m.isFullyEngaged(top));
         m.stop(100);
@@ -123,33 +129,56 @@ public class Probe {
         check(m.edge() == DirectionalScrollEdge.NONE && m.intensity() == 0 && !m.needsFrame());
         m.scroll(bottom, 1, 36, 802);
         check(m.intensity() < .005f);
+        final float beforeMoreTravel = m.intensity();
         m.scroll(bottom, 17, 36, 811);
-        check(m.intensity() == .5f);
+        check(m.intensity() >= beforeMoreTravel && m.intensity() < .01f);
+        m.advance(879);
+        check(m.intensity() == .5f && !m.needsFrame());
         m.reset();
         check(m.edge() == DirectionalScrollEdge.NONE && !m.needsFrame());
 
         // A short reversal can keep gathering travel while the new edge is appearing.
         m.scroll(bottom, 36, 36, 1000);
-        m.scroll(top, 9, 36, 1010);
-        m.advance(1115);
-        m.advance(1165);
+        m.advance(1068);
+        m.scroll(top, 9, 36, 1070);
+        m.advance(1175);
+        m.advance(1225);
         final float beforeAcceleration = m.intensity();
         check(m.edge() == top && beforeAcceleration > 0f && beforeAcceleration < .1f);
-        m.scroll(top, 27, 36, 1165);
+        m.scroll(top, 27, 36, 1225);
         check(m.intensity() == beforeAcceleration && m.needsFrame());
-        m.advance(1175);
-        check(m.intensity() > beforeAcceleration && m.intensity() < beforeAcceleration + .03f);
-        m.advance(1265);
+        m.advance(1235);
+        check(m.intensity() > beforeAcceleration && m.intensity() < beforeAcceleration + .07f);
+        m.advance(1293);
         check(m.isFullyEngaged(top));
 
-        m.stop(1265);
+        m.stop(1293);
         float previous = m.intensity();
-        for (long now = 1273; now < 1550; now += 8) {
+        for (long now = 1301; now < 1580; now += 8) {
             m.advance(now);
             check(m.intensity() <= previous);
             previous = m.intensity();
         }
         check(m.edge() == DirectionalScrollEdge.NONE && m.intensity() == 0f && !m.needsFrame());
+
+        // A missed frame keeps the handoff on its timeline.
+        m.scroll(bottom, 36, 36, 1700);
+        m.advance(1768);
+        m.scroll(top, 36, 36, 1780);
+        m.advance(1935);
+        check(m.edge() == top && Math.abs(m.intensity() - .5f) < .005f);
+        m.advance(1985);
+        check(m.isFullyEngaged(top));
+
+        // A reversal before the first visible frame doesn't wait for an invisible edge.
+        m.reset();
+        m.scroll(bottom, 36, 36, 2100);
+        m.scroll(top, 36, 36, 2101);
+        m.advance(2135);
+        check(m.edge() == top && Math.abs(m.intensity() - .5f) < .005f);
+        m.scroll(bottom, 36, 36, 2155);
+        m.stop(2300);
+        check(m.edge() == DirectionalScrollEdge.NONE && !m.needsFrame());
     }
 }'''}, [JAVA/'app/flexygram/scroll/DirectionalScrollEdge.java',
         JAVA/'app/flexygram/scroll/DirectionalScrollMotion.java'])

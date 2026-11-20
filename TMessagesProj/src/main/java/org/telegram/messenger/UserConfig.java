@@ -315,19 +315,16 @@ public class UserConfig extends BaseController {
     static void preloadStartupConfigs() {
         android.os.Trace.beginSection("Flexy.startup.preload_account_configs");
         try {
-            SharedPreferences[] preferences = new SharedPreferences[MAX_ACCOUNT_COUNT];
-            preferences[0] = getInstance(0).getPreferences();
-            final int selected = preferences[0].getInt("selectedAccount", 0);
-            for (int position = 1; position < MAX_ACCOUNT_COUNT; position++) {
-                final int account = app.flexygram.performance.StartupAccounts.accountAt(position, selected, MAX_ACCOUNT_COUNT);
-                preferences[account] = getInstance(account).getPreferences();
-            }
+            final SharedPreferences primaryPreferences = getInstance(0).getPreferences();
+            final int selected = primaryPreferences.getInt("selectedAccount", 0);
             for (int position = 0; position < MAX_ACCOUNT_COUNT; position++) {
                 final int account = app.flexygram.performance.StartupAccounts.accountAt(position, selected, MAX_ACCOUNT_COUNT);
                 UserConfig config = getInstance(account);
                 if (config.configLoaded) continue;
                 try {
-                    String serialized = preferences[account].getString("user", null);
+                    // Prepare the visible account before touching preferences for other sessions.
+                    final SharedPreferences preferences = account == 0 ? primaryPreferences : config.getPreferences();
+                    String serialized = preferences.getString("user", null);
                     if (serialized == null || config.configLoaded) continue;
                     TLRPC.User user = deserializeUser(serialized);
                     synchronized (config.sync) {

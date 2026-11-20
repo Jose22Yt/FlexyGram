@@ -3,7 +3,7 @@ package app.flexygram.scroll;
 
 /** One active edge. A reversal hands off only after the previous edge reaches zero. */
 public final class DirectionalScrollMotion {
-    private static final float RETURN_MS = 275f, HANDOFF_MS = 105f, RESUME_MS = 100f;
+    private static final float ENTER_MS = 68f, RETURN_MS = 275f, HANDOFF_MS = 105f, RESUME_MS = 100f;
     private static final float MIN_INTENSITY = .002f;
     private int edge, pendingEdge;
     private float intensity, from, target, pendingIntensity;
@@ -20,23 +20,19 @@ public final class DirectionalScrollMotion {
 
     public void scroll(int next, float distance, float engagementDistance, long now) {
         advance(now);
-        if (edge == DirectionalScrollEdge.NONE) {
+        if (edge == DirectionalScrollEdge.NONE || next != edge && intensity <= MIN_INTENSITY) {
             edge = next;
-            travel = distance;
-            intensity = DirectionalScrollEdge.engagement(travel, engagementDistance);
+            pendingEdge = DirectionalScrollEdge.NONE;
+            travel = Math.min(engagementDistance, distance);
+            animateTo(DirectionalScrollEdge.engagement(travel, engagementDistance), ENTER_MS, now);
         } else if (next == edge) {
             travel = Math.min(engagementDistance, travel + distance);
             pendingEdge = DirectionalScrollEdge.NONE;
-            if (duration != 0f) {
-                // Resume from the current deformation, even halfway through a return.
-                if (target == 0f) {
-                    animateTo(1f, RESUME_MS, now);
-                } else {
-                    final float engagement = DirectionalScrollEdge.engagement(travel, engagementDistance);
-                    if (engagement > target) animateTo(engagement, RESUME_MS, now);
-                }
-            } else {
-                intensity = Math.max(intensity, DirectionalScrollEdge.engagement(travel, engagementDistance));
+            final float engagement = DirectionalScrollEdge.engagement(travel, engagementDistance);
+            if (duration != 0f && target == 0f) {
+                animateTo(engagement, RESUME_MS, now);
+            } else if (engagement > (duration != 0f ? target : intensity)) {
+                animateTo(engagement, ENTER_MS, now);
             }
         } else {
             if (pendingEdge != next) {
@@ -50,8 +46,8 @@ public final class DirectionalScrollMotion {
     }
 
     public void stop(long now) {
-        advance(now);
         pendingEdge = DirectionalScrollEdge.NONE;
+        advance(now);
         if (edge == DirectionalScrollEdge.NONE || duration != 0f && target == 0f) return;
         if (intensity <= MIN_INTENSITY) reset();
         else animateTo(0f, RETURN_MS, now);
@@ -63,6 +59,7 @@ public final class DirectionalScrollMotion {
         intensity = target + (from - target) * DirectionalScrollEdge.settle(elapsed, duration);
         if (elapsed < duration) return;
 
+        final long completedAt = started + (long) duration;
         intensity = target;
         duration = 0f;
         if (intensity == 0f) {
@@ -70,7 +67,8 @@ public final class DirectionalScrollMotion {
             pendingEdge = DirectionalScrollEdge.NONE;
             if (edge != DirectionalScrollEdge.NONE) {
                 travel = pendingTravel;
-                animateTo(pendingIntensity, RESUME_MS, now);
+                animateTo(pendingIntensity, RESUME_MS, completedAt);
+                if (now > completedAt) advance(now);
             }
         }
     }

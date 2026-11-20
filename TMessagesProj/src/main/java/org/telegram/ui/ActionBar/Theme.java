@@ -8166,8 +8166,14 @@ public class Theme {
 
     private static final float[] CHAT_EMOJI_SIZE_PERCENTS = {.68f, .46f, .34f, .28f, .22f, .19f};
 
+    private static int commonMessageFontSize = -1;
+    private static float commonMessageDensity = -1f;
+
     public static void createCommonMessageResources() {
         synchronized (sync) {
+            final int fontSize = SharedConfig.fontSize;
+            final float density = AndroidUtilities.density;
+            if (commonMessageFontSize == fontSize && commonMessageDensity == density) return;
             if (chat_msgTextPaint == null) {
                 chat_msgTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
                 chat_msgGameTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
@@ -8207,10 +8213,10 @@ public class Theme {
             chat_msgTextPaintOneEmoji.setTextSize(dp(28 + 18));
             chat_msgTextPaintTwoEmoji.setTextSize(dp(24 + 14));
             chat_msgTextPaintThreeEmoji.setTextSize(dp(20 + 10));
-            chat_msgTextPaint.setTextSize(dp(SharedConfig.fontSize));
+            chat_msgTextPaint.setTextSize(dp(fontSize));
             chat_msgGameTextPaint.setTextSize(dp(14));
             chat_msgBotButtonPaint.setTextSize(dp(15));
-            float smallerDp = (2 * SharedConfig.fontSize + 10) / 3f; // 6f + SharedConfig.fontSize / 2f;
+            float smallerDp = (2 * fontSize + 10) / 3f;
             chat_namePaint.setTextSize(dp(smallerDp));
             chat_replyNamePaint.setTextSize(dp(smallerDp));
             chat_replyTextPaint.setTextSize(dp(smallerDp));
@@ -8221,9 +8227,11 @@ public class Theme {
             chat_titleLabelTextPaint.setTextSize(dp(smallerDp - 2));
             chat_forwardNamePaint.setTextSize(dp(smallerDp));
             chat_adminPaint.setTextSize(dp(smallerDp - 1));
-            chat_msgTextCodePaint.setTextSize(dp(Math.max(Math.min(10, SharedConfig.fontSize - 1), SharedConfig.fontSize - 2)));
-            chat_msgTextCode2Paint.setTextSize(dp(Math.max(Math.min(10, SharedConfig.fontSize - 2), SharedConfig.fontSize - 3)));
-            chat_msgTextCode3Paint.setTextSize(dp(Math.max(Math.min(10, SharedConfig.fontSize - 2), SharedConfig.fontSize - 5)));
+            chat_msgTextCodePaint.setTextSize(dp(Math.max(Math.min(10, fontSize - 1), fontSize - 2)));
+            chat_msgTextCode2Paint.setTextSize(dp(Math.max(Math.min(10, fontSize - 2), fontSize - 3)));
+            chat_msgTextCode3Paint.setTextSize(dp(Math.max(Math.min(10, fontSize - 2), fontSize - 5)));
+            commonMessageFontSize = fontSize;
+            commonMessageDensity = density;
         }
     }
 

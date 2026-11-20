@@ -24,6 +24,7 @@ public class UserConfig {
   String getString(String k,String d){return user;}
  }
  static final List<Integer> reads=new ArrayList<>();
+ static final List<String> startupOrder=new ArrayList<>();
  static final UserConfig[] configs={new UserConfig(0),new UserConfig(1),new UserConfig(2),new UserConfig(3)};
  final int account;final Object sync=new Object();final SharedPreferences prefs=new SharedPreferences();
  volatile boolean configLoaded;
@@ -32,8 +33,8 @@ public class UserConfig {
  static int decodes;
  UserConfig(int account){this.account=account;}
  static UserConfig getInstance(int account){return configs[account];}
- SharedPreferences getPreferences(){reads.add(account);return prefs;}
- static TLRPC.User deserializeUser(String s){decodes++;return new TLRPC.User(Long.parseLong(s));}
+ SharedPreferences getPreferences(){reads.add(account);startupOrder.add("open"+account);return prefs;}
+ static TLRPC.User deserializeUser(String s){decodes++;startupOrder.add("decode"+s);return new TLRPC.User(Long.parseLong(s));}
  void checkPremiumSelf(TLRPC.User previous,TLRPC.User user){callbacks++;}
  STARTUP_USER
  PRELOAD
@@ -44,6 +45,7 @@ public class UserConfig {
   configs[0].prefs.user="10";configs[1].prefs.user="20";configs[2].prefs.user="broken";configs[3].prefs.user="30";
   Thread worker=new Thread(UserConfig::preloadStartupConfigs);worker.start();worker.join();
   check(reads.equals(List.of(0,3,1,2))&&decodes==4);
+  check(startupOrder.indexOf("decode30")<startupOrder.indexOf("open1"));
   for(var c:configs)check(c.currentUser==null&&!c.configLoaded&&c.callbacks==0);
   configs[1].prefs.user="21";configs[2].prefs.user=null;
   for(var c:configs)c.loadConfig();
@@ -55,6 +57,47 @@ public class UserConfig {
  }
 }'''.replace('STARTUP_USER', startup_user).replace('PRELOAD', preload).replace('LOAD_TAIL', tail)
     }, [JAVA/'app/flexygram/performance/StartupAccounts.java'])
+
+
+def test_message_paint_sizes_are_written_only_when_font_size_or_density_changes(tmp_path):
+    source = (JAVA/'org/telegram/ui/ActionBar/Theme.java').read_text()
+    create = method(source, 'public static void createCommonMessageResources()')
+    paints = sorted(set(re.findall(r'\b(chat_\w+)\s*=\s*new TextPaint\(', create)))
+    fields = 'static TextPaint ' + ', '.join(paints) + ';'
+    config = source[source.index('    private static int commonMessageFontSize'):source.index(create)]
+    probe(tmp_path, {'Probe.java': '''
+public class Probe {
+    static final Object sync = new Object();
+    static final float[] CHAT_EMOJI_SIZE_PERCENTS = {.9f,.8f,.7f,.6f,.5f,.4f};
+    static class SharedConfig {static int fontSize=16;}
+    static class AndroidUtilities {static float density=2;static Object bold(){return null;}static Object mono(){return null;}}
+    static class Paint {static final int ANTI_ALIAS_FLAG=1;}
+    static class TextPaint extends Paint {
+        static int writes;
+        int size;
+        TextPaint(int flags){}
+        void setTypeface(Object value){}
+        void setTextSize(int value){size=value;writes++;}
+    }
+    static int dp(float value){return (int)Math.ceil(value*AndroidUtilities.density);}
+    static TextPaint[] chat_msgTextPaintEmoji;
+    FIELDS
+    CONFIG
+    CREATE
+    static void check(boolean value){if(!value)throw new AssertionError();}
+    public static void main(String[] args){
+        createCommonMessageResources();
+        int initialWrites=TextPaint.writes;
+        TextPaint identity=chat_msgTextPaint;
+        check(initialWrites>20 && identity.size==32);
+        for(int i=0;i<1000;i++)createCommonMessageResources();
+        check(TextPaint.writes==initialWrites);
+        SharedConfig.fontSize=20;createCommonMessageResources();
+        check(TextPaint.writes==2*initialWrites && identity==chat_msgTextPaint && identity.size==40);
+        AndroidUtilities.density=1.25f;createCommonMessageResources();
+        check(TextPaint.writes==3*initialWrites && identity.size==25 && chat_msgTextPaintEmoji[0].size!=0);
+    }
+}'''.replace('FIELDS', fields).replace('CONFIG', config).replace('CREATE', create)})
 
 
 def test_selected_cache_precedes_auxiliary_work_for_both_database_open_races(tmp_path):
