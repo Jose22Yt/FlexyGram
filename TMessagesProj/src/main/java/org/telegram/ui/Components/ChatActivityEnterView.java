@@ -3380,8 +3380,8 @@ public class ChatActivityEnterView extends FrameLayout implements
                     canvas.scale(s, s, backgroundRect.centerX(), backgroundRect.centerY());
                     if (!flexyVoiceBackdropDrawn) {
                         canvas.drawRoundRect(backgroundRect, r, r, paint);
-                        if (parentFragment != null && flexyCompactLayout && app.flexygram.effects.ChatEdgeStyle.isReflective()) {
-                            if (compactVoiceReflection == null) compactVoiceReflection = new app.flexygram.effects.ChatEdgeReflection();
+                        if (parentFragment != null && flexyCompactLayout && app.flexygram.effects.ChatEdgeStyle.hasCustomEdge()) {
+                            compactVoiceReflection = app.flexygram.effects.ChatEdgeStyle.updateReflection(compactVoiceReflection);
                             compactVoiceReflection.draw(canvas, backgroundRect, r, isFlexyDarkTheme(), 255);
                         }
                     }
@@ -17296,8 +17296,8 @@ public class ChatActivityEnterView extends FrameLayout implements
             if (isNewDesignSendButton && !compactBackdropDrawn) {
                 final float radius = compactVisualInset >= 0 ? backgroundRect.height() / 2f : dp(RADIUS);
                 canvas.drawRoundRect(backgroundRect, radius, radius, backgroundPaint);
-                if (compactVisualInset >= 0 && app.flexygram.effects.ChatEdgeStyle.isReflective()) {
-                    if (compactSendReflection == null) compactSendReflection = new app.flexygram.effects.ChatEdgeReflection();
+                if (compactVisualInset >= 0 && app.flexygram.effects.ChatEdgeStyle.hasCustomEdge()) {
+                    compactSendReflection = app.flexygram.effects.ChatEdgeStyle.updateReflection(compactSendReflection);
                     final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
                     compactSendReflection.draw(canvas, backgroundRect, radius, dark, backgroundPaint.getAlpha());
                 }

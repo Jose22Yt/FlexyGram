@@ -1689,9 +1689,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             drawable.draw(canvas);
             return;
         }
-        final boolean reflective = app.flexygram.effects.ChatEdgeStyle.isReflective();
-        if (reflective && nativeChatEdgeReflection == null) {
-            nativeChatEdgeReflection = new app.flexygram.effects.ChatEdgeReflection();
+        final boolean reflective = app.flexygram.effects.ChatEdgeStyle.hasCustomEdge();
+        if (reflective) {
+            nativeChatEdgeReflection = app.flexygram.effects.ChatEdgeStyle.updateReflection(nativeChatEdgeReflection);
         }
         drawable.drawWithChatEdge(canvas, reflective ? nativeChatEdgeReflection : null,
                 reflective && colors.isChatThemeDark());

@@ -345,6 +345,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     public void onResume() {
         super.onResume();
         if (getContext() != null) ensureKyantDock(getContext());
+        if (tabsView != null) tabsView.invalidate();
         if (kyantDockView != null) { kyantDockView.syncFromNative(); kyantDockView.backdropChanged(); }
         if (miniPlayer != null) {
             miniPlayer.update(true);

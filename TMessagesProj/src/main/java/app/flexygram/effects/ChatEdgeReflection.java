@@ -16,6 +16,12 @@ public final class ChatEdgeReflection {
     private static final int[] LIGHT = {
             0x240d2237, 0x70ffffff, 0x00ffffff, 0x000d2237, 0x190d2237, 0x3b0d2237
     };
+    private static final int[] SUBTLE_DARK = {
+            0x0bffffff, 0x05ffffff, 0x00ffffff, 0x00ffffff, 0x06ffffff, 0x11ffffff
+    };
+    private static final int[] SUBTLE_LIGHT = {
+            0xe8ffffff, 0x70ffffff, 0x00ffffff, 0x00474747, 0x07474747, 0x24474747
+    };
     private static final int[] DARK_SIDES = {0x00ffffff, 0x48ffffff, 0x48ffffff, 0x00ffffff};
     private static final int[] LIGHT_SIDES = {0x000d2237, 0x400d2237, 0x400d2237, 0x000d2237};
     private static final float[] SIDE_BANDS = {1f, .63f, .28f};
@@ -30,10 +36,23 @@ public final class ChatEdgeReflection {
     private final Paint sidePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Path localShape;
     private boolean darkTheme;
+    private boolean subtle;
     private int nextSlot;
 
     public ChatEdgeReflection() {
         sidePaint.setStyle(Paint.Style.STROKE);
+    }
+
+    public void setSubtle(boolean subtle) {
+        if (this.subtle == subtle) return;
+        this.subtle = subtle;
+        resetGradients();
+    }
+
+    private void resetGradients() {
+        java.util.Arrays.fill(shaders, null);
+        java.util.Arrays.fill(sideShaders, null);
+        nextSlot = 0;
     }
 
     public void draw(Canvas canvas, RectF bounds, float radius, boolean dark, int alpha) {
@@ -58,9 +77,7 @@ public final class ChatEdgeReflection {
         final float shaderHeight = Math.max(1f, Math.round(height * 16f) / 16f);
         if (darkTheme != dark) {
             darkTheme = dark;
-            java.util.Arrays.fill(shaders, null);
-            java.util.Arrays.fill(sideShaders, null);
-            nextSlot = 0;
+            resetGradients();
         }
         int slot = -1;
         for (int i = 0; i < shaders.length; i++) {
@@ -71,21 +88,28 @@ public final class ChatEdgeReflection {
         }
         if (slot < 0) {
             // Keep the falloff close to the edge even when the message field grows.
-            final float ramp = Math.min(.14f, AndroidUtilities.dpf2(5f) / shaderHeight);
-            stops[1] = ramp * .2f;
-            stops[2] = ramp;
-            stops[3] = 1f - ramp;
-            stops[4] = 1f - ramp * .26f;
+            final float ramp = Math.min(.14f, AndroidUtilities.dpf2(subtle ? 1.35f : 5f) / shaderHeight);
+            final boolean subtleLight = subtle && !dark;
+            // On light surfaces the white reflection fades inward, while the gray lower rim is narrower.
+            final float topRamp = subtleLight ? Math.min(.14f, AndroidUtilities.dpf2(2f) / shaderHeight) : ramp;
+            final float bottomRamp = subtleLight ? Math.min(.14f, AndroidUtilities.dpf2(1f) / shaderHeight) : ramp;
+            stops[1] = topRamp * .2f;
+            stops[2] = topRamp;
+            stops[3] = 1f - bottomRamp;
+            stops[4] = 1f - bottomRamp * .26f;
             slot = nextSlot;
             heights[slot] = shaderHeight;
-            shaders[slot] = new LinearGradient(0, 0, 0, shaderHeight, dark ? DARK : LIGHT, stops, Shader.TileMode.CLAMP);
-            // The side reflection takes over as the original highlights fall off.
-            sideStops[0] = ramp * .15f;
-            sideStops[1] = ramp * 2f;
-            sideStops[2] = 1f - sideStops[1];
-            sideStops[3] = 1f - sideStops[0];
-            sideShaders[slot] = new LinearGradient(0, 0, 0, shaderHeight, dark ? DARK_SIDES : LIGHT_SIDES,
-                    sideStops, Shader.TileMode.CLAMP);
+            final int[] colors = subtle ? (dark ? SUBTLE_DARK : SUBTLE_LIGHT) : (dark ? DARK : LIGHT);
+            shaders[slot] = new LinearGradient(0, 0, 0, shaderHeight, colors, stops, Shader.TileMode.CLAMP);
+            if (!subtle) {
+                // The side reflection takes over as the original highlights fall off.
+                sideStops[0] = ramp * .15f;
+                sideStops[1] = ramp * 2f;
+                sideStops[2] = 1f - sideStops[1];
+                sideStops[3] = 1f - sideStops[0];
+                sideShaders[slot] = new LinearGradient(0, 0, 0, shaderHeight, dark ? DARK_SIDES : LIGHT_SIDES,
+                        sideStops, Shader.TileMode.CLAMP);
+            }
             nextSlot = (nextSlot + 1) % shaders.length;
         }
 
@@ -95,12 +119,14 @@ public final class ChatEdgeReflection {
         final int save = canvas.save();
         if (shape != null) {
             canvas.clipPath(shape);
-            if (localShape == null) localShape = new Path();
-            shape.offset(0f, -top, localShape);
+            if (!subtle) {
+                if (localShape == null) localShape = new Path();
+                shape.offset(0f, -top, localShape);
+            }
         }
         canvas.translate(0, top);
         canvas.drawRoundRect(left, 0, right, height, r, r, paint);
-        drawSides(canvas, left, right, height, r, shape != null, sideShaders[slot], alpha);
+        if (!subtle) drawSides(canvas, left, right, height, r, shape != null, sideShaders[slot], alpha);
         canvas.restoreToCount(save);
     }
 

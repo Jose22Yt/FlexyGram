@@ -249,15 +249,17 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
             boolean dark) {
         setStrokeVisible(reflection == null);
         draw(canvas);
-        if (reflection != null) {
-            final Rect bounds = boundProps.boundsWithPadding;
-            if (boundProps.radiiAreSame) {
-                reflection.draw(canvas, bounds.left, bounds.top, bounds.right, bounds.bottom,
-                        boundProps.radii[0], dark, getAlpha());
-            } else {
-                reflection.drawClipped(canvas, bounds.left, bounds.top, bounds.right, bounds.bottom,
-                        boundProps.path, dark, getAlpha());
-            }
+        if (reflection != null) drawChatEdge(canvas, reflection, dark);
+    }
+
+    public final void drawChatEdge(Canvas canvas, app.flexygram.effects.ChatEdgeReflection reflection, boolean dark) {
+        final Rect bounds = boundProps.boundsWithPadding;
+        if (boundProps.radiiAreSame) {
+            reflection.draw(canvas, bounds.left, bounds.top, bounds.right, bounds.bottom,
+                    boundProps.radii[0], dark, getAlpha());
+        } else {
+            reflection.drawClipped(canvas, bounds.left, bounds.top, bounds.right, bounds.bottom,
+                    boundProps.path, dark, getAlpha());
         }
     }
 

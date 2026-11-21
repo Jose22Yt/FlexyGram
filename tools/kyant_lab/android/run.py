@@ -22,6 +22,10 @@ def main():
   target=out/'src/main'/kind/'app/flexygram/kyant'
   shutil.copytree(source/kind/'app/flexygram/kyant',target,dirs_exist_ok=True)
  (out/'src/main/java/app/flexygram/kyant/KyantDockSettingsActivity.java').unlink(missing_ok=True)
+ effects=out/'src/main/java/app/flexygram/effects'
+ effects.mkdir(parents=True,exist_ok=True)
+ for name in ['ChatEdgeReflection.java','ChatEdgeStyle.java']:
+  shutil.copyfile(source/'java/app/flexygram/effects'/name,effects/name)
  shutil.copytree(ROOT/'buildSrc/src',out/'buildSrc/src',dirs_exist_ok=True)
  shutil.copyfile(ROOT/'buildSrc/build.gradle.kts',out/'buildSrc/build.gradle.kts')
  shutil.copytree(Path(__file__).with_name('stubs'),out/'src/main/java',dirs_exist_ok=True)

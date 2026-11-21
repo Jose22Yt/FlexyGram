@@ -3,4 +3,5 @@
     <string name="FlexyChatEdgeStyle">Границы элементов чата</string>
     <string name="FlexyChatEdgeCurrent">Текущий контур</string>
     <string name="FlexyChatEdgeReflection">Световой блик</string>
+    <string name="FlexyChatEdgeSubtle">Мягкий контур</string>
 </resources>

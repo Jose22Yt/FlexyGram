@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import app.flexygram.effects.ChatEdgeStyle
 import app.flexygram.kyant.components.LiquidBottomTab
 import app.flexygram.kyant.components.LiquidBottomTabs
 import org.telegram.messenger.Utilities
@@ -52,6 +53,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     private var geometryRevision by mutableIntStateOf(0)
     private val geometry = KyantDockGeometry.State()
     private var available by mutableStateOf(false)
+    private var subtleEdge by mutableStateOf(false)
     private var ready = false
     private var framePending = false
     private var sourceDirty = false
@@ -101,6 +103,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     }
 
     fun syncFromNative() {
+        subtleEdge = ChatEdgeStyle.isSubtle()
         val wasRendering = isRendering()
         val wasAvailable = available
         visibleScratch.clear()
@@ -223,6 +226,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
                         },
                         backdrop = background,
                         tabsCount = tabs.size,
+                        subtleEdge = subtleEdge,
                         modifier = Modifier.fillMaxSize()
                     ) {
                         tabs.forEachIndexed { index, tab ->

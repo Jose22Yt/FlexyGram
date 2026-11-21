@@ -154,8 +154,8 @@ public class ChatInputViewsContainer extends FrameLayout {
     private boolean solidSurfaceDark;
 
     private ChatEdgeReflection selectedEdgeReflection() {
-        if (!ChatEdgeStyle.isReflective()) return null;
-        if (edgeReflection == null) edgeReflection = new ChatEdgeReflection();
+        if (!ChatEdgeStyle.hasCustomEdge()) return null;
+        edgeReflection = ChatEdgeStyle.updateReflection(edgeReflection);
         return edgeReflection;
     }
 
@@ -487,7 +487,7 @@ public class ChatInputViewsContainer extends FrameLayout {
             }
             tmpRectF.set(signatureChannelMiddle);if(!signatureChannelLeft.isEmpty())tmpRectF.union(signatureChannelLeft);if(!signatureChannelRight.isEmpty())tmpRectF.union(signatureChannelRight);
             tmpRectF.inset(-dp(7),-dp(7));tmpRectF.round(tmpRect);blurredBackgroundDrawable.setBounds(tmpRect);
-            blurredBackgroundDrawable.setStrokeVisible(!ChatEdgeStyle.isReflective());
+            blurredBackgroundDrawable.setStrokeVisible(!ChatEdgeStyle.hasCustomEdge());
             canvas.save();canvas.clipPath(signatureChannelMask);blurredBackgroundDrawable.draw(canvas);canvas.restore();
             flexySurface.setColor(ColorUtils.setAlphaComponent(app.flexygram.composer.ComposerStyle.surface(dark,false),(dark?80:60)*blurredBackgroundDrawable.getAlpha()/255));
         } else {
@@ -581,7 +581,7 @@ public class ChatInputViewsContainer extends FrameLayout {
                 flexyLastAttach.set(flexyAttach);
                 flexyLastHasAttach = attach;
             }
-            blurredBackgroundDrawable.setStrokeVisible(!ChatEdgeStyle.isReflective());
+            blurredBackgroundDrawable.setStrokeVisible(!ChatEdgeStyle.hasCustomEdge());
             canvas.save();
             canvas.clipPath(flexyMask);
             blurredBackgroundDrawable.draw(canvas);

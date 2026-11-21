@@ -45,11 +45,12 @@ public final class ChatEdgeSettingsSection extends SignatureMatteSettingsActivit
         if (position != styleRow || getParentActivity() == null) return;
         final String[] choices = {
                 LocaleController.getString(R.string.FlexyChatEdgeCurrent),
-                LocaleController.getString(R.string.FlexyChatEdgeReflection)
+                LocaleController.getString(R.string.FlexyChatEdgeReflection),
+                LocaleController.getString(R.string.FlexyChatEdgeSubtle)
         };
         showDialog(AlertsCreator.createSingleChoiceDialog(getParentActivity(), choices, getActionBarTitle(),
-                ChatEdgeStyle.isReflective() ? 1 : 0, (dialog, which) -> {
-                    ChatEdgeStyle.setReflective(which == 1);
+                ChatEdgeStyle.getSelected(), (dialog, which) -> {
+                    ChatEdgeStyle.setSelected(which);
                     if (listAdapter != null) listAdapter.notifyItemChanged(styleRow);
                 }));
     }
@@ -64,9 +65,13 @@ public final class ChatEdgeSettingsSection extends SignatureMatteSettingsActivit
 
             @Override
             public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
+                final int label = switch (ChatEdgeStyle.getSelected()) {
+                    case ChatEdgeStyle.REFLECTION -> R.string.FlexyChatEdgeReflection;
+                    case ChatEdgeStyle.SUBTLE -> R.string.FlexyChatEdgeSubtle;
+                    default -> R.string.FlexyChatEdgeCurrent;
+                };
                 ((TextSettingsCell) holder.itemView).setTextAndValue(getActionBarTitle(),
-                        LocaleController.getString(ChatEdgeStyle.isReflective()
-                                ? R.string.FlexyChatEdgeReflection : R.string.FlexyChatEdgeCurrent), false);
+                        LocaleController.getString(label), false);
             }
 
             @Override

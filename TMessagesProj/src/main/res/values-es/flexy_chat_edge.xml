@@ -3,4 +3,5 @@
     <string name="FlexyChatEdgeStyle">Borde de los controles</string>
     <string name="FlexyChatEdgeCurrent">Contorno actual</string>
     <string name="FlexyChatEdgeReflection">Reflejo de borde</string>
+    <string name="FlexyChatEdgeSubtle">Borde tenue</string>
 </resources>

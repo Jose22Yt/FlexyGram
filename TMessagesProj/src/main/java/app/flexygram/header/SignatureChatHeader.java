@@ -157,8 +157,8 @@ public final class SignatureChatHeader {
     private ChatEdgeReflection edgeReflection;
 
     public ChatEdgeReflection selectedEdgeReflection() {
-        if (!ChatEdgeStyle.isReflective()) return null;
-        if (edgeReflection == null) edgeReflection = new ChatEdgeReflection();
+        if (!ChatEdgeStyle.hasCustomEdge()) return null;
+        edgeReflection = ChatEdgeStyle.updateReflection(edgeReflection);
         return edgeReflection;
     }
 

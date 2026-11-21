@@ -28,7 +28,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -41,6 +43,7 @@ import com.kyant.backdrop.Backdrop
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberCombinedBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import app.flexygram.effects.ChatEdgeReflection
 import app.flexygram.kyant.utils.DampedDragAnimation
 import app.flexygram.kyant.utils.InteractiveHighlight
 import com.kyant.backdrop.drawBackdrop
@@ -61,6 +64,7 @@ fun LiquidBottomTabs(
     onTabSelected: (index: Int) -> Unit,
     backdrop: Backdrop,
     tabsCount: Int,
+    subtleEdge: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
@@ -73,6 +77,7 @@ fun LiquidBottomTabs(
         else Color(0xFF121212).copy(0.4f)
 
     val tabsBackdrop = rememberLayerBackdrop()
+    val edge = if (subtleEdge) remember { ChatEdgeReflection().apply { setSubtle(true) } } else null
 
     BoxWithConstraints(
         modifier,
@@ -166,6 +171,7 @@ fun LiquidBottomTabs(
                     backdrop = backdrop,
                     shape = { Capsule() },
                     shadow = null,
+                    highlight = if (subtleEdge) null else ({ Highlight.Default }),
                     effects = {
                         vibrancy()
                         blur(8f.dp.toPx())
@@ -177,7 +183,13 @@ fun LiquidBottomTabs(
                         scaleX = scale
                         scaleY = scale
                     },
-                    onDrawSurface = { drawRect(containerColor) }
+                    onDrawSurface = {
+                        drawRect(containerColor)
+                        if (edge != null) drawIntoCanvas {
+                            edge.draw(it.nativeCanvas, 0f, 0f, size.width, size.height,
+                                size.height / 2f, !isLightTheme, 255)
+                        }
+                    }
                 )
                 .then(interactiveHighlight.modifier)
                 .height(64f.dp)
@@ -213,10 +225,10 @@ fun LiquidBottomTabs(
                                 24f.dp.toPx() * progress
                             )
                         },
-                        highlight = {
+                        highlight = if (subtleEdge) null else ({
                             val progress = dampedDragAnimation.pressProgress
                             Highlight.Default.copy(alpha = progress)
-                        },
+                        }),
                         onDrawSurface = { drawRect(containerColor) }
                     )
                     .then(interactiveHighlight.modifier)
@@ -251,10 +263,10 @@ fun LiquidBottomTabs(
                             chromaticAberration = true
                         )
                     },
-                    highlight = {
+                    highlight = if (subtleEdge) null else ({
                         val progress = dampedDragAnimation.pressProgress
                         Highlight.Default.copy(alpha = progress)
-                    },
+                    }),
                     layerBlock = {
                         scaleX = dampedDragAnimation.scaleX
                         scaleY = dampedDragAnimation.scaleY
@@ -270,6 +282,10 @@ fun LiquidBottomTabs(
                             alpha = 1f - progress
                         )
                         drawRect(Color.Black.copy(alpha = 0.03f * progress))
+                        if (edge != null) drawIntoCanvas {
+                            edge.draw(it.nativeCanvas, 0f, 0f, size.width, size.height,
+                                size.height / 2f, !isLightTheme, 255)
+                        }
                     }
                 )
                 .height(56f.dp)

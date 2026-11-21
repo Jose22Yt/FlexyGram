@@ -29,6 +29,9 @@ import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.glass.GlassTabView;
 
 import app.exteraless.appearance.MainTabsUiHelper;
+import app.flexygram.effects.ChatEdgeReflection;
+import app.flexygram.effects.ChatEdgeStyle;
+import org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,17 +47,26 @@ import xyz.nextalone.nagram.NaConfig;
 public class MainTabsLayout extends AnimatedLinearLayout {
 
     private app.flexygram.kyant.KyantDockView kyantHost;
+    private ChatEdgeReflection subtleEdge;
     public void setKyantHost(app.flexygram.kyant.KyantDockView host) { kyantHost = host; invalidate(); }
     @Override public void onDescendantInvalidated(@NonNull View child, @NonNull View target) {
         super.onDescendantInvalidated(child, target);
         if (kyantHost != null) kyantHost.nativeIconsInvalidated();
     }
     @Override protected void onDraw(Canvas canvas) {
-        if (kyantHost == null || !kyantHost.isRendering()) super.onDraw(canvas);
+        super.onDraw(canvas);
+        if (ChatEdgeStyle.isSubtle() && getBackground() instanceof BlurredBackgroundDrawable background) {
+            subtleEdge = ChatEdgeStyle.updateReflection(subtleEdge);
+            background.drawChatEdge(canvas, subtleEdge, Theme.isCurrentThemeDark());
+        }
     }
     @Override public void draw(Canvas canvas) {
         // View.draw paints backgrounds before onDraw: skip that old layer as well as its controls.
-        if (kyantHost == null || !kyantHost.isRendering()) super.draw(canvas);
+        if (kyantHost != null && kyantHost.isRendering()) return;
+        if (getBackground() instanceof BlurredBackgroundDrawable background) {
+            background.setStrokeVisible(!ChatEdgeStyle.isSubtle());
+        }
+        super.draw(canvas);
     }
 
     public static final int BOTTOM_NAVIGATION_MODE_SHOW = 0;

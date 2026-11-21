@@ -3,4 +3,5 @@
     <string name="FlexyChatEdgeStyle">Chat control edges</string>
     <string name="FlexyChatEdgeCurrent">Current outline</string>
     <string name="FlexyChatEdgeReflection">Edge reflection</string>
+    <string name="FlexyChatEdgeSubtle">Subtle edge</string>
 </resources>
