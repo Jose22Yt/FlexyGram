@@ -9,6 +9,8 @@ def test_reflection_is_transparent_in_the_middle_and_reuses_gradients(tmp_path):
 public class Canvas {
  public int draws, depth, bands, clips, paths; public float top, radius, left, thickness;
  public Paint paint, edge;
+ public boolean hardware;
+ public boolean isHardwareAccelerated(){return hardware;}
  public int save(){ return ++depth; }
  public void translate(float x, float y){ top=y; }
  public void restoreToCount(int id){ depth=id-1; }
@@ -48,6 +50,15 @@ public class Paint {
 public class Path {
  public float offsetY;
  public void offset(float x,float y,Path destination){destination.offsetY=y;}
+}''',
+        'android/os/Build.java': 'package android.os; public class Build { public static class VERSION { public static int SDK_INT=33; } }',
+        'androidx/annotation/RequiresApi.java': 'package androidx.annotation; public @interface RequiresApi { int value(); }',
+        'android/graphics/RuntimeShader.java': '''package android.graphics;
+public class RuntimeShader extends Shader {
+ public static int creations; public int updates; public float width,height,radius;
+ public RuntimeShader(String source){creations++;}
+ public void setFloatUniform(String name,float value){updates++;if(name.equals("radius"))radius=value;}
+ public void setFloatUniform(String name,float first,float second){updates++;width=first;height=second;}
 }''',
         'android/graphics/Shader.java': 'package android.graphics; public class Shader { public enum TileMode { CLAMP } }',
         'android/graphics/LinearGradient.java': '''package android.graphics;
@@ -109,6 +120,18 @@ public class Probe {
   check((1-subtleLight.stops[3])*subtleLight.height>1.9f && (1-subtleLight.stops[3])*subtleLight.height<2.1f);
   reflection.draw(canvas,0,20,200,320,40,false,255);
   check(canvas.paint.getShader()==subtleLight);
+  canvas.hardware=true;
+  reflection.draw(canvas,10,20,410,100,40,true,150);
+  RuntimeShader curved=(RuntimeShader)canvas.paint.getShader();
+  check(curved.width==400 && curved.height==80 && curved.radius==40 && canvas.paint.getAlpha()==150);
+  int updates=curved.updates;
+  reflection.draw(canvas,11,21,411,101,40,true,150);
+  check(curved==canvas.paint.getShader() && curved.updates==updates && RuntimeShader.creations==1);
+  reflection.draw(canvas,0,0,45,45,40,false,255);
+  check(curved.radius==22.5f && curved.width==45 && canvas.depth==0);
+  android.os.Build.VERSION.SDK_INT=32;
+  reflection.draw(canvas,0,0,45,45,22.5f,true,255);
+  check(canvas.paint.getShader() instanceof LinearGradient && RuntimeShader.creations==1);
   reflection.setSubtle(false);
   reflection.draw(canvas,0,20,420,100,40,true,255);
   check(canvas.bands==6006 && java.util.Arrays.equals(((LinearGradient)canvas.paint.getShader()).colors,dark.colors));

@@ -5,7 +5,11 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.graphics.RuntimeShader;
 import android.graphics.Shader;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 import org.telegram.messenger.AndroidUtilities;
 
 /** A perimeter reflection with stronger highlights at the top and bottom. */
@@ -35,6 +39,7 @@ public final class ChatEdgeReflection {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint sidePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Path localShape;
+    private CurvedEdge curvedEdge;
     private boolean darkTheme;
     private boolean subtle;
     private int nextSlot;
@@ -73,6 +78,12 @@ public final class ChatEdgeReflection {
             float radius, Path shape, boolean dark, int alpha) {
         final float height = bottom - top;
         if (height <= 0 || right <= left || alpha == 0) return;
+        final float r = Math.min(radius, Math.min(height, right - left) * .5f);
+        if (subtle && shape == null && Build.VERSION.SDK_INT >= 33 && canvas.isHardwareAccelerated()) {
+            if (curvedEdge == null) curvedEdge = new CurvedEdge();
+            curvedEdge.draw(canvas, left, top, right - left, height, r, dark, alpha);
+            return;
+        }
         // View translations can introduce insignificant float differences in the height.
         final float shaderHeight = Math.max(1f, Math.round(height * 16f) / 16f);
         if (darkTheme != dark) {
@@ -114,7 +125,6 @@ public final class ChatEdgeReflection {
 
         if (paint.getShader() != shaders[slot]) paint.setShader(shaders[slot]);
         if (paint.getAlpha() != alpha) paint.setAlpha(alpha);
-        final float r = Math.min(radius, Math.min(height, right - left) * .5f);
         final int save = canvas.save();
         if (shape != null) {
             canvas.clipPath(shape);
@@ -127,6 +137,68 @@ public final class ChatEdgeReflection {
         canvas.drawRoundRect(left, 0, right, height, r, r, paint);
         if (!subtle) drawSides(canvas, left, right, height, r, shape != null, sideShaders[slot], alpha);
         canvas.restoreToCount(save);
+    }
+
+    @RequiresApi(33)
+    private static final class CurvedEdge {
+        private static final String EFFECT = """
+                uniform float2 size;
+                uniform float radius;
+                uniform float density;
+                uniform float dark;
+
+                half4 main(float2 position) {
+                    float2 centered = position - 0.5 * size;
+                    float2 q = abs(centered) - (0.5 * size - radius);
+                    float2 arc = max(q, float2(0.0));
+                    float arcLength = length(arc);
+                    float distance = arcLength + min(max(q.x, q.y), 0.0) - radius;
+                    float vertical = arcLength > 0.0 ? arc.y / arcLength : step(q.x, q.y);
+                    float direction = smoothstep(0.05, 0.95, vertical);
+                    bool upper = centered.y < 0.0;
+                    float depth = min(0.14 * size.y, density *
+                            (dark > 0.5 ? (upper ? 3.7 : 4.2) : (upper ? 2.0 : 1.0)));
+                    float fade = 1.0 - smoothstep(0.0, depth, max(0.0, -distance));
+                    float strength = dark > 0.5 ? (upper ? 0.24 : 0.29) : (upper ? 0.90 : 0.14);
+                    float opacity = strength * fade * fade * direction * direction;
+                    float tone = dark > 0.5 || upper ? 1.0 : 0.2784;
+                    return half4(half3(tone * opacity), half(opacity));
+                }
+                """;
+
+        private final RuntimeShader shader = new RuntimeShader(EFFECT);
+        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private float width, height, radius = -1f, density;
+        private boolean dark;
+
+        CurvedEdge() {
+            paint.setShader(shader);
+        }
+
+        void draw(Canvas canvas, float left, float top, float width, float height, float radius,
+                boolean dark, int alpha) {
+            if (this.width != width || this.height != height) {
+                shader.setFloatUniform("size", width, height);
+                this.width = width;
+                this.height = height;
+            }
+            if (this.radius != radius) {
+                shader.setFloatUniform("radius", radius);
+                this.radius = radius;
+            }
+            final float density = AndroidUtilities.dpf2(1f);
+            if (this.density != density || this.dark != dark) {
+                shader.setFloatUniform("density", density);
+                shader.setFloatUniform("dark", dark ? 1f : 0f);
+                this.density = density;
+                this.dark = dark;
+            }
+            if (paint.getAlpha() != alpha) paint.setAlpha(alpha);
+            final int save = canvas.save();
+            canvas.translate(left, top);
+            canvas.drawRoundRect(0f, 0f, width, height, radius, radius, paint);
+            canvas.restoreToCount(save);
+        }
     }
 
     private void drawSides(Canvas canvas, float left, float right, float height, float radius,
