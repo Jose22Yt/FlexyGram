@@ -528,6 +528,14 @@ public class DownscaleScrollableNoiseSuppressor {
     private final ArrayList<SourcePart> rectRenderNodes = new ArrayList<>();
     private int rectRenderNodesCount;
 
+    public void clearCapture() {
+        rectRenderNodesCount = 0;
+        rectRenderNodes.clear();
+        if (sharedCapture != null) sharedCapture.discardDisplayList();
+        sharedCapture = null;
+        for (RenderNode node : resultRenderNodes) node.discardDisplayList();
+    }
+
     public int getRenderNodesCount() {
         return rectRenderNodesCount;
     }

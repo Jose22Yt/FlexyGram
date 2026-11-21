@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.PowerManager;
+import android.os.SystemClock;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.math.MathUtils;
@@ -90,7 +92,7 @@ public class LiteMode {
     private static int BATTERY_HIGH = 10;
 
     private static int powerSaverLevel;
-    private static boolean lastPowerSaverApplied;
+    private static volatile boolean lastPowerSaverApplied;
 
     private static int value;
     private static boolean loaded;
@@ -103,31 +105,36 @@ public class LiteMode {
         if (!loaded) {
             loadPreference();
         }
-        if (!ignorePowerSaving && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (getBatteryLevel() <= powerSaverLevel && powerSaverLevel > 0) {
-                if (!lastPowerSaverApplied) {
-                    onPowerSaverApplied(lastPowerSaverApplied = true);
-                }
-                return PRESET_POWER_SAVER;
-            }
-            if (lastPowerSaverApplied) {
-                onPowerSaverApplied(lastPowerSaverApplied = false);
-            }
+        if (ignorePowerSaving || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return value;
+        final boolean powerSaver = systemPowerSaver
+                || powerSaverLevel > 0 && isBatteryBelowThreshold(getBatteryLevel(), powerSaverLevel);
+        if (lastPowerSaverApplied != powerSaver) {
+            lastPowerSaverApplied = powerSaver;
+            onPowerSaverApplied(powerSaver);
         }
-        return value;
+        return powerSaver ? PRESET_POWER_SAVER : value;
     }
 
-    private static int lastBatteryLevelCached = -1;
-    private static long lastBatteryLevelChecked;
+    private static boolean isBatteryBelowThreshold(int level, int threshold) {
+        return level >= 0 && level <= threshold;
+    }
+
+    private static volatile boolean systemPowerSaver;
+    private static volatile int lastBatteryLevelCached = -1;
+    private static volatile long lastBatteryLevelChecked = -12_000L;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static int getBatteryLevel() {
-        long time = 0;
-        if (lastBatteryLevelCached < 0 || (time = System.currentTimeMillis()) - lastBatteryLevelChecked > 1000 * 12) {
-            BatteryManager batteryManager = (BatteryManager) ApplicationLoader.applicationContext.getSystemService(Context.BATTERY_SERVICE);
-            if (batteryManager != null) {
-                lastBatteryLevelCached = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-                lastBatteryLevelChecked = time;
+        final long now = SystemClock.elapsedRealtime();
+        if (now - lastBatteryLevelChecked >= 12_000L) {
+            final Context context = ApplicationLoader.applicationContext;
+            if (context != null) {
+                lastBatteryLevelChecked = now;
+                final BatteryManager batteryManager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
+                if (batteryManager != null) {
+                    final int level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+                    if (level >= 0 && level <= 100) lastBatteryLevelCached = level;
+                }
             }
         }
         return lastBatteryLevelCached;
@@ -159,7 +166,7 @@ public class LiteMode {
     }
 
     public static void toggleFlag(int flag) {
-        toggleFlag(flag, !isEnabled(flag));
+        toggleFlag(flag, !isEnabledSetting(flag));
     }
 
     public static void toggleFlag(int flag, boolean enabled) {
@@ -171,7 +178,7 @@ public class LiteMode {
         value = flags;
         savePreference();
         if (previous != flags) {
-            onFlagsUpdate(previous, flags);
+            if (!lastPowerSaverApplied) onFlagsUpdate(previous, flags);
             // Retained native surfaces must see explicit switches as well as battery transitions.
             dispatchPowerPolicyListeners(lastPowerSaverApplied);
         }
@@ -342,15 +349,13 @@ public class LiteMode {
     }
 
     private static void onFlagsUpdate(int oldValue, int newValue) {
-        int changedFlags = ~oldValue & newValue;
-        if ((changedFlags & FLAGS_ANIMATED_EMOJI) > 0) {
-            AnimatedEmojiDrawable.updateAll();
+        final int changedFlags = oldValue ^ newValue;
+        if ((changedFlags & FLAGS_ANIMATED_EMOJI) != 0) {
+            AndroidUtilities.runOnUIThread(AnimatedEmojiDrawable::updateAll);
         }
-        if ((changedFlags & FLAG_CHAT_BACKGROUND) > 0) {
+        if ((changedFlags & FLAG_CHAT_BACKGROUND) != 0) {
             SvgHelper.SvgDrawable.updateLiteValues();
-        }
-        if ((changedFlags & FLAG_CHAT_BACKGROUND) > 0) {
-            Theme.reloadWallpaper(true);
+            if ((newValue & FLAG_CHAT_BACKGROUND) != 0) Theme.reloadWallpaper(true);
         }
     }
 
@@ -369,15 +374,25 @@ public class LiteMode {
     }
 
     public static class BatteryReceiver extends BroadcastReceiver {
+        private boolean initialized;
+
         @Override
         public void onReceive(Context context, Intent intent) {
+            final boolean powerModeChanged = PowerManager.ACTION_POWER_SAVE_MODE_CHANGED.equals(intent.getAction());
+            if (!initialized || powerModeChanged) {
+                initialized = true;
+                final PowerManager power = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+                systemPowerSaver = power != null && power.isPowerSaveMode();
+            }
+            if (powerModeChanged) {
+                getValue();
+                return;
+            }
             final int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
             final int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-            if (level >= 0 && scale > 0) {
+            if (level >= 0 && scale > 0 && level <= scale) {
+                lastBatteryLevelChecked = SystemClock.elapsedRealtime();
                 lastBatteryLevelCached = level * 100 / scale;
-                lastBatteryLevelChecked = System.currentTimeMillis();
-            } else {
-                lastBatteryLevelChecked = 0;
             }
             getValue();
         }

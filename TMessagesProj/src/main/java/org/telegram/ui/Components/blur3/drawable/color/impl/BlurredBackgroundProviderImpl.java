@@ -343,19 +343,9 @@ public class BlurredBackgroundProviderImpl {
     }
 
     public static boolean checkBlurEnabled(int currentAccount, Theme.ResourcesProvider resourcesProvider) {
-        final boolean isDark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
-        final boolean isLight = !isDark;
-        boolean blurEnabled = SharedConfig.chatBlurEnabled();
-        if (blurEnabled && isLight) {
-            if (MessagesController.getInstance(currentAccount).config.disableBlurInLightTheme.get()) {
-                blurEnabled = false;
-            }
-        }
-        if (blurEnabled && isDark) {
-            if (MessagesController.getInstance(currentAccount).config.disableBlurInDarkTheme.get()) {
-                blurEnabled = false;
-            }
-        }
-        return blurEnabled;
+        if (!SharedConfig.chatBlurEnabled()) return false;
+        final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
+        final MessagesController controller = MessagesController.getInstance(currentAccount);
+        return !(dark ? controller.config.disableBlurInDarkTheme.get() : controller.config.disableBlurInLightTheme.get());
     }
 }

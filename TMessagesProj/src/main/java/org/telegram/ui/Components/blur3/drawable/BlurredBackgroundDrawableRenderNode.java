@@ -68,6 +68,7 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
         return super.setClipToOutline(clipToOutline);
     }
 
+    private boolean liquidGlassAllowed;
     private LiquidGlassEffect liquidGlassEffect;
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
@@ -78,10 +79,9 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
     /** Policy changes reuse this native drawable; an OFF transition must clear the old GPU effect. */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     public void setLiquidGlassEffectAllowed(boolean allowed) {
-        if (allowed == (liquidGlassEffect != null)) return;
-        if (allowed) {
-            liquidGlassEffect = new LiquidGlassEffect(renderNodeFill);
-        } else {
+        if (liquidGlassAllowed == allowed) return;
+        liquidGlassAllowed = allowed;
+        if (!allowed && liquidGlassEffect != null) {
             liquidGlassEffect = null;
             renderNodeFill.setRenderEffect(null);
         }
@@ -125,7 +125,7 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
     @Override
     protected void onSourceOffsetChange(float sourceOffsetX, float sourceOffsetY) {
         super.onSourceOffsetChange(sourceOffsetX, sourceOffsetY);
-        renderNodeInvalidated = true;
+        if (samplesBackdrop()) renderNodeInvalidated = true;
     }
 
     @Override
@@ -155,7 +155,8 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
             c = renderNodeFill.beginRecording();
             c.save();
             c.translate(-sL, -sT);
-            if (liquidGlassEffect != null && Build.VERSION.SDK_INT >= 33) {
+            if (liquidGlassAllowed && Build.VERSION.SDK_INT >= 33) {
+                if (liquidGlassEffect == null) liquidGlassEffect = new LiquidGlassEffect(renderNodeFill);
                 final int thickness = Math.max(Math.min(
                     boundProps.liquidThickness <= 0 ? dp(11) : boundProps.liquidThickness,
                     Math.min(boundProps.boundsWithPadding.width(), boundProps.boundsWithPadding.height()) / 5), 1);
@@ -206,10 +207,13 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
 
     @Override
     public void updateColors() {
+        final int oldBackground = backgroundColor;
+        final int oldStrokeTop = strokeColorTop, oldStrokeBottom = strokeColorBottom, oldStrokeFull = strokeColorFull;
         final boolean sampledBackdrop = samplesBackdrop();
         super.updateColors();
-        if (sampledBackdrop != samplesBackdrop() && renderNode.hasDisplayList()) {
-            source.dispatchOnDrawablesRelativePositionChange();
+        if (sampledBackdrop != samplesBackdrop()) {
+            if (sampledBackdrop) renderNodeFill.discardDisplayList();
+            if (renderNode.hasDisplayList()) source.dispatchOnDrawablesRelativePositionChange();
         }
 
         updateShadowLayer(shadowColor);
@@ -220,7 +224,8 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
             paintStrokeBottom.setColor(strokeColorBottom);
         }
 
-        renderNodeInvalidated = true;
+        renderNodeInvalidated |= oldBackground != backgroundColor || oldStrokeTop != strokeColorTop
+                || oldStrokeBottom != strokeColorBottom || oldStrokeFull != strokeColorFull;
     }
 
     @Override

@@ -71,6 +71,7 @@ import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.GenericProvider;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.LiteMode;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
@@ -2726,7 +2727,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
     public void onScrolled(int dx, int dy) {
         super.onScrolled(dx, dy);
         if (!directionalScrollEdgeSupported || dy == 0 || getScrollState() == SCROLL_STATE_IDLE
-                || !DirectionalScrollSettings.enabled()) return;
+                || !DirectionalScrollSettings.enabled() || LiteMode.isPowerSaverApplied()) return;
         final int previousEdge = scrollEdgeMotion == null ? DirectionalScrollEdge.NONE : scrollEdgeMotion.edge();
         if (previousEdge == DirectionalScrollEdge.NONE && (!SharedConfig.animationsEnabled()
                 || AndroidUtilities.isAccessibilityScreenReaderEnabled())) return;
@@ -2767,6 +2768,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
     private void prepareDirectionalScrollEdge() {
         drawingScrollEdge = DirectionalScrollEdge.NONE;
         if (!DirectionalScrollSettings.enabled() || !SharedConfig.animationsEnabled()
+                || LiteMode.isPowerSaverApplied()
                 || AndroidUtilities.isAccessibilityScreenReaderEnabled() || !canDrawDirectionalScrollEdge()) {
             clearDirectionalScrollEdge();
             return;

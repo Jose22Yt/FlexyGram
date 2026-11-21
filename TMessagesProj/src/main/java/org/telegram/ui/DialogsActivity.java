@@ -3255,6 +3255,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         chatOpenGeneration++;
         LiteMode.removeOnPowerSaverAppliedListener(nativeGlassPowerListener);
         super.onFragmentDestroy();
+        if (scrollableViewNoiseSuppressor != null) scrollableViewNoiseSuppressor.clearCapture();
         if (observersGroup != null) {
             observersGroup.removeAllObservers();
             observersGroup = null;
@@ -15062,6 +15063,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         appliedGlassPolicyInitialized = true;
         appliedLiquidGlassPolicy = liquid;
         appliedBlurPolicy = blur;
+        if (LiteMode.isPowerSaverApplied()) historyWarmup.cancel();
+        if (scrollableViewNoiseSuppressor != null) scrollableViewNoiseSuppressor.clearCapture();
         if (Build.VERSION.SDK_INT >= 31 && scrollableViewNoiseSuppressor != null
                 && scrollableViewNoiseSuppressor.isLiquidGlassEnabled != liquid) {
             // The source callbacks read this field; existing tab/search drawables keep their source.

@@ -506,7 +506,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         ApplicationLoader.postInitApplication(true);
         AndroidUtilities.checkDisplaySize(this, getResources().getConfiguration());
         currentAccount = UserConfig.selectedAccount;
-        registerReceiver(batteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        final IntentFilter powerFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        powerFilter.addAction(android.os.PowerManager.ACTION_POWER_SAVE_MODE_CHANGED);
+        registerReceiver(batteryReceiver, powerFilter);
         if (!UserConfig.getInstance(currentAccount).isClientActivated()) {
             Intent intent = getIntent();
             boolean isProxy = false;

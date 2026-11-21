@@ -54,6 +54,7 @@ public class Probe {
   static final int DRAW_GLASS=0,DRAW_FROSTED_GLASS=1;static int builds;
   final boolean isLiquidGlassEnabled=LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
   DownscaleScrollableNoiseSuppressor(){builds++;}
+  void clearCapture(){}
  }
  static class Source {int updates;void setScrollableNoiseSuppressor(DownscaleScrollableNoiseSuppressor s,int index){updates++;}}
  static class Factory {boolean liquid;int changes;void setLiquidGlassEffectAllowed(boolean b){liquid=b;changes++;}}

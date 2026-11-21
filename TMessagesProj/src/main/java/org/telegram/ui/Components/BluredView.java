@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.view.View;
 
+import org.telegram.messenger.LiteMode;
 import org.telegram.ui.ActionBar.Theme;
 
 public class BluredView extends View {
@@ -19,13 +20,17 @@ public class BluredView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (LiteMode.isPowerSaverApplied()) {
+            canvas.drawColor(0x40000000);
+            return;
+        }
         drawable.draw(canvas);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        drawable.checkSizes();
+        if (!LiteMode.isPowerSaverApplied()) drawable.checkSizes();
     }
 
     public void update() {
@@ -33,6 +38,6 @@ public class BluredView extends View {
     }
 
     public boolean fullyDrawing() {
-        return drawable.isFullyDrawing() && getVisibility() == View.VISIBLE;
+        return getVisibility() == View.VISIBLE && !LiteMode.isPowerSaverApplied() && drawable.isFullyDrawing();
     }
 }

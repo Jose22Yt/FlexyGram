@@ -309,6 +309,7 @@ import org.telegram.ui.Components.Reactions.ReactionsEffectOverlay;
 import org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble;
 import org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory;
 import org.telegram.ui.Components.blur3.DownscaleScrollableNoiseSuppressor;
+import org.telegram.ui.Components.blur3.capture.IBlur3Capture;
 import org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable;
 import org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProviderThemed;
 import org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl;
@@ -560,14 +561,15 @@ public class ChatActivity extends BaseFragment implements
         signatureLiquidGlassAllowed = liquidPolicy;
         // The native suppressor snapshots Liquid Glass in its constructor. Refresh only on a
         // policy transition, otherwise a source created with Glass off remains frosted forever.
+        if (scrollableViewNoiseSuppressor != null) scrollableViewNoiseSuppressor.clearCapture();
         if (scrollableViewNoiseSuppressor != null && scrollableViewNoiseSuppressor.isLiquidGlassEnabled != liquidPolicy) {
             scrollableViewNoiseSuppressor = new DownscaleScrollableNoiseSuppressor();
             if (glassBackgroundSourceRenderNode != null) glassBackgroundSourceRenderNode.setScrollableNoiseSuppressor(
                     scrollableViewNoiseSuppressor, DownscaleScrollableNoiseSuppressor.DRAW_GLASS);
             if (glassBackgroundSourceFrostedRenderNode != null) glassBackgroundSourceFrostedRenderNode.setScrollableNoiseSuppressor(
                     scrollableViewNoiseSuppressor, DownscaleScrollableNoiseSuppressor.DRAW_FROSTED_GLASS);
-            if (contentView != null) invalidateMergedVisibleBlurredPositionsAndSourcesPositions();
         }
+        if (allowed && contentView != null) invalidateMergedVisibleBlurredPositionsAndSourcesPositions();
         glassBackgroundDrawableFactory.setLiquidGlassEffectAllowed(liquidPolicy);
         glassBackgroundDrawableFactoryFrosted.setLiquidGlassEffectAllowed(liquidPolicy);
         if (actionBar!=null) actionBar.updateSignatureNativeGlassPolicy(liquidPolicy);
@@ -3087,7 +3089,7 @@ public class ChatActivity extends BaseFragment implements
             glassBackgroundSourceFrostedRenderNode.setUnderSource(navbarContentSourceWallpaper);
 
             glassBackgroundDrawableFactoryFrosted = new BlurredBackgroundDrawableViewFactory(glassBackgroundSourceFrostedRenderNode);
-            glassBackgroundDrawableFactoryFrosted.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
+            glassBackgroundDrawableFactoryFrosted.setLiquidGlassEffectAllowed(signatureLiquidGlassAllowed);
 
             { // Retain the native source for runtime policy changes; no recording while unused.
                 glassBackgroundSourceRenderNode = new BlurredBackgroundSourceRenderNode(navbarContentSourceWallpaper);
@@ -3095,7 +3097,7 @@ public class ChatActivity extends BaseFragment implements
                 glassBackgroundSourceRenderNode.setScrollableNoiseSuppressor(scrollableViewNoiseSuppressor, DownscaleScrollableNoiseSuppressor.DRAW_GLASS);
                 glassBackgroundSourceRenderNode.setUnderSource(navbarContentSourceWallpaper);
                 glassBackgroundDrawableFactory = new BlurredBackgroundDrawableViewFactory(glassBackgroundSourceRenderNode);
-                glassBackgroundDrawableFactory.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
+                glassBackgroundDrawableFactory.setLiquidGlassEffectAllowed(signatureLiquidGlassAllowed);
             }
         } else {
             scrollableViewNoiseSuppressor = null;
@@ -3890,6 +3892,7 @@ public class ChatActivity extends BaseFragment implements
         app.flexygram.studio.FlexyStyleInstallHelper.cancel(this);
         app.exteraless.plugins.menus.MenuInjector.releaseMessageMenu(this);
         super.onFragmentDestroy();
+        if (scrollableViewNoiseSuppressor != null) scrollableViewNoiseSuppressor.clearCapture();
         releaseFinishedChatRecycler();
         AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
         cancelScrollHintChecks();
@@ -19026,6 +19029,8 @@ public class ChatActivity extends BaseFragment implements
             return true;
         }
 
+        private final IBlur3Capture listBlurCapture = this::drawListImpl;
+
         private void drawListImpl(Canvas blurCanvas, RectF position) {
             final long drawingTime = SystemClock.uptimeMillis();
 
@@ -19082,7 +19087,7 @@ public class ChatActivity extends BaseFragment implements
                 blurCanvas.drawColor(Theme.multAlpha(getThemedColor(Theme.key_windowBackgroundWhite), searchListVisibilityFactor * 0.85f));
             }
 
-            Blur3Utils.captureRelativeParent(this::drawListImpl, blurCanvas, position, chatListView, parent, chatListAlpha);
+            Blur3Utils.captureRelativeParent(listBlurCapture, blurCanvas, position, chatListView, parent, chatListAlpha);
 
             if (messagesSearchListView != null) {
                 Blur3Utils.captureRelativeParent(messagesSearchListView, blurCanvas, position, messagesSearchListView, parent, searchListAlpha);
@@ -53042,9 +53047,11 @@ public class ChatActivity extends BaseFragment implements
             return;
         }
 
-        invalidateBlurredSourcesView.invalidate(flags);
+        if (!signatureNativeGlassAllowed) flags &= BLUR_INVALIDATE_FLAG_CLIP;
+        if (flags != 0 && invalidateBlurredSourcesView != null) invalidateBlurredSourcesView.invalidate(flags);
     }
 
+    private final IBlur3Capture chatBlurCapture = (canvas, bounds) -> contentView.drawList(canvas, bounds);
     private final ArrayList<RectF> glassDrawablesPositions = new ArrayList<>();
     private final ArrayList<RectF> glassDrawablesPositionsMerged = new ArrayList<>();
     private int glassDrawablesPositionsCount;
@@ -53058,13 +53065,15 @@ public class ChatActivity extends BaseFragment implements
             invalidateClipRectForBackgroundAndChatList();
         }
 
+        if (!signatureNativeGlassAllowed || contentView == null || chatListView == null) return;
+
         if (BitwiseUtils.hasFlag(flags, BLUR_INVALIDATE_FLAG_POSITIONS)) {
             glassDrawablesPositionsCount = getMergedVisibleBlurredPositions(glassDrawablesPositionsMerged);
             scrollableViewNoiseSuppressor.setupRenderNodes(glassDrawablesPositionsMerged, glassDrawablesPositionsCount);
         }
 
-        //if (BitwiseUtils.hasFlag(flags, BLUR_INVALIDATE_FLAG_POSITIONS | BLUR_INVALIDATE_FLAG_SCROLL)) {
-        final boolean hasChanges = scrollableViewNoiseSuppressor.invalidateResultRenderNodes(contentView::drawList, contentView.getWidth(), contentView.getHeight());
+        final boolean hasChanges = scrollableViewNoiseSuppressor.invalidateResultRenderNodes(
+                chatBlurCapture, contentView.getWidth(), contentView.getHeight());
         if (hasChanges) {
             if (glassBackgroundSourceRenderNode != null) {
                 glassBackgroundSourceRenderNode.invalidateDisplayListForDrawables();
@@ -53080,8 +53089,6 @@ public class ChatActivity extends BaseFragment implements
                 glassSourceInvalidationCallback.run();
             }
         }
-
-        //}
     }
 
     private int getMergedVisibleBlurredPositions(List<RectF> positions) {

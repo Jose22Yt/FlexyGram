@@ -149,15 +149,20 @@ public final class ChatEdgeReflection {
 
                 half4 main(float2 position) {
                     float2 centered = position - 0.5 * size;
+                    bool upper = centered.y < 0.0;
+                    float depth = min(0.14 * size.y, density *
+                            (dark > 0.5 ? (upper ? 3.7 : 4.2) : (upper ? 2.0 : 1.0)));
+                    float fromHorizontalEdge = 0.5 * size.y - abs(centered.y);
+                    // A point in the straight span cannot receive light from the curved caps.
+                    if (abs(centered.x) <= 0.5 * size.x - radius && fromHorizontalEdge >= depth) {
+                        return half4(0.0);
+                    }
                     float2 q = abs(centered) - (0.5 * size - radius);
                     float2 arc = max(q, float2(0.0));
                     float arcLength = length(arc);
                     float distance = arcLength + min(max(q.x, q.y), 0.0) - radius;
                     float vertical = arcLength > 0.0 ? arc.y / arcLength : step(q.x, q.y);
                     float direction = smoothstep(0.05, 0.95, vertical);
-                    bool upper = centered.y < 0.0;
-                    float depth = min(0.14 * size.y, density *
-                            (dark > 0.5 ? (upper ? 3.7 : 4.2) : (upper ? 2.0 : 1.0)));
                     float fade = 1.0 - smoothstep(0.0, depth, max(0.0, -distance));
                     float strength = dark > 0.5 ? (upper ? 0.24 : 0.29) : (upper ? 0.90 : 0.14);
                     float opacity = strength * fade * fade * direction * direction;

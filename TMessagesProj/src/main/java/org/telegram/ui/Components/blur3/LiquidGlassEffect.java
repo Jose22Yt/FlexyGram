@@ -20,12 +20,10 @@ public class LiquidGlassEffect {
 
     private final RenderNode node;
     private final RuntimeShader shader;
-    private RenderEffect effect;
 
     public LiquidGlassEffect(RenderNode node) {
         this.node = node;
         shader = new RuntimeShader(ShaderSource.CODE);
-        node.setRenderEffect(effect = RenderEffect.createRuntimeShaderEffect(shader, "img"));
     }
 
     private float resolutionX, resolutionY;
@@ -99,7 +97,7 @@ public class LiquidGlassEffect {
             shader.setFloatUniform("refract_intensity", this.intensity = intensity);
             shader.setFloatUniform("refract_index", this.index = index);
             shader.setFloatUniform("foreground_color_premultiplied", r, g, b, a);
-            node.setRenderEffect(effect = RenderEffect.createRuntimeShaderEffect(shader, "img"));
+            node.setRenderEffect(RenderEffect.createRuntimeShaderEffect(shader, "img"));
         }
     }
 

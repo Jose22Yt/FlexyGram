@@ -203,16 +203,16 @@ def test_opaque_native_material_skips_backdrop_recording_and_transparency_restor
  static class Rect {int left,top,right=200,bottom=60;int width(){return right-left;}int height(){return bottom-top;}}
  static class Props {Rect boundsWithPadding=new Rect();int liquidThickness;float liquidIntensity,liquidIndex,strokeWidthTop,strokeWidthBottom;float[]radii=new float[8],shaderRadii=new float[8];boolean useFullStroke;Object strokePathTop;}
  static class Source {int draws;void draw(Canvas c,float a,float b,float d,float e){draws++;}}
- static class Liquid {int updates;void update(Object...args){updates++;}}
- float sourceOffsetX,sourceOffsetY;Props boundProps=new Props();Node renderNode=new Node(),renderNodeFill=new Node();Source source=new Source();Liquid liquidGlassEffect=new Liquid();int backgroundColor,strokeColorTop,strokeColorBottom,strokeColorFull;Object paintStrokeTop,paintStrokeBottom,paintStrokeFull;
+ static class LiquidGlassEffect {int updates;LiquidGlassEffect(Node node){}void update(Object...args){updates++;}}
+ float sourceOffsetX,sourceOffsetY;Props boundProps=new Props();Node renderNode=new Node(),renderNodeFill=new Node();Source source=new Source();boolean liquidGlassAllowed=true;LiquidGlassEffect liquidGlassEffect;int backgroundColor,strokeColorTop,strokeColorBottom,strokeColorFull;Object paintStrokeTop,paintStrokeBottom,paintStrokeFull;
  void drawStrokeRaw(Object...args){}
  SAMPLES
  UPDATE
  public static void main(String[]args){Probe p=new Probe();p.backgroundColor=0xff123456;if(p.samplesBackdrop())throw new AssertionError();
  for(int i=0;i<1000;i++)p.updateDisplayList();
- if(p.source.draws!=0||p.renderNodeFill.records!=0||p.liquidGlassEffect.updates!=0||p.renderNode.records!=1000)throw new AssertionError();
+ if(p.source.draws!=0||p.renderNodeFill.records!=0||p.liquidGlassEffect!=null||p.renderNode.records!=1000)throw new AssertionError();
  p.backgroundColor=0x80123456;if(!p.samplesBackdrop())throw new AssertionError();p.updateDisplayList();if(p.source.draws!=1||p.liquidGlassEffect.updates!=1)throw new AssertionError();
- p.liquidGlassEffect=null;p.updateDisplayList();if(p.source.draws!=2)throw new AssertionError();
+ p.liquidGlassAllowed=false;p.liquidGlassEffect=null;p.updateDisplayList();if(p.source.draws!=2||p.liquidGlassEffect!=null)throw new AssertionError();
  }}'''.replace('UPDATE', update).replace('SAMPLES', samples)})
 
 
@@ -278,8 +278,8 @@ def test_glass_reads_program_once_but_never_shares_mutable_shaders(tmp_path):
         'org/telegram/messenger/R.java': 'package org.telegram.messenger;public class R {public static class raw{public static int liquid_glass_shader;}}',
         'Probe.java': '''import android.graphics.*;import org.telegram.ui.Components.blur3.LiquidGlassEffect;import org.telegram.messenger.AndroidUtilities;
 public class Probe {public static void main(String[]args){java.util.Set<RuntimeShader>shaders=new java.util.HashSet<>();
- for(int i=0;i<1000;i++){RenderNode n=new RenderNode();LiquidGlassEffect glass=new LiquidGlassEffect(n);shaders.add(n.effect.shader);
- glass.update(0,0,200,60,20,20,20,20,10,1,1,0x80123456);int effects=RenderEffect.creates;
+ for(int i=0;i<1000;i++){RenderNode n=new RenderNode();LiquidGlassEffect glass=new LiquidGlassEffect(n);if(n.effect!=null)throw new AssertionError("effect before first draw");
+ glass.update(0,0,200,60,20,20,20,20,10,1,1,0x80123456);shaders.add(n.effect.shader);int effects=RenderEffect.creates;
  for(int j=0;j<100;j++)glass.update(0,0,200,60,20,20,20,20,10,1,1,0x80123456);
  if(RenderEffect.creates!=effects)throw new AssertionError("unchanged uniforms rebuild effect");
  glass.update(0,0,200,60,20,20,20,20,10,1,1,0x80334455);if(RenderEffect.creates!=effects+1)throw new AssertionError();

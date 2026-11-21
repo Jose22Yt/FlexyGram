@@ -60,6 +60,7 @@ import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.UserConfig;
+import org.telegram.messenger.Utilities;
 import org.telegram.messenger.UserObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
@@ -181,6 +182,12 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private BlurredBackgroundDrawable tabsViewBackground;
     private app.flexygram.kyant.KyantDockView kyantDockView;
     private app.flexygram.performance.StartupIdleWork kyantInitWork;
+    private final Utilities.Callback<Boolean> dockPowerListener = ignored -> {
+        if (tabsViewBackground == null) return;
+        tabsViewBackground.updateColors();
+        if (tabsView != null) tabsView.invalidate();
+        blur3_invalidateBlur();
+    };
     private View fadeView;
     private boolean lastHideContacts = NaConfig.INSTANCE.getMainTabsHideContacts().Bool();
     private boolean lastHideCalls = MainTabsHelper.isCallsTabHidden();
@@ -1297,11 +1304,14 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             .addGlobal(NotificationCenter.appUpdateLoading)
             .addGlobal(NotificationCenter.needSetDayNightTheme);
 
-        return super.onFragmentCreate();
+        final boolean created = super.onFragmentCreate();
+        if (created) LiteMode.addOnPowerSaverAppliedListener(dockPowerListener);
+        return created;
     }
 
     @Override
     public void onFragmentDestroy() {
+        LiteMode.removeOnPowerSaverAppliedListener(dockPowerListener);
         if (kyantInitWork != null) kyantInitWork.close();
         Bulletin.removeDelegate(this);
         Bulletin.removeDelegate(contentView);
@@ -1594,7 +1604,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     private void blur3_invalidateBlur() {
         if (kyantDockView != null && kyantDockView.isRendering()) return;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || iBlur3SourceTabGlass == null || fragmentView == null) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || iBlur3SourceTabGlass == null || fragmentView == null
+                || !SharedConfig.chatBlurEnabled()) {
             return;
         }
 
