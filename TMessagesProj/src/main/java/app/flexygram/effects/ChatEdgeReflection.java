@@ -17,7 +17,7 @@ public final class ChatEdgeReflection {
             0x240d2237, 0x70ffffff, 0x00ffffff, 0x000d2237, 0x190d2237, 0x3b0d2237
     };
     private static final int[] SUBTLE_DARK = {
-            0x0bffffff, 0x05ffffff, 0x00ffffff, 0x00ffffff, 0x06ffffff, 0x11ffffff
+            0x24ffffff, 0x19ffffff, 0x00ffffff, 0x00ffffff, 0x16ffffff, 0x20ffffff
     };
     private static final int[] SUBTLE_LIGHT = {
             0xe8ffffff, 0x70ffffff, 0x00ffffff, 0x00474747, 0x07474747, 0x24474747
@@ -88,11 +88,10 @@ public final class ChatEdgeReflection {
         }
         if (slot < 0) {
             // Keep the falloff close to the edge even when the message field grows.
-            final float ramp = Math.min(.14f, AndroidUtilities.dpf2(subtle ? 1.35f : 5f) / shaderHeight);
-            final boolean subtleLight = subtle && !dark;
-            // On light surfaces the white reflection fades inward, while the gray lower rim is narrower.
-            final float topRamp = subtleLight ? Math.min(.14f, AndroidUtilities.dpf2(2f) / shaderHeight) : ramp;
-            final float bottomRamp = subtleLight ? Math.min(.14f, AndroidUtilities.dpf2(1f) / shaderHeight) : ramp;
+            final float topDepthDp = subtle ? (dark ? 4.25f : 2f) : 5f;
+            final float bottomDepthDp = subtle ? (dark ? 3.4f : 1f) : 5f;
+            final float topRamp = Math.min(.14f, AndroidUtilities.dpf2(topDepthDp) / shaderHeight);
+            final float bottomRamp = Math.min(.14f, AndroidUtilities.dpf2(bottomDepthDp) / shaderHeight);
             stops[1] = topRamp * .2f;
             stops[2] = topRamp;
             stops[3] = 1f - bottomRamp;
@@ -103,8 +102,8 @@ public final class ChatEdgeReflection {
             shaders[slot] = new LinearGradient(0, 0, 0, shaderHeight, colors, stops, Shader.TileMode.CLAMP);
             if (!subtle) {
                 // The side reflection takes over as the original highlights fall off.
-                sideStops[0] = ramp * .15f;
-                sideStops[1] = ramp * 2f;
+                sideStops[0] = topRamp * .15f;
+                sideStops[1] = topRamp * 2f;
                 sideStops[2] = 1f - sideStops[1];
                 sideStops[3] = 1f - sideStops[0];
                 sideShaders[slot] = new LinearGradient(0, 0, 0, shaderHeight, dark ? DARK_SIDES : LIGHT_SIDES,

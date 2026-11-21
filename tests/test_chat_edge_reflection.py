@@ -93,8 +93,12 @@ public class Probe {
   for(int i=0;i<100;i++)reflection.draw(canvas,0,20+i,420,100+i,40,true,255);
   LinearGradient subtle=(LinearGradient)canvas.paint.getShader();
   check(LinearGradient.creations==7 && canvas.bands==6003);
-  check((subtle.colors[5]>>>24)<(dark.colors[5]>>>24)/3);
-  check(subtle.stops[2]*subtle.height<3f && (subtle.colors[2]>>>24)==0);
+  int topCrest=subtle.colors[0]>>>24, bottomCrest=subtle.colors[5]>>>24;
+  check(topCrest==36 && bottomCrest==32);
+  check((subtle.colors[1]>>>24)==25 && (subtle.colors[4]>>>24)==22);
+  check((subtle.colors[2]>>>24)==0 && (subtle.colors[3]>>>24)==0);
+  check(Math.abs(subtle.stops[2]*subtle.height-8.5f)<.02f);
+  check(Math.abs((1-subtle.stops[3])*subtle.height-6.8f)<.02f);
   reflection.drawClipped(canvas,0,20,200,320,new Path(),false,255);
   check(canvas.clips==2 && canvas.paths==3 && canvas.depth==0);
   LinearGradient subtleLight=(LinearGradient)canvas.paint.getShader();
