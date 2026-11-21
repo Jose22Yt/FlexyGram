@@ -143,14 +143,7 @@ public class BlurredBackgroundDrawableViewFactory {
         }
 
         if (viewPositionWatcher != null && parent != null && view != null) {
-            final WeakReference<View> viewInstance = new WeakReference<>(view);
-            viewPositionWatcher.subscribe(view, parent, (v, pos) -> {
-                drawable.setSourceOffset(pos.left, pos.top);
-                final View viewR = viewInstance.get();
-                if (viewR != null) {
-                    viewR.invalidate();
-                }
-            }, multiwindow);
+            viewPositionWatcher.subscribeOffsets(view, parent, drawable, BlurredBackgroundDrawable::setSourceOffset, multiwindow);
         }
 
         if (linkedDrawables != null) {

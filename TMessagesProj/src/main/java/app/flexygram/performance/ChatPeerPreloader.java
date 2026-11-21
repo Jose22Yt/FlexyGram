@@ -70,8 +70,8 @@ public final class ChatPeerPreloader {
             NotificationCenter.getInstance(acc).addObserver(observer, NotificationCenter.appDidLogout);
             return observer;
         });
-        MessagesStorage storage = MessagesStorage.getInstance(account);
         try {
+            MessagesStorage storage = MessagesStorage.getInstance(account);
             boolean queued = storage.getStorageQueue().postRunnable(() -> {
                 TLRPC.Chat chat = null;
                 TLRPC.User user = null;

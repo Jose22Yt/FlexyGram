@@ -233,17 +233,30 @@ def test_position_watcher_owns_and_releases_external_window_observers(tmp_path):
  public ViewTreeObserver vto=new ViewTreeObserver();public List<OnAttachStateChangeListener>listeners=new ArrayList<>();
  public void addOnAttachStateChangeListener(OnAttachStateChangeListener l){listeners.add(l);}public void removeOnAttachStateChangeListener(OnAttachStateChangeListener l){listeners.remove(l);}
  public ViewTreeObserver getViewTreeObserver(){return vto;}public boolean isAttachedToWindow(){return true;}public ViewParent getParent(){return null;}
- public int getWidth(){return 10;}public int getHeight(){return 20;}public int getScrollX(){return 0;}public int getScrollY(){return 0;}public float getX(){return 0;}public float getY(){return 0;}public void getLocationOnScreen(int[]a){a[0]=0;a[1]=0;}}''',
+ public int invalidations,screenReads,width=10;public void invalidate(){invalidations++;}public int getWidth(){return width;}public int getHeight(){return 20;}public int getScrollX(){return 0;}public int getScrollY(){return 0;}public float getX(){return 0;}public float getY(){return 0;}public void getLocationOnScreen(int[]a){screenReads++;a[0]=0;a[1]=0;}}''',
         'android/view/ViewGroup.java': 'package android.view;public class ViewGroup extends View{}',
         'Probe.java': '''import android.view.*;import org.telegram.ui.Components.chat.ViewPositionWatcher;
-public class Probe {static void check(boolean v){if(!v)throw new AssertionError();}public static void main(String[]args){
+import java.util.*;import java.lang.ref.WeakReference;
+public class Probe {static void check(boolean v){if(!v)throw new AssertionError();}public static void main(String[]args)throws Exception{
  ViewGroup anchor=new ViewGroup();View external=new View();ViewPositionWatcher watcher=new ViewPositionWatcher(anchor);
  for(int i=0;i<1000;i++)watcher.subscribe(external,anchor,(v,r)->{},true);
  check(external.vto.listeners.size()==1&&external.listeners.size()==1);
  watcher.unsubscribe(external);check(external.vto.listeners.isEmpty()&&external.listeners.isEmpty());
  View sameWindow=new View();sameWindow.vto=anchor.vto;watcher.subscribe(sameWindow,anchor,(v,r)->{},true);check(anchor.vto.listeners.size()==1);
  watcher.subscribe(external,anchor,(v,r)->{},true);watcher.clear();check(external.listeners.isEmpty()&&external.vto.listeners.isEmpty()&&sameWindow.listeners.isEmpty());
+ Object owner=new Object();int[] updates={0};
+ for(int i=0;i<4;i++)watcher.subscribeOffsets(external,anchor,owner,(target,x,y)->{check(target==owner);updates[0]++;},true);
+ watcher.onPreDraw();check(external.screenReads==1&&anchor.screenReads==1&&updates[0]==4&&external.invalidations==1);
+ external.width=12;watcher.onPreDraw();check(external.screenReads==2&&updates[0]==4&&external.invalidations==1);
+ var trackedField=ViewPositionWatcher.class.getDeclaredField("tracked");trackedField.setAccessible(true);
+ var subscriptions=(List<?>)((Map<?,?>)trackedField.get(watcher)).get(external);
+ for(Object subscription:subscriptions){
+  var field=subscription.getClass().getDeclaredField("lifetime");field.setAccessible(true);
+  ((WeakReference<?>)field.get(subscription)).clear();
+ }
+ watcher.onPreDraw();check(updates[0]==4&&anchor.vto.listeners.isEmpty()&&external.vto.listeners.isEmpty()&&external.listeners.isEmpty());
  watcher.subscribe(external,anchor,(v,r)->{},true);watcher.shutdown();check(anchor.vto.listeners.isEmpty()&&anchor.listeners.isEmpty()&&external.listeners.isEmpty());
+ watcher.subscribe(external,anchor,(v,r)->{},true);check(anchor.vto.listeners.isEmpty()&&external.vto.listeners.isEmpty());
  }}'''
     }, [JAVA/'org/telegram/ui/Components/chat/ViewPositionWatcher.java'])
 

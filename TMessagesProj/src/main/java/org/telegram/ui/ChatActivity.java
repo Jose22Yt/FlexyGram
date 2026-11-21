@@ -3870,6 +3870,10 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onFragmentDestroy() {
+        if (viewPositionWatcher != null) {
+            viewPositionWatcher.shutdown();
+            viewPositionWatcher = null;
+        }
         if (scheduledMessagesStartupWork != null) {
             scheduledMessagesStartupWork.close();
             scheduledMessagesStartupWork = null;
@@ -5422,6 +5426,7 @@ public class ChatActivity extends BaseFragment implements
         invalidateBlurredSourcesView = new OnPostDrawView(context, true, this::invalidateMergedVisibleBlurredPositionsAndSourcesImpl);
         contentView.addView(invalidateBlurredSourcesView);
 
+        if (viewPositionWatcher != null) viewPositionWatcher.shutdown();
         viewPositionWatcher = new ViewPositionWatcher(contentView);
 
         final ViewGroup parentView = parentChatActivity != null ? parentChatActivity.contentView : contentView;
@@ -35713,7 +35718,9 @@ public class ChatActivity extends BaseFragment implements
             quickRepliesEmptyView = new QuickRepliesEmptyView(getContext(), chatMode, dialog_id, threadMessageId, quickReplyShortcut, getResourceProvider());
             quickRepliesEmptyView.setBackground(Theme.createServiceDrawable(AndroidUtilities.dp(24), quickRepliesEmptyView, contentView, getThemedPaint(Theme.key_paint_chatActionBackground)));
             emptyViewContainer.addView(quickRepliesEmptyView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER));
-            viewPositionWatcher.subscribe(quickRepliesEmptyView, contentView, (v, r) -> v.invalidate());
+            if (viewPositionWatcher != null) {
+                viewPositionWatcher.subscribe(quickRepliesEmptyView, contentView, (v, r) -> v.invalidate());
+            }
         } else if (chatMode == MODE_EDIT_BUSINESS_LINK) {
             businessLinksEmptyView = new BusinessLinksEmptyView(getContext(), this, businessLink, getResourceProvider());
             businessLinksEmptyView.setBackground(Theme.createServiceDrawable(AndroidUtilities.dp(24), businessLinksEmptyView, contentView, getThemedPaint(Theme.key_paint_chatActionBackground)));

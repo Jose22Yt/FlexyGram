@@ -10,6 +10,7 @@ import android.view.ViewTreeObserver;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -30,21 +31,29 @@ public final class ViewPositionWatcher implements
         void onPositionChanged(@NonNull View view, @NonNull RectF rectInParent);
     }
 
+    public interface OnOffsetChangedListener<T> {
+        void onOffsetChanged(T owner, float x, float y);
+    }
+
     private final View anchorView;
     private ViewTreeObserver vto;
     private boolean listening;
+    private boolean closed;
 
     /** Per-view tracking state. */
     private static final class Tracked {
         final ViewGroup parent;
         final OnChangedListener listener;
+        final WeakReference<?> lifetime;
         final RectF last = new RectF();
-        boolean multiwindow;
+        final boolean multiwindow;
         boolean hasLast;
 
-        Tracked(@NonNull ViewGroup parent, @NonNull OnChangedListener listener) {
+        Tracked(ViewGroup parent, OnChangedListener listener, boolean multiwindow, WeakReference<?> lifetime) {
             this.parent = parent;
             this.listener = listener;
+            this.multiwindow = multiwindow;
+            this.lifetime = lifetime;
         }
     }
 
@@ -56,7 +65,6 @@ public final class ViewPositionWatcher implements
     public ViewPositionWatcher(@NonNull View anchorView) {
         this.anchorView = anchorView;
         anchorView.addOnAttachStateChangeListener(this);
-        attachIfPossible();
     }
 
     public void subscribe(@NonNull View view,
@@ -70,8 +78,21 @@ public final class ViewPositionWatcher implements
                           @NonNull ViewGroup parentView,
                           @NonNull OnChangedListener listener,
                           boolean multiwindow) {
-        Tracked t = new Tracked(parentView, listener);
-        t.multiwindow = multiwindow;
+        subscribe(view, new Tracked(parentView, listener, multiwindow, null));
+    }
+
+    /** Offset observers keep their owner weak and share one invalidation per view. */
+    public <T> void subscribeOffsets(@NonNull View view, @NonNull ViewGroup parentView, @NonNull T owner,
+            @NonNull OnOffsetChangedListener<T> listener, boolean multiwindow) {
+        final WeakReference<T> lifetime = new WeakReference<>(owner);
+        subscribe(view, new Tracked(parentView, (v, rect) -> {
+            final T liveOwner = lifetime.get();
+            if (liveOwner != null) listener.onOffsetChanged(liveOwner, rect.left, rect.top);
+        }, multiwindow, lifetime));
+    }
+
+    private void subscribe(View view, Tracked t) {
+        if (closed) return;
         List<Tracked> tList = tracked.get(view);
         if (tList == null) {
             tList = new ArrayList<>(1);
@@ -79,13 +100,9 @@ public final class ViewPositionWatcher implements
         }
         tList.add(t);
 
-        computeRectInParent(view, parentView, tmpRect);
-        t.last.set(tmpRect);
-        // t.hasLast = true;
-
         ensureListening();
 
-        if (multiwindow && !multiwindowObservers.containsKey(view)) {
+        if (t.multiwindow && !multiwindowObservers.containsKey(view)) {
             multiwindowObservers.put(view, new ViewOnPreDraw(view, anchorView, this));
         }
     }
@@ -95,6 +112,7 @@ public final class ViewPositionWatcher implements
         tracked.remove(view);
         ViewOnPreDraw observer = multiwindowObservers.remove(view);
         if (observer != null) observer.destroy();
+        if (tracked.isEmpty()) detachIfListening();
     }
 
     /** Clear all subscriptions. */
@@ -102,11 +120,12 @@ public final class ViewPositionWatcher implements
         for (ViewOnPreDraw observer : multiwindowObservers.values()) observer.destroy();
         multiwindowObservers.clear();
         tracked.clear();
+        detachIfListening();
     }
 
     /** Stop watching entirely. */
     public void shutdown() {
-        detachIfListening();
+        closed = true;
         anchorView.removeOnAttachStateChangeListener(this);
         clear();
     }
@@ -114,7 +133,7 @@ public final class ViewPositionWatcher implements
     // ─────────────── ViewTreeObserver lifecycle ───────────────
 
     private void attachIfPossible() {
-        if (!anchorView.isAttachedToWindow()) return;
+        if (tracked.isEmpty() || !anchorView.isAttachedToWindow()) return;
         ViewTreeObserver newVto = anchorView.getViewTreeObserver();
         if (newVto != null && newVto.isAlive()) {
             vto = newVto;
@@ -160,35 +179,58 @@ public final class ViewPositionWatcher implements
             attachIfPossible();
         }
 
-        if (tracked.isEmpty()) return true;
-
-        for (Map.Entry<View, List<Tracked>> e : tracked.entrySet()) {
+        final Iterator<Map.Entry<View, List<Tracked>>> entries = tracked.entrySet().iterator();
+        while (entries.hasNext()) {
+            final Map.Entry<View, List<Tracked>> e = entries.next();
             View view = e.getKey();
             List<Tracked> tList = e.getValue();
             if (view == null || tList == null) continue;
 
-            for (Tracked t : tList) {
-                if (t.multiwindow) {
-                    view.getLocationOnScreen(tmpCords);
-                    tmpRect.set(tmpCords[0], tmpCords[1], tmpCords[0] + view.getWidth(), tmpCords[1] + view.getHeight());
-
-                    t.parent.getLocationOnScreen(tmpCords);
-                    tmpRect.offset(-tmpCords[0], -tmpCords[1]);
-                } else {
-                    if (!computeRectInParent(view, t.parent, tmpRect)) continue;
+            ViewGroup previousParent = null;
+            boolean previousMultiwindow = false, rectValid = false, hasMultiwindow = false, invalidateOffsets = false;
+            for (int i = 0; i < tList.size(); i++) {
+                final Tracked t = tList.get(i);
+                if (t.lifetime != null && t.lifetime.get() == null) {
+                    tList.remove(i--);
+                    continue;
                 }
+                hasMultiwindow |= t.multiwindow;
+                if (previousParent != t.parent || previousMultiwindow != t.multiwindow) {
+                    previousParent = t.parent;
+                    previousMultiwindow = t.multiwindow;
+                    if (t.multiwindow) {
+                        view.getLocationOnScreen(tmpCords);
+                        tmpRect.set(tmpCords[0], tmpCords[1], tmpCords[0] + view.getWidth(), tmpCords[1] + view.getHeight());
+                        t.parent.getLocationOnScreen(tmpCords);
+                        tmpRect.offset(-tmpCords[0], -tmpCords[1]);
+                        rectValid = true;
+                    } else {
+                        rectValid = computeRectInParent(view, t.parent, tmpRect);
+                    }
+                }
+                if (!rectValid) continue;
 
-                if (!t.hasLast || !tmpRect.equals(t.last)) {
+                final boolean changed = t.lifetime != null
+                        ? tmpRect.left != t.last.left || tmpRect.top != t.last.top : !tmpRect.equals(t.last);
+                if (!t.hasLast || changed) {
                     t.last.set(tmpRect);
                     t.hasLast = true;
                     try {
-                        t.listener.onPositionChanged(view, new RectF(tmpRect));
+                        t.listener.onPositionChanged(view, t.lifetime != null ? tmpRect : new RectF(tmpRect));
+                        invalidateOffsets |= t.lifetime != null;
                     } catch (Throwable ignored) {
                         // Do not crash UI if callback throws
                     }
                 }
             }
+            if (invalidateOffsets) view.invalidate();
+            if (tList.isEmpty()) entries.remove();
+            if (!hasMultiwindow) {
+                final ViewOnPreDraw observer = multiwindowObservers.remove(view);
+                if (observer != null) observer.destroy();
+            }
         }
+        if (tracked.isEmpty()) detachIfListening();
         return true;
     }
 

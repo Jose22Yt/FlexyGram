@@ -2854,6 +2854,11 @@ public class ImageLoader {
         lottieMemCache.evictAll();
     }
 
+    static void clearMemoryIfInitialized() {
+        final ImageLoader loader = Instance;
+        if (loader != null) loader.clearMemory();
+    }
+
     private void removeFromWaitingForThumb(int TAG, ImageReceiver imageReceiver) {
         String location = waitingForQualityThumbByTag.get(TAG);
         if (location != null) {

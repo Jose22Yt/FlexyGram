@@ -164,6 +164,14 @@ def test_storage_matches_native_backup_outside_dialog_startup_changes():
             original = original.replace('    private DialogFilter sortingDialogFilter;\n', '', 1)
         if name == 'MessagesStorage.java':
             current = current.replace('import java.util.Arrays;\n', '', 1)
+            # Allow only the in-memory precheck before reading the SQLite revision.
+            old_lookup = 'warmed = warmHistory.take(dialogId, count, SystemClock.uptimeMillis(), warmHistoryRevision());'
+            guarded_lookup = '''final long now = SystemClock.uptimeMillis();
+                    if (warmHistory.hasCandidate(dialogId, count, now)) {
+                        warmed = warmHistory.take(dialogId, count, now, warmHistoryRevision());
+                    }'''
+            assert current.count(guarded_lookup) == 1 and original.count(old_lookup) == 1
+            current = current.replace(guarded_lookup, old_lookup, 1)
         assert '\n'.join(line for line in current.splitlines() if line.strip()) == '\n'.join(
             line for line in original.splitlines() if line.strip()), path
 

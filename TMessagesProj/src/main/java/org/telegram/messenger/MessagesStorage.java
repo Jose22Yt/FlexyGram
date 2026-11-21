@@ -10251,7 +10251,10 @@ public class MessagesStorage extends BaseController {
                 if (mergeDialogId == 0 && max_id == 0 && offset_date == 0 && minDate == 0
                         && load_type == LOAD_FROM_UNREAD && mode == 0 && replyMessageId == 0 && processMessages && !isTopic
                         && !warmHistory.isEmpty()) {
-                    warmed = warmHistory.take(dialogId, count, SystemClock.uptimeMillis(), warmHistoryRevision());
+                    final long now = SystemClock.uptimeMillis();
+                    if (warmHistory.hasCandidate(dialogId, count, now)) {
+                        warmed = warmHistory.take(dialogId, count, now, warmHistoryRevision());
+                    }
                 }
                 WarmHistoryDelivery ready = warmed;
                 processMessagesRunnable = ready == null

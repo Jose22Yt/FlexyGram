@@ -10,7 +10,10 @@ public class Probe {
  public static void main(String[]args){
   WarmHistoryCache<String> c=new WarmHistoryCache<>();Object db=new Object();
   WarmHistoryCache.Revision r=new WarmHistoryCache.Revision(db,4,8);
-  c.put(1,25,100,r,100,"one");check(c.take(1,15,101,r)==null);
+  c.put(1,25,100,r,100,"one");
+  check(c.hasCandidate(1,25,101)&&!c.hasCandidate(2,25,101)&&!c.hasCandidate(1,15,101));
+  check(!c.hasCandidate(1,25,99)&&!c.hasCandidate(1,25,5100));
+  check(c.take(1,15,101,r)==null);
   check(c.take(1,25,101,r).equals("one"));check(c.take(1,25,101,r)==null);
   c.put(1,25,100,r,100,"one");c.put(2,25,100,r,100,"two");c.put(3,25,100,r,100,"three");
   check(c.take(1,25,101,r)==null);check(c.take(2,25,101,r).equals("two"));check(c.take(3,25,101,r).equals("three"));
@@ -49,12 +52,12 @@ def test_idle_preparation_coalesces_events_caps_reads_and_ignores_cancelled_comp
     files=warmup_hosts()
     files['Probe.java']='''import app.flexygram.performance.ChatHistoryWarmup;import org.telegram.messenger.*;
 public class Probe implements ChatHistoryWarmup.Host{
- boolean ready=true;int account;public boolean canWarm(){return ready;}public int account(){return account;}public long[]candidates(){return new long[]{100,200,300};}
+ boolean ready=true;int account,candidateChecks;public boolean canWarm(){return ready;}public int account(){return account;}public long[]candidates(){candidateChecks++;return new long[]{100,200,300};}
  static void check(boolean ok){if(!ok)throw new AssertionError();}
  public static void main(String[]args){Probe p=new Probe();ChatHistoryWarmup w=new ChatHistoryWarmup(p);
   for(int i=0;i<10000;i++)w.request();check(AndroidUtilities.posts==1&&AndroidUtilities.delay==350);
-  AndroidUtilities.fire();check(MessagesStorage.dialogs.size()==1);for(int i=0;i<10000;i++)w.request();check(AndroidUtilities.posts==1);
-  MessagesStorage.complete();check(MessagesStorage.dialogs.size()==2);MessagesStorage.complete();check(MessagesStorage.completions.isEmpty());
+  AndroidUtilities.fire();check(MessagesStorage.dialogs.size()==1&&p.candidateChecks==1);for(int i=0;i<10000;i++)w.request();check(AndroidUtilities.posts==1);
+  MessagesStorage.complete();check(MessagesStorage.dialogs.size()==2&&p.candidateChecks==2);MessagesStorage.complete();check(MessagesStorage.completions.isEmpty());
   w.request();check(AndroidUtilities.delay==3000);w.cancel();check(AndroidUtilities.queue.isEmpty());
   w.request();AndroidUtilities.fire();Runnable old=MessagesStorage.completions.remove(0);w.cancel();check(MessagesStorage.cancels==1);
   w.request();AndroidUtilities.fire();int before=MessagesStorage.dialogs.size();old.run();check(MessagesStorage.dialogs.size()==before);

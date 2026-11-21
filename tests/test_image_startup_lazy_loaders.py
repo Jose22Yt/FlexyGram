@@ -77,3 +77,28 @@ def test_image_startup_installs_callbacks_without_eager_account_construction():
     factory=method(source,'private FileLoader.FileLoaderDelegate createFileLoaderDelegate(final int currentAccount)')
     for callback in ['fileUploadProgressChanged','fileDidUploaded','fileDidFailedUpload','fileDidLoaded','fileDidFailedLoad','fileLoadProgressChanged']:
         assert 'void '+callback+'(' in factory
+
+
+def test_memory_pressure_evicts_existing_images_without_initializing_the_loader(tmp_path):
+    source = (JAVA/'org/telegram/messenger/ImageLoader.java').read_text()
+    clear = method(source, 'static void clearMemoryIfInitialized()')
+    app = (JAVA/'org/telegram/messenger/ApplicationLoader.java').read_text()
+    for signature in ('public void onTrimMemory(int level)', 'public void onLowMemory()'):
+        assert 'ImageLoader.clearMemoryIfInitialized()' in method(app, signature)
+    probe(tmp_path, {'Probe.java': '''
+class ImageLoader {
+    static ImageLoader Instance;
+    int evictions;
+    void clearMemory() { evictions++; }
+    CLEAR
+}
+public class Probe {
+    public static void main(String[] args) {
+        ImageLoader.clearMemoryIfInitialized();
+        if (ImageLoader.Instance != null) throw new AssertionError();
+        ImageLoader loader = new ImageLoader();
+        ImageLoader.Instance = loader;
+        ImageLoader.clearMemoryIfInitialized();
+        if (ImageLoader.Instance != loader || loader.evictions != 1) throw new AssertionError();
+    }
+}'''.replace('CLEAR', clear)})

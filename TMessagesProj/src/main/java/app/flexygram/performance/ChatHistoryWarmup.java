@@ -51,10 +51,12 @@ public final class ChatHistoryWarmup implements Runnable {
                 || UserConfig.getInstance(account).getClientUserId() != owner || index >= Math.min(2, candidates.length)) {
             busy = false; return;
         }
-        boolean visible = false;
-        long[] current = host.candidates();
-        if (current != null) for (long id : current) if (id == candidates[index]) { visible = true; break; }
-        if (!visible) { next(token, account, owner, candidates, index + 1); return; }
+        if (index != 0) {
+            boolean visible = false;
+            long[] current = host.candidates();
+            if (current != null) for (long id : current) if (id == candidates[index]) { visible = true; break; }
+            if (!visible) { next(token, account, owner, candidates, index + 1); return; }
+        }
         cancelRead = MessagesStorage.getInstance(account).warmChatHistory(candidates[index], SharedConfig.deviceIsHigh() ? 25 : 15, () -> {
             if (token != generation) return;
             cancelRead = null;

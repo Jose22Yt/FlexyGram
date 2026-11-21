@@ -39,6 +39,11 @@ public final class WarmHistoryCache<T> {
         if (e != null && !e.revision.same(revision)) { clear(); return false; }
         return e != null && e.count == count;
     }
+    /** A local key/age check that does not require an SQLite revision read. */
+    public boolean hasCandidate(long dialog, int count, long now) {
+        Entry<T> entry = entries.get(dialog);
+        return entry != null && entry.count == count && now >= entry.created && now - entry.created < TTL_MS;
+    }
     public T take(long dialog, int count, long now, Revision revision) {
         if (!contains(dialog, count, now, revision)) return null;
         Entry<T> e = entries.remove(dialog); bytes -= e.bytes;
