@@ -7,24 +7,47 @@ def test_reflection_is_transparent_in_the_middle_and_reuses_gradients(tmp_path):
     probe(tmp_path, {
         'android/graphics/Canvas.java': '''package android.graphics;
 public class Canvas {
- public int draws, depth; public float top, radius; public Paint paint;
+ public int draws, depth, bands, clips, paths; public float top, radius, left, thickness;
+ public Paint paint, edge;
  public int save(){ return ++depth; }
  public void translate(float x, float y){ top=y; }
  public void restoreToCount(int id){ depth=id-1; }
+ public void clipPath(Path p){clips++;}
+ public void drawPath(Path p,Paint paint){
+  if(p.offsetY!=-top || paint.getStyle()!=Paint.Style.STROKE)throw new AssertionError();
+  paths++;
+ }
  public void drawRoundRect(float l,float t,float r,float b,float rx,float ry,Paint p){
-  if(t!=0 || b<=t || r<=l || rx!=ry)throw new AssertionError();
-  draws++;radius=rx;paint=p;
+  if(b<=t || r<=l || rx!=ry)throw new AssertionError();
+  if(p.getStyle()==Paint.Style.STROKE){
+   if(t!=p.getStrokeWidth()*.5f)throw new AssertionError();
+   thickness=p.getStrokeWidth();left=l;edge=p;bands++;
+  }else{
+   if(t!=0)throw new AssertionError();
+   draws++;radius=rx;paint=p;
+  }
  }
 }''',
         'android/graphics/Paint.java': '''package android.graphics;
 public class Paint {
  public static final int ANTI_ALIAS_FLAG=1;
+ public enum Style{FILL,STROKE}
  private Shader shader; private int alpha=255;
+ private Style style=Style.FILL; private float width;
  public Paint(int flags){}
+ public Style getStyle(){return style;}
+ public void setStyle(Style style){this.style=style;}
+ public float getStrokeWidth(){return width;}
+ public void setStrokeWidth(float width){this.width=width;}
  public Shader getShader(){ return shader; }
  public void setShader(Shader s){ shader=s; }
  public int getAlpha(){ return alpha; }
  public void setAlpha(int a){ alpha=a; }
+}''',
+        'android/graphics/Path.java': '''package android.graphics;
+public class Path {
+ public float offsetY;
+ public void offset(float x,float y,Path destination){destination.offsetY=y;}
 }''',
         'android/graphics/Shader.java': 'package android.graphics; public class Shader { public enum TileMode { CLAMP } }',
         'android/graphics/LinearGradient.java': '''package android.graphics;
@@ -47,17 +70,25 @@ public class Probe {
    reflection.draw(canvas,0,20+i,420,100+i+(i%2)*.001f,40,true,128);
    reflection.draw(canvas,0,250,45,295,25,true,255);
   }
-  check(LinearGradient.creations==2 && canvas.draws==2000 && canvas.depth==0);
+  check(LinearGradient.creations==4 && canvas.draws==2000 && canvas.bands==6000 && canvas.depth==0);
   check(canvas.top==250 && canvas.radius==22.5f && canvas.paint.getAlpha()==255);
+  check(canvas.thickness>0 && canvas.thickness<3f && canvas.left==canvas.thickness*.5f);
   LinearGradient dark=(LinearGradient)canvas.paint.getShader();
+  LinearGradient darkSide=(LinearGradient)canvas.edge.getShader();
   check((dark.colors[0]>>>24)>0 && (dark.colors[5]>>>24)>(dark.colors[0]>>>24));
   check((dark.colors[2]>>>24)==0 && (dark.colors[3]>>>24)==0);
+  check((darkSide.colors[0]>>>24)==0 && (darkSide.colors[3]>>>24)==0);
+  check((darkSide.colors[1]>>>24)>0 && darkSide.stops[1]<.5f && darkSide.stops[2]>.5f);
   reflection.draw(canvas,0,20,200,320,40,false,150);
   LinearGradient light=(LinearGradient)canvas.paint.getShader();
+  LinearGradient lightSide=(LinearGradient)canvas.edge.getShader();
   check(light!=dark && light.colors[5]!=dark.colors[5] && canvas.paint.getAlpha()==150);
+  check((lightSide.colors[1]&0xffffff)<(darkSide.colors[1]&0xffffff));
   check(light.stops[2]*light.height<=10.01f && (1-light.stops[3])*light.height<=10.01f);
+  reflection.drawClipped(canvas,0,20,200,320,new Path(),false,150);
+  check(canvas.clips==1 && canvas.paths==3 && canvas.depth==0);
   reflection.draw(canvas,0,0,10,10,5,true,0);
-  check(LinearGradient.creations==3 && canvas.draws==2001);
+  check(LinearGradient.creations==6 && canvas.draws==2002);
  }
 }''',
     }, [JAVA/'app/flexygram/effects/ChatEdgeReflection.java'])
