@@ -276,6 +276,7 @@ public class DownscaleScrollableNoiseSuppressor {
 
 
     public void onScrolled(float dx, float dy) {
+        if (!allowNoiseSuppress) return;
         for (int a = 0; a < rectRenderNodesCount; a++) {
             final SourcePart sourcePart = rectRenderNodes.get(a);
             sourcePart.renderNodesForBlur.onScrolled(dx, dy);
