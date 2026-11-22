@@ -129,10 +129,13 @@ public class Probe {
 }'''.replace('BODY', body)})
 
 
-def test_alpha_animation_reuses_display_list_and_notifies_only_on_reentry(tmp_path):
-    body = method((JAVA/'org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawableRenderNode.java').read_text(), 'public void setAlpha(int alpha)')
+def test_alpha_animation_reuses_display_list_and_updates_capture_only_when_visibility_changes(tmp_path):
+    source = (JAVA/'org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawableRenderNode.java').read_text()
+    body = method(source, 'public boolean needsBackdropCapture()') + '\n' + method(source, 'public void setAlpha(int alpha)')
     probe(tmp_path, {'Probe.java': '''
 public class Probe extends Base {
+ static class Color {static int alpha(int color){return color>>>24;}}
+ int backgroundColor=0x80000000;
  static class Node {int updates;void setAlpha(float a){updates++;}}
  static class Source {int positions;void dispatchOnDrawablesRelativePositionChange(){positions++;}}
  Node renderNode=new Node();Source source=new Source();boolean renderNodeInvalidated;
@@ -140,8 +143,8 @@ public class Probe extends Base {
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[] args){Probe p=new Probe();
   for(int i=0;i<10000;i++)p.setAlpha(255);check(p.renderNode.updates==0);
-  for(int a=254;a>=0;a--)p.setAlpha(a);check(p.renderNode.updates==255&&!p.renderNodeInvalidated);
-  p.setAlpha(255);check(p.source.positions==1);p.setAlpha(255);check(p.source.positions==1);
+  for(int a=254;a>=0;a--)p.setAlpha(a);check(p.renderNode.updates==255&&!p.renderNodeInvalidated&&p.source.positions==1);
+  p.setAlpha(255);check(p.source.positions==2);p.setAlpha(255);check(p.source.positions==2);
  }
 }
 class Base {int alpha=255;public int getAlpha(){return alpha;}public void setAlpha(int a){alpha=a;}}
