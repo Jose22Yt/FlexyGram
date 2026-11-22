@@ -111,7 +111,7 @@ public class Probe {
  static class RenderNode {boolean display;boolean hasDisplayList(){return display;}}
  static class SourcePart {Rect position;long lastHash;RenderNode renderNode=new RenderNode();SourcePart(Rect p){position=p;}}
  static class Suppressor {final RectF tmpRectF=new RectF();final Blur3HashImpl builder=new Blur3HashImpl();List<SourcePart> rectRenderNodes=List.of(new SourcePart(new Rect(0,0,400,100)),new SourcePart(new Rect(0,700,400,800)));int rectRenderNodesCount=2,recording,records;
- Canvas beginRecordingRect(int a){recording=a;records++;return new Canvas();}void endRecordingRect(){rectRenderNodes.get(recording).renderNode.display=true;}boolean invalidateResultRenderNodes(int w,int h){return false;}
+ Canvas beginRecordingRect(int a){recording=a;records++;return new Canvas();}void endRecordingRect(boolean captured){rectRenderNodes.get(recording).renderNode.display=captured;}boolean invalidateResultRenderNodes(int w,int h){return false;}
  UPDATE
  }
  ViewPage[] viewPages={new ViewPage()};Search searchViewPager;float sliding;float getRightSlidingProgress(){return sliding;}

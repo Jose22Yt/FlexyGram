@@ -133,6 +133,10 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
         return renderNode.hasDisplayList();
     }
 
+    public boolean needsBackdropCapture() {
+        return getAlpha() > 0 && Color.alpha(backgroundColor) != 255;
+    }
+
     @Override
     public void updateDisplayList() {
         final float offsetX = sourceOffsetX;
@@ -202,7 +206,11 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
 
     @Override
     public void updateColors() {
+        final boolean neededBackdrop = needsBackdropCapture();
         super.updateColors();
+        if (neededBackdrop != needsBackdropCapture() && hasDisplayList()) {
+            source.dispatchOnDrawablesRelativePositionChange();
+        }
 
         updateShadowLayer(shadowColor);
         if (boundProps.useFullStroke) {
@@ -252,13 +260,13 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
 
     @Override
     public void setAlpha(int alpha) {
-        final int oldAlpha = getAlpha();
-        if (oldAlpha == alpha) return;
+        if (getAlpha() == alpha) return;
+        final boolean neededBackdrop = needsBackdropCapture();
         super.setAlpha(alpha);
         renderNode.setAlpha(alpha / 255f);
         // RenderNode alpha is a composition property, not display-list content.
 
-        if (oldAlpha == 0 && alpha > 0) {
+        if (neededBackdrop != needsBackdropCapture()) {
             source.dispatchOnDrawablesRelativePositionChange();
         }
     }

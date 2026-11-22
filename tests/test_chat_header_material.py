@@ -36,7 +36,7 @@ def test_shared_material_tracks_light_dark_flags_account_and_theme(tmp_path):
   palette.bottom=0xff000000|rgb;palette.top=palette.bottom;palette.white=palette.bottom;
   for(ChatGlassColorProvider p:surfaces)p.updateColors();
   int expectedAlpha=!blur||disabled?255:!dark?140:(int)(255*(liquid?.85f:.76f));
-  for(ChatGlassColorProvider p:surfaces)check((p.getBackgroundColor()>>>24)==expectedAlpha&&p.getBackgroundColor()==input.getBackgroundColor());
+  for(ChatGlassColorProvider p:surfaces)check((p.getBackgroundColor()>>>24)==expectedAlpha&&p.getBackgroundColor()==input.getBackgroundColor()&&p.getShadowColor()==0);
  }
  // The same retained provider must switch materials without recreating a drawable.
  SharedConfig.enabled=true;MessagesController.accounts[1].config.disableBlurInDarkTheme.value=false;palette.dark=true;
@@ -66,3 +66,82 @@ def test_header_input_and_pinned_panel_share_policy_and_native_factory():
     draw=method(header,'public boolean drawSignatureNativeGlass(Canvas canvas,')
     assert 'glassDrawableBack.draw(canvas)' in draw and 'glassDrawable.draw(canvas)' in draw and 'glassDrawableMenu.draw(canvas)' in draw
     assert 'signatureGlassCall.draw(canvas)' in draw
+
+
+def test_conversation_fades_stop_at_the_system_bars(tmp_path):
+    source = (JAVA/'org/telegram/ui/ChatActivity.java').read_text()
+    status = method(source, 'private void updateStatusBarFade()')
+    navigation = method(source, 'private void updateNavigationBarFade()')
+    probe(tmp_path, {'Probe.java': '''
+public class Probe {
+ static class View {static final int VISIBLE=0;}
+ static class AndroidUtilities {static int statusBarHeight=27;}
+ static class ActionBar {
+  boolean occupy=true;int visibility;
+  boolean getOccupyStatusBar(){return occupy;}
+  int getVisibility(){return visibility;}
+ }
+ static class Insets {int navigation=19;int getCurrentNavigationBarInset(){return navigation;}}
+ static class Fade {
+  int top,bottom;
+  void setFadeZoneTop(int height){top=height;}
+  void setFadeZoneBottom(int height){bottom=height;}
+ }
+ ActionBar actionBar=new ActionBar();Insets windowInsetsStateHolder=new Insets();Fade chatActivityFadeView=new Fade();
+ boolean inPreviewMode,inBubbleMode,isInsideContainer,hideBottom;
+ boolean shouldHideBottomForGesture(){return hideBottom;}
+ STATUS NAVIGATION
+ static void check(boolean value){if(!value)throw new AssertionError();}
+ public static void main(String[] args){
+  Probe p=new Probe();p.updateStatusBarFade();p.updateNavigationBarFade();
+  check(p.chatActivityFadeView.top==27&&p.chatActivityFadeView.bottom==19);
+  p.inPreviewMode=true;p.updateStatusBarFade();check(p.chatActivityFadeView.top==0);
+  p.inPreviewMode=false;p.actionBar.occupy=false;p.updateStatusBarFade();check(p.chatActivityFadeView.top==0);
+  p.actionBar.occupy=true;p.actionBar.visibility=4;p.updateStatusBarFade();check(p.chatActivityFadeView.top==0);
+  p.windowInsetsStateHolder.navigation=48;p.updateNavigationBarFade();check(p.chatActivityFadeView.bottom==48);
+  p.hideBottom=true;p.updateNavigationBarFade();check(p.chatActivityFadeView.bottom==0);
+ }
+}
+'''.replace('STATUS', status).replace('NAVIGATION', navigation)})
+
+
+def test_backdrop_regions_follow_opacity_and_visibility(tmp_path):
+    directory = JAVA/'org/telegram/ui/Components/blur3'
+    drawable = (directory/'drawable/BlurredBackgroundDrawableRenderNode.java').read_text()
+    needs_capture = method(drawable, 'public boolean needsBackdropCapture()')
+    alpha = method(drawable, 'public void setAlpha(int alpha)')
+    colors = method(drawable, 'public void updateColors()')
+    source = (directory/'source/BlurredBackgroundSourceRenderNode.java').read_text()
+    positions = method(source, 'public int getVisiblePositions(')
+    assert 'd.needsBackdropCapture()' in positions
+
+    probe(tmp_path, {'Probe.java': '''
+class Drawable {
+ int alpha=255,backgroundColor=0xff000000,nextColor=backgroundColor;
+ int getAlpha(){return alpha;}public void setAlpha(int alpha){this.alpha=alpha;}
+ public void updateColors(){backgroundColor=nextColor;}
+}
+public class Probe extends Drawable {
+ static class Color{static int alpha(int color){return color>>>24;}}
+ static class Source{int changes;void dispatchOnDrawablesRelativePositionChange(){changes++;}}
+ static class Paint{void setColor(int color){}}
+ static class Bounds{boolean useFullStroke;}
+ static class RenderNode{void setAlpha(float alpha){}}
+ final Source source=new Source();final Paint paintStrokeFull=new Paint(),paintStrokeTop=new Paint(),paintStrokeBottom=new Paint();
+ final Bounds boundProps=new Bounds();final RenderNode renderNode=new RenderNode();
+ boolean renderNodeInvalidated;int shadowColor,strokeColorFull,strokeColorTop,strokeColorBottom;
+ boolean hasDisplayList(){return true;}
+ void updateShadowLayer(int color){}
+ CAPTURE ALPHA COLORS
+ static void check(boolean value){if(!value)throw new AssertionError();}
+ public static void main(String[] args){
+  Probe p=new Probe();
+  check(!p.needsBackdropCapture());
+  p.nextColor=0x80000000;p.updateColors();check(p.needsBackdropCapture()&&p.source.changes==1);
+  p.setAlpha(128);check(p.needsBackdropCapture()&&p.source.changes==1);
+  p.setAlpha(0);check(!p.needsBackdropCapture()&&p.source.changes==2);
+  p.setAlpha(255);check(p.needsBackdropCapture()&&p.source.changes==3);
+  p.nextColor=0xff000000;p.updateColors();check(!p.needsBackdropCapture()&&p.source.changes==4);
+ }
+}
+'''.replace('CAPTURE', needs_capture).replace('ALPHA', alpha).replace('COLORS', colors)})

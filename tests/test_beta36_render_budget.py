@@ -86,25 +86,46 @@ def test_blur_tiles_cover_negative_coordinates_and_do_not_expand_aligned_edges(t
 def test_blur_capture_reuses_static_content_but_refreshes_moved_regions_and_empty_composite(tmp_path):
     source = (JAVA/'org/telegram/ui/Components/blur3/DownscaleScrollableNoiseSuppressor.java').read_text()
     capture = method(source, 'public boolean invalidateResultRenderNodes(IBlur3Capture capture,')
+    finish = method(source, 'private void endRecordingRect(boolean captured)')
     probe(tmp_path, {'Probe.java': '''import java.util.*;public class Probe {
  static class Rect {int left,top,right=100,bottom=60;}
  static class RectF {void set(Rect r){}}
  static class Canvas {void save(){}void restore(){}void translate(float x,float y){}}
  interface IBlur3Capture {void capture(Canvas c,RectF r);void captureCalculateHash(Hash h,RectF r);}
  static class Hash {long h;void start(){h=0;}void add(long v){h=h*31+v;}long get(){return h;}boolean isUnsupported(){return false;}}
- static class Node {boolean hasDisplayList(){return true;}}
- static class SourcePart {Rect position=new Rect();Node renderNode=new Node();long lastHash;}
+ static class Node {
+  boolean displayList;
+  boolean hasDisplayList(){return displayList;}
+  void endRecording(){displayList=true;}
+  void discardDisplayList(){displayList=false;}
+ }
+ static class SourcePart {
+  Rect position=new Rect();Node renderNode=new Node();long lastHash;
+  void invalidate(){}
+ }
  List<SourcePart>rectRenderNodes=new ArrayList<>();int rectRenderNodesCount=1,composites;RectF tmpRectF=new RectF();Hash builder=new Hash();
- Canvas beginRecordingRect(int a){return new Canvas();}void endRecordingRect(){}
+ int recordingIndex;Rect recordingPos;
+ Canvas beginRecordingRect(int a){
+  if(recordingPos!=null)throw new IllegalStateException();
+  recordingIndex=a;recordingPos=rectRenderNodes.get(a).position;return new Canvas();
+ }
+ FINISH
  boolean invalidateResultRenderNodes(int w,int h){composites++;return true;}
  CAPTURE
- public static void main(String[]args){Probe p=new Probe();p.rectRenderNodes.add(new SourcePart());int[] draws={0};
- IBlur3Capture c=new IBlur3Capture(){public void capture(Canvas c,RectF r){draws[0]++;}public void captureCalculateHash(Hash h,RectF r){h.add(7);}};
+ public static void main(String[]args){Probe p=new Probe();p.rectRenderNodes.add(new SourcePart());int[] draws={0};boolean[] fail={false};
+ IBlur3Capture c=new IBlur3Capture(){public void capture(Canvas c,RectF r){draws[0]++;if(fail[0])throw new IllegalStateException();}public void captureCalculateHash(Hash h,RectF r){h.add(7);}};
  for(int i=0;i<10000;i++)p.invalidateResultRenderNodes(c,100,60);
  if(draws[0]!=1)throw new AssertionError("static recapture");
  p.rectRenderNodes.get(0).position.top=16;p.invalidateResultRenderNodes(c,100,60);if(draws[0]!=2)throw new AssertionError("stale origin");
+ SourcePart part=p.rectRenderNodes.get(0);
+ part.position.top=32;fail[0]=true;
+ try{p.invalidateResultRenderNodes(c,100,60);throw new AssertionError("swallowed failure");}
+ catch(IllegalStateException expected){}
+ if(part.renderNode.hasDisplayList()||p.recordingPos!=null)throw new AssertionError("partial capture retained");
+ part.position.top=16;fail[0]=false;p.invalidateResultRenderNodes(c,100,60);
+ if(draws[0]!=4||!part.renderNode.hasDisplayList())throw new AssertionError("prior hash suppressed recovery");
  int count=p.composites;p.rectRenderNodesCount=0;p.invalidateResultRenderNodes(c,200,80);if(p.composites!=count+1)throw new AssertionError("stale composite");
- }}'''.replace('CAPTURE', capture)})
+ }}'''.replace('CAPTURE', capture).replace('FINISH', finish)})
 
 
 def test_hidden_blur_regions_do_not_allocate_or_record_zero_sized_nodes(tmp_path):

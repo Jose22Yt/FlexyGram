@@ -19,6 +19,10 @@ public final class ChatGlassColorProvider extends BlurredBackgroundColorProvider
         this.backgroundKey = backgroundKey;
     }
 
+    @Override public int getShadowColor() {
+        return 0;
+    }
+
     @Override public int getBackgroundColor() {
         if (!BlurredBackgroundProviderImpl.checkBlurEnabled(account, provider)) {
             return ColorUtils.setAlphaComponent(Theme.getColor(backgroundKey, provider), 255);

@@ -274,6 +274,7 @@ public class DownscaleScrollableNoiseSuppressor {
 
 
     public void onScrolled(float dx, float dy) {
+        if (!allowNoiseSuppress || (dx == 0 && dy == 0)) return;
         for (int a = 0; a < rectRenderNodesCount; a++) {
             final SourcePart sourcePart = rectRenderNodes.get(a);
             sourcePart.renderNodesForBlur.onScrolled(dx, dy);
@@ -382,13 +383,13 @@ public class DownscaleScrollableNoiseSuppressor {
             }
 
             Canvas c = beginRecordingRect(a);
-            c.save();
+            boolean captured = false;
             try {
                 c.translate(-position.left, -position.top);
                 capture.capture(c, tmpRectF);
+                captured = true;
             } finally {
-                c.restore();
-                endRecordingRect();
+                endRecordingRect(captured);
             }
             sourcePart.lastHash = hash;
 
@@ -496,28 +497,31 @@ public class DownscaleScrollableNoiseSuppressor {
         final SourcePart sourcePart = rectRenderNodes.get(index);
         Rect rectF = sourcePart.position;
 
-        recordingPos = rectF;
-        recordingIndex = index;
-
         final int width = rectF.width() / k;
         final int height = rectF.height() / k;
 
         sourcePart.renderNode.setPosition(0, 0, width, height);
         RecordingCanvas c = sourcePart.renderNode.beginRecording(width, height);
+        recordingIndex = index;
+        recordingPos = rectF;
         c.scale(1f / k, 1f / k);
         return c;
     }
 
-    private void endRecordingRect() {
+    private void endRecordingRect(boolean captured) {
         if (recordingPos == null) {
             throw new IllegalStateException();
         }
 
         final SourcePart sourcePart = rectRenderNodes.get(recordingIndex);
-        sourcePart.renderNode.endRecording();
-        sourcePart.invalidate();
-
         recordingPos = null;
+        sourcePart.renderNode.endRecording();
+        if (captured) {
+            sourcePart.invalidate();
+        } else {
+            // An interrupted capture can overwrite the previously cached display list.
+            sourcePart.renderNode.discardDisplayList();
+        }
     }
 
     public void drawDebugPositions(Canvas canvas) {

@@ -4757,7 +4757,6 @@ public class ChatActivity extends BaseFragment implements
             invalidateChatListViewTopPadding();
             invalidateMessagesVisiblePart();
             checkUi_messagesSearchListPadding();
-            checkUi_topFade();
         });
         if (signatureChatHeader != null) { signatureChatHeader.detach(); signatureChatHeader = null; }
         if (avatarContainer != null) {
@@ -7858,8 +7857,10 @@ public class ChatActivity extends BaseFragment implements
 
         chatActivityFadeView = new ChatActivityFadeView(context);
         chatActivityFadeView.setup(navbarContentDrawableFactory);
-        chatActivityFadeView.setFadeHeightTop(dp(48));
-        chatActivityFadeView.setFadeHeightBottom(dp(48));
+        // Keep the wallpaper fade inside the system bars. The header and composer
+        // already supply their own material over the conversation.
+        chatActivityFadeView.setFadeHeightTop(dp(12));
+        chatActivityFadeView.setFadeHeightBottom(dp(12));
         contentView.addView(chatActivityFadeView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
         if (false/* && getDialogId() != getUserConfig().getClientUserId()*/) {
@@ -8657,7 +8658,6 @@ public class ChatActivity extends BaseFragment implements
             hashtagSearchTabs = new ChatSearchTabs(context) {
                 @Override
                 protected void onShownUpdate(boolean finish) {
-                    checkUi_topFade();
                     checkUi_messagesSearchListPadding();
                     checkUi_topPanelLayoutWidth();
                     checkUi_topPanelPositions();
@@ -9855,7 +9855,6 @@ public class ChatActivity extends BaseFragment implements
 
                 @Override
                 protected void onShownUpdate(boolean finish) {
-                    checkUi_topFade();
                     checkUi_messagesSearchListPadding();
                     if (tagSelector != null) {
                         tagSelector.setTranslationY(contentPanTranslation + getCurrentHeight());
@@ -10015,7 +10014,7 @@ public class ChatActivity extends BaseFragment implements
         updatePagedownButtonsPosition();
         updateBotforumTabsBottomMargin();
         checkUi_botMenuPosition();
-        checkUi_BlurHeight();
+        updateNavigationBarFade();
         checkUi_emptyContainerPosition();
         checkUi_chatListViewPaddings();
         checkUi_messagesSearchListPadding();
@@ -11062,7 +11061,6 @@ public class ChatActivity extends BaseFragment implements
                 emptyViewContainer.setTranslationX(getSideMenuWidth() / 2.f);
             }
             checkInsets();
-            checkUi_topFade();
         });
 
         topicsTabs.setSideMenuBackgroundDrawable(glassBackgroundDrawableFactory.create(topicsTabs, BlurredBackgroundProviderImpl.topPanelChatActivity(themeDelegate)));
@@ -20382,8 +20380,7 @@ public class ChatActivity extends BaseFragment implements
             //}
 
             notifyHeightChanged();
-
-            checkUi_topFade();
+            updateStatusBarFade();
         }
 
         private void setNonNoveTranslation(float y) {
@@ -32278,9 +32275,6 @@ public class ChatActivity extends BaseFragment implements
             if (audioCallIconItem != null && usesSignatureHeader()) audioCallIconItem.setVisibility(View.GONE);
         }
         app.flexygram.bubbles.BubbleConfig.load();
-        if (chatActivityFadeView != null) {
-            chatActivityFadeView.setFlexyEdgeBlur(false, glassBackgroundDrawableFactoryFrosted);
-        }
         if (chatListView != null) chatListView.invalidate();
         updateFolderUnreadBadge();
         cachedIsGestureNavigation = AndroidUtil.isGestureNavigation(getContext());
@@ -52209,28 +52203,14 @@ public class ChatActivity extends BaseFragment implements
         updatePagedownButtonsPosition();
         updateBotforumTabsBottomMargin();
         checkUi_botMenuPosition();
-        checkUi_BlurHeight();
+        updateNavigationBarFade();
         checkUi_emptyContainerPosition();
         checkUi_chatListViewPaddings();
     }
 
-    private static final Rect clipBoundsRect = new Rect();
-    private void checkUi_BlurHeight() {
-        final float inputHeight = shouldHideBottomForGesture() ? 0 : windowInsetsStateHolder.getAnimatedMaxBottomInset()
-            + dp(9) + chatInputViewsContainer.getInputBubbleHeight() + dp(7)
-            + getTopicTabsSideSize(TopicsTabsView.Position.BOTTOM);
-
-        chatActivityFadeView.setFadeZoneBottom((int) inputHeight);
-
-        int clipBound = contentView.getMeasuredHeight() - (int) inputHeight + dp(36);
-        clipBound = androidx.core.math.MathUtils.clamp(clipBound, 0, contentView.getMeasuredHeight());
-
-        clipBoundsRect.set(0, 0, contentView.getMeasuredWidth(), clipBound);
-        clipBoundsRect.set(0,
-            blurredViewTopOffset,
-            chatListView.getMeasuredWidth(),
-            chatListView.getMeasuredHeight() - blurredViewBottomOffset - (int) inputHeight + dp(36)
-        );
+    private void updateNavigationBarFade() {
+        int inset = shouldHideBottomForGesture() ? 0 : windowInsetsStateHolder.getCurrentNavigationBarInset();
+        chatActivityFadeView.setFadeZoneBottom(inset);
     }
 
     private void checkUi_emptyContainerPosition() {
@@ -52242,24 +52222,10 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
-    private void checkUi_topFade() {
-        if (parentChatActivity != null) {
-            parentChatActivity.checkUi_topFade();
-        }
-
-        float fadeHeight = actionBar.getMeasuredHeight();
-        fadeHeight += dp(7 - 6);
-        fadeHeight += finalTopPanelHeight(getTopPanelHeightWithPadding(dp(7)));
-        if (topicsTabs != null) {
-            fadeHeight += getTopicTabsSideSize(TopicsTabsView.Position.TOP);
-        }
-        if (actionBarSearchTags != null) {
-            fadeHeight += dp(28 + 7) * actionBarSearchTags.shownT;
-        }
-        fadeHeight += dp(36 + 7) * getHashtagTabsShownT();
-
-        app.exteraless.appearance.ChatHeaderUiHelper.setupChatTopFade(chatActivityFadeView, actionBar,
-            getThemedColor(app.exteraless.appearance.ChatHeaderUiHelper.getChatFadeColorKey()), (int) fadeHeight);
+    private void updateStatusBarFade() {
+        boolean visible = !inPreviewMode && !inBubbleMode && !isInsideContainer
+                && actionBar.getOccupyStatusBar() && actionBar.getVisibility() == View.VISIBLE;
+        chatActivityFadeView.setFadeZoneTop(visible ? AndroidUtilities.statusBarHeight : 0);
     }
 
     private void checkUi_messagesSearchListPadding() {
@@ -52402,7 +52368,6 @@ public class ChatActivity extends BaseFragment implements
                 roundVideoRecordBackground.setAlpha(factor);
                 roundVideoRecordBackground.setVisibility(factor > 0 ? View.VISIBLE : View.INVISIBLE);
             }
-            // checkUi_BlurHeight();
         } else if (id == ANIMATOR_ID_POLL_ADD_ANSWER_VISIBILITY) {
             onBottomItemsVisibilityChanged();
             checkUi_sideControlsLayoutPosition();
