@@ -7129,6 +7129,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         pipActivityHandler.onPause();
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.stopAllHeavyOperations, 4096);
         ApplicationLoader.mainInterfacePaused = true;
+        MediaController.onPlaybackUiVisibilityChanged();
         int account = currentAccount;
         Utilities.stageQueue.postRunnable(() -> {
             ApplicationLoader.mainInterfacePausedStageQueue = true;
@@ -7391,6 +7392,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         ApplicationLoader.mainInterfacePaused = false;
         ConnectionsManager cm = ConnectionsManager.getInstance(currentAccount);
         cm.setAppPaused(false, false);
+        MediaController.onPlaybackUiVisibilityChanged();
         refreshRateMonitor.start();
         if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) {
             frameDiagnostics = app.flexygram.performance.FrameDiagnostics.resume(this, frameDiagnostics);

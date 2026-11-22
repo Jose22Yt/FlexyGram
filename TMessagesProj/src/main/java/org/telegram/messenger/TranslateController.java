@@ -263,13 +263,6 @@ public class TranslateController extends BaseController {
         return notified;
     }
 
-    private int hash(MessageObject messageObject) {
-        if (messageObject == null) {
-            return 0;
-        }
-        return Objects.hash(messageObject.getDialogId(), messageObject.getId());
-    }
-
     private static String currentPluralLanguage() {
         LocaleController.LocaleInfo localeInfo = LocaleController.getInstance().getCurrentLocaleInfo();
         String lang = null;
@@ -910,47 +903,51 @@ public class TranslateController extends BaseController {
         return null;
     }
 
-    private ArrayList<Integer> pendingLanguageChecks = new ArrayList<>();
+    private record LanguageCheckKey(long dialogId, int messageId) {}
+    private final Set<LanguageCheckKey> pendingLanguageChecks = new HashSet<>();
+
     private void checkLanguage(MessageObject messageObject) {
         if (!LanguageDetector.hasSupport()) {
             return;
         }
-        final String detectText = getDetectLanguageText(messageObject);
-        if (!isTranslatable(messageObject) || messageObject.messageOwner == null || TextUtils.isEmpty(detectText)) {
+        final long dialogId = messageObject.getDialogId();
+        final boolean hasLanguage = messageObject.messageOwner.originalLanguage != null;
+        if (!hasLanguage && isDialogTranslatable(dialogId)) {
             return;
         }
-        if (messageObject.messageOwner.originalLanguage != null) {
+        final LanguageCheckKey key = hasLanguage ? null : new LanguageCheckKey(dialogId, messageObject.getId());
+        if (key != null && pendingLanguageChecks.contains(key)) {
+            return;
+        }
+        final String detectText = getDetectLanguageText(messageObject);
+        if (TextUtils.isEmpty(detectText)) {
+            return;
+        }
+        if (hasLanguage) {
             checkDialogTranslatable(messageObject);
             return;
         }
 
-        final long dialogId = messageObject.getDialogId();
-        final int hash = hash(messageObject);
-        if (isDialogTranslatable(dialogId)) {
-            return;
-        }
-        if (pendingLanguageChecks.contains(hash)) {
-            return;
-        }
+        pendingLanguageChecks.add(key);
 
-        pendingLanguageChecks.add(hash);
-
-        Utilities.stageQueue.postRunnable(() -> {
+        if (!Utilities.stageQueue.postRunnable(() -> {
             LanguageDetector.detectLanguage(detectText, lng -> AndroidUtilities.runOnUIThread(() -> {
+                pendingLanguageChecks.remove(key);
                 String detectedLanguage = lng;
                 if (detectedLanguage == null) {
                     detectedLanguage = UNKNOWN_LANGUAGE;
                 }
                 messageObject.messageOwner.originalLanguage = detectedLanguage;
                 getMessagesStorage().updateMessageCustomParams(dialogId, messageObject.messageOwner);
-                pendingLanguageChecks.remove((Integer) hash);
                 checkDialogTranslatable(messageObject);
             }), err -> AndroidUtilities.runOnUIThread(() -> {
+                pendingLanguageChecks.remove(key);
                 messageObject.messageOwner.originalLanguage = UNKNOWN_LANGUAGE;
                 getMessagesStorage().updateMessageCustomParams(dialogId, messageObject.messageOwner);
-                pendingLanguageChecks.remove((Integer) hash);
             }));
-        });
+        })) {
+            pendingLanguageChecks.remove(key);
+        }
     }
 
     private void checkDialogTranslatable(MessageObject messageObject) {

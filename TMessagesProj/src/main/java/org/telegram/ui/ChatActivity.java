@@ -396,6 +396,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -3124,6 +3125,29 @@ public class ChatActivity extends BaseFragment implements
 
     private NotificationCenter.ObserversGroup observersGroup;
 
+    private <T> T loadPeerFromStorage(MessagesStorage storage, Supplier<T> read) {
+        final AtomicReference<T> result = new AtomicReference<>();
+        final CountDownLatch completed = new CountDownLatch(1);
+        if (!storage.getStorageQueue().postRunnable(() -> {
+            try {
+                result.set(read.get());
+            } catch (RuntimeException error) {
+                FileLog.e(error);
+            } finally {
+                completed.countDown();
+            }
+        })) {
+            return null;
+        }
+        try {
+            completed.await();
+            return result.get();
+        } catch (InterruptedException error) {
+            Thread.currentThread().interrupt();
+            return null;
+        }
+    }
+
     @Override
     public boolean onFragmentCreate() {
         android.os.Trace.beginSection("Flexy.chat.fragment_create");
@@ -3187,17 +3211,8 @@ public class ChatActivity extends BaseFragment implements
         if (chatId != 0) {
             currentChat = getMessagesController().getChat(chatId);
             if (currentChat == null) {
-                final CountDownLatch countDownLatch = new CountDownLatch(1);
                 final MessagesStorage messagesStorage = getMessagesStorage();
-                messagesStorage.getStorageQueue().postRunnable(() -> {
-                    currentChat = messagesStorage.getChat(chatId);
-                    countDownLatch.countDown();
-                });
-                try {
-                    countDownLatch.await();
-                } catch (Exception e) {
-                    FileLog.e(e);
-                }
+                currentChat = loadPeerFromStorage(messagesStorage, () -> messagesStorage.getChat(chatId));
                 if (currentChat != null) {
                     getMessagesController().putChat(currentChat, true);
                 } else {
@@ -3226,16 +3241,7 @@ public class ChatActivity extends BaseFragment implements
             currentUser = getMessagesController().getUser(userId);
             if (currentUser == null) {
                 final MessagesStorage messagesStorage = getMessagesStorage();
-                final CountDownLatch countDownLatch = new CountDownLatch(1);
-                messagesStorage.getStorageQueue().postRunnable(() -> {
-                    currentUser = messagesStorage.getUser(userId);
-                    countDownLatch.countDown();
-                });
-                try {
-                    countDownLatch.await();
-                } catch (Exception e) {
-                    FileLog.e(e);
-                }
+                currentUser = loadPeerFromStorage(messagesStorage, () -> messagesStorage.getUser(userId));
                 if (currentUser != null) {
                     getMessagesController().putUser(currentUser, true);
                 } else {
@@ -3263,16 +3269,7 @@ public class ChatActivity extends BaseFragment implements
             currentEncryptedChat = getMessagesController().getEncryptedChat(encId);
             final MessagesStorage messagesStorage = getMessagesStorage();
             if (currentEncryptedChat == null) {
-                final CountDownLatch countDownLatch = new CountDownLatch(1);
-                messagesStorage.getStorageQueue().postRunnable(() -> {
-                    currentEncryptedChat = messagesStorage.getEncryptedChat(encId);
-                    countDownLatch.countDown();
-                });
-                try {
-                    countDownLatch.await();
-                } catch (Exception e) {
-                    FileLog.e(e);
-                }
+                currentEncryptedChat = loadPeerFromStorage(messagesStorage, () -> messagesStorage.getEncryptedChat(encId));
                 if (currentEncryptedChat != null) {
                     getMessagesController().putEncryptedChat(currentEncryptedChat, true);
                 } else {
@@ -3281,16 +3278,8 @@ public class ChatActivity extends BaseFragment implements
             }
             currentUser = getMessagesController().getUser(currentEncryptedChat.user_id);
             if (currentUser == null) {
-                final CountDownLatch countDownLatch = new CountDownLatch(1);
-                messagesStorage.getStorageQueue().postRunnable(() -> {
-                    currentUser = messagesStorage.getUser(currentEncryptedChat.user_id);
-                    countDownLatch.countDown();
-                });
-                try {
-                    countDownLatch.await();
-                } catch (Exception e) {
-                    FileLog.e(e);
-                }
+                final long encryptedUserId = currentEncryptedChat.user_id;
+                currentUser = loadPeerFromStorage(messagesStorage, () -> messagesStorage.getUser(encryptedUserId));
                 if (currentUser != null) {
                     getMessagesController().putUser(currentUser, true);
                 } else {
@@ -3897,6 +3886,7 @@ public class ChatActivity extends BaseFragment implements
         releaseFinishedChatRecycler();
         AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
         cancelScrollHintChecks();
+        cancelPendingScrollHistory();
         if (contentView != null && contentView.signatureWallpaperBlur != null) {
             contentView.signatureWallpaperBlur.close(); contentView.signatureWallpaperBlur = null;
         }
@@ -7878,7 +7868,6 @@ public class ChatActivity extends BaseFragment implements
                 if (isFeedSearch()) {
                     feedIntegration().onScrolled(dy);
                 } else if (firstVisibleItem != RecyclerView.NO_POSITION) {
-                    int totalItemCount = chatAdapter.getItemCount();
                     if (firstVisibleItem == 0 && forwardEndReached[0]) {
                         if (dy >= 0) {
                             canShowPagedownButton = false;
@@ -9855,7 +9844,7 @@ public class ChatActivity extends BaseFragment implements
         emojiAnimationsOverlay = new EmojiAnimationsOverlay(ChatActivity.this, contentView, chatListView, currentAccount, dialog_id, threadMessageId) {
             @Override
             public void onAllEffectsEnd() {
-                updateMessagesVisiblePart(false);
+                invalidateMessagesVisiblePart();
             }
         };
 
@@ -15414,87 +15403,100 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private void checkScrollForLoad(boolean scroll) {
-        if (chatLayoutManager == null || paused || chatAdapter.isFrozen || waitingForGetDifference) {
+        if (chatLayoutManager == null || paused || isFinished || chatAdapter.isFrozen || waitingForGetDifference) {
+            return;
+        }
+        final boolean filtered = chatAdapter.isFiltered;
+        final boolean search = chatMode == MODE_SEARCH;
+        final boolean canLoadOlder = !loading && (search || !pendingOlderHistoryLoad)
+                && (!endReached[0] || !search && mergeDialogId != 0 && !endReached[1]);
+        final boolean canLoadNewer = !search && !loadingForward && !pendingNewerHistoryLoad
+                && (!forwardEndReached[0] || mergeDialogId != 0 && !forwardEndReached[1]);
+        if (filtered ? chatAdapter.loadingUpRow < 0 : !canLoadOlder && !canLoadNewer) {
             return;
         }
         int firstVisibleItem = RecyclerListView.NO_POSITION;
         int lastVisibleItem = RecyclerListView.NO_POSITION;
         int visibleItemCount = 0;
-        for (int i = 0; i < chatListView.getChildCount(); i++) {
+        for (int i = 0, count = chatListView.getChildCount(); i < count; i++) {
             int position = chatListView.getChildAdapterPosition(chatListView.getChildAt(i));
             if (position != RecyclerListView.NO_POSITION) {
                 if (firstVisibleItem == RecyclerListView.NO_POSITION || position < firstVisibleItem) {
                     firstVisibleItem = position;
                 }
-                if (lastVisibleItem == RecyclerListView.NO_POSITION || position > lastVisibleItem) {
+                if (filtered && position > lastVisibleItem) {
                     lastVisibleItem = position;
                 }
                 visibleItemCount++;
             }
         }
-        if (chatAdapter.isFiltered) {
-            if (chatAdapter.loadingUpRow >= 0 && firstVisibleItem >= 0 && chatAdapter.loadingUpRow >= firstVisibleItem && chatAdapter.loadingUpRow <= lastVisibleItem) {
+        if (filtered) {
+            if (firstVisibleItem >= 0 && chatAdapter.loadingUpRow >= firstVisibleItem && chatAdapter.loadingUpRow <= lastVisibleItem) {
                 getMediaDataController().loadMoreSearchMessages(false);
             }
             return;
         }
-        final int firstVisibleItemFinal = firstVisibleItem;
-        final int visibleItemCountFinal = visibleItemCount;
-        int totalItemCount = chatAdapter.getItemCount();
-        int checkLoadCount;
-        if (scroll) {
-            checkLoadCount = 25;
-        } else {
-            checkLoadCount = 5;
-        }
-
-        if (chatMode == MODE_SEARCH) {
-            if (totalItemCount - firstVisibleItemFinal - visibleItemCountFinal <= checkLoadCount && !loading) {
-                if (!endReached[0]) {
-                    loading = true;
-                    waitingForLoad.add(lastLoadIndex);
-                    loadMoreSearchResults();
-                }
+        final boolean loadOlder = canLoadOlder && chatAdapter.getItemCount() - firstVisibleItem - visibleItemCount <= (scroll ? 25 : 5);
+        if (search) {
+            if (loadOlder) {
+                loading = true;
+                waitingForLoad.add(lastLoadIndex);
+                loadMoreSearchResults();
             }
-
             return;
         }
 
-        // Most scroll steps need no I/O; leave the UI queue free until a load edge is reached.
-        boolean canLoadOlder = totalItemCount - firstVisibleItemFinal - visibleItemCountFinal <= checkLoadCount
-                && !loading && (!endReached[0] || mergeDialogId != 0 && !endReached[1]);
-        boolean canLoadNewer = visibleItemCountFinal > 0 && firstVisibleItemFinal <= 10
-                && !loadingForward && (!forwardEndReached[0] || mergeDialogId != 0 && !forwardEndReached[1]);
-        if (!canLoadOlder && !canLoadNewer) return;
-        AndroidUtilities.runOnUIThread(() -> {
-            if (paused || isFinished || chatAdapter.isFrozen || waitingForGetDifference) return;
-            if (totalItemCount - firstVisibleItemFinal - visibleItemCountFinal <= checkLoadCount && !loading) {
-                if (!endReached[0]) {
-                    loading = true;
-                    waitingForLoad.add(lastLoadIndex);
-                    if (messagesByDays.size() != 0) {
-                        getMessagesController().loadMessages(dialog_id, mergeDialogId, false, 50, maxMessageId[0], 0, !cacheEndReached[0], minDate[0], classGuid, 0, 0, chatMode, threadMessageId, replyMaxReadId, lastLoadIndex++, isTopic);
-                    } else {
-                        getMessagesController().loadMessages(dialog_id, mergeDialogId, false, 50, 0, 0, !cacheEndReached[0], minDate[0], classGuid, 0, 0, chatMode, threadMessageId, replyMaxReadId, lastLoadIndex++, isTopic);
-                    }
-                } else if (mergeDialogId != 0 && !endReached[1]) {
-                    loading = true;
-                    waitingForLoad.add(lastLoadIndex);
-                    getMessagesController().loadMessages(mergeDialogId, 0, false, 50, maxMessageId[1], 0, !cacheEndReached[1], minDate[1], classGuid, 0, 0, chatMode, threadMessageId, replyMaxReadId, lastLoadIndex++, isTopic);
+        final boolean loadNewer = canLoadNewer && visibleItemCount > 0 && firstVisibleItem <= 10;
+        if (!loadOlder && !loadNewer) return;
+        final boolean alreadyScheduled = pendingOlderHistoryLoad || pendingNewerHistoryLoad;
+        pendingOlderHistoryLoad |= loadOlder;
+        pendingNewerHistoryLoad |= loadNewer;
+        if (!alreadyScheduled) AndroidUtilities.runOnUIThread(loadScrollHistory);
+    }
+
+    private boolean pendingOlderHistoryLoad;
+    private boolean pendingNewerHistoryLoad;
+    private final Runnable loadScrollHistory = this::loadPendingScrollHistory;
+
+    private void cancelPendingScrollHistory() {
+        if (!pendingOlderHistoryLoad && !pendingNewerHistoryLoad) return;
+        pendingOlderHistoryLoad = false;
+        pendingNewerHistoryLoad = false;
+        AndroidUtilities.cancelRunOnUIThread(loadScrollHistory);
+    }
+
+    private void loadPendingScrollHistory() {
+        final boolean loadOlder = pendingOlderHistoryLoad;
+        final boolean loadNewer = pendingNewerHistoryLoad;
+        pendingOlderHistoryLoad = false;
+        pendingNewerHistoryLoad = false;
+        if (paused || isFinished || chatAdapter.isFrozen || waitingForGetDifference || chatAdapter.isFiltered || chatMode == MODE_SEARCH) return;
+        if (loadOlder && !loading) {
+            if (!endReached[0]) {
+                loading = true;
+                waitingForLoad.add(lastLoadIndex);
+                if (messagesByDays.size() != 0) {
+                    getMessagesController().loadMessages(dialog_id, mergeDialogId, false, 50, maxMessageId[0], 0, !cacheEndReached[0], minDate[0], classGuid, 0, 0, chatMode, threadMessageId, replyMaxReadId, lastLoadIndex++, isTopic);
+                } else {
+                    getMessagesController().loadMessages(dialog_id, mergeDialogId, false, 50, 0, 0, !cacheEndReached[0], minDate[0], classGuid, 0, 0, chatMode, threadMessageId, replyMaxReadId, lastLoadIndex++, isTopic);
                 }
+            } else if (mergeDialogId != 0 && !endReached[1]) {
+                loading = true;
+                waitingForLoad.add(lastLoadIndex);
+                getMessagesController().loadMessages(mergeDialogId, 0, false, 50, maxMessageId[1], 0, !cacheEndReached[1], minDate[1], classGuid, 0, 0, chatMode, threadMessageId, replyMaxReadId, lastLoadIndex++, isTopic);
             }
-            if (visibleItemCountFinal > 0 && !loadingForward && firstVisibleItemFinal <= 10) {
-                if (mergeDialogId != 0 && !forwardEndReached[1]) {
-                    waitingForLoad.add(lastLoadIndex);
-                    getMessagesController().loadMessages(mergeDialogId, 0, false, 50, minMessageId[1], 0, true, maxDate[1], classGuid, 1, 0, chatMode, threadMessageId, replyMaxReadId, lastLoadIndex++, isTopic);
-                    loadingForward = true;
-                } else if (!forwardEndReached[0]) {
-                    waitingForLoad.add(lastLoadIndex);
-                    getMessagesController().loadMessages(dialog_id, mergeDialogId, false, 50, minMessageId[0], 0, true, maxDate[0], classGuid, 1, 0, chatMode, threadMessageId, replyMaxReadId, lastLoadIndex++, isTopic);
-                    loadingForward = true;
-                }
+        }
+        if (loadNewer && !loadingForward) {
+            if (mergeDialogId != 0 && !forwardEndReached[1]) {
+                waitingForLoad.add(lastLoadIndex);
+                getMessagesController().loadMessages(mergeDialogId, 0, false, 50, minMessageId[1], 0, true, maxDate[1], classGuid, 1, 0, chatMode, threadMessageId, replyMaxReadId, lastLoadIndex++, isTopic);
+                loadingForward = true;
+            } else if (!forwardEndReached[0]) {
+                waitingForLoad.add(lastLoadIndex);
+                getMessagesController().loadMessages(dialog_id, mergeDialogId, false, 50, minMessageId[0], 0, true, maxDate[0], classGuid, 1, 0, chatMode, threadMessageId, replyMaxReadId, lastLoadIndex++, isTopic);
+                loadingForward = true;
             }
-        });
+        }
     }
 
     private void processSelectedAttach(int which) {
@@ -17716,11 +17718,6 @@ public class ChatActivity extends BaseFragment implements
             if (viewBottom > height) {
                 viewBottom = viewTop + height;
             }
-            int keyboardOffset = contentView.getKeyboardHeight();
-            if (keyboardOffset < AndroidUtilities.dp(20) && chatActivityEnterView.isPopupShowing() || chatActivityEnterView.panelAnimationInProgress()) {
-                keyboardOffset = chatActivityEnterView.getEmojiPadding();
-            }
-
             final boolean visibleToBeRead = !BaseFragment.hasSheets(this) && (currentChat == null || !ChatObject.isChannelAndNotMegaGroup(currentChat) || view.getMeasuredHeight() > 0 && top + view.getMeasuredHeight() * (messageCell == null || messageCell.getCurrentPosition() == null ? .80f : 1f) < clipBottomFinal);
 
             final float visibleTop = getServiceTop(view);
@@ -29619,7 +29616,7 @@ public class ChatActivity extends BaseFragment implements
         if (isOpen) {
             if (!fragmentOpened) {
                 fragmentOpened = true;
-                updateMessagesVisiblePart(false);
+                invalidateMessagesVisiblePart();
             }
             if (transitionAnimationIndex == 0) {
                 alowedNotifications = OPEN_ALLOWED_NOTIFICATIONS_0;
@@ -29767,7 +29764,7 @@ public class ChatActivity extends BaseFragment implements
             if (pendingRequestsDelegate != null && backward) {
                 pendingRequestsDelegate.onBackToScreen();
             }
-            updateMessagesVisiblePart(false);
+            invalidateMessagesVisiblePart();
         } else {
             getNotificationCenter().onAnimationFinish(transitionAnimationIndex);
             NotificationCenter.getGlobalInstance().onAnimationFinish(transitionAnimationGlobalIndex);
@@ -32625,6 +32622,7 @@ public class ChatActivity extends BaseFragment implements
     public void onPause() {
         cancelFolderUnreadBadgeUpdate();
         cancelScrollHintChecks();
+        cancelPendingScrollHistory();
         AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
         // Refresh the visible translations once on return, rather than scanning a hidden chat.
         translationCheckDeferred = true;

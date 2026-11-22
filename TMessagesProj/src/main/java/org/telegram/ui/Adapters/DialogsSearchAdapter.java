@@ -119,7 +119,6 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
 
     private final Context mContext;
     private Runnable searchRunnable;
-    private Runnable searchRunnable2;
     private int searchHashtagRequest = -1;
     private Runnable searchHashtagRunnable;
     private ArrayList<Object> searchResult = new ArrayList<>();
@@ -152,7 +151,7 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
     private int lastMessagesSearchFilterFlags;
     private String currentMessagesQuery;
     private int nextSearchRate;
-    private int lastSearchId;
+    private volatile int lastSearchId;
     private int lastGlobalSearchId;
     private final boolean allowGlobalSearch;
     private int lastLocalSearchId;
@@ -972,12 +971,8 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
             return;
         }
         String q = query.trim().toLowerCase();
-        if (q.length() == 0) {
-            lastSearchId = 0;
-            updateSearchResults(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), lastSearchId);
-            return;
-        }
-        MessagesStorage.getInstance(currentAccount).getStorageQueue().postRunnable(() -> {
+        if (!MessagesStorage.getInstance(currentAccount).getStorageQueue().postRunnable(() -> {
+            if (searchId != lastSearchId) return;
             ArrayList<Object> resultArray = new ArrayList<>();
             ArrayList<CharSequence> resultArrayNames = new ArrayList<>();
             ArrayList<TLRPC.User> encUsers = new ArrayList<>();
@@ -985,26 +980,30 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
 
             MessagesStorage.getInstance(currentAccount).localSearch(dialogsType, q, resultArray, resultArrayNames, encUsers, filterDialogIds, -1);
             updateSearchResults(resultArray, resultArrayNames, encUsers, contacts, searchId);
-            FiltersView.fillTipDates(q, localTipDates);
-            localTipArchive = false;
-            if (q.length() >= 3 && (LocaleController.getString(R.string.ArchiveSearchFilter).toLowerCase().startsWith(q) || "archive".startsWith(query))) {
-                localTipArchive = true;
-            }
+            ArrayList<FiltersView.DateData> tipDates = new ArrayList<>();
+            FiltersView.fillTipDates(q, tipDates);
+            final boolean tipArchive = q.length() >= 3
+                    && (LocaleController.getString(R.string.ArchiveSearchFilter).toLowerCase().startsWith(q) || "archive".startsWith(query));
             AndroidUtilities.runOnUIThread(() -> {
+                if (searchId != lastSearchId) return;
+                localTipDates = tipDates;
+                localTipArchive = tipArchive;
                 if (filtersDelegate != null) {
                     filtersDelegate.updateFiltersView(false, null, localTipDates, localTipArchive);
                 }
             });
-        });
+        })) {
+            updateSearchResults(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), searchId);
+        }
     }
 
 
     private void updateSearchResults(final ArrayList<Object> result, final ArrayList<CharSequence> names, final ArrayList<TLRPC.User> encUsers,  final ArrayList<ContactsController.Contact> contacts, final int searchId) {
         AndroidUtilities.runOnUIThread(() -> {
-            waitingResponseCount--;
             if (searchId != lastSearchId) {
                 return;
             }
+            waitingResponseCount--;
             lastLocalSearchId = searchId;
             if (lastGlobalSearchId != searchId) {
                 searchAdapterHelper.clear();
@@ -1112,13 +1111,10 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
         }
         lastSearchText = text;
         this.folderId = folderId;
+        final int searchId = ++lastSearchId;
         if (searchRunnable != null) {
-            Utilities.searchQueue.cancelRunnable(searchRunnable);
+            AndroidUtilities.cancelRunOnUIThread(searchRunnable);
             searchRunnable = null;
-        }
-        if (searchRunnable2 != null) {
-            AndroidUtilities.cancelRunOnUIThread(searchRunnable2);
-            searchRunnable2 = null;
         }
         if (searchHashtagRunnable != null) {
             AndroidUtilities.cancelRunOnUIThread(searchHashtagRunnable);
@@ -1186,12 +1182,11 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
                     0,
                     dialogsType == DialogsActivity.DIALOGS_TYPE_DEFAULT,
                     0,
-                    0,
+                    searchId,
                     delegate != null ? delegate.getSearchForumDialogId() : 0
                 );
             }
             searchWas = false;
-            lastSearchId = 0;
             waitingResponseCount = 0;
             globalSearchCollapsed = true;
             phoneCollapsed = true;
@@ -1236,8 +1231,6 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
                 searchResultHashtags.clear();
             }
 
-            lastSearchId++;
-            final int searchId = lastSearchId;
             waitingResponseCount = 3;
             globalSearchCollapsed = true;
             phoneCollapsed = true;
@@ -1267,43 +1260,39 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
 //                return;
 //            }
 
-            Utilities.searchQueue.postRunnable(searchRunnable = () -> {
+            AndroidUtilities.runOnUIThread(searchRunnable = () -> {
+                if (searchId != lastSearchId) return;
                 searchRunnable = null;
                 searchDialogsInternal(query, searchId);
                 if (dialogsType == DialogsActivity.DIALOGS_TYPE_BOT_REQUEST_PEER) {
                     waitingResponseCount -= 2;
                     return;
                 }
-                AndroidUtilities.runOnUIThread(searchRunnable2 = () -> {
-                    searchRunnable2 = null;
-                    if (searchId != lastSearchId) {
-                        return;
-                    }
-                    if (needMessagesSearch != 2 && dialogsType != DialogsActivity.DIALOGS_TYPE_GROUPS_ONLY && dialogsType != DialogsActivity.DIALOGS_TYPE_CHANNELS_ONLY && delegate.getSearchForumDialogId() == 0) {
-                        searchAdapterHelper.queryServerSearch(
-                            query,
-                            true,
-                            dialogsType != DialogsActivity.DIALOGS_TYPE_USERS_ONLY,
-                            true,
-                            dialogsType != DialogsActivity.DIALOGS_TYPE_USERS_ONLY && dialogsType != DialogsActivity.DIALOGS_TYPE_IMPORT_HISTORY_GROUPS,
-                            dialogsType == DialogsActivity.DIALOGS_TYPE_ADD_USERS_TO || dialogsType == DialogsActivity.DIALOGS_TYPE_BOT_SHARE,
-                            0,
-                            dialogsType == DialogsActivity.DIALOGS_TYPE_DEFAULT,
-                            0,
-                            searchId,
-                            delegate != null ? delegate.getSearchForumDialogId() : 0
-                        );
-                    } else {
-                        waitingResponseCount -= 2;
-                    }
-                    if (needMessagesSearch == 0 || dialogsType == DialogsActivity.DIALOGS_TYPE_BOT_REQUEST_PEER) {
-                        waitingResponseCount--;
-                    } else {
-                        searchTopics(text);
-                        searchMessagesInternal(text, searchId);
-                        searchForumMessagesInternal(text, searchId);
-                    }
-                });
+                final long forumDialogId = delegate != null ? delegate.getSearchForumDialogId() : 0;
+                if (needMessagesSearch != 2 && dialogsType != DialogsActivity.DIALOGS_TYPE_GROUPS_ONLY && dialogsType != DialogsActivity.DIALOGS_TYPE_CHANNELS_ONLY && forumDialogId == 0) {
+                    searchAdapterHelper.queryServerSearch(
+                        query,
+                        true,
+                        dialogsType != DialogsActivity.DIALOGS_TYPE_USERS_ONLY,
+                        true,
+                        dialogsType != DialogsActivity.DIALOGS_TYPE_USERS_ONLY && dialogsType != DialogsActivity.DIALOGS_TYPE_IMPORT_HISTORY_GROUPS,
+                        dialogsType == DialogsActivity.DIALOGS_TYPE_ADD_USERS_TO || dialogsType == DialogsActivity.DIALOGS_TYPE_BOT_SHARE,
+                        0,
+                        dialogsType == DialogsActivity.DIALOGS_TYPE_DEFAULT,
+                        0,
+                        searchId,
+                        forumDialogId
+                    );
+                } else {
+                    waitingResponseCount -= 2;
+                }
+                if (needMessagesSearch == 0) {
+                    waitingResponseCount--;
+                } else {
+                    searchTopics(text);
+                    searchMessagesInternal(text, searchId);
+                    searchForumMessagesInternal(text, searchId);
+                }
             }, 300);
 
             final String finalHashtag = hashtag;

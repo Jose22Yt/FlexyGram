@@ -1,7 +1,9 @@
 package org.telegram.ui;
 
 import android.graphics.Canvas;
+import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -275,56 +277,85 @@ public class EmojiAnimationsOverlay implements NotificationCenter.NotificationCe
 
     }
 
+    private SparseArray<View> effectAnchors;
+
+    private static MessageObject effectAnchorMessage(View child) {
+        if (child instanceof ChatMessageCell) return ((ChatMessageCell) child).getMessageObject();
+        if (child instanceof ChatActionCell) return ((ChatActionCell) child).getMessageObject();
+        return null;
+    }
+
+    private void indexEffectAnchors(SparseArray<View> anchors) {
+        for (int i = 0, count = listView.getChildCount(); i < count; i++) {
+            final View child = listView.getChildAt(i);
+            final MessageObject message = effectAnchorMessage(child);
+            if (message != null && anchors.indexOfKey(message.getId()) < 0) {
+                anchors.put(message.getId(), child);
+            }
+        }
+    }
+
+    private View findEffectAnchor(int messageId) {
+        for (int i = 0, count = listView.getChildCount(); i < count; i++) {
+            final View child = listView.getChildAt(i);
+            final MessageObject message = effectAnchorMessage(child);
+            if (message != null && message.getId() == messageId) return child;
+        }
+        return null;
+    }
+
     public void draw(Canvas canvas) {
+        if (chatActivity == null || drawingObjects.size() <= 1) {
+            drawEffects(canvas, null);
+            return;
+        }
+        if (effectAnchors == null) effectAnchors = new SparseArray<>();
+        try {
+            indexEffectAnchors(effectAnchors);
+            drawEffects(canvas, effectAnchors);
+        } finally {
+            effectAnchors.clear();
+        }
+    }
+
+    private void drawEffects(Canvas canvas, @Nullable SparseArray<View> anchors) {
         if (!drawingObjects.isEmpty()) {
+            final long now = chatActivity == null ? 0 : SystemClock.uptimeMillis();
             for (int i = 0; i < drawingObjects.size(); i++) {
                 DrawingObject drawingObject = drawingObjects.get(i);
                 if (chatActivity != null) {
-                    drawingObject.viewFound = false;
+                    final View child = anchors == null ? findEffectAnchor(drawingObject.messageId) : anchors.get(drawingObject.messageId);
+                    drawingObject.viewFound = child != null;
                     float childY = 0;
-                    for (int k = 0; k < listView.getChildCount(); k++) {
-                        View child = listView.getChildAt(k);
-                        ImageReceiver photoImage = null;
-                        MessageObject messageObject = null;
-                        if (child instanceof ChatMessageCell) {
-                            ChatMessageCell cell = (ChatMessageCell) child;
-                            messageObject = cell.getMessageObject();
-                            photoImage = cell.getPhotoImage();
-                        } else if (child instanceof ChatActionCell) {
-                            ChatActionCell cell = (ChatActionCell) child;
-                            messageObject = cell.getMessageObject();
-                            photoImage = cell.getPhotoImage();
-                        }
-                        if (messageObject != null && messageObject.getId() == drawingObject.messageId) {
-                            drawingObject.viewFound = true;
-                            float viewX = listView.getX() + child.getX();
-                            float viewY = listView.getY() + child.getY();
-                            childY = child.getY();
-                            drawingObject.lastW = photoImage.getImageWidth();
-                            drawingObject.lastH = photoImage.getImageHeight();
-                            if (drawingObject.isMessageEffect && child instanceof ChatMessageCell) {
-                                ChatMessageCell cell = ((ChatMessageCell) child);
-                                float sz = getFilterWidth() * AndroidUtilities.density / 1.3f;
-                                drawingObject.lastW = sz / 3f;
-                                drawingObject.lastH = sz / 3f;
-                                drawingObject.lastX = Utilities.clamp(viewX + cell.getTimeX() - sz / 2f, AndroidUtilities.displaySize.x - sz, 0);
-                                drawingObject.lastY = viewY + cell.getTimeY() - sz / 2f;
-                            } else if (drawingObject.isPremiumSticker) {
-                                drawingObject.lastX = viewX + photoImage.getImageX();
-                                drawingObject.lastY = viewY + photoImage.getImageY();
+                    if (child != null) {
+                        final ImageReceiver photoImage = child instanceof ChatMessageCell
+                                ? ((ChatMessageCell) child).getPhotoImage() : ((ChatActionCell) child).getPhotoImage();
+                        float viewX = listView.getX() + child.getX();
+                        float viewY = listView.getY() + child.getY();
+                        childY = child.getY();
+                        drawingObject.lastW = photoImage.getImageWidth();
+                        drawingObject.lastH = photoImage.getImageHeight();
+                        if (drawingObject.isMessageEffect && child instanceof ChatMessageCell) {
+                            ChatMessageCell cell = ((ChatMessageCell) child);
+                            float sz = getFilterWidth() * AndroidUtilities.density / 1.3f;
+                            drawingObject.lastW = sz / 3f;
+                            drawingObject.lastH = sz / 3f;
+                            drawingObject.lastX = Utilities.clamp(viewX + cell.getTimeX() - sz / 2f, AndroidUtilities.displaySize.x - sz, 0);
+                            drawingObject.lastY = viewY + cell.getTimeY() - sz / 2f;
+                        } else if (drawingObject.isPremiumSticker) {
+                            drawingObject.lastX = viewX + photoImage.getImageX();
+                            drawingObject.lastY = viewY + photoImage.getImageY();
+                        } else {
+                            viewX += photoImage.getImageX();
+                            viewY += photoImage.getImageY();
+                            if (drawingObject.isOut) {
+                                viewX += -photoImage.getImageWidth() * 2 + AndroidUtilities.dp(24);
                             } else {
-                                viewX += photoImage.getImageX();
-                                viewY += photoImage.getImageY();
-                                if (drawingObject.isOut) {
-                                    viewX += -photoImage.getImageWidth() * 2 + AndroidUtilities.dp(24);
-                                } else {
-                                    viewX += -AndroidUtilities.dp(24);
-                                }
-                                viewY -= photoImage.getImageWidth();
-                                drawingObject.lastX = viewX;
-                                drawingObject.lastY = viewY;
+                                viewX += -AndroidUtilities.dp(24);
                             }
-                            break;
+                            viewY -= photoImage.getImageWidth();
+                            drawingObject.lastX = viewX;
+                            drawingObject.lastY = viewY;
                         }
                     }
 
@@ -342,9 +373,8 @@ public class EmojiAnimationsOverlay implements NotificationCenter.NotificationCe
                     }
 
                     if (drawingObject.removing && drawingObject.removeProgress != 1f) {
-                        drawingObject.removeProgress = Utilities.clamp(drawingObject.removeProgress + 16 / 150f, 1f, 0);
+                        drawingObject.updateRemovalProgress(now);
                         drawingObject.imageReceiver.setAlpha(1f - drawingObject.removeProgress);
-                        chatActivity.contentView.invalidate();
                     }
                 } else {
                     layoutObject(drawingObject);
@@ -1086,6 +1116,12 @@ public class EmojiAnimationsOverlay implements NotificationCenter.NotificationCe
         boolean isOut;
         boolean removing;
         float removeProgress;
+        private long removeStartTime = -1;
+
+        private void updateRemovalProgress(long now) {
+            if (removeStartTime < 0) removeStartTime = now;
+            removeProgress = Math.min(1f, (now - removeStartTime) / 150f);
+        }
         int messageId;
         TLRPC.Document document;
         ImageReceiver imageReceiver = new ImageReceiver();

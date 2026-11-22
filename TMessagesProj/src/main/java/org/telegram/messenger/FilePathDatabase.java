@@ -321,10 +321,10 @@ public class FilePathDatabase {
         CountDownLatch syncLatch = new CountDownLatch(1);
         long time = System.currentTimeMillis();
         long[] threadTime = new long[1];
-        postToFrontRunnable(() -> {
+        if (!postToFrontRunnable(() -> {
             long threadTimeLocal = System.currentTimeMillis();
-            ensureDatabaseCreated();
             try {
+                ensureDatabaseCreated();
                 for (int i = 0; i < arrayListFinal.size(); i++) {
                     MessageObject messageObject = arrayListFinal.get(i);
                     messageObject.checkMediaExistance(false);
@@ -336,11 +336,14 @@ public class FilePathDatabase {
                 syncLatch.countDown();
             }
 
-        });
+        })) {
+            return;
+        }
 
         try {
             syncLatch.await();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             FileLog.e(e);
         }
 
@@ -510,9 +513,9 @@ public class FilePathDatabase {
         dispatchQueue.postRunnable(runnable);
     }
 
-    private void postToFrontRunnable(Runnable runnable) {
+    private boolean postToFrontRunnable(Runnable runnable) {
         ensureQueueExist();
-        dispatchQueue.postToFrontRunnable(runnable);
+        return dispatchQueue.postToFrontRunnable(runnable);
     }
 
     private void ensureQueueExist() {

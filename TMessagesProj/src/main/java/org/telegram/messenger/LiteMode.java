@@ -50,6 +50,7 @@ public class LiteMode {
     public static final int FLAG_AUTOPLAY_VIDEOS = 1024;
     public static final int FLAG_AUTOPLAY_GIFS = 2048;
     public static final int FLAG_PARTICLES = 1 << 17;
+    private static final int THERMAL_EFFECTS = FLAG_CHAT_BLUR | FLAG_LIQUID_GLASS | FLAG_PARTICLES | FLAG_CHAT_THANOS;
 
     public static int PRESET_LOW = (
         FLAG_ANIMATED_EMOJI_CHAT_PREMIUM |
@@ -93,6 +94,7 @@ public class LiteMode {
 
     private static int powerSaverLevel;
     private static volatile boolean lastPowerSaverApplied;
+    private static volatile boolean thermalPressureHigh;
 
     private static int value;
     private static boolean loaded;
@@ -112,7 +114,8 @@ public class LiteMode {
             lastPowerSaverApplied = powerSaver;
             onPowerSaverApplied(powerSaver);
         }
-        return powerSaver ? PRESET_POWER_SAVER : value;
+        if (powerSaver) return PRESET_POWER_SAVER;
+        return thermalPressureHigh ? value & ~THERMAL_EFFECTS : value;
     }
 
     private static boolean isBatteryBelowThreshold(int level, int threshold) {
@@ -328,6 +331,36 @@ public class LiteMode {
         return lastPowerSaverApplied;
     }
 
+    public static boolean isThermalPressureHigh() {
+        return thermalPressureHigh;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private static class ThermalMonitor {
+        private static boolean registered;
+
+        static void start(Context context, PowerManager power) {
+            if (registered || power == null) return;
+            try {
+                // Android sends the initial status on registration, then reports changes.
+                power.addThermalStatusListener(context.getMainExecutor(), ThermalMonitor::onStatusChanged);
+                registered = true;
+            } catch (RuntimeException error) {
+                FileLog.e(error);
+            }
+        }
+
+        private static void onStatusChanged(int status) {
+            if (BuildConfig.FLEXY_SYSTEM_TRACE) android.os.Trace.setCounter("Flexy.thermal_status", status);
+            // Keep the simpler effects through moderate throttling after a severe event.
+            final boolean high = status >= PowerManager.THERMAL_STATUS_SEVERE
+                    || thermalPressureHigh && status > PowerManager.THERMAL_STATUS_LIGHT;
+            if (high == thermalPressureHigh) return;
+            thermalPressureHigh = high;
+            if (!lastPowerSaverApplied) dispatchPowerPolicyListeners(false);
+        }
+    }
+
     private static void onPowerSaverApplied(boolean powerSaverApplied) {
         if (powerSaverApplied) {
             onFlagsUpdate(getValue(true), PRESET_POWER_SAVER);
@@ -383,6 +416,7 @@ public class LiteMode {
                 initialized = true;
                 final PowerManager power = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
                 systemPowerSaver = power != null && power.isPowerSaveMode();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ThermalMonitor.start(context, power);
             }
             if (powerModeChanged) {
                 getValue();

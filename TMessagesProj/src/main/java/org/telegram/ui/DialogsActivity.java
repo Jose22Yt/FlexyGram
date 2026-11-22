@@ -3252,6 +3252,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onFragmentDestroy() {
         historyWarmup.cancel();
+        clearPreviewBlur();
         chatOpenGeneration++;
         LiteMode.removeOnPowerSaverAppliedListener(nativeGlassPowerListener);
         super.onFragmentDestroy();
@@ -7704,7 +7705,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private boolean canWarmVisibleHistory() {
         return !isPaused() && !isFinished && !onlySelect && !searchIsShowed && !dialogsListFrozen
                 && actionBar != null && !actionBar.isActionModeShowed()
-                && communityId == 0 && !LiteMode.isPowerSaverApplied() && fragmentView != null && fragmentView.isShown()
+                && communityId == 0 && !LiteMode.isPowerSaverApplied() && !LiteMode.isThermalPressureHigh()
+                && fragmentView != null && fragmentView.isShown()
                 && parentLayout != null && !parentLayout.checkTransitionAnimation() && !parentLayout.isInPreviewMode()
                 && viewPages != null && viewPages[0] != null && viewPages[0].isDefaultDialogType()
                 && viewPages[0].listView != null && viewPages[0].listView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE;
@@ -9542,33 +9544,74 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         fragmentView.invalidate();
     }
 
+    private int previewBlurGeneration;
+    private boolean previewBlurPending;
+    private float previewBlurAlpha;
+
+    private void clearPreviewBlur() {
+        previewBlurGeneration++;
+        previewBlurPending = false;
+        previewBlurAlpha = 0f;
+        if (blurredView != null && blurredView.getVisibility() == View.VISIBLE) {
+            blurredView.setVisibility(View.GONE);
+            blurredView.setBackground(null);
+        }
+    }
+
     private void prepareBlurBitmap() {
-        if (blurredView == null) {
+        clearPreviewBlur();
+        if (blurredView == null || fragmentView == null || !SharedConfig.chatBlurEnabled()) return;
+        final int width = fragmentView.getMeasuredWidth(), height = fragmentView.getMeasuredHeight();
+        if (width <= 0 || height <= 0) return;
+        final int w = Math.max(1, width / 9), h = Math.max(1, height / 9);
+        Bitmap bitmap = null;
+        try {
+            bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            bitmap.eraseColor(getThemedColor(Theme.key_windowBackgroundWhite));
+            Canvas canvas = new Canvas(bitmap);
+            canvas.scale(1.0f / 9.0f, 1.0f / 9.0f);
+            fragmentView.draw(canvas);
+        } catch (RuntimeException | OutOfMemoryError unavailable) {
+            if (bitmap != null) bitmap.recycle();
             return;
         }
-        int w = (int) (fragmentView.getMeasuredWidth() / 9.0f);
-        int h = (int) (fragmentView.getMeasuredHeight() / 9.0f);
-        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        bitmap.eraseColor(getThemedColor(Theme.key_windowBackgroundWhite));
-        Canvas canvas = new Canvas(bitmap);
-        canvas.scale(1.0f / 9.0f, 1.0f / 9.0f);
-        fragmentView.draw(canvas);
-        Utilities.stackBlurBitmap(bitmap, Math.max(9, Math.max(w, h) / 180));
-        blurredView.setBackground(new BitmapDrawable(bitmap));
-        blurredView.setAlpha(0.0f);
-        blurredView.setVisibility(View.VISIBLE);
-        checkUi_mainTabsVisible();
+        final int generation = previewBlurGeneration;
+        previewBlurPending = true;
+        final java.lang.ref.WeakReference<DialogsActivity> owner = new java.lang.ref.WeakReference<>(this);
+        final java.lang.ref.WeakReference<View> target = new java.lang.ref.WeakReference<>(blurredView);
+        if (!app.flexygram.performance.AsyncBitmapBlur.submit(bitmap, Math.max(9, Math.max(w, h) / 180),
+                "Flexy.dialog_preview.blur.cpu", result -> {
+                    final DialogsActivity current = owner.get();
+                    if (current == null || generation != current.previewBlurGeneration) {
+                        if (result != null) result.recycle();
+                        return;
+                    }
+                    current.previewBlurPending = false;
+                    if (result == null) return;
+                    if (current.blurredView == null || current.blurredView != target.get() || current.fragmentView == null
+                            || current.fragmentView.getMeasuredWidth() != width || current.fragmentView.getMeasuredHeight() != height
+                            || current.parentLayout == null || !current.parentLayout.isInPreviewMode() || !SharedConfig.chatBlurEnabled()) {
+                        result.recycle();
+                        return;
+                    }
+                    current.blurredView.setBackground(new BitmapDrawable(current.blurredView.getResources(), result));
+                    current.blurredView.setAlpha(current.previewBlurAlpha);
+                    current.blurredView.setVisibility(View.VISIBLE);
+                    current.checkUi_mainTabsVisible();
+                })) {
+            previewBlurPending = false;
+            bitmap.recycle();
+        }
     }
 
     @Override
     public void onTransitionAnimationProgress(boolean isOpen, float progress) {
         if (rightSlidingDialogContainer != null && rightSlidingDialogContainer.hasFragment()) {
             rightSlidingDialogContainer.getFragment().onTransitionAnimationProgress(isOpen, progress);
-        } else if (blurredView != null && blurredView.getVisibility() == View.VISIBLE) {
-            if (isOpen) {
-                blurredView.setAlpha(1.0f - progress);
-            } else {
-                blurredView.setAlpha(progress);
+        } else if (blurredView != null && (previewBlurPending || blurredView.getVisibility() == View.VISIBLE)) {
+            previewBlurAlpha = isOpen ? 1.0f - progress : progress;
+            if (blurredView.getVisibility() == View.VISIBLE && blurredView.getAlpha() != previewBlurAlpha) {
+                blurredView.setAlpha(previewBlurAlpha);
             }
         }
         checkUi_mainTabsVisible();
@@ -9579,10 +9622,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (rightSlidingDialogContainer != null && rightSlidingDialogContainer.hasFragment()) {
             rightSlidingDialogContainer.getFragment().onTransitionAnimationEnd(isOpen, backward);
         } else {
-            if (isOpen && blurredView != null && blurredView.getVisibility() == View.VISIBLE) {
-                blurredView.setVisibility(View.GONE);
-                blurredView.setBackground(null);
-            }
+            if (isOpen) clearPreviewBlur();
             if (isOpen && afterSignup) {
                 try {
                     if (!NekoConfig.disableVibration.Bool()) fragmentView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
@@ -15062,13 +15102,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private final Utilities.Callback<Boolean> nativeGlassPowerListener = ignored -> refreshNativeGlassPolicy();
 
     private void refreshNativeGlassPolicy() {
+        if (LiteMode.isPowerSaverApplied() || LiteMode.isThermalPressureHigh()) historyWarmup.cancel();
         boolean liquid = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
         boolean blur = SharedConfig.chatBlurEnabled();
         if (appliedGlassPolicyInitialized && appliedLiquidGlassPolicy == liquid && appliedBlurPolicy == blur) return;
         appliedGlassPolicyInitialized = true;
         appliedLiquidGlassPolicy = liquid;
         appliedBlurPolicy = blur;
-        if (LiteMode.isPowerSaverApplied()) historyWarmup.cancel();
         if (scrollableViewNoiseSuppressor != null) scrollableViewNoiseSuppressor.clearCapture();
         if (Build.VERSION.SDK_INT >= 31 && scrollableViewNoiseSuppressor != null
                 && scrollableViewNoiseSuppressor.isLiquidGlassEnabled != liquid) {

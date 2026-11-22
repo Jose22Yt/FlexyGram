@@ -7,6 +7,55 @@ from test_composer_layout import method
 from test_render_work_reuse import JAVA, probe
 
 
+def test_chat_storage_fallback_finishes_if_submission_is_rejected_or_read_fails(tmp_path):
+    source = (JAVA / 'org/telegram/ui/ChatActivity.java').read_text()
+    load_peer = method(source, 'private <T> T loadPeerFromStorage(')
+    probe(tmp_path, {'Probe.java': '''
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+
+public class Probe {
+    static class FileLog {
+        static int errors;
+        static void e(RuntimeException error) { errors++; }
+    }
+    static class Queue {
+        boolean accept = true;
+        Runnable held;
+        boolean hold;
+        boolean postRunnable(Runnable work) {
+            if (!accept) return false;
+            if (hold) held = work;
+            else new Thread(work).start();
+            return true;
+        }
+    }
+    static class MessagesStorage {
+        final Queue queue = new Queue();
+        Queue getStorageQueue() { return queue; }
+    }
+    LOAD_PEER
+    static void check(boolean condition) { if (!condition) throw new AssertionError(); }
+    public static void main(String[] args) {
+        Probe probe = new Probe();
+        MessagesStorage storage = new MessagesStorage();
+        check(probe.loadPeerFromStorage(storage, () -> 42) == 42);
+        check(probe.loadPeerFromStorage(storage, () -> { throw new IllegalStateException(); }) == null);
+        check(FileLog.errors == 1);
+        storage.queue.accept = false;
+        check(probe.loadPeerFromStorage(storage, () -> { throw new AssertionError(); }) == null);
+        storage.queue.accept = true;
+        storage.queue.hold = true;
+        Thread.currentThread().interrupt();
+        check(probe.loadPeerFromStorage(storage, () -> 17) == null);
+        check(Thread.interrupted());
+        storage.queue.held.run();
+    }
+}
+'''.replace('LOAD_PEER', load_peer)})
+
+
 def test_unread_comparison_keeps_exact_semantics_and_closes_failed_cursors(tmp_path):
     source = (JAVA/'org/telegram/messenger/MessagesStorage.java').read_text()
     actual = method(source, 'private boolean matchesLocalUnreadCount(')

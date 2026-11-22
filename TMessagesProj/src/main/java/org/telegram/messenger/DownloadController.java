@@ -1648,35 +1648,44 @@ public class DownloadController extends BaseController implements NotificationCe
         getMessagesStorage().getStorageQueue().postRunnable(() -> {
             ArrayList<MessageObject> downloadingMessages = new ArrayList<>();
             ArrayList<MessageObject> recentlyDownloadedMessages = new ArrayList<>();
-            ArrayList<MessageObject> newMessages = new ArrayList<>();
+            ArrayList<MessageObject> allDownloads = new ArrayList<>();
+            SQLiteCursor cursor = null;
             try {
-                getMessagesStorage().getDatabase().executeFast("DELETE FROM downloading_documents WHERE state = 1 AND rowid NOT IN (SELECT rowid FROM downloading_documents WHERE state = 1 ORDER BY date DESC LIMIT 100)").stepThis().dispose();
-                SQLiteCursor cursor2 = getMessagesStorage().getDatabase().queryFinalized("SELECT data, state FROM downloading_documents ORDER BY date DESC");
-                while (cursor2.next()) {
-                    NativeByteBuffer data = cursor2.byteBufferValue(0);
-                    int state = cursor2.intValue(1);
-                    if (data != null) {
+                SQLitePreparedStatement trim = getMessagesStorage().getDatabase().executeFast("DELETE FROM downloading_documents WHERE state = 1 AND rowid NOT IN (SELECT rowid FROM downloading_documents WHERE state = 1 ORDER BY date DESC LIMIT 100)");
+                try {
+                    trim.step();
+                } finally {
+                    trim.dispose();
+                }
+                cursor = getMessagesStorage().getDatabase().queryFinalized("SELECT data, state FROM downloading_documents ORDER BY date DESC");
+                while (cursor.next()) {
+                    final NativeByteBuffer data = cursor.byteBufferValue(0);
+                    if (data == null) continue;
+                    try {
+                        int state = cursor.intValue(1);
                         TLRPC.Message message = TLRPC.Message.TLdeserialize(data, data.readInt32(false), false);
                         if (message != null) {
                             message.readAttachPath(data, UserConfig.getInstance(currentAccount).clientUserId);
                             MessageObject messageObject = new MessageObject(currentAccount, message, false, false);
-                            newMessages.add(messageObject);
+                            allDownloads.add(messageObject);
                             if (state == 0) {
                                 downloadingMessages.add(messageObject);
                             } else {
                                 recentlyDownloadedMessages.add(messageObject);
                             }
                         }
+                    } finally {
                         data.reuse();
                     }
                 }
-                cursor2.dispose();
             } catch (Exception e) {
                 FileLog.e(e);
+                return;
+            } finally {
+                if (cursor != null) cursor.dispose();
             }
 
-            getFileLoader().checkMediaExistance(downloadingMessages);
-            getFileLoader().checkMediaExistance(recentlyDownloadedMessages);
+            getFileLoader().checkMediaExistance(allDownloads);
 
             AndroidUtilities.runOnUIThread(() -> {
                 downloadingFiles.clear();

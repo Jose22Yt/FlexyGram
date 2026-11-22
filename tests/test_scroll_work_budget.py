@@ -71,15 +71,17 @@ public class Probe {
 def test_chat_pagination_only_posts_at_edges_and_keeps_native_loading_rules(tmp_path):
     source = (JAVA/'org/telegram/ui/ChatActivity.java').read_text()
     load = method(source, 'private void checkScrollForLoad(boolean scroll)')
+    pending = source[source.index('    private boolean pendingOlderHistoryLoad;'):source.index('    private void processSelectedAttach(')]
     probe(tmp_path, {'Probe.java': '''import java.util.*;
 public class Probe {
  static class RecyclerListView {static final int NO_POSITION=-1;}
  static class AndroidUtilities {
   static List<Runnable> queue=new ArrayList<>();static int posts;
   static void runOnUIThread(Runnable r){posts++;queue.add(r);}
+  static void cancelRunOnUIThread(Runnable r){queue.remove(r);}
   static void fire(){List<Runnable> copy=new ArrayList<>(queue);queue.clear();for(Runnable r:copy)r.run();}
  }
- static class ListView {int first=40,count=10;int getChildCount(){return count;}int getChildAt(int i){return first+i;}int getChildAdapterPosition(int p){return p;}}
+ static class ListView {int first=40,count=10,positionReads;int getChildCount(){return count;}int getChildAt(int i){return first+i;}int getChildAdapterPosition(int p){positionReads++;return p;}}
  static class Adapter {boolean isFrozen,isFiltered;int loadingUpRow=-1;int getItemCount(){return 100;}}
  static class Controller {List<Object[]> calls=new ArrayList<>();void loadMessages(Object...args){calls.add(args);}}
  static class Media {int calls;void loadMoreSearchMessages(boolean b){calls++;}}
@@ -92,6 +94,7 @@ public class Probe {
  Controller getMessagesController(){return controller;}Media getMediaDataController(){return media;}
  void loadMoreSearchResults(){searchLoads++;}
  LOAD
+ PENDING
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[] args){
   Probe p=new Probe();
@@ -116,8 +119,21 @@ public class Probe {
   p.chatAdapter.isFiltered=true;p.chatAdapter.loadingUpRow=5;p.checkScrollForLoad(true);check(p.media.calls==1&&AndroidUtilities.queue.isEmpty());
   p.chatAdapter.isFiltered=false;p.chatMode=MODE_SEARCH;p.endReached[0]=false;p.chatListView.first=90;
   p.checkScrollForLoad(true);check(p.searchLoads==1&&p.loading&&AndroidUtilities.queue.isEmpty());
+  Probe full=new Probe();full.endReached[0]=full.forwardEndReached[0]=true;
+  for(int i=0;i<10000;i++)full.checkScrollForLoad(true);
+  check(full.chatListView.positionReads==0&&AndroidUtilities.queue.isEmpty());
+  Probe rapid=new Probe();rapid.chatListView.first=80;
+  for(int i=0;i<10000;i++)rapid.checkScrollForLoad(true);
+  rapid.chatListView.first=0;rapid.checkScrollForLoad(true);
+  check(AndroidUtilities.queue.size()==1);
+  AndroidUtilities.fire();check(rapid.controller.calls.size()==2&&rapid.loading&&rapid.loadingForward);
+  rapid.loadingForward=false;rapid.checkScrollForLoad(true);
+  check(AndroidUtilities.queue.size()==1);
+  rapid.cancelPendingScrollHistory();
+  check(AndroidUtilities.queue.isEmpty());
+  rapid.checkScrollForLoad(true);AndroidUtilities.fire();check(rapid.controller.calls.size()==3);
  }
-}'''.replace('LOAD',load)})
+}'''.replace('LOAD',load).replace('PENDING',pending)})
 
 
 def test_scroll_hints_use_cancellable_identity_and_stop_on_leave(tmp_path):

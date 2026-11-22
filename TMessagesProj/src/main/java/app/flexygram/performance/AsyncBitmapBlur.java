@@ -14,17 +14,21 @@ public final class AsyncBitmapBlur {
                 Thread thread = new Thread(() -> {
                     android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
                     task.run();
-                }, "FlexyReactionBlur");
+                }, "FlexyBitmapBlur");
                 thread.setDaemon(true);
                 return thread;
             }, new ThreadPoolExecutor.AbortPolicy());
     private AsyncBitmapBlur() { }
 
     public static boolean submit(Bitmap capture, int radius, Callback callback) {
+        return submit(capture, radius, "Flexy.reactions.blur.cpu", callback);
+    }
+
+    public static boolean submit(Bitmap capture, int radius, String traceSection, Callback callback) {
         try {
             WORKER.execute(() -> {
                 Bitmap result = capture;
-                android.os.Trace.beginSection("Flexy.reactions.blur.cpu");
+                android.os.Trace.beginSection(traceSection);
                 try {
                     Utilities.stackBlurBitmap(capture, radius);
                 } catch (RuntimeException | OutOfMemoryError unavailable) {

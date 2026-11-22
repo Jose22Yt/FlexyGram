@@ -77,6 +77,7 @@ public class SearchDownloadsContainer extends FrameLayout implements Notificatio
     String searchQuery;
     String lastQueryString;
     Runnable lastSearchRunnable;
+    private volatile long searchGeneration;
     RecyclerItemsEnterAnimator itemsEnterAnimator;
 
     boolean checkingFilesExist;
@@ -250,24 +251,23 @@ public class SearchDownloadsContainer extends FrameLayout implements Notificatio
             return;
         }
         checkingFilesExist = true;
-        Utilities.searchQueue.postRunnable(() -> {
-            ArrayList<MessageObject> currentLoadingFiles = new ArrayList<>();
-            ArrayList<MessageObject> recentLoadingFiles = new ArrayList<>();
-
+        final FileLoader fileLoader = FileLoader.getInstance(currentAccount);
+        final ArrayList<MessageObject> currentLoadingFiles = new ArrayList<>();
+        final ArrayList<MessageObject> recentLoadingFiles = new ArrayList<>();
+        fileLoader.getCurrentLoadingFiles(currentLoadingFiles);
+        fileLoader.getRecentLoadingFiles(recentLoadingFiles);
+        if (!Utilities.searchQueue.postRunnable(() -> {
             ArrayList<MessageObject> moveToRecent = new ArrayList<>();
             ArrayList<MessageObject> removeFromRecent = new ArrayList<>();
 
-            FileLoader.getInstance(currentAccount).getCurrentLoadingFiles(currentLoadingFiles);
-            FileLoader.getInstance(currentAccount).getRecentLoadingFiles(recentLoadingFiles);
-
             for (int i = 0; i < currentLoadingFiles.size(); i++) {
-                if (FileLoader.getInstance(currentAccount).getPathToMessage(currentLoadingFiles.get(i).messageOwner).exists()) {
+                if (fileLoader.getPathToMessage(currentLoadingFiles.get(i).messageOwner).exists()) {
                     moveToRecent.add(currentLoadingFiles.get(i));
                 }
             }
 
             for (int i = 0; i < recentLoadingFiles.size(); i++) {
-                if (!FileLoader.getInstance(currentAccount).getPathToMessage(recentLoadingFiles.get(i).messageOwner).exists()) {
+                if (!fileLoader.getPathToMessage(recentLoadingFiles.get(i).messageOwner).exists()) {
                     removeFromRecent.add(recentLoadingFiles.get(i));
                 }
             }
@@ -280,12 +280,15 @@ public class SearchDownloadsContainer extends FrameLayout implements Notificatio
                     DownloadController.getInstance(currentAccount).deleteRecentFiles(removeFromRecent);
                 }
                 checkingFilesExist = false;
-                update(true);
+                if (isAttachedToWindow()) update(true);
             });
-        });
+        })) {
+            checkingFilesExist = false;
+        }
     }
 
     public void update(boolean animated) {
+        final long generation = cancelPendingSearch();
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         if (TextUtils.isEmpty(searchQuery) || isEmptyDownloads()) {
             if (rowCount == 0) {
@@ -321,12 +324,13 @@ public class SearchDownloadsContainer extends FrameLayout implements Notificatio
             FileLoader.getInstance(currentAccount).getCurrentLoadingFiles(currentLoadingFilesTmp);
             FileLoader.getInstance(currentAccount).getRecentLoadingFiles(recentLoadingFilesTmp);
 
-            String q = searchQuery.toLowerCase();
+            final String query = searchQuery;
+            final String q = query.toLowerCase();
             final boolean sameQuery = q.equals(lastQueryString);
 
             lastQueryString = q;
-            Utilities.searchQueue.cancelRunnable(lastSearchRunnable);
-            Utilities.searchQueue.postRunnable(lastSearchRunnable = () -> {
+            if (!Utilities.searchQueue.postRunnable(lastSearchRunnable = () -> {
+                if (generation != searchGeneration) return;
                 ArrayList<MessageObject> currentLoadingFilesRes = new ArrayList<>();
                 ArrayList<MessageObject> recentLoadingFilesRes = new ArrayList<>();
                 for (int i = 0; i < currentLoadingFilesTmp.size(); i++) {
@@ -334,7 +338,7 @@ public class SearchDownloadsContainer extends FrameLayout implements Notificatio
                     if (filename != null && filename.toLowerCase().contains(q)) {
                         final MessageObject messageObject = new MessageObject(currentAccount, currentLoadingFilesTmp.get(i).messageOwner, false, false);
                         messageObject.mediaExists = currentLoadingFilesTmp.get(i).mediaExists;
-                        messageObject.setQuery(searchQuery);
+                        messageObject.setQuery(query);
                         currentLoadingFilesRes.add(messageObject);
                     }
                 }
@@ -344,12 +348,13 @@ public class SearchDownloadsContainer extends FrameLayout implements Notificatio
                     if (documentName != null && documentName.toLowerCase().contains(q)) {
                         final MessageObject messageObject = new MessageObject(currentAccount, recentLoadingFilesTmp.get(i).messageOwner, false, false);
                         messageObject.mediaExists = recentLoadingFilesTmp.get(i).mediaExists;
-                        messageObject.setQuery(searchQuery);
+                        messageObject.setQuery(query);
                         recentLoadingFilesRes.add(messageObject);
                     }
                 }
                 AndroidUtilities.runOnUIThread(() -> {
-                    if (q.equals(lastQueryString)) {
+                    if (generation == searchGeneration) {
+                        lastSearchRunnable = null;
                         if (rowCount == 0) {
                             itemsEnterAnimator.showItemsAnimated(0);
                         }
@@ -364,7 +369,12 @@ public class SearchDownloadsContainer extends FrameLayout implements Notificatio
                     }
                 });
 
-            }, sameQuery ? 0 : 300);
+            }, sameQuery ? 0 : 300)) {
+                lastSearchRunnable = null;
+                lastQueryString = null;
+                emptyView.showProgress(false, false);
+                return;
+            }
 
             this.recentLoadingFilesTmp.clear();
             this.currentLoadingFilesTmp.clear();
@@ -516,6 +526,15 @@ public class SearchDownloadsContainer extends FrameLayout implements Notificatio
         update(false);
     }
 
+    private long cancelPendingSearch() {
+        ++searchGeneration;
+        if (lastSearchRunnable != null) {
+            Utilities.searchQueue.cancelRunnable(lastSearchRunnable);
+            lastSearchRunnable = null;
+        }
+        return searchGeneration;
+    }
+
     private class DownloadsAdapter extends RecyclerListView.SelectionAdapter {
 
         @NonNull
@@ -645,6 +664,7 @@ public class SearchDownloadsContainer extends FrameLayout implements Notificatio
 
     @Override
     protected void onDetachedFromWindow() {
+        cancelPendingSearch();
         super.onDetachedFromWindow();
         NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.onDownloadingFilesChanged);
         NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.premiumFloodWaitReceived);

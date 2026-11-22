@@ -133,10 +133,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
 import tw.nekomimi.nekogram.NekoConfig;
 import tw.nekomimi.nekogram.SaveToDownloadReceiver;
@@ -1099,8 +1100,8 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
     private MessageObject goingToShowMessageObject;
     private MusicListenReporter reporter;
     private boolean manualRecording;
-    private Timer progressTimer = null;
-    private final Object progressTimerSync = new Object();
+    private Runnable playbackProgressTick;
+    private boolean runningPlaybackProgressTick;
     private boolean downloadingCurrentMessage;
     private boolean playMusicAgain;
     private PlaylistGlobalSearchParams playlistGlobalSearchParams;
@@ -1164,7 +1165,6 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
     public short[] recordSamples = new short[1024];
     public long samplesCount;
 
-    private final Object sync = new Object();
 
     private ArrayList<ByteBuffer> recordBuffers = new ArrayList<>();
     private ByteBuffer fileBuffer;
@@ -1680,94 +1680,88 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         return videoPlayer;
     }
 
-    private void startProgressTimer(final MessageObject currentPlayingMessageObject) {
-        synchronized (progressTimerSync) {
-            if (progressTimer != null) {
+    private void startProgressTimer() {
+        stopProgressTimer();
+        playbackProgressTick = new Runnable() {
+            @Override
+            public void run() {
+                if (playbackProgressTick != this) return;
+                runningPlaybackProgressTick = true;
                 try {
-                    progressTimer.cancel();
-                    progressTimer = null;
-                } catch (Exception e) {
-                    FileLog.e(e);
-                }
-            }
-            final String fileName = currentPlayingMessageObject.getFileName();
-            progressTimer = new Timer();
-            progressTimer.schedule(new TimerTask() {
-                private long lastHiddenTick;
-
-                @Override
-                public void run() {
-                    synchronized (sync) {
-                        if (videoPlayer == null && ApplicationLoader.mainInterfacePaused && ApplicationLoader.externalInterfacePaused) {
-                            final long now = SystemClock.elapsedRealtime();
-                            if (now - lastHiddenTick < 1000) {
-                                return;
-                            }
-                            lastHiddenTick = now;
-                        }
-                        AndroidUtilities.runOnUIThread(() -> {
-                            if ((audioPlayer != null || videoPlayer != null) && !isPaused) {
-                                try {
-                                    long duration;
-                                    long progress;
-                                    float value;
-                                    float bufferedValue;
-                                    if (videoPlayer != null) {
-                                        duration = videoPlayer.getDuration();
-                                        progress = videoPlayer.getCurrentPosition();
-                                        if (progress < 0 || duration <= 0) {
-                                            return;
-                                        }
-                                        bufferedValue = videoPlayer.getBufferedPosition() / (float) duration;
-                                        value = progress / (float) duration;
-                                        if (value >= 1) {
-                                            return;
-                                        }
-                                    } else {
-                                        duration = audioPlayer.getDuration();
-                                        progress = audioPlayer.getCurrentPosition();
-                                        value = duration >= 0 ? (progress / (float) duration) : 0.0f;
-                                        bufferedValue = audioPlayer.getBufferedPosition() / (float) duration;
-                                        if (duration == C.TIME_UNSET || progress < 0 || seekToProgressPending != 0) {
-                                            return;
-                                        }
-                                    }
-                                    lastProgress = progress;
-                                    currentPlayingMessageObject.audioPlayerDuration = (int) (duration / 1000);
-                                    currentPlayingMessageObject.audioProgress = value;
-                                    currentPlayingMessageObject.audioProgressSec = (int) (lastProgress / 1000);
-                                    currentPlayingMessageObject.bufferedProgress = bufferedValue;
-                                    if (value >= 0 && shouldSavePositionForCurrentAudio != null && SystemClock.elapsedRealtime() - lastSaveTime >= 1000) {
-                                        final String saveFor = shouldSavePositionForCurrentAudio;
-                                        lastSaveTime = SystemClock.elapsedRealtime();
-                                        Utilities.globalQueue.postRunnable(() -> {
-                                            SharedPreferences.Editor editor = ApplicationLoader.applicationContext.getSharedPreferences("media_saved_pos", Activity.MODE_PRIVATE).edit();
-                                            editor.putFloat(saveFor, value).commit();
-                                        });
-                                    }
-                                    NotificationCenter.getInstance(currentPlayingMessageObject.currentAccount).postNotificationName(NotificationCenter.messagePlayingProgressDidChanged, currentPlayingMessageObject.getId(), value);
-                                } catch (Exception e) {
-                                    FileLog.e(e);
-                                }
-                            }
-                        });
+                    updatePlaybackProgress();
+                } finally {
+                    runningPlaybackProgressTick = false;
+                    if (playbackProgressTick == this) {
+                        final boolean hiddenAudio = videoPlayer == null && ApplicationLoader.mainInterfacePaused
+                                && ApplicationLoader.externalInterfacePaused;
+                        AndroidUtilities.runOnUIThread(this, hiddenAudio ? 1000 : 17);
                     }
                 }
-            }, 0, 17);
+            }
+        };
+        AndroidUtilities.runOnUIThread(playbackProgressTick);
+    }
+
+    public static void onPlaybackUiVisibilityChanged() {
+        final MediaController controller = Instance;
+        if (controller == null || controller.runningPlaybackProgressTick) return;
+        final Runnable tick = controller.playbackProgressTick;
+        if (tick == null) return;
+        AndroidUtilities.cancelRunOnUIThread(tick);
+        AndroidUtilities.runOnUIThread(tick);
+    }
+
+    private void updatePlaybackProgress() {
+        final MessageObject currentPlayingMessageObject = playingMessageObject;
+        if (currentPlayingMessageObject == null || isPaused || (audioPlayer == null && videoPlayer == null)) return;
+        try {
+            long duration;
+            long progress;
+            float value;
+            float bufferedValue;
+            if (videoPlayer != null) {
+                duration = videoPlayer.getDuration();
+                progress = videoPlayer.getCurrentPosition();
+                if (progress < 0 || duration <= 0) {
+                    return;
+                }
+                bufferedValue = videoPlayer.getBufferedPosition() / (float) duration;
+                value = progress / (float) duration;
+                if (value >= 1) {
+                    return;
+                }
+            } else {
+                duration = audioPlayer.getDuration();
+                progress = audioPlayer.getCurrentPosition();
+                value = duration >= 0 ? (progress / (float) duration) : 0.0f;
+                bufferedValue = audioPlayer.getBufferedPosition() / (float) duration;
+                if (duration == C.TIME_UNSET || progress < 0 || seekToProgressPending != 0) {
+                    return;
+                }
+            }
+            lastProgress = progress;
+            currentPlayingMessageObject.audioPlayerDuration = (int) (duration / 1000);
+            currentPlayingMessageObject.audioProgress = value;
+            currentPlayingMessageObject.audioProgressSec = (int) (lastProgress / 1000);
+            currentPlayingMessageObject.bufferedProgress = bufferedValue;
+            if (value >= 0 && shouldSavePositionForCurrentAudio != null && SystemClock.elapsedRealtime() - lastSaveTime >= 1000) {
+                final String saveFor = shouldSavePositionForCurrentAudio;
+                lastSaveTime = SystemClock.elapsedRealtime();
+                Utilities.globalQueue.postRunnable(() -> {
+                    SharedPreferences.Editor editor = ApplicationLoader.applicationContext.getSharedPreferences("media_saved_pos", Activity.MODE_PRIVATE).edit();
+                    editor.putFloat(saveFor, value).commit();
+                });
+            }
+            NotificationCenter.getInstance(currentPlayingMessageObject.currentAccount).postNotificationName(NotificationCenter.messagePlayingProgressDidChanged, currentPlayingMessageObject.getId(), value);
+        } catch (Exception error) {
+            FileLog.e(error);
         }
     }
 
     private void stopProgressTimer() {
-        synchronized (progressTimerSync) {
-            if (progressTimer != null) {
-                try {
-                    progressTimer.cancel();
-                    progressTimer = null;
-                } catch (Exception e) {
-                    FileLog.e(e);
-                }
-            }
-        }
+        if (playbackProgressTick == null) return;
+        AndroidUtilities.cancelRunOnUIThread(playbackProgressTick);
+        playbackProgressTick = null;
     }
 
     public void cleanup() {
@@ -3600,7 +3594,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         if (!SharedConfig.enabledRaiseTo(true)) {
             startRaiseToEarSensors(raiseChat);
         }
-        startProgressTimer(playingMessageObject);
+        startProgressTimer();
         NotificationCenter.getInstance(messageObject.currentAccount).postNotificationName(NotificationCenter.messagePlayingDidStart, messageObject, oldMessageObject);
 
         /*try {
@@ -4182,7 +4176,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         if (!ApplicationLoader.mainInterfacePaused && proximityWakeLock != null && !proximityWakeLock.isHeld() && (playingMessageObject.isVoice() || playingMessageObject.isRoundVideo()) && SharedConfig.enabledRaiseTo(false)) {
 //            proximityWakeLock.acquire();
         }
-        startProgressTimer(playingMessageObject);
+        startProgressTimer();
         NotificationCenter.getInstance(messageObject.currentAccount).postNotificationName(NotificationCenter.messagePlayingDidStart, messageObject, oldMessageObject);
 
         if (videoPlayer != null) {
@@ -4538,7 +4532,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         }
 
         try {
-            startProgressTimer(playingMessageObject);
+            startProgressTimer();
             if (audioVolumeAnimator != null) {
                 audioVolumeAnimator.removeAllListeners();
                 audioVolumeAnimator.cancel();
@@ -5271,12 +5265,12 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         private AccountInstance currentAccount;
         private AlertDialog progressDialog;
         private ArrayList<MessageObject> messageObjects;
-        private HashMap<String, MessageObject> loadingMessageObjects = new HashMap<>();
-        private float finishedProgress;
-        private boolean cancelled;
+        private final HashMap<String, CountDownLatch> pendingFileLoads = new HashMap<>();
+        private volatile float finishedProgress;
+        private volatile boolean cancelled;
         private boolean finished;
         private int copiedFiles;
-        private CountDownLatch waitingForFile;
+        private volatile CountDownLatch waitingForFile;
         private MessagesStorage.IntCallback onFinishRunnable;
         private boolean isMusic;
 
@@ -5296,22 +5290,20 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             progressDialog.setMessage(LocaleController.getString(R.string.Loading));
             progressDialog.setCancelable(true);
             progressDialog.setCancelDialog(true);
-            progressDialog.setOnCancelListener(d -> {
-                cancelled = true;
-            });
+            progressDialog.setOnCancelListener(d -> cancel());
         }
 
         public void start(Context context) {
             AndroidUtilities.runOnUIThread(() -> {
-                if (!finished) {
-                    SaveToDownloadReceiver.showNotification(context, notificationId, messageObjects.size(), () -> cancelled = true);
+                if (!finished && !cancelled) {
+                    SaveToDownloadReceiver.showNotification(context, notificationId, messageObjects.size(), this::cancel);
                 }
             }, 250);
 
             new Thread(() -> {
                 try {
                     if (Build.VERSION.SDK_INT >= 29) {
-                        for (int b = 0, N = messageObjects.size(); b < N; b++) {
+                        for (int b = 0, N = messageObjects.size(); b < N && !cancelled; b++) {
                             MessageObject message = messageObjects.get(b);
                             if (processLivePhotoMessage(message)) {
                                 continue;
@@ -5348,9 +5340,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                             }
                             File sourceFile = new File(path);
                             if (!sourceFile.exists()) {
-                                waitingForFile = new CountDownLatch(1);
-                                addMessageToLoad(message);
-                                waitingForFile.await();
+                                awaitFiles(1, pending -> addMessageToLoad(message, pending));
                             }
                             if (cancelled) {
                                 break;
@@ -5359,8 +5349,8 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                                 sourceFile = FileLoader.getInstance(currentAccount.getCurrentAccount()).getPathToMessage(message.messageOwner);
                                 FileLog.d("saving file: correcting path from " + path + " to " + (sourceFile == null ? null : sourceFile.getAbsolutePath()));
                             }
-                            if (sourceFile != null && sourceFile.exists()) {
-                                saveFileInternal(isMusic ? 3 : 2, sourceFile, name, message);
+                            if (sourceFile != null && sourceFile.exists()
+                                    && saveFileInternal(isMusic ? 3 : 2, sourceFile, name, message, () -> cancelled) != null) {
                                 copiedFiles++;
                             }
                         }
@@ -5380,7 +5370,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                             dir = new File(dir, folderName);
                         }
                         dir.mkdirs();
-                        for (int b = 0, N = messageObjects.size(); b < N; b++) {
+                        for (int b = 0, N = messageObjects.size(); b < N && !cancelled; b++) {
                             MessageObject message = messageObjects.get(b);
                             if (processLivePhotoMessage(message)) {
                                 continue;
@@ -5406,9 +5396,6 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                                     }
                                 }
                             }
-                            if (!destFile.exists()) {
-                                destFile.createNewFile();
-                            }
                             String path = message.messageOwner.attachPath;
                             if (message.qualityToSave != null) {
                                 path = null;
@@ -5429,42 +5416,71 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                                 sourceFile = new File(path);
                             }
                             if (!sourceFile.exists()) {
-                                waitingForFile = new CountDownLatch(1);
-                                addMessageToLoad(message);
-                                waitingForFile.await();
+                                awaitFiles(1, pending -> addMessageToLoad(message, pending));
                             }
-                            if (sourceFile.exists()) {
-                                copyFile(sourceFile, destFile, message.getMimeType());
+                            if (!cancelled && sourceFile.exists() && copyFile(sourceFile, destFile, message.getMimeType())) {
                                 copiedFiles++;
                             }
                         }
                     }
-                    checkIfFinished();
+                } catch (InterruptedException error) {
+                    Thread.currentThread().interrupt();
                 } catch (Exception e) {
                     FileLog.e(e);
+                } finally {
+                    finish();
                 }
 
             }).start();
         }
 
-        private void checkIfFinished() {
-            if (!loadingMessageObjects.isEmpty()) {
-                return;
-            }
+        private void finish() {
             AndroidUtilities.runOnUIThread(() -> {
+                finished = true;
+                pendingFileLoads.clear();
+                currentAccount.getNotificationCenter().removeObserver(this, NotificationCenter.fileLoaded);
+                currentAccount.getNotificationCenter().removeObserver(this, NotificationCenter.fileLoadProgressChanged);
+                currentAccount.getNotificationCenter().removeObserver(this, NotificationCenter.fileLoadFailed);
                 try {
                     SaveToDownloadReceiver.cancelNotification(notificationId);
-                    finished = true;
                     if (onFinishRunnable != null) {
                         AndroidUtilities.runOnUIThread(() -> onFinishRunnable.run(copiedFiles));
                     }
                 } catch (Exception e) {
                     FileLog.e(e);
                 }
-                currentAccount.getNotificationCenter().removeObserver(this, NotificationCenter.fileLoaded);
-                currentAccount.getNotificationCenter().removeObserver(this, NotificationCenter.fileLoadProgressChanged);
-                currentAccount.getNotificationCenter().removeObserver(this, NotificationCenter.fileLoadFailed);
             });
+        }
+
+        private void cancel() {
+            cancelled = true;
+            releaseWait(waitingForFile);
+        }
+
+        private static void releaseWait(CountDownLatch pending) {
+            if (pending == null) return;
+            while (pending.getCount() > 0) pending.countDown();
+        }
+
+        private void awaitFiles(int fileCount, Consumer<CountDownLatch> startLoads) throws InterruptedException {
+            final CountDownLatch pending = new CountDownLatch(fileCount);
+            waitingForFile = pending;
+            try {
+                if (cancelled) return;
+                AndroidUtilities.runOnUIThread(() -> {
+                    if (cancelled || waitingForFile != pending) return;
+                    try {
+                        startLoads.accept(pending);
+                    } catch (RuntimeException error) {
+                        FileLog.e(error);
+                        pendingFileLoads.values().removeIf(value -> value == pending);
+                        releaseWait(pending);
+                    }
+                });
+                pending.await();
+            } finally {
+                waitingForFile = null;
+            }
         }
 
         private boolean processLivePhotoMessage(MessageObject messageObject) throws Exception {
@@ -5487,22 +5503,20 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             final boolean needVideo = videoFile == null || !videoFile.exists();
             final int needCount = (needPhoto ? 1 : 0) + (needVideo ? 1 : 0);
             if (needCount > 0) {
-                waitingForFile = new CountDownLatch(needCount);
                 final TLRPC.Photo finalPhoto = media.photo;
                 final TLRPC.Document finalDoc = media.document;
-                AndroidUtilities.runOnUIThread(() -> {
+                awaitFiles(needCount, pending -> {
                     if (needPhoto) {
                         String fileName = FileLoader.getAttachFileName(photoSize);
-                        loadingMessageObjects.put(fileName, messageObject);
+                        pendingFileLoads.put(fileName, pending);
                         currentAccount.getFileLoader().loadFile(ImageLocation.getForPhoto(photoSize, finalPhoto), messageObject, "jpg", FileLoader.PRIORITY_HIGH, 0);
                     }
                     if (needVideo) {
                         String fileName = FileLoader.getAttachFileName(finalDoc);
-                        loadingMessageObjects.put(fileName, messageObject);
+                        pendingFileLoads.put(fileName, pending);
                         currentAccount.getFileLoader().loadFile(finalDoc, messageObject, FileLoader.PRIORITY_HIGH, 0);
                     }
                 });
-                waitingForFile.await();
             }
             if (cancelled) {
                 return true;
@@ -5528,28 +5542,16 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             final String filename = AndroidUtilities.generateFileName(0, coverExt);
             final String outputMime = coverMime;
             if (Build.VERSION.SDK_INT >= 29) {
+                final File photoFileForSave = photoFile, videoFileForSave = videoFile;
                 final ContentValues cv = new ContentValues();
                 final Uri uriToInsert = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
                 final File dirDest = new File(Environment.DIRECTORY_DOWNLOADS, app.flexygram.branding.FlexyBranding.NAME);
                 cv.put(MediaStore.MediaColumns.RELATIVE_PATH, dirDest + File.separator);
                 cv.put(MediaStore.Downloads.DISPLAY_NAME, filename);
                 cv.put(MediaStore.MediaColumns.MIME_TYPE, outputMime);
-                final Uri dst = ApplicationLoader.applicationContext.getContentResolver().insert(uriToInsert, cv);
-                if (dst != null) {
-                    boolean ok = false;
-                    try (OutputStream os = ApplicationLoader.applicationContext.getContentResolver().openOutputStream(dst)) {
-                        if (os != null) {
-                            writeMotionPhoto(photoFile, videoFile, os, null);
-                            ok = !cancelled;
-                        }
-                    }
-                    if (ok) {
-                        copiedFiles++;
-                    } else {
-                        try {
-                            ApplicationLoader.applicationContext.getContentResolver().delete(dst, null, null);
-                        } catch (Exception ignored) {}
-                    }
+                if (writePendingMedia(ApplicationLoader.applicationContext.getContentResolver(), uriToInsert,
+                        cv, () -> cancelled, out -> writeMotionPhoto(photoFileForSave, videoFileForSave, out, () -> cancelled)) != null) {
+                    copiedFiles++;
                 }
             } else {
                 final File destDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), app.flexygram.branding.FlexyBranding.NAME);
@@ -5559,7 +5561,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                     destFile.createNewFile();
                 }
                 try (FileOutputStream fos = new FileOutputStream(destFile)) {
-                    writeMotionPhoto(photoFile, videoFile, fos, null);
+                    writeMotionPhoto(photoFile, videoFile, fos, () -> cancelled);
                 }
                 if (cancelled) {
                     destFile.delete();
@@ -5581,19 +5583,16 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             return true;
         }
 
-        private void addMessageToLoad(MessageObject messageObject) {
-            AndroidUtilities.runOnUIThread(() -> {
-                TLRPC.Document document = messageObject.getDocument();
-                if (messageObject.qualityToSave != null) {
-                    document = messageObject.qualityToSave;
-                }
-                if (document == null) {
-                    return;
-                }
-                String fileName = FileLoader.getAttachFileName(document);
-                loadingMessageObjects.put(fileName, messageObject);
-                currentAccount.getFileLoader().loadFile(document, messageObject, FileLoader.PRIORITY_HIGH, messageObject.shouldEncryptPhotoOrVideo() ? 2 : 0);
-            });
+        private void addMessageToLoad(MessageObject messageObject, CountDownLatch pending) {
+            final TLRPC.Document document = messageObject.qualityToSave != null
+                    ? messageObject.qualityToSave : messageObject.getDocument();
+            if (document == null) {
+                pending.countDown();
+                return;
+            }
+            String fileName = FileLoader.getAttachFileName(document);
+            pendingFileLoads.put(fileName, pending);
+            currentAccount.getFileLoader().loadFile(document, messageObject, FileLoader.PRIORITY_HIGH, messageObject.shouldEncryptPhotoOrVideo() ? 2 : 0);
         }
 
         private boolean copyFile(File sourceFile, File destFile, String mime) {
@@ -5660,14 +5659,14 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
 
         @Override
         public void didReceivedNotification(int id, int account, Object... args) {
+            if (cancelled || finished) return;
             if (id == NotificationCenter.fileLoaded || id == NotificationCenter.fileLoadFailed) {
                 String fileName = (String) args[0];
-                if (loadingMessageObjects.remove(fileName) != null) {
-                    waitingForFile.countDown();
-                }
+                final CountDownLatch pending = pendingFileLoads.remove(fileName);
+                if (pending != null) pending.countDown();
             } else if (id == NotificationCenter.fileLoadProgressChanged) {
                 String fileName = (String) args[0];
-                if (loadingMessageObjects.containsKey(fileName)) {
+                if (pendingFileLoads.containsKey(fileName)) {
                     Long loadedSize = (Long) args[1];
                     Long totalSize = (Long) args[2];
                     float loadProgress = loadedSize / (float) totalSize;
@@ -5723,7 +5722,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         }
 
         final File sourceFile = file;
-        final boolean[] cancelled = new boolean[]{false};
+        final AtomicBoolean cancelled = new AtomicBoolean();
         if (sourceFile.exists()) {
 
             int notificationId = SaveToDownloadReceiver.createNotificationId();
@@ -5734,10 +5733,10 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                     dialog.setMessage(LocaleController.getString(R.string.Loading));
                     dialog.setCanceledOnTouchOutside(false);
                     dialog.setCancelable(true);
-                    dialog.setOnCancelListener(d -> cancelled[0] = true);
+                    dialog.setOnCancelListener(d -> cancelled.set(true));
                     AndroidUtilities.runOnUIThread(() -> {
                         if (!finished[0]) {
-                            SaveToDownloadReceiver.showNotification(context, notificationId, 1, () -> cancelled[0] = true);
+                            SaveToDownloadReceiver.showNotification(context, notificationId, 1, () -> cancelled.set(true));
                         }
                     }, 250);
                 } catch (Exception e) {
@@ -5755,7 +5754,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                         folderName = folderName + File.separator + chatFolderName;
                     }
                     if (Build.VERSION.SDK_INT >= 29) {
-                        uri = saveFileInternal(type, sourceFile, name, selectedObject);
+                        uri = saveFileInternal(type, sourceFile, name, selectedObject, cancelled::get);
                         result = uri != null;
                     } else {
                         File destFile;
@@ -5812,7 +5811,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                                 FileLog.e(e);
                             }
                             for (long a = 0; a < size; a += 4096) {
-                                if (cancelled[0]) {
+                                if (cancelled.get()) {
                                     break;
                                 }
                                 destination.transferFrom(source, a, Math.min(4096, size - a));
@@ -5828,7 +5827,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                             FileLog.e(e);
                             result = false;
                         }
-                        if (cancelled[0]) {
+                        if (cancelled.get()) {
                             destFile.delete();
                             result = false;
                         }
@@ -5876,7 +5875,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             return;
         }
 
-        final boolean[] cancelled = new boolean[]{false};
+        final AtomicBoolean cancelled = new AtomicBoolean();
         AlertDialog progressDialog = null;
         final boolean[] finished = new boolean[1];
         try {
@@ -5884,7 +5883,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             dialog.setMessage(LocaleController.getString(R.string.Loading));
             dialog.setCanceledOnTouchOutside(false);
             dialog.setCancelable(true);
-            dialog.setOnCancelListener(d -> cancelled[0] = true);
+            dialog.setOnCancelListener(d -> cancelled.set(true));
             AndroidUtilities.runOnUIThread(() -> {
                 if (!finished[0]) {
                     dialog.show();
@@ -5909,22 +5908,9 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                     cv.put(MediaStore.Images.Media.DISPLAY_NAME, filename);
                     cv.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
                     cv.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
-                    final Uri dst = ApplicationLoader.applicationContext.getContentResolver().insert(uriToInsert, cv);
-                    if (dst != null) {
-                        try (OutputStream os = ApplicationLoader.applicationContext.getContentResolver().openOutputStream(dst)) {
-                            if (os != null) {
-                                writeMotionPhoto(photoFile, videoFile, os, cancelled);
-                                ok = !cancelled[0];
-                            }
-                        }
-                        if (ok) {
-                            savedUri = dst;
-                        } else {
-                            try {
-                                ApplicationLoader.applicationContext.getContentResolver().delete(dst, null, null);
-                            } catch (Exception ignored) {}
-                        }
-                    }
+                    savedUri = writePendingMedia(ApplicationLoader.applicationContext.getContentResolver(), uriToInsert,
+                            cv, cancelled::get, out -> writeMotionPhoto(photoFile, videoFile, out, cancelled::get));
+                    ok = savedUri != null;
                 } else {
                     final File destDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), app.flexygram.branding.FlexyBranding.NAME);
                     destDir.mkdirs();
@@ -5933,9 +5919,9 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                         destFile.createNewFile();
                     }
                     try (FileOutputStream fos = new FileOutputStream(destFile)) {
-                        writeMotionPhoto(photoFile, videoFile, fos, cancelled);
+                        writeMotionPhoto(photoFile, videoFile, fos, cancelled::get);
                     }
-                    if (cancelled[0]) {
+                    if (cancelled.get()) {
                         destFile.delete();
                     } else {
                         AndroidUtilities.addMediaToGallery(destFile.getAbsoluteFile());
@@ -5966,7 +5952,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         }).start();
     }
 
-    private static void writeMotionPhoto(File photoFile, File videoFile, OutputStream out, boolean[] cancelled) throws IOException {
+    private static void writeMotionPhoto(File photoFile, File videoFile, OutputStream out, BooleanSupplier cancelled) throws IOException {
         final long videoLength = videoFile.length();
         final String xmp = buildMotionPhotoXmp(videoLength);
         final byte[] xmpHeader = "http://ns.adobe.com/xap/1.0/ ".getBytes("UTF-8");
@@ -5993,7 +5979,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             final byte[] buf = new byte[64 * 1024];
             int n;
             while ((n = pis.read(buf)) > 0) {
-                if (cancelled != null && cancelled[0]) return;
+                if (cancelled.getAsBoolean()) return;
                 out.write(buf, 0, n);
             }
         }
@@ -6001,7 +5987,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             final byte[] buf = new byte[64 * 1024];
             int n;
             while ((n = vis.read(buf)) > 0) {
-                if (cancelled != null && cancelled[0]) return;
+                if (cancelled.getAsBoolean()) return;
                 out.write(buf, 0, n);
             }
         }
@@ -6034,7 +6020,41 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                 "<?xpacket end=\"w\"?>";
     }
 
-    private static Uri saveFileInternal(int type, File sourceFile, String filename, MessageObject messageObject) {
+    private interface MediaWriter {
+        void write(OutputStream out) throws IOException;
+    }
+
+    @RequiresApi(29)
+    private static Uri writePendingMedia(ContentResolver resolver, Uri collection, ContentValues values,
+                                         BooleanSupplier cancelled, MediaWriter writer) throws IOException {
+        if (cancelled.getAsBoolean()) return null;
+        values.put(MediaStore.MediaColumns.IS_PENDING, 1);
+        final Uri entry = resolver.insert(collection, values);
+        if (entry == null) return null;
+        boolean published = false;
+        try {
+            try (OutputStream output = resolver.openOutputStream(entry)) {
+                if (output == null || cancelled.getAsBoolean()) return null;
+                writer.write(output);
+            }
+            if (cancelled.getAsBoolean()) return null;
+            final ContentValues ready = new ContentValues(1);
+            ready.put(MediaStore.MediaColumns.IS_PENDING, 0);
+            published = resolver.update(entry, ready, null, null) > 0;
+            return published ? entry : null;
+        } finally {
+            if (!published) {
+                try {
+                    resolver.delete(entry, null, null);
+                } catch (RuntimeException cleanupError) {
+                    FileLog.e(cleanupError);
+                }
+            }
+        }
+    }
+
+    @RequiresApi(29)
+    private static Uri saveFileInternal(int type, File sourceFile, String filename, MessageObject messageObject, BooleanSupplier cancelled) {
         try {
             int selectedType = type;
             ContentValues contentValues = new ContentValues();
@@ -6094,14 +6114,16 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
 
             contentValues.put(MediaStore.MediaColumns.MIME_TYPE, mimeType);
 
-            Uri dstUri = ApplicationLoader.applicationContext.getContentResolver().insert(uriToInsert, contentValues);
-            if (dstUri != null) {
-                FileInputStream fileInputStream = new FileInputStream(sourceFile);
-                OutputStream outputStream = ApplicationLoader.applicationContext.getContentResolver().openOutputStream(dstUri);
-                AndroidUtilities.copyFile(fileInputStream, outputStream);
-                fileInputStream.close();
-            }
-            return dstUri;
+            return writePendingMedia(ApplicationLoader.applicationContext.getContentResolver(), uriToInsert,
+                    contentValues, cancelled, out -> {
+                        try (FileInputStream input = new FileInputStream(sourceFile)) {
+                            final byte[] buffer = new byte[64 * 1024];
+                            int read;
+                            while (!cancelled.getAsBoolean() && (read = input.read(buffer)) > 0) {
+                                out.write(buffer, 0, read);
+                            }
+                        }
+                    });
         } catch (Exception e) {
             FileLog.e(e);
             return null;

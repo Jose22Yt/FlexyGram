@@ -61,16 +61,23 @@ def test_system_and_in_app_power_savers_preserve_saved_glass_flags(tmp_path):
     policy = method(source, 'public static int getValue(boolean ignorePowerSaving)')
     threshold = method(source, 'private static boolean isBatteryBelowThreshold(')
     receiver = method(source, 'public static class BatteryReceiver extends BroadcastReceiver')
+    thermal = method(source, 'private static class ThermalMonitor')
+    effect_mask = next(line for line in source.splitlines() if 'int THERMAL_EFFECTS =' in line)
     probe(tmp_path, {'Probe.java': '''
 public class Probe {
     static int value=384, powerSaverLevel, level=-1, reads, changes;
-    static boolean loaded=true, systemPowerSaver, lastPowerSaverApplied;
+    static boolean loaded=true, systemPowerSaver, lastPowerSaverApplied, thermalPressureHigh;
+    static int thermalUpdates;
+    static class BuildConfig { static final boolean FLEXY_SYSTEM_TRACE=false; }
+    static class FileLog { static void e(RuntimeException error){throw new AssertionError(error);} }
     static int lastBatteryLevelCached=-1;
     static long lastBatteryLevelChecked;
     static final int PRESET_POWER_SAVER=0;
+    static final int FLAG_CHAT_BLUR=256, FLAG_LIQUID_GLASS=1<<18, FLAG_PARTICLES=1<<17, FLAG_CHAT_THANOS=1<<16;
+    EFFECT_MASK_DECLARATION
     static class Build {
         static class VERSION { static int SDK_INT=35; }
-        static class VERSION_CODES { static final int LOLLIPOP=21; }
+        static class VERSION_CODES { static final int LOLLIPOP=21, Q=29; }
     }
     static class SystemClock { static long elapsedRealtime(){return 100;} }
     static class BatteryManager {
@@ -78,13 +85,22 @@ public class Probe {
     }
     static class PowerManager {
         static final String ACTION_POWER_SAVE_MODE_CHANGED="power";
+        static final int THERMAL_STATUS_LIGHT=1, THERMAL_STATUS_SEVERE=3;
         boolean saver;
+        int thermalStatus, registrations;
+        java.util.function.IntConsumer listener;
         boolean isPowerSaveMode(){return saver;}
+        void addThermalStatusListener(java.util.concurrent.Executor executor, java.util.function.IntConsumer callback){
+            registrations++;
+            listener=status -> executor.execute(() -> callback.accept(status));
+            listener.accept(thermalStatus);
+        }
     }
     static class Context {
         static final String POWER_SERVICE="power";
         PowerManager power=new PowerManager();
         Object getSystemService(String name){return power;}
+        java.util.concurrent.Executor getMainExecutor(){return Runnable::run;}
     }
     record Intent(String getAction, int level) {
         public int getIntExtra(String key,int fallback){return key.equals("level") ? level : 100;}
@@ -92,15 +108,22 @@ public class Probe {
     static abstract class BroadcastReceiver { abstract void onReceive(Context c,Intent i); }
     static void loadPreference(){throw new AssertionError();}
     static void onPowerSaverApplied(boolean enabled){changes++;}
+    static void dispatchPowerPolicyListeners(boolean battery){require(!battery);thermalUpdates++;}
     static int getBatteryLevel(){reads++;return lastBatteryLevelCached;}
     static int getValue(){return getValue(false);}
     POLICY
     THRESHOLD
     RECEIVER
+    THERMAL
     static void require(boolean valid){if(!valid) throw new AssertionError();}
     public static void main(String[] args){
         Context c=new Context();BatteryReceiver receiver=new BatteryReceiver();
         require(getValue()==384 && reads==0);
+        Build.VERSION.SDK_INT=28;
+        receiver.onReceive(c,new Intent("battery",75));
+        require(c.power.registrations==0);
+        Build.VERSION.SDK_INT=35;
+        receiver=new BatteryReceiver();
         c.power.saver=true;receiver.onReceive(c,new Intent("battery",75));
         require(getValue()==0 && getValue(true)==384 && changes==1 && reads==0);
         c.power.saver=false;receiver.onReceive(c,new Intent("power",-1));
@@ -115,9 +138,34 @@ public class Probe {
         require(getValue()==384 && changes==4);
         lastBatteryLevelCached=-1;
         require(getValue()==384 && changes==4);
+        require(c.power.registrations==1);
+        c.power.listener.accept(2);
+        require(getValue()==384 && thermalUpdates==0);
+        c.power.listener.accept(3);
+        c.power.listener.accept(4);
+        c.power.listener.accept(2);
+        require(getValue()==128 && getValue(true)==384 && thermalUpdates==1 && !lastPowerSaverApplied);
+        value=128 | FLAG_CHAT_BLUR | FLAG_LIQUID_GLASS | FLAG_PARTICLES | FLAG_CHAT_THANOS;
+        require(getValue()==128 && getValue(true)==value);
+        value=384;
+        c.power.saver=true;receiver.onReceive(c,new Intent("power",-1));
+        c.power.listener.accept(1);
+        require(getValue()==0 && changes==5 && thermalUpdates==1);
+        c.power.listener.accept(3);
+        c.power.saver=false;receiver.onReceive(c,new Intent("power",-1));
+        require(getValue()==128 && changes==6 && thermalUpdates==1);
+        c.power.listener.accept(1);
+        require(getValue()==384 && thermalUpdates==2);
+        new BatteryReceiver().onReceive(c,new Intent("battery",90));
+        require(c.power.registrations==1);
     }
 }
-'''.replace('POLICY', policy).replace('THRESHOLD', threshold).replace('RECEIVER', receiver)})
+'''.replace('POLICY', policy).replace('THRESHOLD', threshold).replace('RECEIVER', receiver)
+        .replace('THERMAL\n', thermal + '\n').replace('EFFECT_MASK_DECLARATION', effect_mask),
+        'android/os/Trace.java': '''package android.os;
+public class Trace { public static void setCounter(String name, long value) { throw new AssertionError(); } }
+''',
+    })
 
 
 def test_disabled_chat_blur_keeps_clipping_without_queuing_captures(tmp_path):
