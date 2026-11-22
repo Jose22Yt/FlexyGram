@@ -113,6 +113,17 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p build/reports/ui-beta
+          export FLEXY_MAVEN_CENTRAL_URL=https://maven-central.storage-download.googleapis.com/maven2
+          export FLEXY_MAVEN_SETTINGS="$RUNNER_TEMP/flexy-maven-settings.xml"
+          cat > "$FLEXY_MAVEN_SETTINGS" <<'XML'
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">
+            <mirrors><mirror>
+              <id>central-google-mirror</id>
+              <mirrorOf>central</mirrorOf>
+              <url>https://maven-central.storage-download.googleapis.com/maven2</url>
+            </mirror></mirrors>
+          </settings>
+          XML
           python -m pytest tests/ -q -p no:cacheprovider --junitxml=build/reports/ui-beta/tests.xml
           python -m pytest tools/connected_alpha/test_flexystudio.py -q -p no:cacheprovider
           python tools/connected_alpha/check_studio_types.py
@@ -134,6 +145,8 @@ jobs:
           } 2>&1 | tee build/reports/ui-beta/wheels.log
           echo "ALPHA_WHEELHOUSE=$RUNNER_TEMP/beta-wheelhouse" >> "$GITHUB_ENV"
       - name: Verify scoped Kyant Compose layout and touch bounds
+        env:
+          FLEXY_MAVEN_CENTRAL_URL: https://maven-central.storage-download.googleapis.com/maven2
         shell: bash
         run: |
           python tools/kyant_lab/android/run.py --sdk-root "$ANDROID_HOME" --output-dir build/reports/kyant-layout

@@ -3,7 +3,7 @@
 Only the native FlexyGram host APIs are explicit doubles; Compose layout is real.
 Requires JDK21, Android SDK37/build-tools36 and network/cached Maven dependencies.
 """
-import argparse,subprocess,shutil
+import argparse,json,os,subprocess,shutil
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[3]
 
@@ -13,8 +13,18 @@ def main():
  p.add_argument('--output-dir',type=Path,required=True)
  p.add_argument('--gradle',type=Path,default=ROOT/'gradlew')
  args=p.parse_args();out=args.output_dir.resolve();out.mkdir(parents=True,exist_ok=True)
- (out/'settings.gradle').write_text("pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }\ndependencyResolutionManagement { repositories { google(); mavenCentral() } }\nrootProject.name='KyantLayoutProbe'\n")
- shutil.copyfile(Path(__file__).with_name('build.gradle'),out/'build.gradle')
+ central_url = os.environ.get('FLEXY_MAVEN_CENTRAL_URL')
+ robolectric_repo = ''
+ if central_url:
+  robolectric_repo = 'maven { url = uri(' + json.dumps(central_url) + '); content { includeGroup("org.robolectric") } }; '
+ (out/'settings.gradle').write_text(
+  "pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }\n"
+  "dependencyResolutionManagement { repositories { google(); " + robolectric_repo
+  + "mavenCentral() } }\nrootProject.name='KyantLayoutProbe'\n")
+ build_script = Path(__file__).with_name('build.gradle').read_text()
+ if central_url:
+  build_script = build_script.replace("'https://repo.maven.apache.org/maven2'", json.dumps(central_url))
+ (out/'build.gradle').write_text(build_script)
  (out/'gradle.properties').write_text('org.gradle.jvmargs=-Xmx1536m\nandroid.useAndroidX=true\n')
  (out/'local.properties').write_text('sdk.dir='+args.sdk_root.resolve().as_posix()+'\n')
  source=ROOT/'TMessagesProj/src/main'

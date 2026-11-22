@@ -53,7 +53,11 @@ def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_wr
         stubs_writer = write_stubs
     stubs_writer(source, ROOT)
     shutil.copyfile(here/(test_class+'.java.in'), source/(test_class+'.java'))
-    shutil.copyfile(HERE/'pom.xml', output/'pom.xml')
+    central_url = os.environ.get('FLEXY_MAVEN_CENTRAL_URL')
+    pom_source = (HERE/'pom.xml').read_text()
+    if central_url:
+        pom_source = pom_source.replace('https://repo.maven.apache.org/maven2', central_url)
+    (output/'pom.xml').write_text(pom_source)
     if extra_aars:
         ns={'m':'http://maven.apache.org/POM/4.0.0'}
         ET.register_namespace('', ns['m'])
@@ -82,6 +86,8 @@ def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_wr
             path = Path(tmp)/'settings.xml'
             path.write_bytes(ET.tostring(settings)); path.chmod(0o600)
             command += ['-s', str(path), '-Dprobe.proxy.host='+proxy.hostname, '-Dprobe.proxy.port='+str(proxy.port or 80)]
+        elif os.environ.get('FLEXY_MAVEN_SETTINGS'):
+            command += ['-s', os.environ['FLEXY_MAVEN_SETTINGS']]
         subprocess.run(command + ['dependency:resolve'], check=True)
         if dependency_writer is not None:
             dependency_writer(output, repository, sdk)
