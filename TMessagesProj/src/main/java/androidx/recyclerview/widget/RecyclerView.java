@@ -2484,6 +2484,11 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
         return false;
     }
 
+    /** Friction for inertial scrolling. Programmatic scrolls keep their own timing. */
+    protected float getFlingFriction() {
+        return ViewConfiguration.getScrollFriction();
+    }
+
     public float getCurrentVelocity() {
         if (mVelocityTracker != null) {
             mVelocityTracker.computeCurrentVelocity(1000, mMaxFlingVelocity);
@@ -5450,6 +5455,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
                 mInterpolator = sQuinticInterpolator;
                 mOverScroller = new OverScroller(getContext(), sQuinticInterpolator);
             }
+            mOverScroller.setFriction(getFlingFriction());
             mOverScroller.fling(0, 0, velocityX, velocityY,
                     Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
             postOnAnimation();

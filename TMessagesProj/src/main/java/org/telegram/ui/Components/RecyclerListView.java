@@ -1477,6 +1477,8 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         return null;
     }
 
+    protected static final float CONVERSATION_FLING_FRICTION_MULTIPLIER = 0.88f;
+
     private final app.flexygram.performance.ScrollFrameRateHint scrollFrameRateHint =
             new app.flexygram.performance.ScrollFrameRateHint(this);
 

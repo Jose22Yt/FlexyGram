@@ -7634,6 +7634,20 @@ public class ChatActivity extends BaseFragment implements
             private boolean scrollUp;
             private final int scrollValue = AndroidUtilities.dp(100);
 
+            private void scheduleScrollHintChecks() {
+                if (paused || isFinished) {
+                    return;
+                }
+                if (savedMessagesTagHint != null && !savedMessagesTagHintShown && !savedMessagesTagHint.shown()) {
+                    AndroidUtilities.cancelRunOnUIThread(checkSavedMessagesTagHintRunnable);
+                    AndroidUtilities.runOnUIThread(checkSavedMessagesTagHintRunnable, 2000);
+                }
+                if (botMessageHint == null) {
+                    AndroidUtilities.cancelRunOnUIThread(checkBotMessageHintRunnable);
+                    AndroidUtilities.runOnUIThread(checkBotMessageHintRunnable, 2000);
+                }
+            }
+
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) app.flexygram.performance.FrameDiagnostics.scrolling(getParentActivity(), newState != RecyclerView.SCROLL_STATE_IDLE);
@@ -7660,6 +7674,7 @@ public class ChatActivity extends BaseFragment implements
                     updateVisibleRows();
                     invalidateMergedVisibleBlurredPositionsAndSources(BLUR_INVALIDATE_FLAG_SCROLL);
                     scrollByTouch = false;
+                    scheduleScrollHintChecks();
                 } else {
                     if (groupEmojiPackHint != null && groupEmojiPackHint.shown()) {
                         groupEmojiPackHint.hide();
@@ -7806,23 +7821,20 @@ public class ChatActivity extends BaseFragment implements
 
                 checkTranslation(false);
 
-                if (savedMessagesTagHint != null) {
-                    if (savedMessagesTagHint.shown()) {
-                        savedMessagesTagHint.hide();
-                    } else if (!savedMessagesTagHintShown) {
-                        lastScrollTime = System.currentTimeMillis();
-                        AndroidUtilities.cancelRunOnUIThread(checkSavedMessagesTagHintRunnable);
-                        AndroidUtilities.runOnUIThread(checkSavedMessagesTagHintRunnable, 2000);
-                    }
+                if (savedMessagesTagHint != null && !savedMessagesTagHintShown && (dx != 0 || dy != 0)) {
+                    lastScrollTime = android.os.SystemClock.uptimeMillis();
+                }
+                if (savedMessagesTagHint != null && savedMessagesTagHint.shown()) {
+                    savedMessagesTagHint.hide();
                 }
                 if (videoConversionTimeHint != null && videoConversionTimeHint.shown()) {
                     videoConversionTimeHint.hide();
                 }
                 if (botMessageHint != null && botMessageHint.shown()) {
                     botMessageHint.hide();
-                } else {
-                    AndroidUtilities.cancelRunOnUIThread(checkBotMessageHintRunnable);
-                    AndroidUtilities.runOnUIThread(checkBotMessageHintRunnable, 2000);
+                }
+                if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
+                    scheduleScrollHintChecks();
                 }
                 if (timeHint != null && timeHint.shown()) {
                     timeHint.hide();
@@ -29393,7 +29405,7 @@ public class ChatActivity extends BaseFragment implements
         if (paused || chatListView == null || isTranslationScrollActive() || savedMessagesTagHint == null || savedMessagesTagHint.shown() || savedMessagesTagHintShown || !checkedSavedMessagesHint) {
             return;
         }
-        if (savedMessagesTagHint != null && !isMessagesSearchListVisible() && System.currentTimeMillis() - lastScrollTime > 1800 && MessagesController.getGlobalMainSettings().getInt("savedsearchtaghint", 0) < 1) {
+        if (savedMessagesTagHint != null && !isMessagesSearchListVisible() && android.os.SystemClock.uptimeMillis() - lastScrollTime > 1800 && MessagesController.getGlobalMainSettings().getInt("savedsearchtaghint", 0) < 1) {
             final int[] loc = new int[2];
             ChatMessageCell foundCell = null;
             for (int i = chatListView.getChildCount() - 1; i >= 0; --i) {
@@ -53072,6 +53084,11 @@ public class ChatActivity extends BaseFragment implements
 
         public ChatListRecyclerView(Context context, ThemeDelegate themeDelegate) {
             super(context, themeDelegate);
+        }
+
+        @Override
+        protected float getFlingFriction() {
+            return super.getFlingFriction() * CONVERSATION_FLING_FRICTION_MULTIPLIER;
         }
 
         void drawChatBackgroundElements(Canvas canvas) {
