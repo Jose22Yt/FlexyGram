@@ -77,3 +77,12 @@ public class Probe {
     }
 }
 """.replace("METHODS", methods)})
+
+
+def test_normal_message_delivery_offers_alert_before_dispatching_ui_observers():
+    source = (JAVA / "org/telegram/messenger/MessagesController.java").read_text()
+    update = method(source, "public boolean updateInterfaceWithMessages(")
+    dispatch = "postNotificationName(NotificationCenter.didReceiveNewMessages, dialogId, messages, scheduled, mode)"
+    assert update.index("isBlockedOrFiltered(message)") < update.index("launch.onFlexyIncomingMessages(")
+    assert update.index("launch.onFlexyIncomingMessages(") < update.index(dispatch)
+    assert "mode == ChatActivity.MODE_DEFAULT && hasNotOutMessage && launch != null" in update

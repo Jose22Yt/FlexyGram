@@ -1327,4 +1327,6 @@
     <string name="FlexyInAppAlertInherit">Usar ajustes del chat</string>
     <string name="FlexyInAppAlertNewMessage">Mensaje nuevo</string>
     <string name="FlexyInAppAlertDismiss">Descartar</string>
+    <string name="FlexyInAppAlertTest">Probar aviso</string>
+    <string name="FlexyInAppAlertTestMessage">Desliza hacia arriba para ocultar este aviso.</string>
 </resources>

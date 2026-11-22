@@ -11552,4 +11552,6 @@
     <string name="FlexyInAppAlertInherit">Use chat settings</string>
     <string name="FlexyInAppAlertNewMessage">New message</string>
     <string name="FlexyInAppAlertDismiss">Dismiss</string>
+    <string name="FlexyInAppAlertTest">Preview alert</string>
+    <string name="FlexyInAppAlertTestMessage">Swipe up to hide this alert.</string>
 </resources>

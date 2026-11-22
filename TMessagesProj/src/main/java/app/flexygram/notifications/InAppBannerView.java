@@ -41,7 +41,7 @@ final class InAppBannerView extends FrameLayout {
     private VelocityTracker velocity;
     private Runnable action;
     private float progress, anchorX, anchorY, anchorWidth, downY, downX, downProgress, dragDistance;
-    private boolean dragging, cancelled, closing;
+    private boolean dragging, cancelled, closing, startOnLayout;
 
     InAppBannerView(Context context) {
         super(context);
@@ -99,6 +99,10 @@ final class InAppBannerView extends FrameLayout {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         applyProgress();
+        if (startOnLayout) {
+            startOnLayout = false;
+            animateTo(1f);
+        }
     }
 
     private void place(WindowInsetsCompat insets, int width) {
@@ -171,7 +175,8 @@ final class InAppBannerView extends FrameLayout {
         place(ViewCompat.getRootWindowInsets(this), parent.getWidth());
         progress = 0f;
         applyProgress();
-        animateTo(1f);
+        startOnLayout = capsule.getWidth() == 0 || isLayoutRequested();
+        if (!startOnLayout) animateTo(1f);
     }
 
     private void open() {
@@ -316,6 +321,7 @@ final class InAppBannerView extends FrameLayout {
     }
 
     void hide() {
+        startOnLayout = false;
         removeCallbacks(expire);
         stopAnimation();
         clearTouch();

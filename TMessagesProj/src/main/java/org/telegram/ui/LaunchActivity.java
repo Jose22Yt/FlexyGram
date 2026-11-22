@@ -1454,10 +1454,40 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     private app.flexygram.notifications.InAppAlerts flexyInAppAlerts;
 
     public boolean canShowFlexyInAppAlert() {
-        return isResumed && !isFinishing() && !isDestroyed() && hasWindowFocus()
+        return isResumed && !isFinishing() && !isDestroyed() && ApplicationLoader.isScreenOn
+                && frameLayout != null && frameLayout.isShown()
                 && !switchingAccount && !isInPictureInPictureMode && !SharedConfig.appLocked
                 && !SharedConfig.isWaitingForPasscodeEnter && VoIPService.getSharedInstance() == null
                 && (!PhotoViewer.hasInstance() || !PhotoViewer.getInstance().isVisible());
+    }
+
+    public void onFlexyIncomingMessages(int account, long dialog, java.util.List<MessageObject> messages) {
+        if (account != currentAccount || !canShowFlexyInAppAlert()) return;
+        android.content.SharedPreferences preferences = app.flexygram.notifications.InAppAlerts.preferences(account);
+        if (!app.flexygram.notifications.InAppAlerts.hasSelections(preferences)) return;
+        BaseFragment visible = getSafeLastFragment();
+        if (!(visible instanceof ChatActivity) && AndroidUtilities.isTablet() && rightActionBarLayout != null
+                && rightActionBarLayout.getView().isShown() && sheetFragmentsStack.isEmpty()) {
+            visible = rightActionBarLayout.getSafeLastFragment();
+        }
+        getFlexyInAppAlerts(preferences).onMessages(account, dialog, messages,
+                visible instanceof ChatActivity ? (ChatActivity) visible : null);
+    }
+
+    public void previewFlexyInAppAlert(int account) {
+        if (frameLayout == null) return;
+        frameLayout.post(() -> {
+            if (account == currentAccount && canShowFlexyInAppAlert()) {
+                getFlexyInAppAlerts(app.flexygram.notifications.InAppAlerts.preferences(account)).preview();
+            }
+        });
+    }
+
+    private app.flexygram.notifications.InAppAlerts getFlexyInAppAlerts(android.content.SharedPreferences preferences) {
+        if (flexyInAppAlerts == null) {
+            flexyInAppAlerts = new app.flexygram.notifications.InAppAlerts(this, frameLayout, preferences);
+        }
+        return flexyInAppAlerts;
     }
 
     private void hideFlexyInAppAlert() {
@@ -1489,7 +1519,6 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             .createObserversGroup(this)
             .add(NotificationCenter.openBoostForUsersDialog)
             .add(NotificationCenter.appDidLogout)
-            .add(NotificationCenter.didReceiveNewMessages)
             .add(NotificationCenter.mainUserInfoChanged)
             .add(NotificationCenter.attachMenuBotsDidLoad)
             .add(NotificationCenter.didUpdateConnectionState)
@@ -7577,23 +7606,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     @SuppressWarnings("unchecked")
     public void didReceivedNotification(int id, final int account, Object... args) {
-        if (id == NotificationCenter.didReceiveNewMessages) {
-            if (!isResumed || account != currentAccount || frameLayout == null
-                    || args.length < 4 || !(args[0] instanceof Long) || !(args[1] instanceof java.util.List)
-                    || !Boolean.FALSE.equals(args[2]) || !Integer.valueOf(ChatActivity.MODE_DEFAULT).equals(args[3])) return;
-            android.content.SharedPreferences preferences = app.flexygram.notifications.InAppAlerts.preferences(account);
-            if (!app.flexygram.notifications.InAppAlerts.hasSelections(preferences) || !canShowFlexyInAppAlert()) return;
-            if (flexyInAppAlerts == null) {
-                flexyInAppAlerts = new app.flexygram.notifications.InAppAlerts(this, frameLayout, preferences);
-            }
-            BaseFragment visible = getSafeLastFragment();
-            if (!(visible instanceof ChatActivity) && AndroidUtilities.isTablet() && rightActionBarLayout != null
-                    && rightActionBarLayout.getView().isShown() && sheetFragmentsStack.isEmpty()) {
-                visible = rightActionBarLayout.getSafeLastFragment();
-            }
-            flexyInAppAlerts.onMessages(account, (Long) args[0], (java.util.List<?>) args[1],
-                    visible instanceof ChatActivity ? (ChatActivity) visible : null);
-        } else if (id == NotificationCenter.didStartedCall) {
+        if (id == NotificationCenter.didStartedCall) {
             hideFlexyInAppAlert();
         } else if (id == NotificationCenter.appDidLogout) {
             hideFlexyInAppAlert();

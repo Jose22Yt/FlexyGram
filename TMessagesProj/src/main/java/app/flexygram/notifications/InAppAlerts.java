@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.view.HapticFeedbackConstants;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -141,10 +142,24 @@ public final class InAppAlerts {
             builder.setNeutralButton(LocaleController.getString(R.string.FlexyInAppAlertInherit),
                     (d, which) -> saveOptions(preferences, dialog, topic, 0));
         }
-        builder.show();
+        LaunchActivity launch = LaunchActivity.instance;
+        if (launch != null) {
+            Button previewButton = new Button(context);
+            previewButton.setText(LocaleController.getString(R.string.FlexyInAppAlertTest));
+            previewButton.setAllCaps(false);
+            rows.addView(previewButton);
+            AlertDialog settings = builder.create();
+            previewButton.setOnClickListener(v -> {
+                settings.dismiss();
+                launch.previewFlexyInAppAlert(account);
+            });
+            settings.show();
+        } else {
+            builder.show();
+        }
     }
 
-    public void onMessages(int account, long dialog, List<?> messages, ChatActivity visibleChat) {
+    public void onMessages(int account, long dialog, List<MessageObject> messages, ChatActivity visibleChat) {
         if (dialog == 0 || DialogObject.isEncryptedDialog(dialog) || SharedConfig.appLocked
                 || SharedConfig.isWaitingForPasscodeEnter || VoIPService.getSharedInstance() != null) return;
         int dialogFlags = preferences.getInt(key(dialog, 0), 0);
@@ -165,8 +180,7 @@ public final class InAppAlerts {
         long topic = 0;
         int count = 0, flags = 0;
         for (int i = messages.size() - 1; i >= 0; i--) {
-            if (!(messages.get(i) instanceof MessageObject)) continue;
-            MessageObject message = (MessageObject) messages.get(i);
+            MessageObject message = messages.get(i);
             if (message.messageOwner == null || message.getId() <= 0 || message.isOut() || !message.isUnread()
                     || message.messageOwner instanceof TLRPC.TL_messageService || message.isEphemeralAndNotWelcome()) continue;
             long messageTopic = forum ? message.getTopicId() : 0;
@@ -216,17 +230,28 @@ public final class InAppAlerts {
                 }
             }
         }
-        if (banner == null) {
-            banner = new InAppBannerView(activity);
-            root.addView(banner, new FrameLayout.LayoutParams(-1, -1));
-        }
-        if (root.getChildAt(root.getChildCount() - 1) != banner) banner.bringToFront();
+        prepareBanner();
         banner.show(name, preview, () -> {
             if (UserConfig.selectedAccount == account && activity.canShowFlexyInAppAlert()) {
                 activity.openMessage(dialog, id, null, null, 0, -1, null);
             }
         }, update);
         if (!update && (flags & VIBRATE) != 0) root.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+    }
+
+    private void prepareBanner() {
+        if (banner == null) {
+            banner = new InAppBannerView(activity);
+            root.addView(banner, new FrameLayout.LayoutParams(-1, -1));
+        }
+        if (root.getChildAt(root.getChildCount() - 1) != banner) banner.bringToFront();
+    }
+
+    public void preview() {
+        shownDialog = 0;
+        prepareBanner();
+        banner.show(LocaleController.getString(R.string.FlexyInAppAlertTitle),
+                LocaleController.getString(R.string.FlexyInAppAlertTestMessage), null, false);
     }
 
     private static boolean canPreview(MessagesController controller, long dialog, MessageObject message) {
