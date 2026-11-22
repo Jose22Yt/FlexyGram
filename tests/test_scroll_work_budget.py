@@ -125,7 +125,11 @@ def test_scroll_hints_use_cancellable_identity_and_stop_on_leave(tmp_path):
     start = source.index('private final Runnable checkBotMessageHintRunnable')
     fields = source[start:source.index('private void checkBotMessageHint()', start)]
     scroll = source[source.index('public void onScrolled(RecyclerView recyclerView, int dx, int dy)'):]
-    schedule = scroll[scroll.index('if (savedMessagesTagHint != null)'):scroll.index('if (timeHint != null')]
+    schedule = method(source, 'private void scheduleScrollHintChecks()')
+    idle_guard = method(scroll, 'if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE)')
+    assert 'scheduleScrollHintChecks();' in idle_guard
+    state = method(source[source.index(schedule):], 'public void onScrollStateChanged(')
+    assert 'scheduleScrollHintChecks();' in method(state, 'if (newState == RecyclerView.SCROLL_STATE_IDLE)')
     for callback in ('checkSavedMessagesTagHint', 'checkBotMessageHint'):
         assert f'ChatActivity.this::{callback}' not in source
         assert 'paused || chatListView == null || isTranslationScrollActive()' in method(source, f'private void {callback}()')
@@ -135,23 +139,36 @@ def test_scroll_hints_use_cancellable_identity_and_stop_on_leave(tmp_path):
 public class Probe {
  static class AndroidUtilities {
   static List<Runnable> queue=new ArrayList<>();
+  static int posts;
   static void cancelRunOnUIThread(Runnable r){queue.removeIf(item->item==r);}
-  static void runOnUIThread(Runnable r,long delay){queue.add(r);}
+  static void runOnUIThread(Runnable r,long delay){posts++;queue.add(r);}
   static void fire(){List<Runnable> copy=new ArrayList<>(queue);queue.clear();for(Runnable r:copy)r.run();}
  }
  static class Hint {boolean shown(){return false;}void hide(){}}
- Hint savedMessagesTagHint=new Hint(),videoConversionTimeHint,botMessageHint;
- boolean savedMessagesTagHintShown;long lastScrollTime;int tagChecks,botChecks;
+ Hint savedMessagesTagHint=new Hint(),botMessageHint;
+ boolean savedMessagesTagHintShown,paused,isFinished;int tagChecks,botChecks;
+ static class RecyclerView {
+  static final int SCROLL_STATE_IDLE=0;
+  int state;int getScrollState(){return state;}
+ }
+ RecyclerView recyclerView=new RecyclerView();
  void checkSavedMessagesTagHint(){tagChecks++;}void checkBotMessageHint(){botChecks++;}
  FIELDS
- void onScroll(){SCHEDULE}
+ SCHEDULE
+ void onScroll(){IDLE_GUARD}
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[] args){
-  Probe p=new Probe();for(int i=0;i<10000;i++)p.onScroll();
-  check(AndroidUtilities.queue.size()==2);AndroidUtilities.fire();check(p.tagChecks==1&&p.botChecks==1);
+  Probe p=new Probe();
+  for(int state:new int[]{1,2}){
+   p.recyclerView.state=state;
+   for(int i=0;i<10000;i++)p.onScroll();
+   check(AndroidUtilities.posts==0&&AndroidUtilities.queue.isEmpty());
+  }
+  p.recyclerView.state=0;p.onScroll();
+  check(AndroidUtilities.posts==2&&AndroidUtilities.queue.size()==2);AndroidUtilities.fire();check(p.tagChecks==1&&p.botChecks==1);
   p.onScroll();p.cancelScrollHintChecks();AndroidUtilities.fire();check(p.tagChecks==1&&p.botChecks==1);
  }
-}'''.replace('FIELDS',fields).replace('SCHEDULE',schedule)})
+}'''.replace('FIELDS',fields).replace('SCHEDULE',schedule).replace('IDLE_GUARD',idle_guard)})
 
 
 def test_dialog_scroll_reuses_range_and_skips_inflight_folder_loads(tmp_path):
@@ -161,20 +178,21 @@ def test_dialog_scroll_reuses_range_and_skips_inflight_folder_loads(tmp_path):
     load = method(source, 'private void checkListLoad(ViewPage viewPage, int firstVisibleItem, int lastVisibleItem, boolean loadAll)')
     probe(tmp_path, {'Probe.java': '''import java.util.*;
 public class Probe {
- static class RecyclerView {static final int NO_POSITION=-1;int visits;int[] positions={-1,70,71,72,73,74,75,76,77,78,79};int getChildCount(){return positions.length;}int getChildAt(int i){visits++;return positions[i];}int getChildAdapterPosition(int v){return v;}}
- RecyclerView recyclerView=new RecyclerView();Object viewPage=new Object();int first,last,loads;
+ static class View {final int position;View(int position){this.position=position;}}
+ static class RecyclerView {static final int NO_POSITION=-1;int visits;int[] positions={-1,70,71,72,73,74,75,76,77,78,79};int getChildCount(){return positions.length;}View getChildAt(int i){visits++;return new View(positions[i]);}int getChildAdapterPosition(View v){return v.position;}}
+ RecyclerView recyclerView=new RecyclerView();Object viewPage=new Object();int first,last,loads;View firstChild;
  void checkListLoad(Object page,int first,int last){this.first=first;this.last=last;}
- void scroll(){SCAN}
+ void scroll(){SCAN firstChild=firstVisibleChild;}
  void run(boolean load,boolean loadArchived,int folderId){GUARDS if(load)loads++;if(loadArchived)loads++;}
  static class Controller {boolean[] loading={false,false};boolean isLoadingDialogs(int folder){return loading[folder];}}
  Controller controller=new Controller();Controller getMessagesController(){return controller;}
  static void check(boolean b){if(!b)throw new AssertionError();}
- public static void main(String[] args){Probe p=new Probe();p.scroll();check(p.first==70&&p.last==79&&p.recyclerView.visits==11);
+ public static void main(String[] args){Probe p=new Probe();p.scroll();check(p.first==70&&p.last==79&&p.firstChild.position==70&&p.recyclerView.visits==11);
   p.controller.loading[0]=true;p.controller.loading[1]=true;
   for(int i=0;i<10000;i++)p.run(true,true,0);check(p.loads==0);
   p.controller.loading[1]=false;p.run(true,true,0);check(p.loads==1);
   p.controller.loading[0]=false;p.run(true,false,0);check(p.loads==2);
-  p.recyclerView.positions=new int[]{-1,-1};p.scroll();check(p.first==-1&&p.last==-1);
+  p.recyclerView.positions=new int[]{-1,-1};p.scroll();check(p.first==-1&&p.last==-1&&p.firstChild==null);
  }
 }'''.replace('SCAN',scan).replace('GUARDS',load[load.index('load &='):load.index('if (load || loadArchived)')])})
 def test_selector_pagination_uses_the_adapter_snapshot_without_rebuilding_the_list(tmp_path):

@@ -453,21 +453,22 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         View view = current == null ? null : current.getFragmentView();
         return view != null && view.isShown() && !view.isLayoutRequested();
     }
+    private static final int[] ORIGINAL_ICON_SOURCES = {
+            R.drawable.fg_ios_original_chat_context_menu_forward,
+            R.drawable.fg_ios_original_chat_context_menu_reply,
+            R.drawable.fg_ios_original_navigation_back,
+            R.drawable.fg_ios_original_navigation_search,
+            R.drawable.fg_ios_original_navigation_close,
+            R.drawable.fg_ios_original_globalmusicplayer_next,
+            R.drawable.fg_ios_original_globalmusicplayer_previous,
+            R.drawable.fg_ios_original_globalmusicplayer_play,
+            R.drawable.fg_ios_original_globalmusicplayer_pause,
+            R.drawable.fg_ios_original_globalmusicplayer_orderrandom,
+            R.drawable.fg_ios_original_globalmusicplayer_repeat
+    };
     private final Runnable startIconPreload = () -> {
         if (!isResumed || customResources == null || !app.flexygram.icons.ExactIcons.isEnabled()) return;
-        cancelIconPreload = customResources.preloadOriginalIcons(new int[] {
-                R.drawable.fg_ios_original_chat_context_menu_forward,
-                R.drawable.fg_ios_original_chat_context_menu_reply,
-                R.drawable.fg_ios_original_navigation_back,
-                R.drawable.fg_ios_original_navigation_search,
-                R.drawable.fg_ios_original_navigation_close,
-                R.drawable.fg_ios_original_globalmusicplayer_next,
-                R.drawable.fg_ios_original_globalmusicplayer_previous,
-                R.drawable.fg_ios_original_globalmusicplayer_play,
-                R.drawable.fg_ios_original_globalmusicplayer_pause,
-                R.drawable.fg_ios_original_globalmusicplayer_orderrandom,
-                R.drawable.fg_ios_original_globalmusicplayer_repeat
-        });
+        cancelIconPreload = customResources.preloadOriginalIcons(ORIGINAL_ICON_SOURCES);
     };
     private final android.view.Choreographer.FrameCallback iconPreloadFrame = time -> AndroidUtilities.runOnUIThread(startIconPreload);
 
@@ -7194,6 +7195,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onDestroy() {
+        if (staticInstanceForAlerts == this) staticInstanceForAlerts = null;
         if (startupDrawReporter != null) startupDrawReporter.close();
         if (startupIdleWork != null) startupIdleWork.close();
         if (frameLayout != null) frameLayout.removeCallbacks(startupAuxiliary);
@@ -8299,13 +8301,16 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     long freeSpace;
                     StatFs statFs = new StatFs(path.getAbsolutePath());
                     freeSpace = statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong();
+                    if (force == 0) {
+                        preferences.edit().putLong("last_space_check", System.currentTimeMillis()).apply();
+                    }
                     if (force > 0 || freeSpace < 1024 * 1024 * 50) {
                         if (force > 0) {
                             alreadyShownFreeDiscSpaceAlertForced = System.currentTimeMillis();
+                            preferences.edit().putLong("last_space_check", alreadyShownFreeDiscSpaceAlertForced).apply();
                         }
-                        preferences.edit().putLong("last_space_check", System.currentTimeMillis()).commit();
                         AndroidUtilities.runOnUIThread(() -> {
-                            if (checkFreeDiscSpaceShown) {
+                            if (isFinishing() || isDestroyed() || checkFreeDiscSpaceShown) {
                                 return;
                             }
                             try {
@@ -8388,7 +8393,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             SharedPreferences preferences = MessagesController.getGlobalMainSettings();
             Set<String> showedLangs = new HashSet<>(preferences.getStringSet("language_showed3", new HashSet<>()));
             showedLangs.add(systemLang);
-            preferences.edit().putStringSet("language_showed3", showedLangs).commit();
+            preferences.edit().putStringSet("language_showed3", showedLangs).apply();
         } catch (Exception e) {
             FileLog.e(e);
         }

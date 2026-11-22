@@ -30,6 +30,7 @@ final class BubbleFractureRenderer {
     private final int duration,force=100;
     private final Options settings;
     private final List<FractureMesh.Piece> pieces;
+    private final float firstPieceDelay;
     private final ArrayList<Path> paths = new ArrayList<>();
     private final Paint paint = new Paint(3), edge = new Paint(3), flashPaint = new Paint(3), blastPaint = new Paint(3), smokePaint = new Paint(3);
     private final int[] pos = {0,0};
@@ -42,10 +43,13 @@ final class BubbleFractureRenderer {
         settings=new Options(style-1,100,100,100,15,100,100,650,100,32,100,90,100);
         gravity=160*density;
         pieces=settings.style==0?FractureMesh.make(width,height,20,seed):settings.style==3?TntMesh.make(width,height,32,seed):Collections.emptyList();
+        float earliest = 1f;
         for(FractureMesh.Piece p:pieces){
+            earliest = Math.min(earliest, p.delay);
             Path path=new Path();path.moveTo(p.xy[0],p.xy[1]);
             for(int i=2;i<p.xy.length;i+=2)path.lineTo(p.xy[i],p.xy[i+1]);path.close();paths.add(path);
         }
+        firstPieceDelay = earliest;
         src=new Rect(0,0,image.getWidth(),image.getHeight());dst=new RectF(0,0,width,height);
         edge.setStyle(Paint.Style.STROKE);edge.setStrokeWidth(.55f*density);edge.setColor(0x44ffffff);
         flashPaint.setColorFilter(new PorterDuffColorFilter(0xffffffff,PorterDuff.Mode.SRC_ATOP));
@@ -87,17 +91,21 @@ final class BubbleFractureRenderer {
                 return;
             }
             paint.setAlpha((int)(255*FractureMesh.fade(progress)));
-            for(int i=0;i<pieces.size();i++) {
-                FractureMesh.Piece p=pieces.get(i);
-                float phase=FractureMesh.phase(progress,p.delay);
-                float seconds=DeleteMotionMath.smooth(phase)*total;
-                float x=p.vx*density*seconds*.38f*settings.spread*.01f,y=p.vy*density*seconds*.28f+gravity*seconds*seconds*.5f,rotation=p.spin*phase*phase*settings.spin*.01f;
-                int save=c.save();
-                c.translate(pos[0]+x,pos[1]+y);
-                c.rotate(rotation,p.cx,p.cy);
-                c.clipPath(paths.get(i));
+            if (progress <= firstPieceDelay) {
                 c.drawBitmap(image,src,dst,paint);
-                c.restoreToCount(save);
+            } else {
+                for(int i=0;i<pieces.size();i++) {
+                    FractureMesh.Piece p=pieces.get(i);
+                    float phase=FractureMesh.phase(progress,p.delay);
+                    float seconds=DeleteMotionMath.smooth(phase)*total;
+                    float x=p.vx*density*seconds*.38f*settings.spread*.01f,y=p.vy*density*seconds*.28f+gravity*seconds*seconds*.5f,rotation=p.spin*phase*phase*settings.spin*.01f;
+                    int save=c.save();
+                    c.translate(pos[0]+x,pos[1]+y);
+                    c.rotate(rotation,p.cx,p.cy);
+                    c.clipPath(paths.get(i));
+                    c.drawBitmap(image,src,dst,paint);
+                    c.restoreToCount(save);
+                }
             }
             // Hairline cracks emerge only before their pieces detach, never a solid overlay.
             if(settings.cracks>0&&progress>.04f&&progress<.50f) {

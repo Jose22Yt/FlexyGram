@@ -4920,14 +4920,17 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     viewPage.dialogsItemAnimator.onListScroll(-dy);
                     int firstVisiblePosition = -1;
                     int lastVisiblePosition = -1;
+                    View firstVisibleChild = null;
                     for (int i = 0; i < recyclerView.getChildCount(); i++) {
-                        int position = recyclerView.getChildAdapterPosition(recyclerView.getChildAt(i));
+                        View child = recyclerView.getChildAt(i);
+                        int position = recyclerView.getChildAdapterPosition(child);
                         if (position >= 0) {
                             if (lastVisiblePosition == -1 || position > lastVisiblePosition) {
                                 lastVisiblePosition = position;
                             }
                             if (firstVisiblePosition == -1 || position < firstVisiblePosition) {
                                 firstVisiblePosition = position;
+                                firstVisibleChild = child;
                             }
                         }
                     }
@@ -4936,12 +4939,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     invalidateScrollY = true;
                     if (initialDialogsType != DIALOGS_TYPE_WIDGET && wasManualScroll && recyclerView.getChildCount() > 0) {
                         if (firstVisiblePosition != RecyclerView.NO_POSITION) {
-                            RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(firstVisiblePosition);
-                            if (!hasHiddenArchive() || holder != null && holder.getAdapterPosition() >= 0) {
-                                int firstViewTop = 0;
-                                if (holder != null) {
-                                    firstViewTop = holder.itemView.getTop();
-                                }
+                            // During pending adapter updates, keep the holder lookup's refresh semantics.
+                            View firstView = firstVisibleChild;
+                            if (recyclerView.hasPendingAdapterUpdates()) {
+                                RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(firstVisiblePosition);
+                                firstView = holder != null && holder.getAdapterPosition() >= 0 ? holder.itemView : null;
+                            }
+                            if (!hasHiddenArchive() || firstView != null) {
+                                int firstViewTop = firstView != null ? firstView.getTop() : 0;
                                 boolean goingDown;
                                 boolean changed = true;
                                 if (prevPosition == firstVisiblePosition) {

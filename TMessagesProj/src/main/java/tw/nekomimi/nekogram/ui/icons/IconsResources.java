@@ -52,12 +52,15 @@ public class IconsResources extends Resources {
     /** Only static source PNG IDs; no Theme, Views, icon-pack manager or shared tinted drawables. */
     public Runnable preloadOriginalIcons(int[] sources) {
         if (sources == null || sources.length == 0 || sources.length > 32) return null;
-        final int[] ids = sources.clone();
-        final Configuration configuration = new Configuration(getConfiguration());
+        final int[] ids;
+        final Configuration configuration;
         final long generation;
         synchronized (cacheLock) {
-            if (configuration.equals(warmedConfiguration) && java.util.Arrays.equals(ids, warmedSources)) return null;
-            if (!warming.compareAndSet(false, true)) return null;
+            if (getConfiguration().equals(warmedConfiguration) && java.util.Arrays.equals(sources, warmedSources)) return null;
+            if (warming.get()) return null;
+            ids = sources.clone();
+            configuration = new Configuration(getConfiguration());
+            warming.set(true);
             generation = cacheGeneration;
         }
         final AtomicBoolean cancelled = new AtomicBoolean();
