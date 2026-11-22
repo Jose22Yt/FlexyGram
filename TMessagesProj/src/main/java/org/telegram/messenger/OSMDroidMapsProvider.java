@@ -34,19 +34,37 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class OSMDroidMapsProvider implements IMapsProvider {
 
+    private static boolean configured;
+
+    private static synchronized void ensureConfigured(Context context) {
+        if (configured) return;
+        try {
+            var config = org.osmdroid.config.Configuration.getInstance();
+            config.setUserAgentValue("FlexyGram/" + BuildConfig.VERSION_NAME + " (+https://github.com/Jose22Yt/FlexyGram)");
+            File base = new File(context.getApplicationContext().getCacheDir(), "osmdroid");
+            config.setOsmdroidBasePath(base);
+            config.setOsmdroidTileCache(new File(base, "tiles"));
+            configured = true;
+        } catch (RuntimeException error) {
+            FileLog.e(error);
+        }
+    }
+
     @Override
     public void initializeMaps(Context context) {
-
+        ensureConfigured(context);
     }
 
     @Override
     public IMapView onCreateMapView(Context context) {
+        ensureConfigured(context);
         return new OSMDroidMapView(context);
     }
 
