@@ -22574,15 +22574,6 @@ public class MessagesController extends BaseController implements NotificationCe
                 getNotificationCenter().postNotificationName(NotificationCenter.replaceMessagesObjects, dialogId, gramMessages);
             }
         }
-        // Offer unread messages before UI observers can mark them read or defer their events.
-        LaunchActivity launch = LaunchActivity.instance;
-        if (mode == ChatActivity.MODE_DEFAULT && hasNotOutMessage && launch != null) {
-            try {
-                launch.onFlexyIncomingMessages(currentAccount, dialogId, messages);
-            } catch (RuntimeException e) {
-                FileLog.e(e);
-            }
-        }
         getNotificationCenter().postNotificationName(NotificationCenter.didReceiveNewMessages, dialogId, messages, scheduled, mode);
 
         if (lastMessage == null || scheduled) {

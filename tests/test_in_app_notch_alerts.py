@@ -80,9 +80,11 @@ public class Probe {
 
 
 def test_normal_message_delivery_offers_alert_before_dispatching_ui_observers():
-    source = (JAVA / "org/telegram/messenger/MessagesController.java").read_text()
-    update = method(source, "public boolean updateInterfaceWithMessages(")
-    dispatch = "postNotificationName(NotificationCenter.didReceiveNewMessages, dialogId, messages, scheduled, mode)"
-    assert update.index("isBlockedOrFiltered(message)") < update.index("launch.onFlexyIncomingMessages(")
-    assert update.index("launch.onFlexyIncomingMessages(") < update.index(dispatch)
-    assert "mode == ChatActivity.MODE_DEFAULT && hasNotOutMessage && launch != null" in update
+    center = (JAVA / "org/telegram/messenger/NotificationCenter.java").read_text()
+    publish = method(center, "public void postNotificationName(final int id, Object... args)")
+    assert "if (id == didReceiveNewMessages)" in publish
+    assert publish.index("InAppAlerts.onIncomingNotification(") < publish.index("postNotificationNameInternal(")
+    alerts = (JAVA / "app/flexygram/notifications/InAppAlerts.java").read_text()
+    receive = method(alerts, "public static void onIncomingNotification(")
+    assert "Boolean.FALSE.equals(args[2])" in receive
+    assert "Integer.valueOf(ChatActivity.MODE_DEFAULT).equals(args[3])" in receive

@@ -609,6 +609,10 @@ public class NotificationCenter {
     }
 
     public void postNotificationName(final int id, Object... args) {
+        if (id == didReceiveNewMessages) {
+            // The visual alert needs the incoming message before observers can mutate its read state.
+            app.flexygram.notifications.InAppAlerts.onIncomingNotification(currentAccount, args);
+        }
         if ((id == updateInterfaces || id == startAllHeavyOperations || id == stopAllHeavyOperations)
                 && args != null && args.length > 0 && args[0] instanceof Number && !(args[0] instanceof Integer)) {
             args[0] = ((Number) args[0]).intValue();

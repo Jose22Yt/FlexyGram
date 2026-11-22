@@ -14,6 +14,7 @@ import android.widget.ScrollView;
 
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.DialogObject;
+import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
@@ -50,6 +51,19 @@ public final class InAppAlerts {
         this.activity = activity;
         this.root = root;
         this.preferences = preferences;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void onIncomingNotification(int account, Object[] args) {
+        LaunchActivity launch = LaunchActivity.instance;
+        if (launch == null || !LaunchActivity.isResumed || args == null || args.length < 4
+                || !(args[0] instanceof Long) || !(args[1] instanceof List)
+                || !Boolean.FALSE.equals(args[2]) || !Integer.valueOf(ChatActivity.MODE_DEFAULT).equals(args[3])) return;
+        try {
+            launch.onFlexyIncomingMessages(account, (Long) args[0], (List<MessageObject>) args[1]);
+        } catch (RuntimeException error) {
+            FileLog.e(error);
+        }
     }
 
     public static SharedPreferences preferences(int account) {
