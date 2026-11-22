@@ -39,6 +39,8 @@ def test_alert_selection_count_tracks_enable_and_inheritance(tmp_path):
     methods = "\n".join(method(source, signature) for signature in (
         "public static boolean hasSelections(",
         "private static void saveOptions(",
+        "private static String key(",
+        "private static String topicCountKey(",
     ))
     probe(tmp_path, {"Probe.java": """
 import java.util.HashMap;
@@ -61,16 +63,17 @@ public class Probe {
     public static void main(String[] args) {
         SharedPreferences settings = new SharedPreferences();
         check(!hasSelections(settings));
-        saveOptions(settings, "-5:0", 1);
-        saveOptions(settings, "-5:1", 32);
+        saveOptions(settings, -5, 0, 1);
+        saveOptions(settings, -5, 1, 32);
         check(hasSelections(settings) && settings.getInt(ACTIVE_COUNT, 0) == 1);
-        saveOptions(settings, "-5:1", 5);
-        saveOptions(settings, "-5:1", 17);
+        saveOptions(settings, -5, 1, 5);
+        saveOptions(settings, -5, 1, 17);
         check(settings.getInt(ACTIVE_COUNT, 0) == 2);
-        saveOptions(settings, "-5:0", 0);
-        check(hasSelections(settings));
-        saveOptions(settings, "-5:1", 0);
-        check(!hasSelections(settings) && !settings.values.containsKey("-5:1"));
+        saveOptions(settings, -5, 0, 0);
+        check(hasSelections(settings) && settings.getInt(topicCountKey(-5), 0) == 1);
+        saveOptions(settings, -5, 1, 0);
+        check(!hasSelections(settings) && !settings.values.containsKey(key(-5, 1)));
+        check(!settings.values.containsKey(topicCountKey(-5)));
     }
 }
 """.replace("METHODS", methods)})

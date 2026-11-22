@@ -143,13 +143,19 @@ final class InAppBannerView extends FrameLayout {
     }
 
     void show(CharSequence name, CharSequence text, Runnable open, boolean update) {
-        title.setText(name);
-        preview.setText(text);
-        preview.setVisibility(TextUtils.isEmpty(text) ? GONE : VISIBLE);
-        capsule.setContentDescription(TextUtils.isEmpty(text) ? name : TextUtils.concat(name, "\n", text));
+        boolean hasPreview = !TextUtils.isEmpty(text);
+        boolean changed = !TextUtils.equals(title.getText(), name)
+                || preview.getVisibility() != (hasPreview ? VISIBLE : GONE)
+                || (hasPreview && !TextUtils.equals(preview.getText(), text));
+        if (changed) {
+            title.setText(name);
+            preview.setText(text);
+            preview.setVisibility(hasPreview ? VISIBLE : GONE);
+            capsule.setContentDescription(hasPreview ? TextUtils.concat(name, "\n", text) : name);
+        }
         action = open;
         if (update && !closing && getVisibility() == VISIBLE) {
-            if (velocity == null) scheduleExpiry();
+            if (velocity == null && animator == null) scheduleExpiry();
             return;
         }
         stopAnimation();

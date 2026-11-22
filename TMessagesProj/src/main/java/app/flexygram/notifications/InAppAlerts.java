@@ -59,21 +59,32 @@ public final class InAppAlerts {
         return preferences.getInt(ACTIVE_COUNT, 0) > 0;
     }
 
-    private static void saveOptions(SharedPreferences preferences, String key, int options) {
+    private static void saveOptions(SharedPreferences preferences, long dialog, long topic, int options) {
+        String key = key(dialog, topic);
         boolean wasEnabled = (preferences.getInt(key, 0) & ENABLED) != 0;
         boolean enabled = (options & ENABLED) != 0;
         SharedPreferences.Editor editor = preferences.edit();
         if (options == 0) editor.remove(key);
         else editor.putInt(key, options);
         if (wasEnabled != enabled) {
-            int count = preferences.getInt(ACTIVE_COUNT, 0) + (enabled ? 1 : -1);
-            editor.putInt(ACTIVE_COUNT, Math.max(0, count));
+            int change = enabled ? 1 : -1;
+            editor.putInt(ACTIVE_COUNT, Math.max(0, preferences.getInt(ACTIVE_COUNT, 0) + change));
+            if (topic != 0) {
+                String topicCount = topicCountKey(dialog);
+                int count = preferences.getInt(topicCount, 0) + change;
+                if (count > 0) editor.putInt(topicCount, count);
+                else editor.remove(topicCount);
+            }
         }
         editor.apply();
     }
 
     private static String key(long dialog, long topic) {
         return "flexy_alert:" + dialog + ":" + topic;
+    }
+
+    private static String topicCountKey(long dialog) {
+        return "flexy_alert_topics:" + dialog;
     }
 
     public static void showSettings(Context context, int account, long dialog, long topic) {
@@ -123,12 +134,12 @@ public final class InAppAlerts {
                         if (values[i]) updated |= flags[i];
                     }
                     if ((updated & ENABLED) == 0) updated = topic == 0 ? 0 : TOPIC_DISABLED;
-                    saveOptions(preferences, key, updated);
+                    saveOptions(preferences, dialog, topic, updated);
                 })
                 .setNegativeButton(LocaleController.getString(R.string.Cancel), null);
         if (topic != 0) {
             builder.setNeutralButton(LocaleController.getString(R.string.FlexyInAppAlertInherit),
-                    (d, which) -> saveOptions(preferences, key, 0));
+                    (d, which) -> saveOptions(preferences, dialog, topic, 0));
         }
         builder.show();
     }
@@ -137,11 +148,19 @@ public final class InAppAlerts {
         if (dialog == 0 || DialogObject.isEncryptedDialog(dialog) || SharedConfig.appLocked
                 || SharedConfig.isWaitingForPasscodeEnter || VoIPService.getSharedInstance() != null) return;
         int dialogFlags = preferences.getInt(key(dialog, 0), 0);
+        if ((dialogFlags & ENABLED) == 0 && (dialog > 0 || preferences.getInt(topicCountKey(dialog), 0) == 0)) return;
         MessagesController controller = MessagesController.getInstance(account);
         TLRPC.Chat chat = dialog < 0 ? controller.getChat(-dialog) : null;
         boolean forum = ChatObject.isForum(chat);
         if ((dialogFlags & ENABLED) == 0 && !forum) return;
 
+        long visibleTopic = -1;
+        if (visibleChat != null && visibleChat.getDialogId() == dialog) {
+            visibleTopic = visibleChat.getTopicId();
+            if (visibleTopic == 0) return;
+        }
+        boolean sameDialogShowing = banner != null && banner.isShowing() && shownDialog == dialog;
+        if (banner != null && banner.isInteracting() && !sameDialogShowing) return;
         MessageObject newest = null;
         long topic = 0;
         int count = 0, flags = 0;
@@ -151,13 +170,12 @@ public final class InAppAlerts {
             if (message.messageOwner == null || message.getId() <= 0 || message.isOut() || !message.isUnread()
                     || message.messageOwner instanceof TLRPC.TL_messageService || message.isEphemeralAndNotWelcome()) continue;
             long messageTopic = forum ? message.getTopicId() : 0;
-            if (newest != null && topic != messageTopic) continue;
-            if (banner != null && banner.isShowing() && shownDialog == dialog && shownTopic == messageTopic
+            if (messageTopic == visibleTopic || (newest != null && topic != messageTopic)) continue;
+            if (sameDialogShowing && shownTopic == messageTopic
                     && message.getId() <= newestId) continue;
-            int options = messageTopic == 0 ? dialogFlags : preferences.getInt(key(dialog, messageTopic), dialogFlags);
+            int options = newest != null ? flags : messageTopic == 0 ? dialogFlags
+                    : preferences.getInt(key(dialog, messageTopic), dialogFlags);
             if ((options & ENABLED) == 0) continue;
-            if (visibleChat != null && visibleChat.getDialogId() == dialog
-                    && (visibleChat.getTopicId() == 0 || visibleChat.getTopicId() == messageTopic)) continue;
             if ((options & IMPORTANT_ONLY) != 0 && !message.messageOwner.mentioned
                     && (message.replyMessageObject == null || !message.replyMessageObject.isOut())) continue;
             if (newest == null) {
@@ -168,7 +186,7 @@ public final class InAppAlerts {
             count++;
         }
         if (newest == null) return;
-        boolean update = banner != null && banner.isShowing() && shownDialog == dialog && shownTopic == topic;
+        boolean update = sameDialogShowing && shownTopic == topic;
         if (!update && banner != null && banner.isInteracting()) return;
         int id = newest.getId();
         shownDialog = dialog;
