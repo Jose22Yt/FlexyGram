@@ -119,6 +119,10 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
     private void start(){host.addOnAttachStateChangeListener(hostListener);Choreographer.getInstance().postFrameCallback(this);invalidate();}
     @Override public void doFrame(long nanos){
         if(stopped)return;
+        if (host.getWindowVisibility() != View.VISIBLE || !host.isShown()) {
+            stop();
+            return;
+        }
         View src=source.get();
         if(src!=null && !src.isAttachedToWindow()){stop();return;}
         if(firstFrame<0)firstFrame=nanos;
@@ -151,6 +155,10 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
         // Published bitmaps can still be referenced by RenderThread; retire them through GC.
         renderer=null;image=null;
         Completion done=completion;completion=null;if(done!=null)done.finishOne();
+    }
+    @Override protected void onWindowVisibilityChanged(int visibility) {
+        super.onWindowVisibilityChanged(visibility);
+        if (visibility != View.VISIBLE && counted) stop();
     }
     @Override protected void onDetachedFromWindow(){stop();super.onDetachedFromWindow();}
 }
