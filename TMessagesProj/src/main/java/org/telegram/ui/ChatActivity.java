@@ -1936,6 +1936,7 @@ public class ChatActivity extends BaseFragment implements
     private final static int charge_fee = 72;
 
     private final static int chat_menu_topic_create = 73;
+    private static final int flexy_in_app_alert = 75;
 
     private final static int id_chat_compose_panel = 1000;
     private final static int to_the_beginning = 200;
@@ -4555,6 +4556,11 @@ public class ChatActivity extends BaseFragment implements
                         args.putBoolean("addContact", true);
                         presentFragment(new ContactAddActivity(args));
                     }
+                } else if (id == flexy_in_app_alert) {
+                    if (getParentActivity() != null) {
+                        app.flexygram.notifications.InAppAlerts.showSettings(
+                                getParentActivity(), currentAccount, dialog_id, getTopicId());
+                    }
                 } else if (id == mute) {
                     toggleMute(false);
                 } else if (id == add_shortcut) {
@@ -5147,6 +5153,10 @@ public class ChatActivity extends BaseFragment implements
                         muteItem.openSwipeBack();
                     }
                 });
+                if (chatMode == MODE_DEFAULT && !DialogObject.isEncryptedDialog(dialog_id)) {
+                    headerItem.lazilyAddSubItem(flexy_in_app_alert, R.drawable.msg_notifications,
+                            LocaleController.getString(R.string.FlexyInAppAlertTitle));
+                }
                 muteItemGap = headerItem.lazilyAddColoredGap();
             }
 

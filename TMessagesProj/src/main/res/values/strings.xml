@@ -11543,4 +11543,13 @@
     <string name="CreateManagedBotUsernameCheckFailed">Couldn\'t check this username. Please try again.</string>
     <string name="FlexyFolderThemeAccent">Use theme accent for active folder</string>
 
+    <string name="FlexyInAppAlertTitle">In-app alerts</string>
+    <string name="FlexyInAppAlertEnabled">Show alerts for this chat or topic</string>
+    <string name="FlexyInAppAlertImportant">Mentions and replies only</string>
+    <string name="FlexyInAppAlertNames">Show name only</string>
+    <string name="FlexyInAppAlertPrivate">Hide name and message</string>
+    <string name="FlexyInAppAlertVibrate">Vibrate</string>
+    <string name="FlexyInAppAlertInherit">Use chat settings</string>
+    <string name="FlexyInAppAlertNewMessage">New message</string>
+    <string name="FlexyInAppAlertDismiss">Dismiss</string>
 </resources>

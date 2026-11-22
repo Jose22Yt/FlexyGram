@@ -1318,4 +1318,13 @@
     <string name="Understood">👍 Entendido</string>
     <string name="FlexyFolderThemeAccent">Usar acento del tema en carpeta activa</string>
 
+    <string name="FlexyInAppAlertTitle">Avisos dentro de FlexyGram</string>
+    <string name="FlexyInAppAlertEnabled">Mostrar avisos de este chat o tema</string>
+    <string name="FlexyInAppAlertImportant">Solo menciones y respuestas</string>
+    <string name="FlexyInAppAlertNames">Mostrar solo el nombre</string>
+    <string name="FlexyInAppAlertPrivate">Ocultar nombre y mensaje</string>
+    <string name="FlexyInAppAlertVibrate">Vibrar</string>
+    <string name="FlexyInAppAlertInherit">Usar ajustes del chat</string>
+    <string name="FlexyInAppAlertNewMessage">Mensaje nuevo</string>
+    <string name="FlexyInAppAlertDismiss">Descartar</string>
 </resources>

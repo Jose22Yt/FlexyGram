@@ -676,6 +676,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         globalObserversGroup = NotificationCenter.getGlobalInstance()
             .createObserversGroup(this)
+            .add(NotificationCenter.didStartedCall)
             .add(NotificationCenter.needShowAlert)
             .add(NotificationCenter.reloadInterface)
             .add(NotificationCenter.suggestedLangpack)
@@ -1450,6 +1451,25 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     private NotificationCenter.ObserversGroup observersGroup;
     private NotificationCenter.ObserversGroup globalObserversGroup;
 
+    private app.flexygram.notifications.InAppAlerts flexyInAppAlerts;
+
+    public boolean canShowFlexyInAppAlert() {
+        return isResumed && !isFinishing() && !isDestroyed() && hasWindowFocus()
+                && !switchingAccount && !isInPictureInPictureMode && !SharedConfig.appLocked
+                && !SharedConfig.isWaitingForPasscodeEnter && VoIPService.getSharedInstance() == null
+                && (!PhotoViewer.hasInstance() || !PhotoViewer.getInstance().isVisible());
+    }
+
+    private void hideFlexyInAppAlert() {
+        if (flexyInAppAlerts != null) flexyInAppAlerts.hide();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (!hasFocus) hideFlexyInAppAlert();
+    }
+
     private void checkCurrentAccount() {
         if (currentAccount == UserConfig.selectedAccount && observersGroup != null) {
             return;
@@ -1460,11 +1480,16 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             observersGroup = null;
         }
 
+        if (flexyInAppAlerts != null) {
+            flexyInAppAlerts.dispose();
+            flexyInAppAlerts = null;
+        }
         currentAccount = UserConfig.selectedAccount;
         observersGroup = NotificationCenter.getInstance(currentAccount)
             .createObserversGroup(this)
             .add(NotificationCenter.openBoostForUsersDialog)
             .add(NotificationCenter.appDidLogout)
+            .add(NotificationCenter.didReceiveNewMessages)
             .add(NotificationCenter.mainUserInfoChanged)
             .add(NotificationCenter.attachMenuBotsDidLoad)
             .add(NotificationCenter.didUpdateConnectionState)
@@ -1593,6 +1618,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             selectAnimatedEmojiDialog.dismiss();
             selectAnimatedEmojiDialog = null;
         }
+        hideFlexyInAppAlert();
         SharedConfig.appLocked = true;
         if (SecretMediaViewer.hasInstance() && SecretMediaViewer.getInstance().isVisible()) {
             SecretMediaViewer.getInstance().closePhoto(false, false);
@@ -7058,6 +7084,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onPause() {
+        hideFlexyInAppAlert();
         cancelIconPreload();
         cancelStartupStatusRefresh();
         startupStatus.reset();
@@ -7195,6 +7222,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onDestroy() {
+        if (flexyInAppAlerts != null) {
+            flexyInAppAlerts.dispose();
+            flexyInAppAlerts = null;
+        }
         if (staticInstanceForAlerts == this) staticInstanceForAlerts = null;
         if (startupDrawReporter != null) startupDrawReporter.close();
         if (startupIdleWork != null) startupIdleWork.close();
@@ -7546,7 +7577,26 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     @SuppressWarnings("unchecked")
     public void didReceivedNotification(int id, final int account, Object... args) {
-        if (id == NotificationCenter.appDidLogout) {
+        if (id == NotificationCenter.didReceiveNewMessages) {
+            if (!isResumed || account != currentAccount || frameLayout == null
+                    || args.length < 4 || !(args[0] instanceof Long) || !(args[1] instanceof java.util.List)
+                    || !Boolean.FALSE.equals(args[2]) || !Integer.valueOf(ChatActivity.MODE_DEFAULT).equals(args[3])) return;
+            android.content.SharedPreferences preferences = app.flexygram.notifications.InAppAlerts.preferences(account);
+            if (!app.flexygram.notifications.InAppAlerts.hasSelections(preferences) || !canShowFlexyInAppAlert()) return;
+            if (flexyInAppAlerts == null) {
+                flexyInAppAlerts = new app.flexygram.notifications.InAppAlerts(this, frameLayout, preferences);
+            }
+            BaseFragment visible = getSafeLastFragment();
+            if (!(visible instanceof ChatActivity) && AndroidUtilities.isTablet() && rightActionBarLayout != null
+                    && rightActionBarLayout.getView().isShown() && sheetFragmentsStack.isEmpty()) {
+                visible = rightActionBarLayout.getSafeLastFragment();
+            }
+            flexyInAppAlerts.onMessages(account, (Long) args[0], (java.util.List<?>) args[1],
+                    visible instanceof ChatActivity ? (ChatActivity) visible : null);
+        } else if (id == NotificationCenter.didStartedCall) {
+            hideFlexyInAppAlert();
+        } else if (id == NotificationCenter.appDidLogout) {
+            hideFlexyInAppAlert();
             switchToAvailableAccountOrLogout();
         } else if (id == NotificationCenter.openBoostForUsersDialog) {
             long dialogId = (long) args[0];
@@ -7939,6 +7989,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 onThemeLoadFinish();
             }
         } else if (id == NotificationCenter.screenStateChanged) {
+            if (!ApplicationLoader.isScreenOn) hideFlexyInAppAlert();
             if (ApplicationLoader.mainInterfacePaused) {
                 return;
             }
