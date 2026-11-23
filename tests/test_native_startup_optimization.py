@@ -38,13 +38,22 @@ def test_readiness_requires_loaded_laid_out_visible_content_and_unlocked_activit
  static class BaseFragment{boolean paused;View view=new View();boolean isPaused(){return paused;}View getFragmentView(){return view;}}
  static class ViewPagerActivity extends BaseFragment{BaseFragment current;BaseFragment getCurrentVisibleFragment(){return current;}}
  static class ChatActivity extends BaseFragment{boolean firstLoading=true;View chatListView=new View();CHAT}
- static class DialogsActivity extends BaseFragment{static class Controller{boolean dialogsLoaded;}static class Page{View listView=new View();}Page[]viewPages={new Page()};Controller controller=new Controller();Controller getMessagesController(){return controller;}DIALOGS}
+ static class DialogsActivity extends BaseFragment{
+  static class Controller{boolean dialogsLoaded;}
+  static class Adapter{boolean pending;boolean hasPendingListDiff(){return pending;}}
+  static class ViewPage{View listView=new View();Adapter dialogsAdapter=new Adapter();boolean firstDialogsUpdateQueued,hasData;
+   boolean shouldPublishFirstHomeDialogs(){return hasData;}}
+  ViewPage[]viewPages={new ViewPage()};Controller controller=new Controller();Controller getMessagesController(){return controller;}DIALOGS
+ }
  boolean isResumed=true,finishing,destroyed;BaseFragment current;boolean isFinishing(){return finishing;}boolean isDestroyed(){return destroyed;}BaseFragment getSafeLastFragment(){throw new AssertionError("global selection may belong to a bubble Activity");}
  class Layout{BaseFragment getSafeLastFragment(){return current;}} Layout actionBarLayout=new Layout();java.util.List<Layout>sheetFragmentsStack=new java.util.ArrayList<>();
  READY
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[]args){Probe p=new Probe();check(!p.isStartupContentReady());DialogsActivity d=new DialogsActivity();ViewPagerActivity pager=new ViewPagerActivity();pager.current=d;p.current=pager;
  check(!p.isStartupContentReady());d.controller.dialogsLoaded=true;check(p.isStartupContentReady());d.viewPages[0].listView.layout=true;check(!p.isStartupContentReady());d.viewPages[0].listView.layout=false;
+ var page=d.viewPages[0];page.hasData=true;check(!p.isStartupContentReady());page.hasData=false;
+ page.firstDialogsUpdateQueued=true;check(!p.isStartupContentReady());page.firstDialogsUpdateQueued=false;
+ page.dialogsAdapter.pending=true;check(!p.isStartupContentReady());page.dialogsAdapter.pending=false;check(p.isStartupContentReady());
  SharedConfig.appLocked=true;check(!p.isStartupContentReady());SharedConfig.appLocked=false;p.isResumed=false;check(!p.isStartupContentReady());p.isResumed=true;
  ChatActivity chat=new ChatActivity();p.current=chat;check(!p.isStartupContentReady());chat.firstLoading=false;check(p.isStartupContentReady());chat.paused=true;check(!p.isStartupContentReady());
  p.current=new BaseFragment();check(p.isStartupContentReady());p.destroyed=true;check(!p.isStartupContentReady());

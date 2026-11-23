@@ -4,6 +4,66 @@ from test_render_work_reuse import JAVA, probe
 from test_composer_layout import method
 
 
+def test_first_home_dialog_batch_promotes_the_pending_update_once(tmp_path):
+    source = (JAVA / 'org/telegram/ui/DialogsActivity.java').read_text()
+    methods = '\n'.join(method(source, name) for name in (
+        'public void updateList(boolean animated)', 'private boolean shouldPublishFirstHomeDialogs()',
+        'private void cancelListUpdate()',
+    ))
+    start = source.index('        final Runnable updateListRunnable =')
+    callback = source[start:source.index('        private void cancelListUpdate()', start)]
+    probe(tmp_path, {'Probe.java': '''import java.util.*;
+public class Probe {
+ static final int DIALOGS_TYPE_DEFAULT=0;
+ static class AndroidUtilities {
+  static Map<Runnable, Integer> pending=new LinkedHashMap<>();
+  static int posts;
+  static void runOnUIThread(Runnable callback,int delay){check(!pending.containsKey(callback));pending.put(callback,delay);posts++;}
+  static void cancelRunOnUIThread(Runnable callback){pending.remove(callback);}
+  static void fire(){Runnable next=pending.keySet().iterator().next();pending.remove(next);next.run();}
+ }
+ static class Controller {
+  List<Integer> dialogs=new ArrayList<>();List<Integer> getDialogs(int folder){return dialogs;}
+ }
+ static class Adapter {
+  final Controller controller;int count,updates,cancelled;
+  Adapter(Controller controller){this.controller=controller;}
+  int getDialogsCount(){return count;}
+  void updateList(Runnable restore){count=controller.dialogs.size();updates++;}
+  void cancelPendingListDiff(){cancelled++;}
+ }
+ static class Animator {boolean isRunning(){return false;}}
+ static class ListView {void setItemAnimator(Animator value){}}
+ int folderId,communityId,dialogsType;
+ boolean isPaused,isFinished,onlySelect,dialogsListFrozen,updating,firstDialogsUpdateQueued,invalidateScrollY;
+ Probe[] viewPages={this};
+ Controller controller=new Controller();Controller getMessagesController(){return controller;}
+ Adapter dialogsAdapter=new Adapter(controller);
+ Animator dialogsItemAnimator=new Animator();ListView listView=new ListView();
+ Runnable saveScrollPositionRunnable=()->{};
+ CALLBACK
+ METHODS
+ static void check(boolean valid){if(!valid)throw new AssertionError();}
+ void delay(int value){check(AndroidUtilities.pending.get(updateListRunnable)==value&&AndroidUtilities.pending.size()==1);}
+ public static void main(String[] args){
+  Probe p=new Probe();p.updateList(false);p.delay(36);
+  p.controller.dialogs.add(1);p.updateList(false);p.delay(0);
+  for(int i=0;i<10000;i++)p.updateList(false);
+  check(AndroidUtilities.posts==2&&p.firstDialogsUpdateQueued&&p.dialogsAdapter.updates==0);
+  AndroidUtilities.fire();
+  check(p.dialogsAdapter.updates==1&&p.dialogsAdapter.count==1&&!p.firstDialogsUpdateQueued&&!p.updating);
+  p.updateList(false);p.delay(36);p.cancelListUpdate();
+  check(AndroidUtilities.pending.isEmpty()&&p.dialogsAdapter.cancelled==1);
+  Probe emptyThenPaused=new Probe();emptyThenPaused.controller.dialogs.add(1);
+  emptyThenPaused.updateList(false);emptyThenPaused.delay(0);emptyThenPaused.isPaused=true;
+  AndroidUtilities.fire();
+  check(!emptyThenPaused.firstDialogsUpdateQueued&&!emptyThenPaused.updating&&emptyThenPaused.dialogsAdapter.updates==0);
+  Probe picker=new Probe();picker.onlySelect=true;picker.controller.dialogs.add(1);
+  picker.updateList(false);picker.delay(36);picker.cancelListUpdate();
+ }
+}'''.replace('CALLBACK', callback).replace('METHODS', methods)})
+
+
 def test_archive_initial_page_keeps_pagination_and_end_threshold(tmp_path):
     source = (JAVA/'org/telegram/messenger/MessagesStorage.java').read_text()
     start = source.index('                    if (a == 0) {', source.index('public void getDialogs(int folderId'))

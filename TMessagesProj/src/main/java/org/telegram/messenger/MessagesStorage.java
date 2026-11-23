@@ -17291,6 +17291,18 @@ public class MessagesStorage extends BaseController {
         return ids == null || count == ids.length ? ids : Arrays.copyOf(ids, count);
     }
 
+    private TLRPC.Message readCachedDialogReply(SQLiteCursor cursor, int column) throws SQLiteException {
+        final NativeByteBuffer data = cursor.byteBufferValue(column);
+        if (data == null) return null;
+        try {
+            final TLRPC.Message reply = TLRPC.Message.TLdeserialize(data, data.readInt32(false), false);
+            if (reply != null) reply.readAttachPath(data, getUserConfig().clientUserId);
+            return reply;
+        } finally {
+            data.reuse();
+        }
+    }
+
     public void getDialogs(int folderId, int offset, int count, boolean loadDraftsPeersAndFolders) {
         final long[] draftsDialogIds = loadDraftsPeersAndFolders ? getTopLevelDraftDialogIds() : null;
         final int storageTrace = PerformanceTrace.beginAsync("Flexy.dialogs.storage_queue");
@@ -17413,18 +17425,10 @@ public class MessagesStorage extends BaseController {
 
                                 try {
                                     if (message.reply_to != null && message.reply_to.reply_to_msg_id != 0 && isMessageActionTypeWithReply(message.action)) {
-                                        if (!cursor.isNull(13)) {
-                                            NativeByteBuffer data2 = cursor.byteBufferValue(13);
-                                            if (data2 != null) {
-                                                message.replyMessage = TLRPC.Message.TLdeserialize(data2, data2.readInt32(false), false);
-                                                message.replyMessage.readAttachPath(data2, getUserConfig().clientUserId);
-                                                data2.reuse();
-                                                if (message.replyMessage != null) {
-                                                    addUsersAndChatsFromMessage(message.replyMessage, usersToLoad, chatsToLoad, emojiToLoad);
-                                                }
-                                            }
-                                        }
-                                        if (message.replyMessage == null) {
+                                        message.replyMessage = readCachedDialogReply(cursor, 13);
+                                        if (message.replyMessage != null) {
+                                            addUsersAndChatsFromMessage(message.replyMessage, usersToLoad, chatsToLoad, emojiToLoad);
+                                        } else {
                                             addReplyMessages(message, replyMessageOwners, dialogReplyMessagesIds);
                                         }
                                     }
@@ -17470,7 +17474,7 @@ public class MessagesStorage extends BaseController {
                                 whereClause.append(" OR ");
                             }
                         }
-                        cursor = database.queryFinalized(String.format(Locale.US, "SELECT uid, data, read_state, mid, send_state, date, replydata, group_id FROM messages_v2 WHERE %s ORDER BY date DESC", whereClause));
+                        cursor = database.queryFinalized(String.format(Locale.US, "SELECT uid, data, read_state, mid, send_state, date, replydata FROM messages_v2 WHERE %s ORDER BY date DESC", whereClause));
                         while (cursor.next()) {
                             long did = cursor.longValue(0);
                             TLRPC.Dialog dialog = dialogsWithAlbums.get(did);
@@ -17486,7 +17490,7 @@ public class MessagesStorage extends BaseController {
                                     MessageObject.setUnreadFlags(message, cursor.intValue(2));
                                     message.id = cursor.intValue(3);
                                     int date = cursor.intValue(5);
-                                    if (date != 0) {
+                                    if (date > dialog.last_message_date) {
                                         dialog.last_message_date = date;
                                     }
                                     message.send_state = cursor.intValue(4);
@@ -17497,18 +17501,10 @@ public class MessagesStorage extends BaseController {
 
                                     try {
                                         if (message.reply_to != null && message.reply_to.reply_to_msg_id != 0 && isMessageActionTypeWithReply(message.action)) {
-                                            if (!cursor.isNull(7)) {
-                                                NativeByteBuffer data2 = cursor.byteBufferValue(7);
-                                                if (data2 != null) {
-                                                    message.replyMessage = TLRPC.Message.TLdeserialize(data2, data2.readInt32(false), false);
-                                                    message.replyMessage.readAttachPath(data2, getUserConfig().clientUserId);
-                                                    data2.reuse();
-                                                    if (message.replyMessage != null) {
-                                                        addUsersAndChatsFromMessage(message.replyMessage, usersToLoad, chatsToLoad, null);
-                                                    }
-                                                }
-                                            }
-                                            if (message.replyMessage == null) {
+                                            message.replyMessage = readCachedDialogReply(cursor, 6);
+                                            if (message.replyMessage != null) {
+                                                addUsersAndChatsFromMessage(message.replyMessage, usersToLoad, chatsToLoad, null);
+                                            } else {
                                                 addReplyMessages(message, replyMessageOwners, dialogReplyMessagesIds);
                                             }
                                         }
@@ -17585,12 +17581,8 @@ public class MessagesStorage extends BaseController {
                 ArrayList<TLRPC.UserFull> fullUsers = null;
                 if (!dialogUsers.isEmpty()) {
                     HashSet<Long> fullUsersToLoad = new HashSet<>();
-                    for (Long did : dialogUsers) {
-                        for (int i = 0; i < dialogs.users.size(); i++) {
-                            if (dialogs.users.get(i).id == did && dialogs.users.get(i).premium) {
-                                fullUsersToLoad.add(did);
-                            }
-                        }
+                    for (TLRPC.User user : dialogs.users) {
+                        if (user.premium && dialogUsers.contains(user.id)) fullUsersToLoad.add(user.id);
                     }
                     if (!fullUsersToLoad.isEmpty()) {
                         fullUsers = loadUserInfos(fullUsersToLoad);

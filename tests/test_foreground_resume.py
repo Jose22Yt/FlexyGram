@@ -16,13 +16,18 @@ def diff_hosts():
  public void notifyItemRangeChanged(int p,int n,Object payload){check();events++;}}}''',
     }
     source = (JAVA / 'org/telegram/ui/Adapters/DialogsAdapter.java').read_text()
+    activity = (JAVA / 'org/telegram/ui/DialogsActivity.java').read_text()
     actual = '\n'.join(method(source, signature) for signature in [
         'private static final class DiffItem', 'private DiffItem[] snapshotDiffItems(', 'private static boolean preservesRowPositions(',
-        'public void updateList(Runnable saveScrollPosition)', 'private void applyListDiff(', 'public void notifyDataSetChanged()'])
+        'public void updateList(Runnable saveScrollPosition)', 'private void applyListDiff(',
+        'public void cancelPendingListDiff()', 'public void notifyDataSetChanged()'])
+    actual += '\n' + method(activity, 'private void cancelListUpdate()')
     host = '''import java.util.*;import androidx.recyclerview.widget.*;
 class Queue{ArrayDeque<Runnable>jobs=new ArrayDeque<>();boolean accept=true;boolean postRunnable(Runnable r){if(!accept)return false;jobs.add(r);return true;}
+ void cancelRunnable(Runnable r){jobs.remove(r);}
  void worker()throws Exception{Runnable r=jobs.remove();Throwable[]error={null};Thread t=new Thread(()->{try{r.run();}catch(Throwable e){error[0]=e;}},"diff-worker");t.start();t.join();if(error[0]!=null)throw new AssertionError(error[0]);}}
-class DialogDiffQueue{static Queue queue=new Queue();}class AndroidUtilities{static ArrayDeque<Runnable>ui=new ArrayDeque<>();static void runOnUIThread(Runnable r){ui.add(r);}}
+class DialogDiffQueue{static Queue queue=new Queue();}class AndroidUtilities{static ArrayDeque<Runnable>ui=new ArrayDeque<>();static void runOnUIThread(Runnable r){ui.add(r);}
+ static void cancelRunOnUIThread(Runnable r){ui.remove(r);}}
 class FileLog{static void e(Throwable e){throw new AssertionError(e);}}
 public class Probe extends RecyclerView.Adapter{
  static final int VIEW_TYPE_DIALOG=0,VIEW_TYPE_HEADER_2=1,VIEW_TYPE_ME_URL=2,VIEW_TYPE_USER=3,VIEW_TYPE_EMPTY=4,VIEW_TYPE_LAST_EMPTY=5;
@@ -30,6 +35,7 @@ public class Probe extends RecyclerView.Adapter{
  static class ItemInternal{int viewType,emptyType;boolean isFolder,isForumCell,pinned;Dialog dialog;Contact contact;Url recentMeUrl;
  ItemInternal(long id){dialog=new Dialog(id);}}
  ArrayList<ItemInternal>itemInternals=new ArrayList<>(),source=new ArrayList<>();boolean isCalculatingDiff,updateListPending;long diffGeneration;Runnable pendingScrollPosition;
+ Runnable pendingDiffWork;boolean updating,firstDialogsUpdateQueued;final Probe dialogsAdapter=this;final Runnable updateListRunnable=()->{};
  int committedRowsRefreshes;void refreshCommittedRows(){committedRowsRefreshes++;}
  void updateItemList(){itemInternals.clear();itemInternals.addAll(source);}
  ACTUAL
@@ -63,11 +69,28 @@ def test_large_production_lists_diff_on_worker_and_dispatch_only_on_ui(tmp_path)
 
 def test_old_worker_cannot_replace_a_full_refresh_or_a_new_inflight_generation(tmp_path):
     run_diff(tmp_path, '''Probe p=new Probe();p.initial(80);p.source(10,90);int[]staleSaved={0};p.updateList(()->staleSaved[0]++);
+ Runnable stale=DialogDiffQueue.queue.jobs.peek();
  p.source(100,85);p.notifyDataSetChanged();check(p.full==1&&!p.isCalculatingDiff&&p.itemInternals.get(0).dialog.id==100);
+ check(DialogDiffQueue.queue.jobs.isEmpty());
  p.source(200,95);p.updateList(null);long current=p.diffGeneration;int events=p.events;
- DialogDiffQueue.queue.worker();check(AndroidUtilities.ui.isEmpty());
+ stale.run();check(AndroidUtilities.ui.isEmpty());
  check(p.diffGeneration==current&&p.isCalculatingDiff&&p.itemInternals.get(0).dialog.id==100&&p.events==events&&staleSaved[0]==0);
  complete();check(!p.isCalculatingDiff&&p.itemInternals.get(0).dialog.id==200&&p.itemInternals.size()==95);
+ ''')
+
+
+def test_leaving_dialogs_cancels_queued_diffs_and_discards_results_already_on_ui(tmp_path):
+    run_diff(tmp_path, '''Probe p=new Probe();p.initial(100);int[]saved={0};
+ p.source(10,110);p.updateList(()->saved[0]++);
+ p.source(20,120);p.updateList(()->saved[0]++);
+ DialogDiffQueue.queue.worker();check(AndroidUtilities.ui.size()==1);
+ p.cancelListUpdate();AndroidUtilities.ui.remove().run();
+ check(p.events==0&&saved[0]==0&&p.itemInternals.get(0).dialog.id==0);
+ check(!p.isCalculatingDiff&&!p.updateListPending&&DialogDiffQueue.queue.jobs.isEmpty());
+ p.updateList(null);p.cancelListUpdate();
+ check(DialogDiffQueue.queue.jobs.isEmpty()&&p.events==0);
+ p.source(30,130);p.updateList(null);complete();
+ check(!p.isCalculatingDiff&&p.itemInternals.get(0).dialog.id==30&&p.itemInternals.size()==130);
  ''')
 
 
@@ -293,3 +316,105 @@ def test_native_network_resumes_before_list_rebuild_and_fragment_resume():
     assert 'needsDialogsSortOnResume()' in resume
     assert resume.count('cm.setAppPaused(false, false)') == 1
     assert 'cm.resumeNetworkMaybe()' not in resume
+
+
+def test_chat_pause_saves_a_matching_message_and_offset_and_preserves_unread_entry(tmp_path):
+    source = (JAVA / 'org/telegram/ui/ChatActivity.java').read_text()
+    save = method(source, 'if (!pausedOnLastMessage && !firstLoading && (!isThreadChat() || isTopic))')
+    helpers = '\n'.join(method(source, signature) for signature in (
+        'private boolean hasAttachedSponsoredMessage()',
+        'private static MessageObject getScrollAnchorMessage(RecyclerView.ViewHolder holder)',
+        'private boolean hasUnreadMessagesAfterScrollPosition(int position)',
+    ))
+    probe(tmp_path, {'Probe.java': '''import java.util.*;
+public class Probe {
+ static class SharedPreferences {
+  final Map<String,Integer> values=new HashMap<>();
+  class Editor {
+   void putInt(String name,int value){values.put(name,value);}
+   void remove(String name){values.remove(name);}
+   void apply(){}
+  }
+  Editor edit(){return new Editor();}
+ }
+ static class MessagesController {
+  static SharedPreferences settings;
+  static SharedPreferences getNotificationsSettings(int account){return settings;}
+ }
+ static class NotificationsController {static String getSharedPrefKey(long dialog,long topic){return "key";}}
+ static class BuildVars {static boolean LOGS_ENABLED;}
+ static class FileLog {static void d(String value){}}
+ static class MessageObject {
+  int id;boolean sponsored,unread,out;
+  static class Owner {boolean from_scheduled;}
+  Owner messageOwner=new Owner();
+  MessageObject(int id){this.id=id;}
+  int getId(){return id;}
+  boolean isSponsored(){return sponsored;}
+  boolean isUnread(){return unread;}
+  boolean isOut(){return out;}
+ }
+ static class View {
+  int bottom;
+  View(int bottom){this.bottom=bottom;}
+  int getBottom(){return bottom;}
+ }
+ interface IMessageCell {MessageObject getMessageObject();}
+ static class ChatMessageCell extends View implements IMessageCell {
+  MessageObject message;
+  ChatMessageCell(int bottom,MessageObject message){super(bottom);this.message=message;}
+  public MessageObject getMessageObject(){return message;}
+ }
+ static class ChatActionCell extends ChatMessageCell {ChatActionCell(int b,MessageObject m){super(b,m);}}
+ static class RecyclerView {
+  static final int NO_POSITION=-1;
+  static class ViewHolder {View itemView;ViewHolder(View view){itemView=view;}}
+ }
+ static class RecyclerListView extends RecyclerView {
+  static class Holder extends ViewHolder {Holder(View item){super(item);}}
+  List<View> children=new ArrayList<>();
+  Map<Integer,Holder> positions=new HashMap<>();
+  int getChildCount(){return children.size();}
+  View getChildAt(int index){return children.get(index);}
+  Holder findViewHolderForAdapterPosition(int position){return positions.get(position);}
+  int getMeasuredHeight(){return 600;}
+ }
+ static class Layout {int position=2;int findFirstVisibleItemPosition(){return position;}}
+ static class Adapter {int messagesStartRow;}
+ boolean pausedOnLastMessage,firstLoading,isTopic;
+ int currentAccount;long dialog_id;Object currentEncryptedChat;
+ Layout chatLayoutManager=new Layout();
+ RecyclerListView chatListView=new RecyclerListView();
+ Adapter chatAdapter=new Adapter();
+ List<MessageObject> messages=new ArrayList<>();
+ boolean isThreadChat(){return false;}
+ long getTopicId(){return 0;}
+ void save(){SAVE}
+ HELPERS
+ static void check(boolean valid,String scenario){if(!valid)throw new AssertionError(scenario);}
+ Probe(){MessagesController.settings=new SharedPreferences();}
+ public static void main(String[] args){
+  Probe p=new Probe();p.chatListView.positions.put(2,new RecyclerListView.Holder(new View(510)));
+  p.chatListView.positions.put(3,new RecyclerListView.Holder(new ChatActionCell(460,new MessageObject(42))));
+  p.save();
+  check(MessagesController.settings.values.equals(Map.of("diditemkey",42,"diditemokey",-140)),"fallback row must provide both ID and offset");
+  p=new Probe();MessageObject unread=new MessageObject(90);unread.unread=true;
+  p.messages.add(new MessageObject(91));p.messages.add(unread);
+  p.chatListView.positions.put(2,new RecyclerListView.Holder(new ChatMessageCell(480,new MessageObject(42))));
+  p.save();check(MessagesController.settings.values.isEmpty(),"prefer the new unread position");
+  p=new Probe();p.chatListView.children.add(new ChatMessageCell(100,null));
+  p.currentEncryptedChat=new Object();
+  p.chatListView.positions.put(2,new RecyclerListView.Holder(new ChatMessageCell(500,new MessageObject(-11))));
+  p.save();check(MessagesController.settings.values.get("diditemkey")==-11,"skip an unbound cell and accept secret chat IDs");
+  p=new Probe();MessageObject sponsored=new MessageObject(77);sponsored.sponsored=true;
+  p.chatListView.children.add(new ChatMessageCell(100,sponsored));
+  p.chatListView.positions.put(2,new RecyclerListView.Holder(new ChatMessageCell(480,new MessageObject(42))));
+  p.save();check(MessagesController.settings.values.isEmpty(),"sponsored rows must not affect restored position");
+  p=new Probe();MessageObject outgoing=new MessageObject(91);outgoing.unread=true;outgoing.out=true;
+  p.messages.add(outgoing);
+  p.chatListView.positions.put(2,new RecyclerListView.Holder(new ChatMessageCell(480,new MessageObject(42))));
+  p.save();check(MessagesController.settings.values.get("diditemkey")==42,"ordinary outgoing unread state does not block restoration");
+  outgoing.messageOwner.from_scheduled=true;
+  p.save();check(MessagesController.settings.values.isEmpty(),"a sent scheduled message can take unread priority");
+ }
+}'''.replace('SAVE', save).replace('HELPERS', helpers)})

@@ -418,6 +418,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         boolean updating;
+        private boolean firstDialogsUpdateQueued;
 
         Runnable saveScrollPositionRunnable = () -> {
             if (listView != null && listView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE && listView.getChildCount() > 0 && listView.getLayoutManager() != null) {
@@ -460,11 +461,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 invalidateScrollY = true;
             }
             updating = false;
+            firstDialogsUpdateQueued = false;
         };
 
         private void cancelListUpdate() {
             AndroidUtilities.cancelRunOnUIThread(updateListRunnable);
             updating = false;
+            firstDialogsUpdateQueued = false;
+            if (dialogsAdapter != null) dialogsAdapter.cancelPendingListDiff();
         }
 
         @Override
@@ -520,7 +524,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         public void updateList(boolean animated) {
-            if (isPaused) {
+            if (isPaused || isFinished) {
                 return;
             }
             if (animated) {
@@ -529,14 +533,24 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 updateListRunnable.run();
                 return;
             }
+            final boolean firstDialogs = shouldPublishFirstHomeDialogs();
             if (updating) {
-                return;
+                if (!firstDialogs || firstDialogsUpdateQueued) return;
+                AndroidUtilities.cancelRunOnUIThread(updateListRunnable);
             }
             updating = true;
+            firstDialogsUpdateQueued = firstDialogs;
             if (!dialogsItemAnimator.isRunning()) {
                 listView.setItemAnimator(null);
             }
-            AndroidUtilities.runOnUIThread(updateListRunnable, 36);
+            // Publish the initial data at the next UI turn, outside RecyclerView layout.
+            AndroidUtilities.runOnUIThread(updateListRunnable, firstDialogs ? 0 : 36);
+        }
+
+        private boolean shouldPublishFirstHomeDialogs() {
+            return folderId == 0 && communityId == 0 && !onlySelect && !dialogsListFrozen
+                    && dialogsType == DIALOGS_TYPE_DEFAULT && viewPages != null && viewPages[0] == this
+                    && dialogsAdapter.getDialogsCount() == 0 && !getMessagesController().getDialogs(0).isEmpty();
         }
     }
 
@@ -10768,8 +10782,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     public boolean isStartupContentReady() {
-        return !isPaused() && getMessagesController().dialogsLoaded && viewPages != null && viewPages[0] != null
-                && viewPages[0].listView != null && viewPages[0].listView.isShown() && !viewPages[0].listView.isLayoutRequested();
+        if (isPaused() || !getMessagesController().dialogsLoaded || viewPages == null || viewPages[0] == null) return false;
+        final ViewPage page = viewPages[0];
+        return page.listView != null && page.dialogsAdapter != null && page.listView.isShown() && !page.listView.isLayoutRequested()
+                && !page.firstDialogsUpdateQueued && !page.shouldPublishFirstHomeDialogs()
+                && !page.dialogsAdapter.hasPendingListDiff();
     }
 
     protected RecyclerListView getListView() {

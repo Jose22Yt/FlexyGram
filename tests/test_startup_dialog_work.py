@@ -1,6 +1,70 @@
 """Check draft selection and scroll phase updates using actual production methods."""
+import re
+import sqlite3
+
 from test_composer_layout import method
 from test_render_work_reuse import JAVA, probe
+
+
+def test_local_album_query_reads_reply_blob_and_keeps_newest_dialog_date():
+    source = (JAVA / 'org/telegram/messenger/MessagesStorage.java').read_text()
+    album = source[source.index('if (dialogsWithAlbums != null) {'):source.index('                loadReplyMessages(replyMessageOwners, dialogReplyMessagesIds, usersToLoad, chatsToLoad, 0);',
+                                                                                   source.index('if (dialogsWithAlbums != null) {'))]
+    query = re.search(r'"(SELECT uid, data,.*?ORDER BY date DESC)"', album).group(1)
+    column = int(re.search(r'readCachedDialogReply\(cursor, (\d+)\)', album).group(1))
+    with sqlite3.connect(':memory:') as db:
+        db.execute('CREATE TABLE messages_v2(uid, data, read_state, mid, send_state, date, replydata, group_id)')
+        db.executemany('INSERT INTO messages_v2 VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (
+            (-12, b'new', 0, 21, 0, 102, b'cached reply', 600),
+            (-12, b'old', 0, 20, 0, 97, None, 600),
+            (-12, b'other album', 0, 22, 0, 130, b'other reply', 601),
+        ))
+        rows = db.execute(query % 'uid = -12 AND group_id = 600').fetchall()
+    assert [row[column] for row in rows] == [b'cached reply', None]
+    assert [row[5] for row in rows] == [102, 97]
+    assert 'if (date > dialog.last_message_date)' in album
+
+
+def test_cached_dialog_reply_reuses_native_buffer_for_valid_and_invalid_replies(tmp_path):
+    source = (JAVA / 'org/telegram/messenger/MessagesStorage.java').read_text()
+    implementation = method(source, 'private TLRPC.Message readCachedDialogReply(')
+    probe(tmp_path, {'Probe.java': '''class SQLiteException extends Exception {}
+class NativeByteBuffer {
+    int marker, releases;
+    NativeByteBuffer(int marker){this.marker=marker;}
+    int readInt32(boolean strict){return marker;}
+    void reuse(){releases++;}
+}
+class SQLiteCursor {
+    NativeByteBuffer data;
+    NativeByteBuffer byteBufferValue(int column){if(column!=6)throw new AssertionError();return data;}
+}
+class TLRPC {
+    static class Message {
+        long owner;
+        static Message TLdeserialize(NativeByteBuffer source,int marker,boolean strict){
+            if(marker==2)throw new IllegalStateException("corrupt");
+            return marker==1?new Message():null;
+        }
+        void readAttachPath(NativeByteBuffer source,long owner){this.owner=owner;}
+    }
+}
+public class Probe {
+    long clientUserId=87;Probe getUserConfig(){return this;}
+    IMPLEMENTATION
+    static void check(boolean value){if(!value)throw new AssertionError();}
+    public static void main(String[] args)throws Exception{
+        Probe probe=new Probe();SQLiteCursor cursor=new SQLiteCursor();
+        check(probe.readCachedDialogReply(cursor,6)==null);
+        cursor.data=new NativeByteBuffer(1);
+        check(probe.readCachedDialogReply(cursor,6).owner==87&&cursor.data.releases==1);
+        cursor.data=new NativeByteBuffer(0);
+        check(probe.readCachedDialogReply(cursor,6)==null&&cursor.data.releases==1);
+        cursor.data=new NativeByteBuffer(2);
+        try{probe.readCachedDialogReply(cursor,6);throw new AssertionError();}
+        catch(IllegalStateException expected){check(cursor.data.releases==1);}
+    }
+}'''.replace('IMPLEMENTATION', implementation)})
 
 
 def test_top_level_drafts_snapshot_excludes_topic_only_entries(tmp_path):

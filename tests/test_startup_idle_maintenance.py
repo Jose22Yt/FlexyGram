@@ -16,6 +16,10 @@ public class Probe{static void check(boolean b){if(!b)throw new AssertionError()
  ready[0]=true;w.afterDraw();q.fire();check(calls[0]==1&&q.jobs.isEmpty());for(int i=0;i<10000;i++)w.afterDraw();check(q.additions==2);
  StartupIdleWork gone=new StartupIdleWork(q,()->true,()->calls[0]++);gone.afterDraw();var stale=q.jobs.get(0);gone.close();stale.queueIdle();check(q.jobs.isEmpty()&&calls[0]==1);
  StartupIdleWork recreated=new StartupIdleWork(q,()->true,()->calls[0]++);recreated.afterDraw();q.fire();check(calls[0]==2);recreated.close();
+ StartupIdleWork paused=new StartupIdleWork(q,()->true,()->calls[0]++);
+ paused.afterDraw();var cancelled=q.jobs.get(0);paused.cancelPending();cancelled.queueIdle();
+ check(q.jobs.isEmpty()&&calls[0]==2);
+ paused.afterDraw();q.fire();check(calls[0]==3);paused.close();
 }}'''
     }, [JAVA/'app/flexygram/performance/StartupIdleWork.java'])
 

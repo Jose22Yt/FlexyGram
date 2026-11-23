@@ -2001,7 +2001,7 @@ public class StarsController {
 
             cancelled = true;
             bulletin.hide();
-            if (overlay != null) {
+            if (overlay != null && overlay.isShowing(messageObject)) {
                 overlay.hide();
             }
 

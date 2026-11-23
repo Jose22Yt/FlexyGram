@@ -519,6 +519,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
     boolean updateListPending;
     private volatile long diffGeneration;
     private Runnable pendingScrollPosition;
+    private Runnable pendingDiffWork;
 
     private static final class DialogDiffQueue {
         static final DispatchQueue queue = new DispatchQueue("dialogsDiffQueue", true, android.os.Process.THREAD_PRIORITY_BACKGROUND);
@@ -625,7 +626,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         if (Math.max(before.length, after.length) < 50) {
             applyListDiff(generation, newItems, DiffUtil.calculateDiff(callback), restoreScroll);
         } else {
-            if (!DialogDiffQueue.queue.postRunnable(() -> {
+            pendingDiffWork = () -> {
                 if (generation != diffGeneration) return;
                 DiffUtil.DiffResult result;
                 try { result = DiffUtil.calculateDiff(callback); }
@@ -636,8 +637,11 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
                     });
                     return;
                 }
-                AndroidUtilities.runOnUIThread(() -> applyListDiff(generation, newItems, result, restoreScroll));
-            })) {
+                if (generation == diffGeneration) {
+                    AndroidUtilities.runOnUIThread(() -> applyListDiff(generation, newItems, result, restoreScroll));
+                }
+            };
+            if (!DialogDiffQueue.queue.postRunnable(pendingDiffWork)) {
                 notifyDataSetChanged();
             }
         }
@@ -653,6 +657,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
             refreshCommittedRows();
         } finally {
             if (generation == diffGeneration) {
+                pendingDiffWork = null;
                 isCalculatingDiff = false;
                 if (updateListPending) {
                     Runnable next = pendingScrollPosition;
@@ -663,11 +668,24 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         }
     }
 
+    public boolean hasPendingListDiff() {
+        return isCalculatingDiff;
+    }
+
+    public void cancelPendingListDiff() {
+        ++diffGeneration;
+        if (pendingDiffWork != null) {
+            DialogDiffQueue.queue.cancelRunnable(pendingDiffWork);
+            pendingDiffWork = null;
+        }
+        updateListPending = false;
+        pendingScrollPosition = null;
+        isCalculatingDiff = false;
+    }
+
     @Override
     public void notifyDataSetChanged() {
-        ++diffGeneration;
-        updateListPending = false; pendingScrollPosition = null;
-        isCalculatingDiff = false;
+        cancelPendingListDiff();
         itemInternals = new ArrayList<>();
         updateItemList();
         super.notifyDataSetChanged();

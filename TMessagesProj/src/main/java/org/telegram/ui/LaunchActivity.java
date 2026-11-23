@@ -7114,6 +7114,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onPause() {
         hideFlexyInAppAlert();
+        MediaController.cancelGalleryCheck();
+        if (startupIdleWork != null) startupIdleWork.cancelPending();
         cancelIconPreload();
         cancelStartupStatusRefresh();
         startupStatus.reset();

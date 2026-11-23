@@ -3,6 +3,58 @@ from test_render_work_reuse import JAVA,probe
 from test_composer_layout import method
 
 
+def test_gallery_resume_counts_all_media_and_drops_stale_results(tmp_path):
+    media=(JAVA/'org/telegram/messenger/MediaController.java').read_text()
+    launch=(JAVA/'org/telegram/ui/LaunchActivity.java').read_text()
+    assert 'MediaController.cancelGalleryCheck()' in method(launch, 'protected void onPause()')
+    methods='\n'.join(method(media, signature) for signature in (
+        'public static void checkGallery()', 'public static void cancelGalleryCheck()',
+    ))
+    probe(tmp_path, {'Probe.java': '''import java.util.*;
+public class Probe {
+ static class Build {static class VERSION {static int SDK_INT=37;}}
+ static class ApplicationLoader {static boolean mainInterfacePaused;}
+ static class AlbumEntry {List<Integer> photos;AlbumEntry(int size){photos=Collections.nCopies(size,0);}}
+ static class Queue {
+  final ArrayDeque<Runnable> jobs=new ArrayDeque<>();boolean accept=true;
+  boolean postRunnable(Runnable work,int delay){check(delay==2000);if(!accept)return false;jobs.add(work);return true;}
+  void cancelRunnable(Runnable work){jobs.remove(work);}
+ }
+ static class Utilities {static Queue globalQueue=new Queue();}
+ static class AndroidUtilities {
+  static ArrayDeque<Runnable> ui=new ArrayDeque<>();
+  static void runOnUIThread(Runnable work){ui.add(work);}
+  static void cancelRunOnUIThread(Runnable work){ui.remove(work);}
+ }
+ static AlbumEntry allPhotosAlbumEntry=new AlbumEntry(2),allMediaAlbumEntry;
+ static Runnable pendingGalleryCheck,refreshGalleryRunnable;
+ static volatile long galleryCheckGeneration;
+ static int readCount,reloads,result=3;
+ static Runnable duringQuery;
+ static int countGalleryMedia(){readCount++;if(duringQuery!=null)duringQuery.run();return result;}
+ static void loadGalleryPhotosAlbums(int guid){reloads++;}
+ METHODS
+ static void check(boolean valid){if(!valid)throw new AssertionError();}
+ static void queue(){Utilities.globalQueue.jobs.remove().run();}
+ static void apply(){AndroidUtilities.ui.remove().run();}
+ public static void main(String[] args){
+  allMediaAlbumEntry=new AlbumEntry(3); // Two photos and a video.
+  for(int i=0;i<10000;i++)checkGallery();
+  check(Utilities.globalQueue.jobs.size()==1);queue();apply();
+  check(readCount==1&&reloads==0);
+  result=4;checkGallery();queue();cancelGalleryCheck();
+  checkGallery();apply();check(reloads==0&&pendingGalleryCheck!=null);
+  queue();apply();check(reloads==1&&pendingGalleryCheck==null);
+  checkGallery();queue();allMediaAlbumEntry=new AlbumEntry(4);apply();check(reloads==1);
+  checkGallery();cancelGalleryCheck();check(Utilities.globalQueue.jobs.isEmpty());
+  duringQuery=Probe::cancelGalleryCheck;checkGallery();queue();duringQuery=null;
+  check(AndroidUtilities.ui.isEmpty()&&pendingGalleryCheck==null);
+  result=-1;checkGallery();queue();apply();check(reloads==1);
+  Utilities.globalQueue.accept=false;checkGallery();check(pendingGalleryCheck==null);
+ }
+}'''.replace('METHODS', methods)})
+
+
 def test_startup_label_gate_has_bounded_delay_and_resets_between_accounts(tmp_path):
     probe(tmp_path,{'Probe.java':'''import app.flexygram.performance.StartupStatus;
 public class Probe{static void check(boolean v){if(!v)throw new AssertionError();}public static void main(String[]args){StartupStatus s=new StartupStatus();

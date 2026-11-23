@@ -381,6 +381,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     @Override
     public void onPause() {
         super.onPause();
+        if (kyantInitWork != null) kyantInitWork.cancelPending();
         if (accountSwitchHint != null) {
             accountSwitchHint.hide();
         }

@@ -3504,11 +3504,12 @@ public class ChatActivity extends BaseFragment implements
 
                 if (startLoadFromMessageId == 0) {
                     SharedPreferences sharedPreferences = MessagesController.getNotificationsSettings(currentAccount);
-                    int messageId = sharedPreferences.getInt("diditem" + NotificationsController.getSharedPrefKey(dialog_id, getTopicId()), 0);
+                    final String scrollKey = NotificationsController.getSharedPrefKey(dialog_id, getTopicId());
+                    int messageId = sharedPreferences.getInt("diditem" + scrollKey, 0);
                     if (messageId != 0) {
                         wasManualScroll = true;
                         loadingFromOldPosition = true;
-                        startLoadFromMessageOffset = sharedPreferences.getInt("diditemo" + NotificationsController.getSharedPrefKey(dialog_id, getTopicId()), 0);
+                        startLoadFromMessageOffset = sharedPreferences.getInt("diditemo" + scrollKey, 0);
                         startLoadFromMessageId = messageId;
                     }
                 } else {
@@ -7939,7 +7940,7 @@ public class ChatActivity extends BaseFragment implements
                     chatActivityEnterView.hideHints();
                 }
                 if (starReactionsOverlay != null) {
-                    starReactionsOverlay.invalidate();
+                    starReactionsOverlay.onChatScrolled();
                 }
                 if (botDraftHeightController != null) {
                     botDraftHeightController.onScroll();
@@ -32640,6 +32641,7 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onPause() {
+        if (starReactionsOverlay != null) starReactionsOverlay.cancelPendingTouch();
         AndroidUtilities.cancelRunOnUIThread(editTimerCheck);
         AndroidUtilities.cancelRunOnUIThread(forwardingHintTick);
         cancelPendingReactionPresentation();
@@ -32694,74 +32696,35 @@ public class ChatActivity extends BaseFragment implements
                 SharedPreferences.Editor editor = MessagesController.getNotificationsSettings(currentAccount).edit();
                 int messageId = 0;
                 int offset = 0;
-                if (chatLayoutManager != null) {
-                    boolean sponsoredMessageFound = false;
-                    for (int i = 0; i < chatListView.getChildCount(); i++) {
-                        if (chatListView.getChildAt(i) instanceof ChatMessageCell && ((ChatMessageCell) chatListView.getChildAt(i)).getMessageObject().isSponsored()) {
-                            sponsoredMessageFound = true;
-                            break;
+                if (chatLayoutManager != null && chatListView != null && chatAdapter != null) {
+                    final int position = chatLayoutManager.findFirstVisibleItemPosition();
+                    if (position > 0 && !hasAttachedSponsoredMessage()) {
+                        RecyclerView.ViewHolder holder = chatListView.findViewHolderForAdapterPosition(position);
+                        MessageObject anchor = getScrollAnchorMessage(holder);
+                        if (anchor == null || anchor.getId() == 0) {
+                            holder = chatListView.findViewHolderForAdapterPosition(position + 1);
+                            anchor = getScrollAnchorMessage(holder);
                         }
-                    }
-                    int position = chatLayoutManager.findFirstVisibleItemPosition();
-                    if (position != 0 && !sponsoredMessageFound) {
-                        RecyclerListView.Holder holder = (RecyclerListView.Holder) chatListView.findViewHolderForAdapterPosition(position);
-                        if (holder != null) {
-                            int mid = 0;
-                            MessageObject messageObject = null;
-                            if (holder.itemView instanceof ChatMessageCell) {
-                                messageObject = ((ChatMessageCell) holder.itemView).getMessageObject();
-                            } else if (holder.itemView instanceof ChatActionCell) {
-                                messageObject = ((ChatActionCell) holder.itemView).getMessageObject();
-                            }
-                            if (messageObject != null) {
-                                mid = messageObject.getId();
-                            }
-                            if (mid == 0) {
-                                holder = (RecyclerListView.Holder) chatListView.findViewHolderForAdapterPosition(position + 1);
-                            }
-                            boolean ignore = false;
-                            int count = 0;
-                            for (int a = position - 1; a >= chatAdapter.messagesStartRow; a--) {
-                                int num = a - chatAdapter.messagesStartRow;
-                                if (num < 0 || num >= messages.size()) {
-                                    continue;
-                                }
-                                MessageObject messageObject2 = messages.get(num);
-                                if (messageObject2 == null || messageObject2.getId() == 0) {
-                                    continue;
-                                }
-                                if ((!messageObject2.isOut() || messageObject2.messageOwner.from_scheduled) && messageObject != null && messageObject.isUnread()) {
-                                    ignore = true;
-                                    messageId = 0;
-                                }
-                                if (count > 2) {
-                                    break;
-                                }
-                                count++;
-                            }
-                            if (holder != null && !ignore) {
-                                if (messageObject != null) {
-                                    messageId = messageObject.getId();
-                                }
-                                if (messageId > 0 && currentEncryptedChat == null || messageId < 0 && currentEncryptedChat != null) {
-                                    offset = holder.itemView.getBottom() - chatListView.getMeasuredHeight();
-                                    if (BuildVars.LOGS_ENABLED) {
-                                        FileLog.d("save offset = " + offset + " for mid " + messageId);
-                                    }
-                                } else {
-                                    messageId = 0;
+                        if (anchor != null && !hasUnreadMessagesAfterScrollPosition(position)) {
+                            final int anchorId = anchor.getId();
+                            if (currentEncryptedChat == null ? anchorId > 0 : anchorId < 0) {
+                                messageId = anchorId;
+                                offset = holder.itemView.getBottom() - chatListView.getMeasuredHeight();
+                                if (BuildVars.LOGS_ENABLED) {
+                                    FileLog.d("save offset = " + offset + " for mid " + messageId);
                                 }
                             }
                         }
                     }
                 }
+                final String scrollKey = NotificationsController.getSharedPrefKey(dialog_id, getTopicId());
                 if (messageId != 0) {
-                    editor.putInt("diditem" + NotificationsController.getSharedPrefKey(dialog_id, getTopicId()), messageId);
-                    editor.putInt("diditemo" + NotificationsController.getSharedPrefKey(dialog_id, getTopicId()), offset);
+                    editor.putInt("diditem" + scrollKey, messageId);
+                    editor.putInt("diditemo" + scrollKey, offset);
                 } else {
                     pausedOnLastMessage = true;
-                    editor.remove("diditem" + NotificationsController.getSharedPrefKey(dialog_id, getTopicId()));
-                    editor.remove("diditemo" + NotificationsController.getSharedPrefKey(dialog_id, getTopicId()));
+                    editor.remove("diditem" + scrollKey);
+                    editor.remove("diditemo" + scrollKey);
                 }
                 editor.apply();
             }
@@ -32782,6 +32745,34 @@ public class ChatActivity extends BaseFragment implements
         if (AvatarPreviewer.hasVisibleInstance()) {
             AvatarPreviewer.getInstance().close();
         }
+    }
+
+    private boolean hasAttachedSponsoredMessage() {
+        for (int i = 0, count = chatListView.getChildCount(); i < count; i++) {
+            final View child = chatListView.getChildAt(i);
+            if (child instanceof ChatMessageCell cell) {
+                final MessageObject message = cell.getMessageObject();
+                if (message != null && message.isSponsored()) return true;
+            }
+        }
+        return false;
+    }
+
+    private static MessageObject getScrollAnchorMessage(RecyclerView.ViewHolder holder) {
+        return holder != null && holder.itemView instanceof IMessageCell cell ? cell.getMessageObject() : null;
+    }
+
+    private boolean hasUnreadMessagesAfterScrollPosition(int position) {
+        // The chat adapter is reversed. Lower positions are nearer the latest message.
+        final int lastIndex = Math.min(position - 1 - chatAdapter.messagesStartRow, messages.size() - 1);
+        int checked = 0;
+        for (int i = lastIndex; i >= 0 && checked < 4; i--) {
+            final MessageObject message = messages.get(i);
+            if (message == null || message.getId() == 0) continue;
+            if (message.isUnread() && (!message.isOut() || message.messageOwner.from_scheduled)) return true;
+            checked++;
+        }
+        return false;
     }
 
     public void setResolvedChatLink(TL_account.resolvedBusinessChatLinks resolvedChatLink) {

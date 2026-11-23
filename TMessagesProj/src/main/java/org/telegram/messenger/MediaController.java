@@ -1349,72 +1349,62 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         }
     }
 
+    private static Runnable pendingGalleryCheck;
+    private static volatile long galleryCheckGeneration;
+
     public static void checkGallery() {
-        if (Build.VERSION.SDK_INT < 24 || allPhotosAlbumEntry == null) {
-            return;
-        }
-        final int prevSize = allPhotosAlbumEntry.photos.size();
-        Utilities.globalQueue.postRunnable(() -> {
-            int count = 0;
-            Cursor cursor = null;
-            try {
-                final Context context = ApplicationLoader.applicationContext;
-                if (
-                    Build.VERSION.SDK_INT >= 33 && (
-                        context.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED ||
-                        context.checkSelfPermission(Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED ||
-                        context.checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
-                    ) ||
-                    context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    cursor = MediaStore.Images.Media.query(context.getContentResolver(), MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{"COUNT(_id)"}, null, null, null);
-                    if (cursor != null) {
-                        if (cursor.moveToNext()) {
-                            count += cursor.getInt(0);
-                        }
-                    }
-                }
-            } catch (Throwable e) {
-                FileLog.e(e);
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
-                }
-            }
-            try {
-                final Context context = ApplicationLoader.applicationContext;
-                if (
-                    Build.VERSION.SDK_INT >= 33 && (
-                        context.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED ||
-                        context.checkSelfPermission(Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED ||
-                        context.checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
-                    ) ||
-                    context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    cursor = MediaStore.Images.Media.query(context.getContentResolver(), MediaStore.Video.Media.EXTERNAL_CONTENT_URI, new String[]{"COUNT(_id)"}, null, null, null);
-                    if (cursor != null) {
-                        if (cursor.moveToNext()) {
-                            count += cursor.getInt(0);
-                        }
-                    }
-                }
-            } catch (Throwable e) {
-                FileLog.e(e);
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
-                }
-            }
-            if (prevSize != count) {
+        final AlbumEntry album = allMediaAlbumEntry;
+        if (Build.VERSION.SDK_INT < 24 || album == null || pendingGalleryCheck != null) return;
+        final long generation = ++galleryCheckGeneration;
+        pendingGalleryCheck = () -> {
+            if (galleryCheckGeneration != generation) return;
+            final int count = countGalleryMedia();
+            if (galleryCheckGeneration != generation) return;
+            AndroidUtilities.runOnUIThread(() -> {
+                if (galleryCheckGeneration != generation) return;
+                pendingGalleryCheck = null;
+                if (ApplicationLoader.mainInterfacePaused || count < 0 || allMediaAlbumEntry != album
+                        || album.photos.size() == count) return;
                 if (refreshGalleryRunnable != null) {
                     AndroidUtilities.cancelRunOnUIThread(refreshGalleryRunnable);
                     refreshGalleryRunnable = null;
                 }
                 loadGalleryPhotosAlbums(0);
-            }
-        }, 2000);
+            });
+        };
+        if (!Utilities.globalQueue.postRunnable(pendingGalleryCheck, 2000)) pendingGalleryCheck = null;
     }
 
+    public static void cancelGalleryCheck() {
+        if (pendingGalleryCheck == null) return;
+        ++galleryCheckGeneration;
+        Utilities.globalQueue.cancelRunnable(pendingGalleryCheck);
+        pendingGalleryCheck = null;
+    }
+
+    private static int countGalleryMedia() {
+        final Context context = ApplicationLoader.applicationContext;
+        final boolean mayReadMedia = (Build.VERSION.SDK_INT >= 33
+                && (context.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
+                || context.checkSelfPermission(Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED
+                || context.checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED))
+                || context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        if (!mayReadMedia) return 0;
+        final int photos = countGalleryMedia(context, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        if (photos < 0) return -1;
+        final int videos = countGalleryMedia(context, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        return videos < 0 ? -1 : photos + videos;
+    }
+
+    private static int countGalleryMedia(Context context, Uri collection) {
+        try (Cursor cursor = MediaStore.Images.Media.query(context.getContentResolver(), collection,
+                new String[]{"COUNT(_id)"}, null, null, null)) {
+            return cursor != null && cursor.moveToNext() ? cursor.getInt(0) : -1;
+        } catch (Exception e) {
+            FileLog.e(e);
+            return -1;
+        }
+    }
 
     private ExternalObserver externalObserver;
     private InternalObserver internalObserver;

@@ -26,6 +26,7 @@ public final class StartupIdleWork implements AutoCloseable {
     }
 
     private boolean onIdle() {
+        if (!scheduled) return false;
         scheduled = false;
         if (!complete && ready.getAsBoolean()) {
             complete = true;
@@ -34,9 +35,14 @@ public final class StartupIdleWork implements AutoCloseable {
         return false;
     }
 
-    @Override public void close() {
-        complete = true;
+    public void cancelPending() {
+        if (!scheduled) return;
         scheduled = false;
         queue.removeIdleHandler(idle);
+    }
+
+    @Override public void close() {
+        complete = true;
+        cancelPending();
     }
 }

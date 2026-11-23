@@ -3,6 +3,133 @@ from test_composer_layout import method
 from test_render_work_reuse import JAVA, probe
 
 
+def test_paid_reaction_overlay_draws_only_when_its_content_changes(tmp_path):
+    source = (JAVA / 'org/telegram/ui/Stars/StarReactionsOverlay.java').read_text()
+    draw = method(source, 'protected void dispatchDraw(Canvas canvas)')
+    assert 'invalidate()' not in draw
+    assert 'counterAlpha.set(counterShown)' in draw
+    assert 'drawable.setMasterParent(this)' in method(source, 'public void playEffect()')
+    chat_source = (JAVA / 'org/telegram/ui/ChatActivity.java').read_text()
+    assert 'starReactionsOverlay.onChatScrolled()' in chat_source
+    scroll = method(source, 'public void onChatScrolled()')
+    probe(tmp_path, {'Probe.java': '''public class Probe {
+ Object cell;
+ int redraws;
+ void invalidate(){redraws++;}
+ SCROLL
+ public static void main(String[] args){
+  Probe overlay=new Probe();
+  for(int i=0;i<10000;i++)overlay.onChatScrolled();
+  if(overlay.redraws!=0)throw new AssertionError("inactive overlay redraws during chat scroll");
+  overlay.cell=new Object();overlay.onChatScrolled();
+  if(overlay.redraws!=1)throw new AssertionError("anchored overlay must follow the message");
+  overlay.cell=null;overlay.onChatScrolled();
+  if(overlay.redraws!=1)throw new AssertionError("detached message still triggers a redraw");
+ }
+}'''.replace('SCROLL', scroll)})
+
+
+def test_paid_reaction_touch_requires_same_message_and_release_inside_button(tmp_path):
+    source = (JAVA / 'org/telegram/ui/Stars/StarReactionsOverlay.java').read_text()
+    methods = '\n'.join(method(source, signature) for signature in (
+        'public void cancelPendingTouch()', 'public boolean onTouchEvent(MotionEvent event)',
+        'public boolean isShowing(MessageObject obj)',
+    ))
+    chat = (JAVA / 'org/telegram/ui/ChatActivity.java').read_text()
+    assert 'starReactionsOverlay.cancelPendingTouch()' in method(chat, 'public void onPause()')
+    assert 'pressedReaction != null && !hidden && isAttachedToWindow() && isShowing(msg)' in source
+    controller = (JAVA / 'org/telegram/ui/Stars/StarsController.java').read_text()
+    pending = controller[controller.index('public final Runnable cancelRunnable = this::cancel;'):]
+    assert 'overlay.isShowing(messageObject)' in method(pending, 'public void cancel()')
+    probe(tmp_path, {'Probe.java': '''class TouchHost {public boolean onTouchEvent(MotionEvent event){return false;}}
+class MotionEvent {
+ static final int ACTION_DOWN=0,ACTION_UP=1,ACTION_MOVE=2,ACTION_CANCEL=3,ACTION_POINTER_DOWN=5;
+ int action;float x;
+ MotionEvent(int action,boolean inside){this.action=action;x=inside?5:50;}
+ int getActionMasked(){return action;}float getX(){return x;}float getY(){return 0;}
+}
+public class Probe extends TouchHost {
+ static class AndroidUtilities {
+  static Runnable queued;
+  static void runOnUIThread(Runnable work,int delay){check(queued==null);queued=work;}
+  static void cancelRunOnUIThread(Runnable work){if(queued==work)queued=null;}
+ }
+ static class ViewConfiguration {static int getLongPressTimeout(){return 500;}}
+ static class RectF {boolean contains(float x,float y){return x<10;}}
+ static class ButtonBounce {boolean pressed;void setPressed(boolean value){pressed=value;}}
+ static class ReactionsLayoutInBubble {
+  static class ReactionButton {ButtonBounce bounce=new ButtonBounce();}
+  ReactionButton button=new ReactionButton();
+  ReactionButton getReactionButton(String name){return button;}
+ }
+ static class MessageObject {
+  int getId(){return 1;}
+  long dialogId=2;
+  long getDialogId(){return dialogId;}
+ }
+ Object cell=new Object();int messageId=1;long messageDialogId=2;
+ MessageObject message=new MessageObject();MessageObject getMessageObject(){return message;}
+ final Runnable longPressRunnable=()->{};
+ final RectF clickBounds=new RectF();
+ final ReactionsLayoutInBubble layout=new ReactionsLayoutInBubble();
+ ReactionsLayoutInBubble getReactionsLayoutInBubble(){return layout;}
+ ReactionsLayoutInBubble.ReactionButton pressedReaction;
+ int sent;boolean hidden;
+ void tap(float x,float y,boolean send,boolean ripple){if(send)sent++;}
+ METHODS
+ static void check(boolean valid){if(!valid)throw new AssertionError();}
+ boolean event(int action,boolean inside){return onTouchEvent(new MotionEvent(action,inside));}
+ public static void main(String[] args){
+  Probe p=new Probe();
+  check(!p.event(1,true)&&p.sent==0);
+  check(p.event(0,true)&&p.layout.button.bounce.pressed&&AndroidUtilities.queued!=null);
+  check(p.event(1,false)&&p.sent==0&&!p.layout.button.bounce.pressed&&AndroidUtilities.queued==null);
+  check(p.event(0,true)&&p.event(2,false)&&!p.event(1,true)&&p.sent==0);
+  check(p.event(0,true)&&p.event(5,true)&&!p.event(1,true)&&p.sent==0);
+  check(p.event(0,true));p.message.dialogId=3;
+  check(!p.event(1,true)&&AndroidUtilities.queued==null&&p.sent==0);
+  p.message.dialogId=2;check(p.event(0,true)&&p.event(1,true)&&p.sent==1);
+  check(p.event(0,true));p.cancelPendingTouch();check(!p.event(1,true)&&p.sent==1);
+  p.layout.button=null;check(!p.event(0,true)&&AndroidUtilities.queued==null);
+ }
+}'''.replace('METHODS', methods)})
+
+
+def test_paid_reaction_focus_reverses_from_current_progress(tmp_path):
+    source = (JAVA / 'org/telegram/ui/Stars/StarReactionsOverlay.java').read_text()
+    methods = '\n'.join(method(source, signature) for signature in (
+        'private void cancelFocusAnimation()', 'public void focusTo(float dst, Runnable whenDone)',
+    ))
+    probe(tmp_path, {'Probe.java': '''public class Probe {
+ static class Animator {}
+ static class AnimatorListenerAdapter {public void onAnimationEnd(Animator animation){}}
+ static class ValueAnimator extends Animator {
+  float from,to,value;java.util.function.Consumer<ValueAnimator> update;AnimatorListenerAdapter listener;
+  static ValueAnimator ofFloat(float from,float to){ValueAnimator a=new ValueAnimator();a.from=from;a.to=to;return a;}
+  void addUpdateListener(java.util.function.Consumer<ValueAnimator> callback){update=callback;}
+  void addListener(AnimatorListenerAdapter callback){listener=callback;}
+  void cancel(){listener.onAnimationEnd(this);}
+  void setInterpolator(Object value){}void setDuration(long duration){}void start(){}
+  Float getAnimatedValue(){return value;}
+  void advance(float next){value=next;update.accept(this);}
+ }
+ static class CubicBezierInterpolator {static Object EASE_OUT_QUINT;}
+ float focus;ValueAnimator focusAnimator;
+ void invalidate(){}
+ METHODS
+ static void check(boolean valid){if(!valid)throw new AssertionError();}
+ public static void main(String[] args){
+  Probe p=new Probe();int[] done={0};
+  p.focusTo(1f,()->done[0]++);ValueAnimator opening=p.focusAnimator;
+  opening.advance(.4f);
+  p.focusTo(0f,()->done[0]+=10);ValueAnimator closing=p.focusAnimator;
+  check(closing.from==.4f&&p.focus==.4f&&done[0]==0);
+  closing.listener.onAnimationEnd(closing);
+  check(p.focus==0f&&p.focusAnimator==null&&done[0]==10);
+ }
+}'''.replace('METHODS', methods)})
+
+
 def test_reaction_callbacks_only_present_their_owned_generation(tmp_path):
     source = (JAVA/'org/telegram/ui/ChatActivity.java').read_text()
     methods = '\n'.join(method(source, name) for name in (
