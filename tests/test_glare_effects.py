@@ -42,7 +42,11 @@ def test_default_static_renderer_is_preserved():
  for anchor, historical in [('protected static void drawStrokeRaw(\n','public static void drawStroke(\n'),('protected static void drawStrokeRaw(Canvas canvas, float left, float top, float right, float bottom,','public static void drawStroke(Canvas canvas, float left, float top, float right, float bottom,')]:
   actual=method(new,anchor).replace('protected static void drawStrokeRaw','public static void drawStroke')
   actual=actual.replace(replacement,'if (GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;')
-  assert actual==method(old,historical)
+  expected=method(old,historical)
+  # Each half must clip against the vertical radius of the corner it draws.
+  expected=expected.replace('clipRect(cx, top, right, MathUtils.clamp(top + radii[0]', 'clipRect(cx, top, right, MathUtils.clamp(top + radii[3]')
+  expected=expected.replace('clipRect(left, MathUtils.clamp(bottom - radii[4] * 2, top, bottom), cx', 'clipRect(left, MathUtils.clamp(bottom - radii[7] * 2, top, bottom), cx')
+  assert actual==expected
  assert 'finally { paint.setStrokeWidth(previousWidth); }' in new
  assert 'applyOutlineWidth();' in new
 

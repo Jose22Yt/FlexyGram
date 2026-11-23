@@ -230,7 +230,7 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
 
     @Override
     public void draw(@NonNull Canvas canvas) {
-        if (boundProps.boundsWithPadding.isEmpty()) {
+        if (getAlpha() == 0 || boundProps.boundsWithPadding.isEmpty()) {
             return;
         }
 

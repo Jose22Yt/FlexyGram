@@ -50,6 +50,7 @@ public final class ChatEdgeReflection {
     private Path localShape;
     private CurvedEdge curvedEdge;
     private boolean darkTheme;
+    private float gradientDensity;
     private boolean subtle;
     private boolean satin;
     private int nextSlot;
@@ -117,7 +118,9 @@ public final class ChatEdgeReflection {
         }
         // View translations can introduce insignificant float differences in the height.
         final float shaderHeight = Math.max(1f, Math.round(height * 16f) / 16f);
-        if (darkTheme != dark) {
+        final float density = AndroidUtilities.dpf2(1f);
+        if (darkTheme != dark || gradientDensity != density) {
+            gradientDensity = density;
             darkTheme = dark;
             resetGradients();
         }

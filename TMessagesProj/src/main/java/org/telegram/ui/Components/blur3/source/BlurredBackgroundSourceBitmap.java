@@ -23,6 +23,7 @@ public class BlurredBackgroundSourceBitmap implements BlurredBackgroundSource {
     }
 
     public void setBitmap(Bitmap bitmap) {
+        if (bitmap != null && bitmap.isRecycled()) bitmap = null;
         if (this.bitmap == bitmap) {
             return;
         }
@@ -52,16 +53,12 @@ public class BlurredBackgroundSourceBitmap implements BlurredBackgroundSource {
     }
 
 
-    private final Matrix matrixForDraw = new Matrix();
-
     @Override
     public void draw(Canvas canvas, float left, float top, float right, float bottom) {
         if (bitmap == null || bitmap.isRecycled() || bitmapShader == null) {
             return;
         }
 
-        matrixForDraw.set(bitmapMatrix);
-        matrixForDraw.postTranslate(left, top);
         bitmapShader.setLocalMatrix(bitmapMatrix);
 
         canvas.drawRect(left, top, right, bottom, bitmapPaint);
@@ -81,16 +78,19 @@ public class BlurredBackgroundSourceBitmap implements BlurredBackgroundSource {
     }
 
     public Canvas beginRecording(int width, int height, float scale) {
-        final int bitmapWidth = Math.round(width / scale);
-        final int bitmapHeight = Math.round(width / scale);
-        if (bitmapInternal == null || bitmapInternal.isRecycled() || bitmapInternal.getWidth() != bitmapHeight || bitmapInternal.getHeight() != bitmapHeight) {
+        if (width <= 0 || height <= 0 || !(scale > 0f) || Float.isInfinite(scale)) {
+            throw new IllegalArgumentException("Recording requires positive dimensions and a finite positive scale");
+        }
+        final int bitmapWidth = Math.max(1, Math.round(width / scale));
+        final int bitmapHeight = Math.max(1, Math.round(height / scale));
+        if (bitmapInternal == null || bitmapInternal.isRecycled() || bitmapInternal.getWidth() != bitmapWidth || bitmapInternal.getHeight() != bitmapHeight) {
             bitmapInternal = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
         } else {
             bitmapInternal.eraseColor(0);
         }
 
         final Canvas canvas = new Canvas(bitmapInternal);
-        canvas.scale((float) width / bitmapWidth, (float) height / bitmapHeight);
+        canvas.scale((float) bitmapWidth / width, (float) bitmapHeight / height);
         return canvas;
     }
 

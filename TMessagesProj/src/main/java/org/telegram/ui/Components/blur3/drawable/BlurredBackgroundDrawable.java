@@ -41,7 +41,6 @@ import org.telegram.ui.Components.blur3.source.BlurredBackgroundSourceRenderNode
 import org.telegram.ui.Components.blur3.source.BlurredBackgroundSourceWrapped;
 import org.telegram.ui.Components.blur3.utils.NinePatchBuilder;
 
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
 
 public abstract class BlurredBackgroundDrawable extends Drawable implements GlassOutlineStyle.Listener {
@@ -583,7 +582,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
                 }
                 canvas.restore();
                 canvas.save();
-                if (canvas.clipRect(cx, top, right, MathUtils.clamp(top + radii[0] * 2, top, bottom))) {
+                if (canvas.clipRect(cx, top, right, MathUtils.clamp(top + radii[3] * 2, top, bottom))) {
                     canvas.drawRoundRect(
                             left - strokeHalf,
                             top + strokeHalf,
@@ -612,7 +611,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
             } else {
                 final float cx = (left + right) / 2f;
                 canvas.save();
-                if (canvas.clipRect(left, MathUtils.clamp(bottom - radii[4] * 2, top, bottom), cx, bottom)) {
+                if (canvas.clipRect(left, MathUtils.clamp(bottom - radii[7] * 2, top, bottom), cx, bottom)) {
                     canvas.drawRoundRect(
                             left - strokeHalf,
                             top - strokeHalf,
@@ -716,7 +715,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
     /* Universal */
 
     protected void drawSource(Canvas canvas, BlurredBackgroundSource source) {
-        if (boundProps.boundsWithPadding.isEmpty()) {
+        if (alpha == 0 || boundProps.boundsWithPadding.isEmpty()) {
             return;
         }
 
@@ -745,7 +744,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
     private final Paint backgroundBitmapFill = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint shadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Matrix bitmapShaderMatrix = new Matrix();
-    private final WeakReference<Bitmap> bitmapInShader = new WeakReference<>(null);
+    private Bitmap bitmapInShader;
     private @Nullable BitmapShader bitmapShader;
 
     {
@@ -824,17 +823,13 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
     }
 
     private void drawSourceBitmap(Canvas canvas, BlurredBackgroundSourceBitmap source) {
-        final Bitmap newBitmap = source.getBitmap();
-        final Bitmap oldBitmap = bitmapInShader.get();
-
-        if (newBitmap != oldBitmap) {
-            if (newBitmap != null && !newBitmap.isRecycled()) {
-                bitmapShader = new BitmapShader(newBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-                backgroundBitmapPaint.setShader(bitmapShader);
-            } else {
-                bitmapShader = null;
-                backgroundBitmapPaint.setShader(null);
-            }
+        final Bitmap bitmap = source.getBitmap();
+        final Bitmap usableBitmap = bitmap != null && !bitmap.isRecycled() ? bitmap : null;
+        if (bitmapInShader != usableBitmap) {
+            bitmapShader = usableBitmap == null ? null :
+                    new BitmapShader(usableBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+            backgroundBitmapPaint.setShader(bitmapShader);
+            bitmapInShader = usableBitmap;
         }
 
         if (Color.alpha(shadowColor) > 0) {
@@ -849,7 +844,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
             ninePatchDrawable.draw(canvas);
         }
 
-        if (bitmapShader != null && newBitmap != null && !newBitmap.isRecycled() && alpha > 0) {
+        if (bitmapShader != null) {
             bitmapShaderMatrix.set(source.getMatrix());
             bitmapShaderMatrix.postTranslate(-sourceOffsetX, -sourceOffsetY);
             bitmapShader.setLocalMatrix(bitmapShaderMatrix);

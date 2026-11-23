@@ -60,14 +60,18 @@ public class BlurredBackgroundWithFadeDrawable extends Drawable {
     }
 
     public void setFadeHeight(int fadeHeight, boolean opacity) {
-        if (this.fadeHeight == fadeHeight && this.opacity == opacity) {
+        if (shader != null && this.fadeHeight == fadeHeight && this.opacity == opacity) {
             return;
         }
 
         this.fadeHeight = fadeHeight;
-        this.opacity = opacity;
-        maskFadeGradientPaint.setShader(shader = createGradient(Color.BLACK, opacity));
-        colorStaticPaint.setShader(null);
+        if (shader == null || this.opacity != opacity) {
+            this.opacity = opacity;
+            shader = createGradient(Color.BLACK, opacity);
+            maskFadeGradientPaint.setShader(shader);
+            gradientShader = null;
+            composeShader = null;
+        }
 
         matrix.reset();
         matrix.setScale(1, fadeHeight);
@@ -94,6 +98,7 @@ public class BlurredBackgroundWithFadeDrawable extends Drawable {
     private int overrideFadeColor;
     private int lastOverrideFadeColor;
     private int lastOverrideFadeHeight;
+    private boolean lastOverrideDark;
     private boolean overrideFadeEnabled;
 
     public void setIgnoreFastWay(boolean ignoreFastWay) {
@@ -101,16 +106,20 @@ public class BlurredBackgroundWithFadeDrawable extends Drawable {
     }
 
     public void setOverrideFadeColor(int color) {
-        if (overrideFadeColor != color) {
-            overrideFadeColor = color;
-            overrideFadeShader = null;
-        }
-        overrideFadeEnabled = true;
-        invalidateSelf();
+        updateOverrideFadeColor(color);
     }
 
-    private static LinearGradient createOverrideFadeGradient(int color, int height, float scale) {
-        final boolean dark = Theme.isCurrentThemeDark();
+    public boolean updateOverrideFadeColor(int color) {
+        if (overrideFadeEnabled && overrideFadeColor == color && lastOverrideDark == Theme.isCurrentThemeDark()) {
+            return false;
+        }
+        overrideFadeColor = color;
+        overrideFadeEnabled = true;
+        invalidateSelf();
+        return true;
+    }
+
+    private static LinearGradient createOverrideFadeGradient(int color, int height, float scale, boolean dark) {
         final float[] alphas = {
             dark ? 0.95f : 1.0f,
             dark ? 0.9f : 0.93f,
@@ -127,11 +136,13 @@ public class BlurredBackgroundWithFadeDrawable extends Drawable {
 
     private void drawOverrideFade(Canvas canvas, Rect bounds) {
         final int height = Math.max(1, bounds.height());
-        if (lastOverrideFadeColor != overrideFadeColor || lastOverrideFadeHeight != height || overrideFadeShader == null) {
+        final boolean dark = Theme.isCurrentThemeDark();
+        if (lastOverrideDark != dark || lastOverrideFadeColor != overrideFadeColor || lastOverrideFadeHeight != height || overrideFadeShader == null) {
+            lastOverrideDark = dark;
             lastOverrideFadeColor = overrideFadeColor;
             lastOverrideFadeHeight = height;
-            overrideFadeShader = createOverrideFadeGradient(overrideFadeColor, height, 1.0f);
-            overrideMaskShader = createOverrideFadeGradient(Color.BLACK, height, 0.75f);
+            overrideFadeShader = createOverrideFadeGradient(overrideFadeColor, height, 1.0f, dark);
+            overrideMaskShader = createOverrideFadeGradient(Color.BLACK, height, 0.75f, dark);
             overrideComposeShader = null;
             overrideFadePaint.setShader(overrideFadeShader);
         }
@@ -142,7 +153,7 @@ public class BlurredBackgroundWithFadeDrawable extends Drawable {
         final BlurredBackgroundSource source = drawable.getUnwrappedSource();
         if (!ignoreFastWay && source instanceof BlurredBackgroundSourceBitmap && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             final Bitmap bitmap = ((BlurredBackgroundSourceBitmap) source).getBitmap();
-            if (bitmap != null) {
+            if (bitmap != null && !bitmap.isRecycled()) {
                 if (bitmapShader == null || lastBitmap != bitmap) {
                     lastBitmap = bitmap;
                     bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
@@ -193,11 +204,12 @@ public class BlurredBackgroundWithFadeDrawable extends Drawable {
             // fast way - just draw gradient
 
             final int color = ((BlurredBackgroundSourceColor) source).getColor();
-            if (colorStaticLast != color ||gradientShader == null) {
+            if (colorStaticLast != color || gradientShader == null) {
                 gradientShader = createGradient(color, opacity);
+                composeShader = null;
                 colorStaticLast = color;
-                colorStaticPaint.setShader(gradientShader);
             }
+            if (colorStaticPaint.getShader() != gradientShader) colorStaticPaint.setShader(gradientShader);
 
             int offset = 0;
             if (fadeHeight < 0) {
@@ -218,7 +230,7 @@ public class BlurredBackgroundWithFadeDrawable extends Drawable {
 
             final BlurredBackgroundSourceBitmap s = (BlurredBackgroundSourceBitmap) source;
             final Bitmap bitmap = s.getBitmap();
-            if (bitmap == null) {
+            if (bitmap == null || bitmap.isRecycled()) {
                 return;
             }
 

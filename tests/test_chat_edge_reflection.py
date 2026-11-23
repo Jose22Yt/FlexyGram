@@ -71,7 +71,7 @@ public class LinearGradient extends Shader {
 }''',
         'android/graphics/RectF.java': 'package android.graphics; public class RectF { public float left,top,right,bottom; }',
         'org/telegram/messenger/AndroidUtilities.java': '''package org.telegram.messenger;
-public class AndroidUtilities { public static float dpf2(float dp){return dp*2;} }''',
+public class AndroidUtilities { public static float density=2f; public static float dpf2(float dp){return dp*density;} }''',
         'Probe.java': '''import android.graphics.*;
 import app.flexygram.effects.ChatEdgeReflection;
 public class Probe {
@@ -121,6 +121,11 @@ public class Probe {
   check((1-subtleLight.stops[3])*subtleLight.height>1.9f && (1-subtleLight.stops[3])*subtleLight.height<2.1f);
   reflection.draw(canvas,0,20,200,320,40,false,255);
   check(canvas.paint.getShader()==subtleLight);
+  org.telegram.messenger.AndroidUtilities.density=3f;
+  reflection.draw(canvas,0,20,200,320,40,false,255);
+  LinearGradient scaled=(LinearGradient)canvas.paint.getShader();
+  check(scaled!=subtleLight && Math.abs(scaled.stops[2]*scaled.height-6f)<.02f);
+  org.telegram.messenger.AndroidUtilities.density=2f;
   canvas.hardware=true;
   reflection.draw(canvas,10,20,410,100,40,true,150);
   RuntimeShader curved=(RuntimeShader)canvas.paint.getShader();

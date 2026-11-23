@@ -169,3 +169,90 @@ public class Probe{
  for(int i=0;i<1000;i++){p.messages.add(one);p.messages.add(two);}p.messages.add(new MessageObject(100,0));p.run(10,20);
  if(!p.seen.equals(List.of(5,200,100))||!p.visible.equals(List.of(true,false,false)))throw new AssertionError();
  }}'''.replace('BLOCK',block)})
+
+
+def test_bitmap_blur_reuses_shader_and_releases_unusable_sources(tmp_path):
+    source = (JAVA/'org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawable.java').read_text()
+    draw = method(source, 'private void drawSourceBitmap(')
+    probe(tmp_path, {'Probe.java': '''public class Probe {
+        static class Bitmap { boolean recycled; boolean isRecycled(){return recycled;} }
+        static class Shader { enum TileMode {CLAMP} }
+        static class BitmapShader {
+            static int created;
+            BitmapShader(Bitmap b, Shader.TileMode x, Shader.TileMode y){created++;}
+            void setLocalMatrix(Matrix matrix){}
+        }
+        static class Matrix {void set(Matrix m){} void postTranslate(float x,float y){}}
+        static class Paint {void setShader(BitmapShader s){} void setColor(int c){} void setAlpha(int a){}}
+        static class Canvas {}
+        static class Rect {int left,right,top,bottom;}
+        static class Bounds {
+            Rect boundsWithPadding=new Rect();
+            int draws;
+            void draw(Canvas c,Paint p){draws++;}
+        }
+        static class NinePatchDrawable {void setBounds(int l,int t,int r,int b){} void setAlpha(int a){} void draw(Canvas c){}}
+        static class Color {static int alpha(int c){return c>>>24;}}
+        static class Theme {static int multAlpha(int c,float a){return c;}}
+        static class BlurredBackgroundSourceBitmap {
+            Bitmap bitmap;
+            Matrix matrix=new Matrix();
+            Bitmap getBitmap(){return bitmap;} Matrix getMatrix(){return matrix;}
+        }
+        BitmapShader bitmapShader;
+        Bitmap bitmapInShader;
+        int alpha=255, shadowColor, backgroundColor, sourceOffsetX, sourceOffsetY;
+        Matrix bitmapShaderMatrix=new Matrix();
+        Bounds boundProps=new Bounds();
+        Rect ninePatchDrawablePadding=new Rect();
+        Paint backgroundBitmapPaint=new Paint(),backgroundBitmapFill=new Paint();
+        NinePatchDrawable checkNinePatchDrawable(int c,boolean s){throw new AssertionError();}
+        void drawStrokeInternalIfNeeded(Canvas c){}
+        DRAW
+        public static void main(String[] args){
+            Probe p=new Probe(); Canvas c=new Canvas();
+            BlurredBackgroundSourceBitmap source=new BlurredBackgroundSourceBitmap();
+            source.bitmap=new Bitmap();
+            for(int i=0;i<1000;i++){p.sourceOffsetX=i;p.drawSourceBitmap(c,source);}
+            if(BitmapShader.created!=1 || p.boundProps.draws!=1000)throw new AssertionError();
+            source.bitmap=new Bitmap();p.drawSourceBitmap(c,source);
+            source.bitmap.recycled=true;p.drawSourceBitmap(c,source);
+            if(p.bitmapShader!=null || p.bitmapInShader!=null)throw new AssertionError();
+            source.bitmap=null;p.drawSourceBitmap(c,source);
+            if(BitmapShader.created!=2 || p.boundProps.draws!=1001)throw new AssertionError();
+        }
+    }'''.replace('DRAW',draw)})
+
+
+def test_downsampled_recording_maps_full_extent_and_reuses_rectangular_target(tmp_path):
+    source = (JAVA/'org/telegram/ui/Components/blur3/source/BlurredBackgroundSourceBitmap.java').read_text()
+    recording = method(source, 'public Canvas beginRecording(int width, int height, float scale)')
+    probe(tmp_path, {'Probe.java': '''public class Probe {
+        static class Bitmap {
+            enum Config {ARGB_8888}
+            int width,height,clears;
+            boolean isRecycled(){return false;}
+            int getWidth(){return width;} int getHeight(){return height;}
+            void eraseColor(int color){clears++;}
+            static Bitmap createBitmap(int w,int h, Config config){
+                Bitmap b=new Bitmap();b.width=w;b.height=h;return b;
+            }
+        }
+        static class Canvas {
+            Canvas(Bitmap b){} float x,y;
+            void scale(float sx,float sy){x=sx;y=sy;}
+        }
+        Bitmap bitmapInternal;
+        RECORDING
+        public static void main(String[] args){
+            Probe p=new Probe();Canvas c=p.beginRecording(100,60,4);
+            Bitmap b=p.bitmapInternal;
+            if(c.x*100!=25 || c.y*60!=15)throw new AssertionError();
+            p.beginRecording(100,60,4);
+            if(p.bitmapInternal!=b || b.clears!=1)throw new AssertionError();
+            p.beginRecording(160,60,4);
+            if(p.bitmapInternal==b || p.bitmapInternal.width!=40)throw new AssertionError();
+            p.beginRecording(1,1,8);
+            if(p.bitmapInternal.width!=1 || p.bitmapInternal.height!=1)throw new AssertionError();
+        }
+    }'''.replace('RECORDING', recording)})
