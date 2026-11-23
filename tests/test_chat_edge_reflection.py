@@ -16,6 +16,7 @@ public class Canvas {
  public void restoreToCount(int id){ depth=id-1; }
  public void clipPath(Path p){clips++;}
  public void drawPath(Path p,Paint paint){
+  if(paint.getShader() instanceof BitmapShader){paths++;return;}
   if(p.offsetY!=-top || paint.getStyle()!=Paint.Style.STROKE)throw new AssertionError();
   paths++;
  }
@@ -25,14 +26,14 @@ public class Canvas {
    if(t!=p.getStrokeWidth()*.5f)throw new AssertionError();
    thickness=p.getStrokeWidth();left=l;edge=p;bands++;
   }else{
-   if(t!=0)throw new AssertionError();
+   if(t!=0 && !(p.getShader() instanceof BitmapShader))throw new AssertionError();
    draws++;radius=rx;paint=p;
   }
  }
 }''',
         'android/graphics/Paint.java': '''package android.graphics;
 public class Paint {
- public static final int ANTI_ALIAS_FLAG=1;
+ public static final int ANTI_ALIAS_FLAG=1, FILTER_BITMAP_FLAG=2;
  public enum Style{FILL,STROKE}
  private Shader shader; private int alpha=255;
  private Style style=Style.FILL; private float width;
@@ -46,6 +47,12 @@ public class Paint {
  public int getAlpha(){ return alpha; }
  public void setAlpha(int a){ alpha=a; }
 }''',
+        'android/graphics/Bitmap.java': 'package android.graphics; public class Bitmap {public int getWidth(){return 80;}public int getHeight(){return 80;}}',
+        'android/graphics/BitmapFactory.java': 'package android.graphics; public class BitmapFactory {public static int count; public static Bitmap decodeResource(Object resources,int id){count++;return new Bitmap();}}',
+        'android/graphics/BitmapShader.java': 'package android.graphics; public class BitmapShader extends Shader {public static int count;public BitmapShader(Bitmap b,TileMode x,TileMode y){count++;}public void setLocalMatrix(Matrix m){}}',
+        'android/graphics/Matrix.java': 'package android.graphics; public class Matrix {public void setScale(float x,float y){}public void postTranslate(float x,float y){}}',
+        'org/telegram/messenger/ApplicationLoader.java': 'package org.telegram.messenger; public class ApplicationLoader {public static ApplicationLoader applicationContext=new ApplicationLoader(); public Object getResources(){return null;}}',
+        'org/telegram/messenger/R.java': 'package org.telegram.messenger; public class R {public static class drawable {public static final int flexy_satin_pill_dark=1,flexy_satin_circle_dark=2,flexy_satin_pill_light=3,flexy_satin_circle_light=4;}}',
         'android/graphics/Path.java': '''package android.graphics;
 public class Path {
  public float offsetY;
@@ -143,16 +150,20 @@ public class Probe {
   check(canvas.bands==6006 && java.util.Arrays.equals(((LinearGradient)canvas.paint.getShader()).colors,dark.colors));
   reflection.setSatin(true);
   reflection.draw(canvas,0,20,420,100,40,true,255);
-  LinearGradient satin=(LinearGradient)canvas.paint.getShader();
-  check(satin.colors.length==8 && (satin.colors[0]>>>24)==0 && (satin.colors[7]>>>24)==0);
-  check(satin.stops[1]>0 && satin.stops[6]<1 && (satin.colors[5]>>>24)<(satin.colors[2]>>>24));
-  check(canvas.bands==6006);
+  check(canvas.paint.getShader() instanceof BitmapShader && canvas.bands==6006);
+  int paths=canvas.paths;
   android.os.Build.VERSION.SDK_INT=33;
-  reflection.drawClipped(canvas,0,20,420,100,new Path(),new float[]{12,12,20,20,30,30,40,40},true,255);
-  check(canvas.clips==3 && canvas.paint.getShader()==curved && canvas.depth==0);
+  for(int i=0;i<100;i++){
+   reflection.draw(canvas,0,20+i,420,100+i,40,true,200);
+   reflection.draw(canvas,10,0,50,40,20,true,255);
+   reflection.drawClipped(canvas,0,20,420,100,new Path(),true,255);
+  }
+  check(canvas.paths==paths+100 && BitmapFactory.count==2 && BitmapShader.count==2);
+  reflection.draw(canvas,10,0,50,40,20,false,255);
+  check(BitmapFactory.count==3 && BitmapShader.count==3 && RuntimeShader.creations==1);
  }
 }''',
-    }, [JAVA/'app/flexygram/effects/ChatEdgeReflection.java'])
+    }, [JAVA/'app/flexygram/effects/ChatEdgeReflection.java', JAVA/'app/flexygram/effects/SatinEdgeMaterial.java'])
 
 
 def test_existing_outline_and_reflection_are_mutually_exclusive():

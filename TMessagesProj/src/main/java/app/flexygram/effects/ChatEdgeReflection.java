@@ -26,14 +26,6 @@ public final class ChatEdgeReflection {
     private static final int[] SUBTLE_LIGHT = {
             0xe8ffffff, 0x70ffffff, 0x00ffffff, 0x00474747, 0x07474747, 0x24474747
     };
-    private static final int[] SATIN_DARK = {
-            0x00ffffff, 0x00ffffff, 0x12ffffff, 0x00ffffff,
-            0x00ffffff, 0x08ffffff, 0x00ffffff, 0x00ffffff
-    };
-    private static final int[] SATIN_LIGHT = {
-            0x00ffffff, 0x00ffffff, 0xb0ffffff, 0x00ffffff,
-            0x00474747, 0x12474747, 0x00474747, 0x00474747
-    };
     private static final int[] DARK_SIDES = {0x00ffffff, 0x48ffffff, 0x48ffffff, 0x00ffffff};
     private static final int[] LIGHT_SIDES = {0x000d2237, 0x400d2237, 0x400d2237, 0x000d2237};
     private static final float[] SIDE_BANDS = {1f, .63f, .28f};
@@ -42,7 +34,6 @@ public final class ChatEdgeReflection {
     private final float[] heights = new float[4];
     private final float[] stops = {0f, 0f, 0f, 0f, 0f, 1f};
     private final float[] sideStops = new float[4];
-    private final float[] satinStops = {0f, 0f, 0f, 0f, 0f, 0f, 0f, 1f};
     private final LinearGradient[] shaders = new LinearGradient[4];
     private final LinearGradient[] sideShaders = new LinearGradient[4];
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -51,8 +42,14 @@ public final class ChatEdgeReflection {
     private CurvedEdge curvedEdge;
     private boolean darkTheme;
     private float gradientDensity;
-    private boolean subtle;
     private boolean satin;
+    private SatinEdgeMaterial satinMaterial;
+
+    public void setSatin(boolean satin) {
+        this.satin = satin;
+    }
+
+    private boolean subtle;
     private int nextSlot;
 
     public ChatEdgeReflection() {
@@ -62,12 +59,6 @@ public final class ChatEdgeReflection {
     public void setSubtle(boolean subtle) {
         if (this.subtle == subtle) return;
         this.subtle = subtle;
-        resetGradients();
-    }
-
-    public void setSatin(boolean satin) {
-        if (this.satin == satin) return;
-        this.satin = satin;
         resetGradients();
     }
 
@@ -93,17 +84,7 @@ public final class ChatEdgeReflection {
 
     public void drawClipped(Canvas canvas, float left, float top, float right, float bottom,
             Path shape, float[] radii, boolean dark, int alpha) {
-        if (satin && Build.VERSION.SDK_INT >= 33 && canvas.isHardwareAccelerated()) {
-            final float width = right - left, height = bottom - top;
-            if (width <= 0f || height <= 0f || alpha == 0) return;
-            if (curvedEdge == null) curvedEdge = new CurvedEdge();
-            final int save = canvas.save();
-            canvas.clipPath(shape);
-            curvedEdge.draw(canvas, left, top, width, height, 0f, dark, true, radii, alpha);
-            canvas.restoreToCount(save);
-        } else {
-            drawClipped(canvas, left, top, right, bottom, shape, dark, alpha);
-        }
+        drawClipped(canvas, left, top, right, bottom, shape, dark, alpha);
     }
 
     private void draw(Canvas canvas, float left, float top, float right, float bottom,
@@ -111,9 +92,14 @@ public final class ChatEdgeReflection {
         final float height = bottom - top;
         if (height <= 0 || right <= left || alpha == 0) return;
         final float r = Math.min(radius, Math.min(height, right - left) * .5f);
-        if ((subtle || satin) && shape == null && Build.VERSION.SDK_INT >= 33 && canvas.isHardwareAccelerated()) {
+        if (satin) {
+            if (satinMaterial == null) satinMaterial = new SatinEdgeMaterial();
+            satinMaterial.draw(canvas, left, top, right, bottom, r, shape, dark, alpha);
+            return;
+        }
+        if (subtle && shape == null && Build.VERSION.SDK_INT >= 33 && canvas.isHardwareAccelerated()) {
             if (curvedEdge == null) curvedEdge = new CurvedEdge();
-            curvedEdge.draw(canvas, left, top, right - left, height, r, dark, satin, null, alpha);
+            curvedEdge.draw(canvas, left, top, right - left, height, r, dark, alpha);
             return;
         }
         // View translations can introduce insignificant float differences in the height.
@@ -144,21 +130,8 @@ public final class ChatEdgeReflection {
             slot = nextSlot;
             heights[slot] = shaderHeight;
             final int[] colors = subtle ? (dark ? SUBTLE_DARK : SUBTLE_LIGHT) : (dark ? DARK : LIGHT);
-            if (satin) {
-                final float topFade = Math.min(.23f, AndroidUtilities.dpf2(5.2f) / shaderHeight);
-                final float bottomFade = Math.min(.22f, AndroidUtilities.dpf2(5f) / shaderHeight);
-                satinStops[1] = topFade * .10f;
-                satinStops[2] = topFade * .38f;
-                satinStops[3] = topFade;
-                satinStops[4] = 1f - bottomFade;
-                satinStops[5] = 1f - bottomFade * .43f;
-                satinStops[6] = 1f - bottomFade * .17f;
-                shaders[slot] = new LinearGradient(0, 0, 0, shaderHeight,
-                        dark ? SATIN_DARK : SATIN_LIGHT, satinStops, Shader.TileMode.CLAMP);
-            } else {
-                shaders[slot] = new LinearGradient(0, 0, 0, shaderHeight, colors, stops, Shader.TileMode.CLAMP);
-            }
-            if (!subtle && !satin) {
+            shaders[slot] = new LinearGradient(0, 0, 0, shaderHeight, colors, stops, Shader.TileMode.CLAMP);
+            if (!subtle) {
                 // The side reflection takes over as the original highlights fall off.
                 sideStops[0] = topRamp * .15f;
                 sideStops[1] = topRamp * 2f;
@@ -175,14 +148,14 @@ public final class ChatEdgeReflection {
         final int save = canvas.save();
         if (shape != null) {
             canvas.clipPath(shape);
-            if (!subtle && !satin) {
+            if (!subtle) {
                 if (localShape == null) localShape = new Path();
                 shape.offset(0f, -top, localShape);
             }
         }
         canvas.translate(0, top);
         canvas.drawRoundRect(left, 0, right, height, r, r, paint);
-        if (!subtle && !satin) drawSides(canvas, left, right, height, r, shape != null, sideShaders[slot], alpha);
+        if (!subtle) drawSides(canvas, left, right, height, r, shape != null, sideShaders[slot], alpha);
         canvas.restoreToCount(save);
     }
 
@@ -193,46 +166,26 @@ public final class ChatEdgeReflection {
                 uniform float radius;
                 uniform float density;
                 uniform float dark;
-                uniform float satin;
-                uniform float4 corners;
 
                 half4 main(float2 position) {
                     float2 centered = position - 0.5 * size;
                     bool upper = centered.y < 0.0;
                     float depth = min(0.14 * size.y, density *
                             (dark > 0.5 ? (upper ? 3.7 : 4.2) : (upper ? 2.0 : 1.0)));
-                    if (satin > 0.5) depth = min(0.23 * size.y, density * (upper ? 5.2 : 5.0));
-                    float corner = radius;
-                    if (satin > 0.5) {
-                        corner = upper ? (centered.x < 0.0 ? corners.x : corners.y) :
-                                (centered.x < 0.0 ? corners.w : corners.z);
-                        corner = min(corner, 0.5 * min(size.x, size.y));
-                    }
                     float fromHorizontalEdge = 0.5 * size.y - abs(centered.y);
                     // A point in the straight span cannot receive light from the curved caps.
-                    if (abs(centered.x) <= 0.5 * size.x - corner && fromHorizontalEdge >= depth) {
+                    if (abs(centered.x) <= 0.5 * size.x - radius && fromHorizontalEdge >= depth) {
                         return half4(0.0);
                     }
-                    float2 q = abs(centered) - (0.5 * size - corner);
+                    float2 q = abs(centered) - (0.5 * size - radius);
                     float2 arc = max(q, float2(0.0));
                     float arcLength = length(arc);
-                    float distance = arcLength + min(max(q.x, q.y), 0.0) - corner;
+                    float distance = arcLength + min(max(q.x, q.y), 0.0) - radius;
                     float vertical = arcLength > 0.0 ? arc.y / arcLength : step(q.x, q.y);
                     float direction = smoothstep(0.05, 0.95, vertical);
                     float fade = 1.0 - smoothstep(0.0, depth, max(0.0, -distance));
                     float strength = dark > 0.5 ? (upper ? 0.24 : 0.29) : (upper ? 0.90 : 0.14);
                     float opacity = strength * fade * fade * direction * direction;
-                    if (satin > 0.5) {
-                        // The reflection peaks inside the fill and falls to zero before the silhouette.
-                        float inset = -distance;
-                        float start = depth * (upper ? 0.10 : 0.17);
-                        float peak = depth * (upper ? 0.38 : 0.43);
-                        float feather = smoothstep(start, peak, inset) *
-                                (1.0 - smoothstep(peak, depth, inset));
-                        float lateral = 1.0 - smoothstep(0.50, 0.99, abs(centered.x) * 2.0 / size.x);
-                        strength = dark > 0.5 ? (upper ? 0.073 : 0.031) : (upper ? 0.69 : 0.071);
-                        opacity = strength * feather * direction * direction * lateral;
-                    }
                     float tone = dark > 0.5 || upper ? 1.0 : 0.2784;
                     return half4(half3(tone * opacity), half(opacity));
                 }
@@ -241,16 +194,14 @@ public final class ChatEdgeReflection {
         private final RuntimeShader shader = new RuntimeShader(EFFECT);
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private float width, height, radius = -1f, density;
-        private float topLeft = -1f, topRight, bottomRight, bottomLeft;
         private boolean dark;
-        private boolean satin;
 
         CurvedEdge() {
             paint.setShader(shader);
         }
 
         void draw(Canvas canvas, float left, float top, float width, float height, float radius,
-                boolean dark, boolean satin, float[] radii, int alpha) {
+                boolean dark, int alpha) {
             if (this.width != width || this.height != height) {
                 shader.setFloatUniform("size", width, height);
                 this.width = width;
@@ -266,23 +217,6 @@ public final class ChatEdgeReflection {
                 shader.setFloatUniform("dark", dark ? 1f : 0f);
                 this.density = density;
                 this.dark = dark;
-            }
-            if (this.satin != satin) {
-                shader.setFloatUniform("satin", satin ? 1f : 0f);
-                this.satin = satin;
-            }
-            if (satin) {
-                final float tl = radii == null ? radius : radii[0];
-                final float tr = radii == null ? radius : radii[2];
-                final float br = radii == null ? radius : radii[4];
-                final float bl = radii == null ? radius : radii[6];
-                if (topLeft != tl || topRight != tr || bottomRight != br || bottomLeft != bl) {
-                    shader.setFloatUniform("corners", tl, tr, br, bl);
-                    topLeft = tl;
-                    topRight = tr;
-                    bottomRight = br;
-                    bottomLeft = bl;
-                }
             }
             if (paint.getAlpha() != alpha) paint.setAlpha(alpha);
             final int save = canvas.save();
