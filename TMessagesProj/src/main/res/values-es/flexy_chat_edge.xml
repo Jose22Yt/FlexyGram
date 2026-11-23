@@ -4,4 +4,5 @@
     <string name="FlexyChatEdgeCurrent">Contorno actual</string>
     <string name="FlexyChatEdgeReflection">Reflejo de borde</string>
     <string name="FlexyChatEdgeSubtle">Borde tenue</string>
+    <string name="FlexyChatEdgeSatin">Reflejo satinado</string>
 </resources>

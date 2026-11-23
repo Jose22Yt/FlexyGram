@@ -80,6 +80,7 @@ import tw.nekomimi.nekogram.folder.FolderIconHelper;
 public class FilterTabsView extends FrameLayout {
     private boolean signatureHome;
     private boolean signatureHomeOpaquePreview;
+    private app.flexygram.effects.ChatEdgeReflection satinEdge;
     private int signatureAccent, signatureAccentInk;
     private final app.flexygram.home.SignatureFolderAccent signatureAccentColors=new app.flexygram.home.SignatureFolderAccent();
     private final app.flexygram.home.SignatureFolderAccent signatureDefaultColors=new app.flexygram.home.SignatureFolderAccent();
@@ -105,6 +106,10 @@ public class FilterTabsView extends FrameLayout {
             app.flexygram.home.SignatureHomeStyle.text(dark,true),glassBase,app.flexygram.home.SignatureHomeStyle.text(dark,false));
     }
 
+
+    public void invalidateFolderEdges() {
+        for (int i = 0; i < listView.getChildCount(); i++) listView.getChildAt(i).invalidate();
+    }
 
     /** Settings-only solid sample; never changes the global Liquid Glass preference. */
     public void setSignatureHomeOpaquePreview(boolean opaque) {
@@ -457,6 +462,7 @@ public class FilterTabsView extends FrameLayout {
                 signaturePalette=themed?signatureAccentColors:signatureDefaultColors;
                 signatureSelected = app.flexygram.home.SignatureHomeStyle.selection(currentTab.id, id1, id2,
                         animatingIndicator || manualScrollingToId != -1, animatingIndicatorProgress);
+                final boolean satin = !signatureHomeOpaquePreview && app.flexygram.effects.ChatEdgeStyle.isSatin();
                 boolean nativePill = !signatureHomeOpaquePreview && signaturePillGlass != null && canvas.isHardwareAccelerated()
                         && org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.checkBlurEnabled(resourcesProvider);
                 if (nativePill) {
@@ -467,13 +473,25 @@ public class FilterTabsView extends FrameLayout {
                         signaturePillGlass.setRadius(signaturePillRadius);
                     }
                     signaturePillGlass.setBounds(dp(3), Math.round((getHeight()-h)/2), getWidth()-dp(3), Math.round((getHeight()+h)/2));
+                    signaturePillGlass.setStrokeVisible(!satin);
                     signaturePillGlass.draw(canvas);
                 }
                 if (!nativePill || signatureSelected > 0) {
                     signatureHomePainter.category(canvas, getMeasuredWidth(), getMeasuredHeight(), AndroidUtilities.density,
                             dark, nativePill, signatureSelected,
                             themed?signatureAccent:
-                            app.flexygram.home.SignatureHomeStyle.selectedSurface(dark,nativePill));
+                            app.flexygram.home.SignatureHomeStyle.selectedSurface(dark,nativePill), !satin);
+                }
+                if (satin) {
+                    satinEdge = app.flexygram.effects.ChatEdgeStyle.updateReflection(satinEdge);
+                    if (nativePill) {
+                        signaturePillGlass.drawChatEdge(canvas, satinEdge, dark);
+                    } else {
+                        final float h = app.flexygram.home.SignatureHomeStyle.categoryHeight(getMeasuredHeight(), AndroidUtilities.density);
+                        final float inset = 3f * AndroidUtilities.density;
+                        satinEdge.draw(canvas, inset, (getMeasuredHeight() - h) / 2f,
+                                getMeasuredWidth() - inset, (getMeasuredHeight() + h) / 2f, h / 2f, dark, 255);
+                    }
                 }
                 textPaint.setColor(signaturePalette.inkAt(signatureSelected));
             }

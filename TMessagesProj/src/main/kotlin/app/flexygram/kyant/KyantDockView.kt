@@ -54,6 +54,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     private val geometry = KyantDockGeometry.State()
     private var available by mutableStateOf(false)
     private var subtleEdge by mutableStateOf(false)
+    private var satinEdge by mutableStateOf(false)
     private var ready = false
     private var framePending = false
     private var sourceDirty = false
@@ -124,6 +125,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         }
 
         subtleEdge = ChatEdgeStyle.isSubtle()
+        satinEdge = ChatEdgeStyle.isSatin()
         visibleScratch.clear()
         for (i in 0 until dock.childCount) {
             val tab = dock.getChildAt(i) as? GlassTabView ?: continue
@@ -234,6 +236,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
                         backdrop = background,
                         tabsCount = tabs.size,
                         subtleEdge = subtleEdge,
+                        satinEdge = satinEdge,
                         modifier = Modifier.fillMaxSize()
                     ) {
                         tabs.forEachIndexed { index, tab ->

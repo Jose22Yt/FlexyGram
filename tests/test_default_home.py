@@ -47,7 +47,7 @@ def test_no_style_selector_or_iphone_home_routes_remain():
     assert 'HomeStyleConfig' not in nav and 'IOS_ORDER' not in nav
     # Original artwork and the pre-existing default home controls are retained.
     assert 'IosOriginalAssets.TAB_CHATS' in (JAVA/'org/telegram/ui/Components/glass/GlassTabView.java').read_text()
-    assert 'drawSignatureHomeControl(canvas, searchItem)' in native
+    assert 'drawSignatureHomeControl(canvas, searchItem, satin)' in native
 
 
 def test_empty_edit_mode_cannot_dispatch_a_dialog_action(tmp_path):

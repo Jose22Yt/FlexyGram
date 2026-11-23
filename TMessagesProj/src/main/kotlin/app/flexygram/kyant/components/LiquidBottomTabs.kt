@@ -65,6 +65,7 @@ fun LiquidBottomTabs(
     backdrop: Backdrop,
     tabsCount: Int,
     subtleEdge: Boolean,
+    satinEdge: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
@@ -77,7 +78,13 @@ fun LiquidBottomTabs(
         else Color(0xFF121212).copy(0.4f)
 
     val tabsBackdrop = rememberLayerBackdrop()
-    val edge = if (subtleEdge) remember { ChatEdgeReflection().apply { setSubtle(true) } } else null
+    val customEdge = subtleEdge || satinEdge
+    val edge = if (customEdge) remember(subtleEdge, satinEdge) {
+        ChatEdgeReflection().apply {
+            setSubtle(subtleEdge)
+            setSatin(satinEdge)
+        }
+    } else null
 
     BoxWithConstraints(
         modifier,
@@ -171,7 +178,7 @@ fun LiquidBottomTabs(
                     backdrop = backdrop,
                     shape = { Capsule() },
                     shadow = null,
-                    highlight = if (subtleEdge) null else ({ Highlight.Default }),
+                    highlight = if (customEdge) null else ({ Highlight.Default }),
                     effects = {
                         vibrancy()
                         blur(8f.dp.toPx())
@@ -225,7 +232,7 @@ fun LiquidBottomTabs(
                                 24f.dp.toPx() * progress
                             )
                         },
-                        highlight = if (subtleEdge) null else ({
+                        highlight = if (customEdge) null else ({
                             val progress = dampedDragAnimation.pressProgress
                             Highlight.Default.copy(alpha = progress)
                         }),
@@ -263,7 +270,7 @@ fun LiquidBottomTabs(
                             chromaticAberration = true
                         )
                     },
-                    highlight = if (subtleEdge) null else ({
+                    highlight = if (customEdge) null else ({
                         val progress = dampedDragAnimation.pressProgress
                         Highlight.Default.copy(alpha = progress)
                     }),

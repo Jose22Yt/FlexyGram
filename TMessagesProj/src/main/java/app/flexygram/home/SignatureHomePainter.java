@@ -12,10 +12,15 @@ public final class SignatureHomePainter {
 
     public void control(Canvas canvas, float cx, float cy, float diameter, float density,
                         boolean dark, boolean glass, float alpha) {
+        control(canvas, cx, cy, diameter, density, dark, glass, alpha, true);
+    }
+
+    public void control(Canvas canvas, float cx, float cy, float diameter, float density,
+                        boolean dark, boolean glass, float alpha, boolean drawOutline) {
         if (diameter <= 0 || alpha <= 0) return;
         float r = diameter / 2;
         bounds.set(cx - r, cy - r, cx + r, cy + r);
-        surface(canvas, r, density, dark, SignatureHomeStyle.surface(dark, glass), alpha);
+        surface(canvas, r, density, dark, SignatureHomeStyle.surface(dark, glass), alpha, drawOutline);
     }
 
     public void category(Canvas canvas, float width, float height, float density,
@@ -25,6 +30,11 @@ public final class SignatureHomePainter {
 
     public void category(Canvas canvas,float width,float height,float density,boolean dark,boolean glass,
                          float selection,int selectedColor) {
+        category(canvas, width, height, density, dark, glass, selection, selectedColor, true);
+    }
+
+    public void category(Canvas canvas, float width, float height, float density, boolean dark, boolean glass,
+                         float selection, int selectedColor, boolean drawOutline) {
         float h = SignatureHomeStyle.categoryHeight(height, density);
         // Inset each native cell, including RTL and reordered/animated cells.
         // No item decoration changes positions or filter hit testing.
@@ -38,17 +48,17 @@ public final class SignatureHomePainter {
         } else {
             color = blend(SignatureHomeStyle.surface(dark, false), selectedColor, selection);
         }
-        surface(canvas, h / 2, density, dark, color, 1);
+        surface(canvas, h / 2, density, dark, color, 1, drawOutline);
     }
 
-    private void surface(Canvas canvas, float radius, float density, boolean dark, int color, float alpha) {
+    private void surface(Canvas canvas, float radius, float density, boolean dark, int color, float alpha, boolean drawOutline) {
         boolean effects = org.telegram.messenger.SharedConfig.chatBlurEnabled();
         if (!effects) color |= 0xFF000000;
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(color);
         paint.setAlpha(Math.round((color >>> 24) * Math.max(0, Math.min(1, alpha))));
         canvas.drawRoundRect(bounds, radius, radius, paint);
-        if (!effects) return;
+        if (!effects || !drawOutline) return;
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(Math.max(1, density * .5f));
         color = SignatureHomeStyle.edge(dark);

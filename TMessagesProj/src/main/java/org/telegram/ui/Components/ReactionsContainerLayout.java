@@ -636,6 +636,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
     }
 
     private BlurredBackgroundDrawable blurredBackgroundDrawable;
+    private app.flexygram.effects.ChatEdgeReflection satinReactionEdge;
     private BlurredBackgroundDrawable blurredBackgroundDrawable1;
     private BlurredBackgroundDrawable blurredBackgroundDrawable2;
 
@@ -747,6 +748,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
                 float sc = transitionProgress;
                 canvas.scale(sc, sc, pivotX, getHeight() / 2f);
             }
+            final boolean satin = type == TYPE_DEFAULT && app.flexygram.effects.ChatEdgeStyle.isSatin();
             if (type == TYPE_STORY || delegate.drawBackground()) {
                 delegate.drawRoundRect(canvas, rect, radius, getX(), getY(), 255, false);
             } else if (glassBackground != null) {
@@ -761,10 +763,16 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
 
                     blurredBackgroundDrawable.setBounds(AndroidUtilities.rectTmp2);
                     blurredBackgroundDrawable.setAlpha(bgPaint.getAlpha());
+                    if (type == TYPE_DEFAULT) blurredBackgroundDrawable.setStrokeVisible(!satin);
                     blurredBackgroundDrawable.draw(canvas);
                 } else {
                     canvas.drawRoundRect(rect, radius, radius, bgPaint);
                 }
+            }
+            if (satin) {
+                satinReactionEdge = app.flexygram.effects.ChatEdgeStyle.updateReflection(satinReactionEdge);
+                final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
+                satinReactionEdge.draw(canvas, rect, radius, dark, bgPaint.getAlpha());
             }
 
             if (hasStar) {

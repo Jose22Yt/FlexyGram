@@ -196,10 +196,17 @@ public class FragmentSearchField extends FrameLayout implements FactorAnimator.T
     }
 
     private Drawable bg;
+    private app.flexygram.effects.ChatEdgeReflection satinEdge;
+    private boolean satinEdgeSupported;
+
+    public void setSatinEdgeSupported(boolean supported) {
+        satinEdgeSupported = supported;
+    }
 
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
         canvas.save();
+        final boolean satin = satinEdgeSupported && app.flexygram.effects.ChatEdgeStyle.isSatin();
         if (bg != null) {
             bg.setBounds(
                 getPaddingLeft(),
@@ -215,7 +222,15 @@ public class FragmentSearchField extends FrameLayout implements FactorAnimator.T
                     getPaddingTop() - dp(4),
                     getWidth() - getPaddingRight() + dp(4),
                     (getHeight() - getPaddingBottom()) + dp(4));
+            if (satinEdgeSupported) blurredBackgroundDrawable.setStrokeVisible(!satin);
             blurredBackgroundDrawable.draw(canvas);
+        }
+        if (satin) {
+            satinEdge = app.flexygram.effects.ChatEdgeStyle.updateReflection(satinEdge);
+            final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
+            // The idle and glass fills crossfade over the same shape. Draw its reflection once.
+            satinEdge.draw(canvas, getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(),
+                    getHeight() - getPaddingBottom(), dp(20), dark, 255);
         }
         super.dispatchDraw(canvas);
         canvas.restore();

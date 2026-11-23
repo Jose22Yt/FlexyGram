@@ -27,6 +27,12 @@ public class DialogsActivityTopPanelLayout extends AnimatedLinearLayout {
     }
 
     BlurredBackgroundDrawable backgroundDrawable;
+    private app.flexygram.effects.ChatEdgeReflection satinEdge;
+    private boolean satinEdgeSupported;
+
+    public void setSatinEdgeSupported(boolean supported) {
+        satinEdgeSupported = supported;
+    }
 
     public void setBlurredBackground(BlurredBackgroundDrawable background) {
         backgroundDrawable = background;
@@ -101,7 +107,14 @@ public class DialogsActivityTopPanelLayout extends AnimatedLinearLayout {
         if (getMetadata().getTotalVisibility() == 0) return;
 
         if (backgroundDrawable != null) {
-            backgroundDrawable.draw(canvas);
+            if (satinEdgeSupported && app.flexygram.effects.ChatEdgeStyle.isSatin()) {
+                satinEdge = app.flexygram.effects.ChatEdgeStyle.updateReflection(satinEdge);
+                backgroundDrawable.drawWithChatEdge(canvas, satinEdge, Theme.isCurrentThemeDark());
+            } else if (satinEdgeSupported) {
+                backgroundDrawable.drawWithChatEdge(canvas, null, false);
+            } else {
+                backgroundDrawable.draw(canvas);
+            }
         }
 
         View callDrawnView = null;

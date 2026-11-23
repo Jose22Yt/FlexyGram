@@ -11,6 +11,8 @@ package org.telegram.ui;
 import app.exteraless.appearance.AppearanceConfig;
 import app.exteraless.components.TranslateBeforeSendWrapper;
 import app.exteraless.drawer.DrawerContainer;
+import app.flexygram.effects.ChatEdgeReflection;
+import app.flexygram.effects.ChatEdgeStyle;
 import app.flexygram.home.SignatureHomePainter;
 import app.flexygram.home.SignatureHomeStyle;
 import app.exteraless.drawer.MainMenuHelper;
@@ -3321,6 +3323,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     public ActionBar createActionBar(Context context) {
         ActionBar actionBar = new ActionBar(context, resourceProvider) {
             private final SignatureHomePainter signatureHomePainter = new SignatureHomePainter();
+            private ChatEdgeReflection satinEdge;
             private final class HomeControlGlass {
                 BlurredBackgroundDrawable drawable;
                 float radius = -1;
@@ -3344,17 +3347,23 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 super.dispatchDraw(canvas);
             }
 
-            private void drawSignatureHomeControl(Canvas canvas, View item) {
+            private void drawSignatureHomeControl(Canvas canvas, View item, boolean satin) {
                 if (item == null || item.getVisibility() != View.VISIBLE || menu == null) return;
                 boolean dark = resourceProvider != null ? resourceProvider.isDark() : Theme.isCurrentThemeDark();
                 // Native themes may use white action-bar icons on a light Home.
                 // Cache the two filters and reapply only when a theme update replaces one.
-                if (item instanceof ActionBarMenuItem) {
+                if (!BuildConfig.NATIVE_BASELINE_TEST && item instanceof ActionBarMenuItem) {
                     android.widget.ImageView icon = ((ActionBarMenuItem) item).getIconView();
                     PorterDuffColorFilter ink = dark ? signatureHomeDarkInk : signatureHomeLightInk;
                     if (icon != null && icon.getColorFilter() != ink) icon.setColorFilter(ink);
                 }
                 float diameter = SignatureHomeStyle.controlDiameter(item.getWidth(), item.getHeight(), AndroidUtilities.density);
+                final float r = diameter * Math.min(item.getScaleX(), item.getScaleY()) / 2f;
+                final float cx = menu.getX() + item.getX() + item.getWidth() / 2f;
+                final float cy = menu.getY() + item.getY() + item.getHeight() / 2f;
+                final float alpha = item.getAlpha() * menu.getAlpha();
+                if (r <= 0f || alpha <= 0f) return;
+                if (satin) satinEdge = ChatEdgeStyle.updateReflection(satinEdge);
                 if (signatureHomeGlassFactory != null && canvas.isHardwareAccelerated()
                         && BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, resourceProvider)) {
                     HomeControlGlass retained = homeControlGlass.get(item);
@@ -3366,20 +3375,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     BlurredBackgroundDrawable glass = retained.drawable;
                     int color = Theme.getColor(Theme.key_windowBackgroundWhite, resourceProvider);
                     if (retained.color != color) { retained.color = color; glass.updateColors(); }
-                    float r = diameter * Math.min(item.getScaleX(), item.getScaleY()) / 2f;
-                    float cx = menu.getX() + item.getX() + item.getWidth() / 2f;
-                    float cy = menu.getY() + item.getY() + item.getHeight() / 2f;
                     if (retained.radius != r) { retained.radius = r; glass.setRadius(r); }
                     glass.setBounds(Math.round(cx-r), Math.round(cy-r), Math.round(cx+r), Math.round(cy+r));
-                    glass.setAlpha(Math.round(255 * item.getAlpha() * menu.getAlpha()));
-                    glass.draw(canvas);
+                    glass.setAlpha(Math.round(255 * alpha));
+                    glass.drawWithChatEdge(canvas, satin ? satinEdge : null, dark);
                     return;
                 }
-                signatureHomePainter.control(canvas,
-                        menu.getX() + item.getX() + item.getWidth() / 2f,
-                        menu.getY() + item.getY() + item.getHeight() / 2f,
-                        diameter * Math.min(item.getScaleX(), item.getScaleY()), AndroidUtilities.density,
-                        dark, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS), item.getAlpha() * menu.getAlpha());
+                signatureHomePainter.control(canvas, cx, cy, 2f * r, AndroidUtilities.density,
+                        dark, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS), alpha, !satin);
+                if (satin) satinEdge.draw(canvas, cx - r, cy - r, cx + r, cy + r, r, dark, Math.round(255 * alpha));
             }
 
 
@@ -3401,10 +3405,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 if (inPreviewMode && avatarContainer != null && child != avatarContainer) {
                     return false;
                 }
-                if (!org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && isSignatureHome() && child == menu && progressToActionMode == 0
-                        && !isActionModeShowed() && getRightSlidingProgress() == 0) {
-                    drawSignatureHomeControl(canvas, searchItem);
-                    drawSignatureHomeControl(canvas, optionsItem);
+                final boolean satin = ChatEdgeStyle.isSatin();
+                if ((!BuildConfig.NATIVE_BASELINE_TEST || satin) && isSignatureHome() && child == menu && progressToActionMode == 0
+                        && !isActionModeShowed() && getRightSlidingProgress() == 0 && (!satin || searchAnimationProgress == 0)) {
+                    drawSignatureHomeControl(canvas, searchItem, satin);
+                    drawSignatureHomeControl(canvas, optionsItem, satin);
                 }
                 return super.drawChild(canvas, child, drawingTime);
             }
@@ -5224,6 +5229,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
             topPanelLayout.setPadding(dp(11), dp(21), dp(11), dp(21));
             topPanelLayout.setBlurredBackground(topPanelLayoutBackground);
+            topPanelLayout.setSatinEdgeSupported(isSignatureHome());
             topPanelLayout.setDefaultRadiusDp(communityId != 0 ? 18 : 24);
 
             fragmentLocationContextViewWrapper = new FrameLayout(context);
@@ -5579,6 +5585,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         if (fragmentSearchField != null) {
+            fragmentSearchField.setSatinEdgeSupported(isSignatureHome());
             fragmentSearchField.setupBlurredBackground(iBlur3FactoryLiquidGlass.create(fragmentSearchField, BlurredBackgroundProviderImpl.topPanel(resourceProvider)));
         }
 
@@ -7488,9 +7495,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
+    private boolean homeSatinApplied;
+
     @Override
     public void onResume() {
         super.onResume();
+        if (isSignatureHome() && homeSatinApplied != ChatEdgeStyle.isSatin()) {
+            homeSatinApplied = ChatEdgeStyle.isSatin();
+            if (actionBar != null) actionBar.invalidate();
+            if (filterTabsView != null) filterTabsView.invalidateFolderEdges();
+            if (fragmentSearchField != null) fragmentSearchField.invalidate();
+            if (topPanelLayout != null) topPanelLayout.invalidate();
+        }
         historyWarmup.request();
         refreshNativeGlassPolicy();
         updateSeparateSearchVisibility(mainTabsActivityController != null && app.flexygram.navigation.LiquidNavigationConfig.isEnabled()

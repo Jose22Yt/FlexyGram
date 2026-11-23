@@ -4,4 +4,5 @@
     <string name="FlexyChatEdgeCurrent">Current outline</string>
     <string name="FlexyChatEdgeReflection">Edge reflection</string>
     <string name="FlexyChatEdgeSubtle">Subtle edge</string>
+    <string name="FlexyChatEdgeSatin">Satin reflection</string>
 </resources>

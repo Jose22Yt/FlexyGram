@@ -191,7 +191,7 @@ def test_retired_navigation_never_loads_saved_preferences(tmp_path):
 def test_home_controls_cannot_draw_the_extra_glass_layer():
     source=(JAVA/'org/telegram/ui/DialogsActivity.java').read_text()
     assert 'boolean home = !org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && isSignatureHome()' in source
-    assert 'if (!org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST && isSignatureHome() && child == menu' in source
+    assert 'if ((!BuildConfig.NATIVE_BASELINE_TEST || satin) && isSignatureHome() && child == menu' in source
     assert 'signatureHomeGlassFactory = org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST ? null :' in source
 
 

@@ -59,6 +59,7 @@ public class RuntimeShader extends Shader {
  public RuntimeShader(String source){creations++;}
  public void setFloatUniform(String name,float value){updates++;if(name.equals("radius"))radius=value;}
  public void setFloatUniform(String name,float first,float second){updates++;width=first;height=second;}
+ public void setFloatUniform(String name,float a,float b,float c,float d){updates++;}
 }''',
         'android/graphics/Shader.java': 'package android.graphics; public class Shader { public enum TileMode { CLAMP } }',
         'android/graphics/LinearGradient.java': '''package android.graphics;
@@ -135,6 +136,15 @@ public class Probe {
   reflection.setSubtle(false);
   reflection.draw(canvas,0,20,420,100,40,true,255);
   check(canvas.bands==6006 && java.util.Arrays.equals(((LinearGradient)canvas.paint.getShader()).colors,dark.colors));
+  reflection.setSatin(true);
+  reflection.draw(canvas,0,20,420,100,40,true,255);
+  LinearGradient satin=(LinearGradient)canvas.paint.getShader();
+  check(satin.colors.length==8 && (satin.colors[0]>>>24)==0 && (satin.colors[7]>>>24)==0);
+  check(satin.stops[1]>0 && satin.stops[6]<1 && (satin.colors[5]>>>24)<(satin.colors[2]>>>24));
+  check(canvas.bands==6006);
+  android.os.Build.VERSION.SDK_INT=33;
+  reflection.drawClipped(canvas,0,20,420,100,new Path(),new float[]{12,12,20,20,30,30,40,40},true,255);
+  check(canvas.clips==3 && canvas.paint.getShader()==curved && canvas.depth==0);
  }
 }''',
     }, [JAVA/'app/flexygram/effects/ChatEdgeReflection.java'])
@@ -174,8 +184,9 @@ public class NekoConfig {
 }''',
         'app/flexygram/effects/ChatEdgeReflection.java': '''package app.flexygram.effects;
 public class ChatEdgeReflection {
- public boolean subtle;
+ public boolean subtle,satin;
  public void setSubtle(boolean value){subtle=value;}
+ public void setSatin(boolean value){satin=value;}
 }''',
         'Probe.java': '''public class Probe {
  public static void main(String[] args){app.flexygram.effects.StyleProbe.run();}
@@ -191,6 +202,9 @@ public class StyleProbe {
   ChatEdgeStyle.setSelected(ChatEdgeStyle.SUBTLE);
   check(NekoConfig.prefs.stored==2 && ChatEdgeStyle.isSubtle());
   check(ChatEdgeStyle.updateReflection(reflection)==reflection && reflection.subtle);
+  ChatEdgeStyle.setSelected(ChatEdgeStyle.SATIN);
+  check(NekoConfig.prefs.stored==3 && ChatEdgeStyle.isSatin() && !ChatEdgeStyle.isSubtle());
+  check(ChatEdgeStyle.updateReflection(reflection)==reflection && reflection.satin && !reflection.subtle);
   ChatEdgeStyle.setSelected(ChatEdgeStyle.CURRENT);
   check(NekoConfig.prefs.stored==0 && !ChatEdgeStyle.hasCustomEdge());
  }

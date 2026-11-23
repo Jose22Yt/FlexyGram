@@ -259,7 +259,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
                     boundProps.radii[0], dark, getAlpha());
         } else {
             reflection.drawClipped(canvas, bounds.left, bounds.top, bounds.right, bounds.bottom,
-                    boundProps.path, dark, getAlpha());
+                    boundProps.path, boundProps.radii, dark, getAlpha());
         }
     }
 

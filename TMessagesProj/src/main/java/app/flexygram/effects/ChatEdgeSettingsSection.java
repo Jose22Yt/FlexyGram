@@ -46,7 +46,8 @@ public final class ChatEdgeSettingsSection extends SignatureMatteSettingsActivit
         final String[] choices = {
                 LocaleController.getString(R.string.FlexyChatEdgeCurrent),
                 LocaleController.getString(R.string.FlexyChatEdgeReflection),
-                LocaleController.getString(R.string.FlexyChatEdgeSubtle)
+                LocaleController.getString(R.string.FlexyChatEdgeSubtle),
+                LocaleController.getString(R.string.FlexyChatEdgeSatin)
         };
         showDialog(AlertsCreator.createSingleChoiceDialog(getParentActivity(), choices, getActionBarTitle(),
                 ChatEdgeStyle.getSelected(), (dialog, which) -> {
@@ -68,6 +69,7 @@ public final class ChatEdgeSettingsSection extends SignatureMatteSettingsActivit
                 final int label = switch (ChatEdgeStyle.getSelected()) {
                     case ChatEdgeStyle.REFLECTION -> R.string.FlexyChatEdgeReflection;
                     case ChatEdgeStyle.SUBTLE -> R.string.FlexyChatEdgeSubtle;
+                    case ChatEdgeStyle.SATIN -> R.string.FlexyChatEdgeSatin;
                     default -> R.string.FlexyChatEdgeCurrent;
                 };
                 ((TextSettingsCell) holder.itemView).setTextAndValue(getActionBarTitle(),
