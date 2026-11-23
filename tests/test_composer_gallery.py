@@ -78,18 +78,18 @@ public class Probe {
         JAVA/'app/flexygram/composer/ComposerGeometry.java'])
 
 
-def test_composer_controls_follow_gallery_without_adding_rows_to_header(tmp_path):
+def test_composer_controls_and_header_counter_stay_in_their_own_gallery(tmp_path):
     source=(JAVA/'app/flexygram/settings/signature/ConversationStyleSettingsActivity.java').read_text()
     adapter=source[source.index('@Override protected BaseListAdapter createAdapter'):]
     probe(tmp_path, {'Probe.java': '''import java.util.*;
 public class Probe {
- static final int GALLERY=310,POSITION=311,TYPE_HEADER=4,TYPE_INFO_PRIVACY=7,TYPE_SETTINGS=2;
+ static final int GALLERY=310,POSITION=311,TYPE_HEADER=4,TYPE_INFO_PRIVACY=7,TYPE_SETTINGS=2,TYPE_CHECK=3;
  static class HeaderConfig{static void load(){}}
  static class Base{int rowCount;final List<String> keys=new ArrayList<>();
   void updateRows(){rowCount=0;keys.clear();}int addRow(){return addRow("");}
   int addRow(String key){keys.add(key);return rowCount++;}int addHeader(String key){return addRow(key);}}
  static class Page extends Base{
-  boolean header;int galleryRow,layoutHeaderRow,levelRow,positionRow,resetPositionRow,infoRow;
+  boolean header;int galleryRow,iosCounterRow,layoutHeaderRow,levelRow,positionRow,resetPositionRow,infoRow;
   __ROWS__
   class Adapter{__TYPE__}
  }
@@ -101,7 +101,9 @@ public class Probe {
   check(page.levelRow==2&&page.positionRow==3&&page.resetPositionRow==4&&page.infoRow==5);
   check(a.getItemViewType(page.positionRow)==POSITION&&a.getItemViewType(page.levelRow)==TYPE_SETTINGS);
   check(page.keys.contains("flexyComposerLevel")&&page.keys.contains("flexyComposerPosition"));
-  page.header=true;page.updateRows();check(page.rowCount==1&&a.getItemViewType(0)==GALLERY);
+  check(page.iosCounterRow==-1&&!page.keys.contains("signatureHeaderIosCounter"));
+  page.header=true;page.updateRows();check(page.rowCount==2&&a.getItemViewType(0)==GALLERY);
+  check(page.iosCounterRow==1&&a.getItemViewType(1)==TYPE_CHECK&&page.keys.get(1).equals("signatureHeaderIosCounter"));
   check(page.positionRow==-1&&page.levelRow==-1&&page.infoRow==-1);
  }
 }'''.replace('__ROWS__',method(source,'protected void updateRows()')).replace('__TYPE__',method(adapter,'public int getItemViewType('))})

@@ -49,7 +49,7 @@ public class Paint {
 }''',
         'android/graphics/Bitmap.java': 'package android.graphics; public class Bitmap {public int getWidth(){return 80;}public int getHeight(){return 80;}}',
         'android/graphics/BitmapFactory.java': 'package android.graphics; public class BitmapFactory {public static int count; public static Bitmap decodeResource(Object resources,int id){count++;return new Bitmap();}}',
-        'android/graphics/BitmapShader.java': 'package android.graphics; public class BitmapShader extends Shader {public static int count;public BitmapShader(Bitmap b,TileMode x,TileMode y){count++;}public void setLocalMatrix(Matrix m){}}',
+        'android/graphics/BitmapShader.java': 'package android.graphics; public class BitmapShader extends Shader {public static int count, updates;public BitmapShader(Bitmap b,TileMode x,TileMode y){count++;}public void setLocalMatrix(Matrix m){updates++;}}',
         'android/graphics/Matrix.java': 'package android.graphics; public class Matrix {public void setScale(float x,float y){}public void postTranslate(float x,float y){}}',
         'org/telegram/messenger/ApplicationLoader.java': 'package org.telegram.messenger; public class ApplicationLoader {public static ApplicationLoader applicationContext=new ApplicationLoader(); public Object getResources(){return null;}}',
         'org/telegram/messenger/R.java': 'package org.telegram.messenger; public class R {public static class drawable {public static final int flexy_satin_pill_dark=1,flexy_satin_circle_dark=2,flexy_satin_pill_light=3,flexy_satin_circle_light=4;}}',
@@ -151,6 +151,13 @@ public class Probe {
   reflection.setSatin(true);
   reflection.draw(canvas,0,20,420,100,40,true,255);
   check(canvas.paint.getShader() instanceof BitmapShader && canvas.bands==6006);
+  int materialUpdates=BitmapShader.updates;
+  for(int i=0;i<200;i++){
+   reflection.draw(canvas,0,20+i,420,100+i,40,true,255);
+   check(canvas.top==20+i && canvas.depth==0);
+  }
+  check(BitmapShader.updates==materialUpdates);
+
   int paths=canvas.paths;
   android.os.Build.VERSION.SDK_INT=33;
   for(int i=0;i<100;i++){
