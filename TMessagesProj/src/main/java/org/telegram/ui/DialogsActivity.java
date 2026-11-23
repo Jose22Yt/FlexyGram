@@ -289,6 +289,8 @@ import org.telegram.ui.community.CommunityUtils;
 import org.telegram.ui.community.cells.CommunityRequestsCell;
 
 import java.io.File;
+import java.util.function.Consumer;
+import java.util.function.IntUnaryOperator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -422,49 +424,58 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         boolean updating;
         private boolean firstDialogsUpdateQueued;
 
-        Runnable saveScrollPositionRunnable = () -> {
-            if (listView != null && listView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE && listView.getChildCount() > 0 && listView.getLayoutManager() != null) {
-                boolean hasHiddenArchive = dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive() && archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN;
-                float tabsTranslation = scrollYOffset;
-                LinearLayoutManager layoutManager = ((LinearLayoutManager) listView.getLayoutManager());
-                View view = null;
-                int position = -1;
-                int top = Integer.MAX_VALUE;
-                for (int i = 0; i < listView.getChildCount(); i++) {
-                    int childPosition = listView.getChildAdapterPosition(listView.getChildAt(i));
-                    View child = listView.getChildAt(i);
-                    if (childPosition != RecyclerListView.NO_POSITION && child != null && child.getTop() < top) {
-                        view = child;
-                        position = childPosition;
-                        top = child.getTop();
-                    }
-                }
-                if (view != null) {
-                    float offset = view.getTop() - listView.getPaddingTop();
-                    if (!hasStories) {
-                        //  offset += tabsTranslation;
-                    } else {
-                        tabsTranslation = 0;
-                    }
-                    if (listView.getScrollState() != RecyclerView.SCROLL_STATE_DRAGGING) {
-                        if (hasHiddenArchive && position == 0 && listView.getPaddingTop() - view.getTop() - view.getMeasuredHeight() + tabsTranslation < 0) {
-                            position = 1;
-                            offset = tabsTranslation;
-                        }
-                        layoutManager.scrollToPositionWithOffset(position, (int) offset);
-                    }
-                }
-            }
-        };
+        private final Consumer<IntUnaryOperator> listScrollAnchor = positions -> restoreScrollAnchor(positions, false);
+        private final Consumer<IntUnaryOperator> chatReturnScrollAnchor = positions -> restoreScrollAnchor(positions, true);
 
-        final Runnable updateListRunnable = () -> {
+        private void restoreScrollAnchor(IntUnaryOperator positions, boolean returningFromChat) {
+            if (listView == null || layoutManager == null || layoutManager.hasPendingScrollPosition()
+                    || listView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE) return;
+
+            final int paddingTop = listView.getPaddingTop();
+            final int viewportBottom = listView.getHeight() - listView.getPaddingBottom();
+            final boolean hiddenArchive = dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive()
+                    && archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN;
+            final float tabsOffset = hasStories ? 0 : scrollYOffset;
+            int anchorTop = Integer.MAX_VALUE;
+            int anchorPosition = RecyclerView.NO_POSITION;
+            int anchorOffset = 0;
+            for (int i = 0; i < listView.getChildCount(); i++) {
+                final View child = listView.getChildAt(i);
+                final int top = child.getTop();
+                if (top >= anchorTop || top >= viewportBottom || child.getBottom() <= paddingTop) continue;
+                final int position = listView.getChildAdapterPosition(child);
+                if (position == RecyclerView.NO_POSITION) continue;
+                int offset = top - paddingTop;
+                final boolean skipArchive = hiddenArchive && position == 0 && paddingTop - child.getBottom() + tabsOffset < 0;
+                int target;
+                if (skipArchive) {
+                    target = positions.applyAsInt(1);
+                    offset = (int) tabsOffset;
+                } else {
+                    // Let the live list expose new top items if the user was already at the start.
+                    target = !returningFromChat && position == 0 && offset >= 0 ? 0
+                            : positions.applyAsInt(position);
+                }
+                if (target == RecyclerView.NO_POSITION) continue;
+                anchorPosition = target;
+                anchorTop = top;
+                anchorOffset = offset;
+            }
+            if (anchorPosition != RecyclerView.NO_POSITION) {
+                layoutManager.scrollToPositionWithOffset(anchorPosition, anchorOffset);
+            }
+        }
+
+        final Runnable updateListRunnable = () -> updateListNow(false);
+
+        private void updateListNow(boolean returningFromChat) {
             if (!isPaused && !isFinished) {
-                dialogsAdapter.updateList(saveScrollPositionRunnable);
+                dialogsAdapter.updateList(returningFromChat ? chatReturnScrollAnchor : listScrollAnchor);
                 invalidateScrollY = true;
             }
             updating = false;
             firstDialogsUpdateQueued = false;
-        };
+        }
 
         private void cancelListUpdate() {
             AndroidUtilities.cancelRunOnUIThread(updateListRunnable);
@@ -511,18 +522,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (!dialogsItemAnimator.isRunning()) {
                 listView.setItemAnimator(null);
             }
-            updateListRunnable.run();
-            final int position = dialogsAdapter.findDialogPosition(dialogId);
-            if (position < 0) {
-                return;
-            }
+            updateListNow(true);
             for (int i = 0; i < listView.getChildCount(); i++) {
                 final View child = listView.getChildAt(i);
                 if (child instanceof DialogCell && ((DialogCell) child).getDialogId() == dialogId) {
                     ((DialogCell) child).invalidateLastDrawnState();
+                    final int position = listView.getChildAdapterPosition(child);
+                    if (position != RecyclerView.NO_POSITION) dialogsAdapter.notifyItemChanged(position);
+                    break;
                 }
             }
-            dialogsAdapter.notifyItemChanged(position);
         }
 
         public void updateList(boolean animated) {

@@ -12,7 +12,7 @@ def test_first_home_dialog_batch_promotes_the_pending_update_once(tmp_path):
     ))
     start = source.index('        final Runnable updateListRunnable =')
     callback = source[start:source.index('        private void cancelListUpdate()', start)]
-    probe(tmp_path, {'Probe.java': '''import java.util.*;
+    probe(tmp_path, {'Probe.java': '''import java.util.*;import java.util.function.*;
 public class Probe {
  static final int DIALOGS_TYPE_DEFAULT=0;
  static class AndroidUtilities {
@@ -29,7 +29,7 @@ public class Probe {
   final Controller controller;int count,updates,cancelled;
   Adapter(Controller controller){this.controller=controller;}
   int getDialogsCount(){return count;}
-  void updateList(Runnable restore){count=controller.dialogs.size();updates++;}
+  void updateList(Consumer<IntUnaryOperator> restore){count=controller.dialogs.size();updates++;}
   void cancelPendingListDiff(){cancelled++;}
  }
  static class Animator {boolean isRunning(){return false;}}
@@ -40,7 +40,7 @@ public class Probe {
  Controller controller=new Controller();Controller getMessagesController(){return controller;}
  Adapter dialogsAdapter=new Adapter(controller);
  Animator dialogsItemAnimator=new Animator();ListView listView=new ListView();
- Runnable saveScrollPositionRunnable=()->{};
+ Consumer<IntUnaryOperator> chatReturnScrollAnchor=mapping->{},listScrollAnchor=mapping->{};
  CALLBACK
  METHODS
  static void check(boolean valid){if(!valid)throw new AssertionError();}

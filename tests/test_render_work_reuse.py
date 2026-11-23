@@ -139,8 +139,9 @@ def test_unread_99_plus_does_not_relayout_but_keeps_real_count(tmp_path):
     probe(tmp_path,{
         'android/text/TextPaint.java':'package android.text;public class TextPaint{public void set(TextPaint p){}public float measureText(String s){return s.length()*10;}}',
         'android/text/Layout.java':'package android.text;public class Layout{public enum Alignment{ALIGN_CENTER}}',
-        'android/text/StaticLayout.java':'package android.text;public class StaticLayout{public static int builds;public String text;public StaticLayout(String s,TextPaint p,int w,Layout.Alignment a,float x,float y,boolean pad){builds++;text=s;}}',
+        'android/text/StaticLayout.java':'package android.text;public class StaticLayout{public static int builds;public String text;public int getWidth(){return text.length()*10;}public StaticLayout(String s,TextPaint p,int w,Layout.Alignment a,float x,float y,boolean pad){builds++;text=s;}}',
         'Probe.java':'''public class Probe{static class Theme{static android.text.TextPaint dialogs_countTextPaint=new android.text.TextPaint();}
+ static class Bar{void invalidate(){}} final Bar bar=new Bar();
  int unreadCount,changes;android.text.TextPaint unreadPaint=new android.text.TextPaint();android.text.StaticLayout unreadLayout;
  void changed(){changes++;}SETTER
  static void check(boolean b){if(!b)throw new AssertionError();}

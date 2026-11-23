@@ -108,3 +108,41 @@ public class ComposerRegression extends MeasuredView {
         assert result.returncode == 0, result.stderr
         result = subprocess.run(["java", "-cp", directory, "ComposerRegression"], capture_output=True, text=True)
         assert result.returncode == 0, result.stderr
+
+
+def test_chat_padding_compensates_once_and_drops_offset_during_fast_scroll(tmp_path):
+    from test_render_work_reuse import JAVA, probe
+
+    probe(tmp_path, {
+        'android/view/View.java': '''package android.view;public class View{
+          public interface OnLayoutChangeListener{void onLayoutChange(View v,int l,int t,int r,int b,int ol,int ot,int or,int ob);}
+        }''',
+        'androidx/recyclerview/widget/RecyclerView.java': '''package androidx.recyclerview.widget;
+        import android.view.View;
+        public class RecyclerView extends View{
+          public int top=60,bottom=20,offset,scrollCalls,listenerCalls,paddingChanges;
+          private OnLayoutChangeListener listener;
+          public int getPaddingTop(){return top;}public int getPaddingBottom(){return bottom;}
+          public int getPaddingLeft(){return 0;}public int getPaddingRight(){return 0;}
+          public boolean canScrollVertically(int direction){return direction!=0;}
+          public void setPadding(int l,int t,int r,int b){top=t;bottom=b;paddingChanges++;}
+          public void addOnLayoutChangeListener(OnLayoutChangeListener value){if(listener!=null)throw new AssertionError();listener=value;listenerCalls++;}
+          public void removeOnLayoutChangeListener(OnLayoutChangeListener value){if(listener==value)listener=null;}
+          public void scrollBy(int x,int y){offset+=y;scrollCalls++;}
+          public void layout(){if(listener!=null)listener.onLayoutChange(this,0,0,0,0,0,0,0,0);}
+        }''',
+        'org/telegram/messenger/FileLog.java': '''package org.telegram.messenger;
+        public class FileLog{public static void e(Throwable e){throw new AssertionError(e);}}''',
+        'Probe.java': '''import androidx.recyclerview.widget.RecyclerView;
+        import org.telegram.ui.Components.chat.ChatListViewPaddingsAnimator;
+        public class Probe{public static void main(String[]args){
+          RecyclerView list=new RecyclerView();ChatListViewPaddingsAnimator animator=new ChatListViewPaddingsAnimator(list);
+          animator.setPaddings(64,20.2f,true);animator.setPaddings(68,20.4f,true);
+          if(list.listenerCalls!=1||list.scrollCalls!=0)throw new AssertionError();
+          list.layout();list.layout();if(list.offset!=-8||list.scrollCalls!=1)throw new AssertionError();
+          animator.setPaddings(72,20.6f,true);animator.setPaddings(72,20.7f,false);list.layout();
+          if(list.offset!=-8||list.scrollCalls!=1||list.bottom!=21||list.paddingChanges!=3)throw new AssertionError();
+          animator.setPaddings(76,21,true);animator.setPaddings(72,21,true);list.layout();
+          if(list.scrollCalls!=1)throw new AssertionError();
+        }}'''
+    }, [JAVA/'org/telegram/ui/Components/chat/ChatListViewPaddingsAnimator.java'])

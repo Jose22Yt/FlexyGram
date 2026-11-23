@@ -57,12 +57,13 @@ def test_zero_badge_is_retained_and_unchanged_counts_do_not_remeasure(tmp_path):
  'android/graphics/Paint.java':'''package android.graphics;public class Paint{public void set(Paint p){}public float measureText(String s){return s.length()*6;}}''',
  'org/telegram/ui/ActionBar/Theme.java':'''package org.telegram.ui.ActionBar;public class Theme{public static final android.graphics.Paint dialogs_countTextPaint=new android.graphics.Paint();}''',
  'android/text/Layout.java':'''package android.text;public class Layout{public enum Alignment{ALIGN_CENTER}}''',
- 'android/text/StaticLayout.java':'''package android.text;public class StaticLayout{public static int allocations;public String text;public StaticLayout(String s,android.graphics.Paint p,int width,Layout.Alignment a,float m,float add,boolean pad){text=s;allocations++;}}''',
+ 'android/text/StaticLayout.java':'''package android.text;public class StaticLayout{public static int allocations;public String text;public int getWidth(){return text.length()*6;}public StaticLayout(String s,android.graphics.Paint p,int width,Layout.Alignment a,float m,float add,boolean pad){text=s;allocations++;}}''',
  'Probe.java':'''import org.telegram.ui.ActionBar.Theme;public class Probe{
- int unreadCount,changes;android.text.StaticLayout unreadLayout;android.graphics.Paint unreadPaint=new android.graphics.Paint();void changed(){changes++;}
+ int unreadCount,changes;static class Bar{int redraws;void invalidate(){redraws++;}}Bar bar=new Bar();android.text.StaticLayout unreadLayout;android.graphics.Paint unreadPaint=new android.graphics.Paint();void changed(){changes++;}
  SETTER
  public static void main(String[]args){Probe p=new Probe();p.setCount(0);if(!p.unreadLayout.text.equals("0"))throw new AssertionError();for(int i=0;i<10000;i++)p.setCount(0);
  if(p.changes!=1||android.text.StaticLayout.allocations!=1)throw new AssertionError("idle text rebuild");
+ p.setCount(8);if(p.changes!=1||p.bar.redraws!=1)throw new AssertionError("equal width requests a layout");
  p.setCount(101);for(int i=102;i<10000;i++)p.setCount(i);if(!p.unreadLayout.text.equals("99+")||p.changes!=2)throw new AssertionError();
  p.setCount(-1);if(!p.unreadLayout.text.equals("0"))throw new AssertionError();
  }}'''.replace('SETTER',setter)

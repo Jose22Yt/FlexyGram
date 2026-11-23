@@ -80,6 +80,8 @@ import org.telegram.ui.Stories.StoriesController;
 import org.telegram.ui.Stories.StoriesListPlaceProvider;
 import org.telegram.ui.community.CommunityUtils;
 
+import java.util.function.Consumer;
+import java.util.function.IntUnaryOperator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -518,7 +520,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
     boolean isCalculatingDiff;
     boolean updateListPending;
     private volatile long diffGeneration;
-    private Runnable pendingScrollPosition;
+    private Consumer<IntUnaryOperator> pendingScrollPosition;
     private Runnable pendingDiffWork;
 
     private static final class DialogDiffQueue {
@@ -576,7 +578,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         return true;
     }
 
-    public void updateList(Runnable saveScrollPosition) {
+    public void updateList(Consumer<IntUnaryOperator> saveScrollPosition) {
         if (isCalculatingDiff) {
             updateListPending = true;
             pendingScrollPosition = saveScrollPosition;
@@ -599,7 +601,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
             return;
         }
         final DiffItem[] after = snapshotDiffItems(newItems);
-        final Runnable restoreScroll = preservesRowPositions(before, after) ? null : saveScrollPosition;
+        final Consumer<IntUnaryOperator> restoreScroll = preservesRowPositions(before, after) ? null : saveScrollPosition;
         itemInternals = oldItems;
 
         DiffUtil.Callback callback = new DiffUtil.Callback() {
@@ -647,10 +649,13 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         }
     }
 
-    private void applyListDiff(long generation, ArrayList<ItemInternal> newItems, DiffUtil.DiffResult result, Runnable saveScrollPosition) {
+    private void applyListDiff(long generation, ArrayList<ItemInternal> newItems, DiffUtil.DiffResult result, Consumer<IntUnaryOperator> saveScrollPosition) {
         if (generation != diffGeneration) return;
         try {
-            if (saveScrollPosition != null) saveScrollPosition.run();
+            if (saveScrollPosition != null) {
+                final ArrayList<ItemInternal> oldItems = itemInternals;
+                saveScrollPosition.accept(position -> mapScrollAnchor(result, oldItems, newItems, position));
+            }
             if (generation != diffGeneration) return;
             itemInternals = newItems;
             result.dispatchUpdatesTo(this);
@@ -660,12 +665,28 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
                 pendingDiffWork = null;
                 isCalculatingDiff = false;
                 if (updateListPending) {
-                    Runnable next = pendingScrollPosition;
+                    Consumer<IntUnaryOperator> next = pendingScrollPosition;
                     updateListPending = false; pendingScrollPosition = null;
                     updateList(next);
                 }
             }
         }
+    }
+
+    private int mapScrollAnchor(DiffUtil.DiffResult result, ArrayList<ItemInternal> oldItems,
+                                ArrayList<ItemInternal> newItems, int position) {
+        if (position < 0 || position >= oldItems.size()) return RecyclerView.NO_POSITION;
+        final int mapped = result.convertOldPositionToNew(position);
+        if (mapped != RecyclerView.NO_POSITION) return mapped;
+        final ItemInternal old = oldItems.get(position);
+        if (old.dialog == null) return RecyclerView.NO_POSITION;
+        // Pinning or changing a cell style can replace an adapter row for the same chat.
+        for (int i = 0; i < newItems.size(); i++) {
+            final ItemInternal candidate = newItems.get(i);
+            if (candidate.viewType == old.viewType && candidate.dialog != null
+                    && candidate.dialog.id == old.dialog.id) return i;
+        }
+        return RecyclerView.NO_POSITION;
     }
 
     public boolean hasPendingListDiff() {

@@ -377,6 +377,15 @@ public class DownscaleScrollableNoiseSuppressor {
      * bounds, sampling, and blur so the area in between is never blurred.
      */
     public boolean captureDisjointRegions(CaptureDisjointRegions capture, int width, int height) {
+        final boolean tracing = beginCaptureTrace();
+        try {
+            return captureSharedRegions(capture, width, height);
+        } finally {
+            if (tracing) android.os.Trace.endSection();
+        }
+    }
+
+    private boolean captureSharedRegions(CaptureDisjointRegions capture, int width, int height) {
         if (rectRenderNodesCount != 2 || width <= 0 || height <= 0) return false;
         final Rect first = rectRenderNodes.get(0).position;
         final Rect second = rectRenderNodes.get(1).position;
@@ -427,6 +436,22 @@ public class DownscaleScrollableNoiseSuppressor {
     }
 
     public boolean invalidateResultRenderNodes(IBlur3Capture capture, int width, int height) {
+        final boolean tracing = beginCaptureTrace();
+        try {
+            return updateCapturedRegions(capture, width, height);
+        } finally {
+            if (tracing) android.os.Trace.endSection();
+        }
+    }
+
+    private boolean beginCaptureTrace() {
+        if (!org.telegram.messenger.BuildConfig.FLEXY_FRAME_DIAGNOSTICS
+                || android.os.Build.VERSION.SDK_INT < 29 || !android.os.Trace.isEnabled()) return false;
+        android.os.Trace.beginSection(isLiquidGlassEnabled ? "Flexy.glass.capture" : "Flexy.blur.capture");
+        return true;
+    }
+
+    private boolean updateCapturedRegions(IBlur3Capture capture, int width, int height) {
         if (width <= 0 || height <= 0) return false;
         for (int a = 0; a < rectRenderNodesCount; a++) {
             final SourcePart sourcePart = rectRenderNodes.get(a);

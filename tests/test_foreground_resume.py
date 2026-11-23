@@ -10,7 +10,7 @@ def diff_hosts():
         'androidx/annotation/VisibleForTesting.java': 'package androidx.annotation;public @interface VisibleForTesting{}',
         'androidx/annotation/IntRange.java': 'package androidx.annotation;public @interface IntRange{long from() default Long.MIN_VALUE;long to() default Long.MAX_VALUE;}',
         'androidx/recyclerview/widget/RecyclerView.java': '''package androidx.recyclerview.widget;public class RecyclerView{
- public static class Adapter{public int events,full;void check(){if(!Thread.currentThread().getName().equals("main"))throw new AssertionError("worker touched adapter");}
+ public static final int NO_POSITION=-1;public static class Adapter{public int events,full;void check(){if(!Thread.currentThread().getName().equals("main"))throw new AssertionError("worker touched adapter");}
  public void notifyDataSetChanged(){check();full++;}public void notifyItemRangeInserted(int p,int n){check();events++;}
  public void notifyItemRangeRemoved(int p,int n){check();events++;}public void notifyItemMoved(int a,int b){check();events++;}
  public void notifyItemRangeChanged(int p,int n,Object payload){check();events++;}}}''',
@@ -19,10 +19,11 @@ def diff_hosts():
     activity = (JAVA / 'org/telegram/ui/DialogsActivity.java').read_text()
     actual = '\n'.join(method(source, signature) for signature in [
         'private static final class DiffItem', 'private DiffItem[] snapshotDiffItems(', 'private static boolean preservesRowPositions(',
-        'public void updateList(Runnable saveScrollPosition)', 'private void applyListDiff(',
+        'public void updateList(Consumer<IntUnaryOperator> saveScrollPosition)', 'private void applyListDiff(',
+        'private int mapScrollAnchor(',
         'public void cancelPendingListDiff()', 'public void notifyDataSetChanged()'])
     actual += '\n' + method(activity, 'private void cancelListUpdate()')
-    host = '''import java.util.*;import androidx.recyclerview.widget.*;
+    host = '''import java.util.*;import java.util.function.*;import androidx.recyclerview.widget.*;
 class Queue{ArrayDeque<Runnable>jobs=new ArrayDeque<>();boolean accept=true;boolean postRunnable(Runnable r){if(!accept)return false;jobs.add(r);return true;}
  void cancelRunnable(Runnable r){jobs.remove(r);}
  void worker()throws Exception{Runnable r=jobs.remove();Throwable[]error={null};Thread t=new Thread(()->{try{r.run();}catch(Throwable e){error[0]=e;}},"diff-worker");t.start();t.join();if(error[0]!=null)throw new AssertionError(error[0]);}}
@@ -34,7 +35,7 @@ public class Probe extends RecyclerView.Adapter{
  static class Dialog{long id;boolean isFolder;Dialog(long n){id=n;}}static class Contact{long user_id;}static class Url{String url;}
  static class ItemInternal{int viewType,emptyType;boolean isFolder,isForumCell,pinned;Dialog dialog;Contact contact;Url recentMeUrl;
  ItemInternal(long id){dialog=new Dialog(id);}}
- ArrayList<ItemInternal>itemInternals=new ArrayList<>(),source=new ArrayList<>();boolean isCalculatingDiff,updateListPending;long diffGeneration;Runnable pendingScrollPosition;
+ ArrayList<ItemInternal>itemInternals=new ArrayList<>(),source=new ArrayList<>();boolean isCalculatingDiff,updateListPending;long diffGeneration;Consumer<IntUnaryOperator> pendingScrollPosition;
  Runnable pendingDiffWork;boolean updating,firstDialogsUpdateQueued;final Probe dialogsAdapter=this;final Runnable updateListRunnable=()->{};
  int committedRowsRefreshes;void refreshCommittedRows(){committedRowsRefreshes++;}
  void updateItemList(){itemInternals.clear();itemInternals.addAll(source);}
@@ -57,7 +58,8 @@ def run_diff(tmp_path, body):
 
 def test_large_production_lists_diff_on_worker_and_dispatch_only_on_ui(tmp_path):
     run_diff(tmp_path, '''Probe p=new Probe();p.initial(1000);var visible=p.itemInternals;p.source(20,1200);int[]saved={0};
- p.updateList(()->saved[0]++);check(p.isCalculatingDiff&&p.events==0&&p.itemInternals==visible&&saved[0]==0);
+ p.updateList(mapping->{saved[0]++;check(mapping.applyAsInt(9)==-1);check(mapping.applyAsInt(42)==22);});
+ check(p.isCalculatingDiff&&p.events==0&&p.itemInternals==visible&&saved[0]==0);
  check(DialogDiffQueue.queue.jobs.size()==1&&AndroidUtilities.ui.isEmpty());DialogDiffQueue.queue.worker();
  check(p.itemInternals==visible&&p.events==0&&saved[0]==0);AndroidUtilities.ui.remove().run();
  check(!p.isCalculatingDiff&&p.itemInternals.size()==1200&&p.itemInternals.get(0).dialog.id==20&&saved[0]==1&&p.events>0);
@@ -67,8 +69,19 @@ def test_large_production_lists_diff_on_worker_and_dispatch_only_on_ui(tmp_path)
  ''')
 
 
+def test_scroll_anchor_tracks_chat_id_across_reordering_and_pinning(tmp_path):
+    run_diff(tmp_path, """Probe p=new Probe();p.initial(8);p.source(0,8);
+ var moved=p.source.remove(6);moved.pinned=true;p.source.add(0,moved);
+ var removed=p.source.remove(3);check(removed.dialog.id==2);
+ p.updateList(mapping->{
+  check(mapping.applyAsInt(6)==0&&mapping.applyAsInt(2)==RecyclerView.NO_POSITION);
+  check(mapping.applyAsInt(7)==6&&mapping.applyAsInt(30)==RecyclerView.NO_POSITION);
+ });check(p.itemInternals.get(0).dialog.id==6);
+ """)
+
+
 def test_old_worker_cannot_replace_a_full_refresh_or_a_new_inflight_generation(tmp_path):
-    run_diff(tmp_path, '''Probe p=new Probe();p.initial(80);p.source(10,90);int[]staleSaved={0};p.updateList(()->staleSaved[0]++);
+    run_diff(tmp_path, '''Probe p=new Probe();p.initial(80);p.source(10,90);int[]staleSaved={0};p.updateList(mapping->staleSaved[0]++);
  Runnable stale=DialogDiffQueue.queue.jobs.peek();
  p.source(100,85);p.notifyDataSetChanged();check(p.full==1&&!p.isCalculatingDiff&&p.itemInternals.get(0).dialog.id==100);
  check(DialogDiffQueue.queue.jobs.isEmpty());
@@ -81,8 +94,8 @@ def test_old_worker_cannot_replace_a_full_refresh_or_a_new_inflight_generation(t
 
 def test_leaving_dialogs_cancels_queued_diffs_and_discards_results_already_on_ui(tmp_path):
     run_diff(tmp_path, '''Probe p=new Probe();p.initial(100);int[]saved={0};
- p.source(10,110);p.updateList(()->saved[0]++);
- p.source(20,120);p.updateList(()->saved[0]++);
+ p.source(10,110);p.updateList(mapping->saved[0]++);
+ p.source(20,120);p.updateList(mapping->saved[0]++);
  DialogDiffQueue.queue.worker();check(AndroidUtilities.ui.size()==1);
  p.cancelListUpdate();AndroidUtilities.ui.remove().run();
  check(p.events==0&&saved[0]==0&&p.itemInternals.get(0).dialog.id==0);
@@ -108,8 +121,8 @@ def test_first_dialog_page_publishes_without_worker_and_rejected_diff_recovers(t
 
 def test_repeated_refresh_requests_coalesce_and_keep_latest_scroll_callback(tmp_path):
     run_diff(tmp_path, '''Probe p=new Probe();p.initial(100);int[]first={0},discarded={0},latest={0};
- p.source(10,110);p.updateList(()->first[0]++);p.source(20,120);p.updateList(()->discarded[0]++);
- p.source(30,130);p.updateList(()->latest[0]++);check(DialogDiffQueue.queue.jobs.size()==1);
+ p.source(10,110);p.updateList(mapping->first[0]++);p.source(20,120);p.updateList(mapping->discarded[0]++);
+ p.source(30,130);p.updateList(mapping->latest[0]++);check(DialogDiffQueue.queue.jobs.size()==1);
  complete();check(first[0]==1&&discarded[0]==0&&latest[0]==0&&p.isCalculatingDiff&&DialogDiffQueue.queue.jobs.size()==1);
  complete();check(!p.isCalculatingDiff&&p.itemInternals.get(0).dialog.id==30&&p.itemInternals.size()==130&&latest[0]==1&&discarded[0]==0);
  ''')
@@ -128,9 +141,9 @@ def test_diff_identity_freezes_mutable_models_and_distinguishes_urls(tmp_path):
 
 def test_reentrant_full_refresh_and_failed_scroll_save_release_diff_state(tmp_path):
     run_diff(tmp_path, '''Probe p=new Probe();p.initial(80);p.source(10,90);
- p.updateList(()->{p.source(200,100);p.notifyDataSetChanged();});complete();
+ p.updateList(mapping->{p.source(200,100);p.notifyDataSetChanged();});complete();
  check(p.itemInternals.size()==100&&p.itemInternals.get(0).dialog.id==200&&!p.isCalculatingDiff&&p.events==0);
- p.source(20,110);p.updateList(()->{throw new IllegalStateException("scroll callback");});
+ p.source(20,110);p.updateList(mapping->{throw new IllegalStateException("scroll callback");});
  DialogDiffQueue.queue.worker();try{AndroidUtilities.ui.remove().run();throw new AssertionError();}catch(IllegalStateException expected){}
  check(!p.isCalculatingDiff);p.updateList(null);complete();check(p.itemInternals.size()==110&&!p.isCalculatingDiff);
  ''')
@@ -418,3 +431,45 @@ public class Probe {
   p.save();check(MessagesController.settings.values.isEmpty(),"a sent scheduled message can take unread priority");
  }
 }'''.replace('SAVE', save).replace('HELPERS', helpers)})
+
+
+def test_return_anchor_uses_visible_row_and_keeps_its_pixel_offset(tmp_path):
+    source = (JAVA/'org/telegram/ui/DialogsActivity.java').read_text()
+    restore = method(source, 'private void restoreScrollAnchor(')
+    probe(tmp_path, {'Probe.java': '''import java.util.function.IntUnaryOperator;
+
+    public class Probe {
+      static class RecyclerView {static final int NO_POSITION=-1,SCROLL_STATE_IDLE=0;}
+      static class View {
+        final int position,top,bottom;
+        View(int position,int top,int bottom){this.position=position;this.top=top;this.bottom=bottom;}
+        int getTop(){return top;}int getBottom(){return bottom;}
+      }
+      static class ListView {
+        final View[] rows={new View(7,-68,12),new View(8,12,92),new View(9,92,172),new View(10,172,252)};
+        int state;
+        int getScrollState(){return state;}int getChildCount(){return rows.length;}View getChildAt(int i){return rows[i];}
+        int getPaddingTop(){return 24;}int getPaddingBottom(){return 24;}int getHeight(){return 200;}
+        int getChildAdapterPosition(View child){return child.position;}
+      }
+      static class Manager {
+        int calls,position,offset;boolean pending;
+        boolean hasPendingScrollPosition(){return pending;}
+        void scrollToPositionWithOffset(int position,int offset){this.position=position;this.offset=offset;calls++;}
+      }
+      static final int DIALOGS_TYPE_DEFAULT=0,ARCHIVE_ITEM_STATE_HIDDEN=0;
+      final ListView listView=new ListView();final Manager layoutManager=new Manager();
+      int dialogsType,archivePullViewState;boolean hasStories;float scrollYOffset;
+      boolean hasHiddenArchive(){return false;}
+      RESTORE
+      public static void main(String[]args){
+        Probe p=new Probe();
+        p.restoreScrollAnchor(position -> position==8 ? 12 : 11,true);
+        if(p.layoutManager.position!=12 || p.layoutManager.offset!=-12)throw new AssertionError();
+        p.restoreScrollAnchor(position -> position==8 ? RecyclerView.NO_POSITION : 11,true);
+        if(p.layoutManager.position!=11 || p.layoutManager.offset!=68)throw new AssertionError();
+        p.layoutManager.pending=true;p.restoreScrollAnchor(position -> 0,true);
+        p.layoutManager.pending=false;p.listView.state=1;p.restoreScrollAnchor(position -> 0,true);
+        if(p.layoutManager.calls!=2)throw new AssertionError();
+      }
+    }'''.replace('RESTORE', restore)})

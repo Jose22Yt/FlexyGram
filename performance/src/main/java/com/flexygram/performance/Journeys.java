@@ -32,6 +32,23 @@ final class Journeys {
         Assert.assertNotNull("Synthetic fixture missing", chat);
         return chat;
     }
+    static int fixtureChatTop() {
+        return fixtureChatRow().getVisibleBounds().top;
+    }
+
+    static void returnToChatList(int initialTop) {
+        android.os.Trace.beginSection("Flexy.benchmark.return_to_chat_list");
+        try {
+            back();
+            int tolerance = Math.round(2 * InstrumentationRegistry.getInstrumentation().getTargetContext()
+                    .getResources().getDisplayMetrics().density);
+            Assert.assertEquals("The synthetic chat moved after returning to the list",
+                    initialTop, fixtureChatTop(), Math.max(1, tolerance));
+        } finally {
+            android.os.Trace.endSection();
+        }
+    }
+
     static void openChat(){
         fixtureChatRow().click();
         Assert.assertTrue("Composer not visible",device.wait(Until.hasObject(By.pkg(PACKAGE).clazz(java.util.regex.Pattern.compile(".*EditText.*"))),TIMEOUT));

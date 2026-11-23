@@ -85,7 +85,7 @@ def test_blur_tiles_cover_negative_coordinates_and_do_not_expand_aligned_edges(t
 
 def test_blur_capture_reuses_static_content_but_refreshes_moved_regions_and_empty_composite(tmp_path):
     source = (JAVA/'org/telegram/ui/Components/blur3/DownscaleScrollableNoiseSuppressor.java').read_text()
-    capture = method(source, 'public boolean invalidateResultRenderNodes(IBlur3Capture capture,')
+    capture = method(source, 'private boolean updateCapturedRegions(')
     probe(tmp_path, {'Probe.java': '''import java.util.*;public class Probe {
  static class Rect {int left,top,right=100,bottom=60;}
  static class RectF {void set(Rect r){}}
@@ -101,10 +101,10 @@ def test_blur_capture_reuses_static_content_but_refreshes_moved_regions_and_empt
  CAPTURE
  public static void main(String[]args){Probe p=new Probe();p.rectRenderNodes.add(new SourcePart());int[] draws={0};
  IBlur3Capture c=new IBlur3Capture(){public void capture(Canvas c,RectF r){draws[0]++;}public void captureCalculateHash(Hash h,RectF r){h.add(7);}};
- for(int i=0;i<10000;i++)p.invalidateResultRenderNodes(c,100,60);
+ for(int i=0;i<10000;i++)p.updateCapturedRegions(c,100,60);
  if(draws[0]!=1)throw new AssertionError("static recapture");
- p.rectRenderNodes.get(0).position.top=16;p.invalidateResultRenderNodes(c,100,60);if(draws[0]!=2)throw new AssertionError("stale origin");
- int count=p.composites;p.rectRenderNodesCount=0;p.invalidateResultRenderNodes(c,200,80);if(p.composites!=count+1)throw new AssertionError("stale composite");
+ p.rectRenderNodes.get(0).position.top=16;p.updateCapturedRegions(c,100,60);if(draws[0]!=2)throw new AssertionError("stale origin");
+ int count=p.composites;p.rectRenderNodesCount=0;p.updateCapturedRegions(c,200,80);if(p.composites!=count+1)throw new AssertionError("stale composite");
  }}'''.replace('CAPTURE', capture)})
 
 

@@ -90,8 +90,8 @@ def test_home_blur_reuses_clean_content_and_refreshes_scroll_animation_search_an
     relative=method(utils,'public static void captureRelativeParent(IBlur3Capture capture, Canvas canvas, RectF position, View view, ViewGroup parent, int alpha)')
     hash_relative=method(utils,'public static void calculateHashRelativeParent(')
     suppress=(JAVA/'org/telegram/ui/Components/blur3/DownscaleScrollableNoiseSuppressor.java').read_text()
-    update=method(suppress,'public boolean invalidateResultRenderNodes(IBlur3Capture capture, int width, int height)')
-    shared=method(suppress,'public boolean captureDisjointRegions(CaptureDisjointRegions capture, int width, int height)')
+    update=method(suppress,'private boolean updateCapturedRegions(').replace('private boolean updateCapturedRegions','public boolean invalidateResultRenderNodes')
+    shared=method(suppress,'private boolean captureSharedRegions(').replace('private boolean captureSharedRegions','public boolean captureDisjointRegions')
     probe(tmp_path, {'Probe.java': '''import java.util.*;
 public class Probe {
  static class PointF {float x,y;}

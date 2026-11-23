@@ -106,6 +106,7 @@ public class BadgeRegression {
         int unreadCount;StaticLayout unreadLayout;Object provider;Geometry geometry=new Geometry();
         Paint badgePaint=new Paint(1);TextPaint unreadPaint=new TextPaint(1);RectF badgeRect=new RectF();
         void changed(){}
+        AppCompatImageView bar=new AppCompatImageView(new Context());
         NATIVE
     }
     static void require(boolean ok,String message){if(!ok)throw new AssertionError(message);}

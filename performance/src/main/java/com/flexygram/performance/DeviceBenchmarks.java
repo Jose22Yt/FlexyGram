@@ -10,6 +10,7 @@ import java.util.*;
 public class DeviceBenchmarks {
     @Rule public final MacrobenchmarkRule benchmark=new MacrobenchmarkRule();
     private boolean scrollFixtureChecked;
+    private int returnAnchorTop;
     private CompilationMode compilation(){
         String mode=androidx.test.platform.app.InstrumentationRegistry.getArguments().getString("flexy.compilation","baseline");
         if(mode.equals("none"))return new CompilationMode.None();
@@ -29,6 +30,20 @@ public class DeviceBenchmarks {
         benchmark.measureRepeated(Journeys.PACKAGE,Arrays.asList(new FrameTimingMetric()),compilation(),StartupMode.WARM,20,
                 scope->{Journeys.launch(scope);return Unit.INSTANCE;},scope->{Journeys.openChat();Journeys.keyboard();Journeys.back();return Unit.INSTANCE;});
     }
+    @Test public void keyboardInOpenChat() {
+        benchmark.measureRepeated(Journeys.PACKAGE, Arrays.asList(new FrameTimingMetric()), compilation(),
+                StartupMode.WARM, 20,
+                scope -> {
+                    Journeys.launch(scope);
+                    Journeys.openChat();
+                    return Unit.INSTANCE;
+                },
+                scope -> {
+                    Journeys.keyboard();
+                    return Unit.INSTANCE;
+                });
+    }
+
     @Test public void homeScroll() {
         benchmark.measureRepeated(Journeys.PACKAGE, Arrays.asList(new FrameTimingMetric()), compilation(), StartupMode.WARM, 20,
                 scope -> {
@@ -50,6 +65,23 @@ public class DeviceBenchmarks {
                 scope -> { Journeys.launch(scope); return Unit.INSTANCE; },
                 scope -> { Journeys.openChatToVisibleHistory(message); return Unit.INSTANCE; });
     }
+    @Test public void closeChatToSameListPosition() {
+        benchmark.measureRepeated(Journeys.PACKAGE, Arrays.asList(new FrameTimingMetric(),
+                        new TraceSectionMetric("Flexy.benchmark.return_to_chat_list",
+                                TraceSectionMetric.Mode.First.INSTANCE, "closeChatToSameListPosition", false)),
+                compilation(), StartupMode.WARM, 20,
+                scope -> {
+                    Journeys.launch(scope);
+                    returnAnchorTop = Journeys.fixtureChatTop();
+                    Journeys.openChat();
+                    return Unit.INSTANCE;
+                },
+                scope -> {
+                    Journeys.returnToChatList(returnAnchorTop);
+                    return Unit.INSTANCE;
+                });
+    }
+
     @Test public void messageScroll(){
         String message = Journeys.fixtureMessage();
         benchmark.measureRepeated(Journeys.PACKAGE, Arrays.asList(new FrameTimingMetric()), compilation(), StartupMode.WARM, 20,

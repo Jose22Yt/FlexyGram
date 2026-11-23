@@ -6,14 +6,14 @@ from test_foreground_resume import run_diff
 
 def test_unchanged_rows_do_not_restore_scroll_but_native_spacer_diff_still_runs(tmp_path):
     run_diff(tmp_path, '''Probe p=new Probe();p.initial(20);int[] restored={0};
- for(int i=0;i<10000;i++){p.source(0,20);p.updateList(()->restored[0]++);}
+ for(int i=0;i<10000;i++){p.source(0,20);p.updateList(mapping->restored[0]++);}
  check(restored[0]==0&&p.events==0&&!p.isCalculatingDiff);
  var footer=new ItemInternal(0);footer.viewType=VIEW_TYPE_LAST_EMPTY;p.itemInternals.add(footer);
  p.source(0,20);var nextFooter=new ItemInternal(0);nextFooter.viewType=VIEW_TYPE_LAST_EMPTY;p.source.add(nextFooter);
- p.updateList(()->restored[0]++);check(restored[0]==0&&p.events>0);
- p.source(1,20);p.updateList(()->restored[0]++);check(restored[0]==1);
- p.initial(100);p.source(0,100);p.updateList(()->restored[0]++);complete();check(restored[0]==1);
- p.source(1,100);p.updateList(()->restored[0]++);complete();check(restored[0]==2);
+ p.updateList(mapping->restored[0]++);check(restored[0]==0&&p.events>0);
+ p.source(1,20);p.updateList(mapping->restored[0]++);check(restored[0]==1);
+ p.initial(100);p.source(0,100);p.updateList(mapping->restored[0]++);complete();check(restored[0]==1);
+ p.source(1,100);p.updateList(mapping->restored[0]++);complete();check(restored[0]==2);
  ''')
 
 

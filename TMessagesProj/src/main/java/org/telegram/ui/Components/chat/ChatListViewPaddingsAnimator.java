@@ -1,72 +1,53 @@
 package org.telegram.ui.Components.chat;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
+import android.view.View;
+
 import androidx.recyclerview.widget.RecyclerView;
 
-
-
-import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
 
 public class ChatListViewPaddingsAnimator {
     private final RecyclerView recyclerView;
+    private int pendingTopOffset;
+
+    private final View.OnLayoutChangeListener applyTopOffset = (view, left, top, right, bottom,
+            oldLeft, oldTop, oldRight, oldBottom) -> applyPendingOffset();
 
     public ChatListViewPaddingsAnimator(RecyclerView recyclerView) {
         this.recyclerView = recyclerView;
     }
 
-    private int currentAdditionalHeight;
-    public void setPaddings(
-        int paddingTopTarget,
-        float paddingBottomAnimated, boolean allowScrollCompensation
-    ) {
-        final int additionalHeight = 0; //(int) Math.ceil(Math.abs(translationY));
-
-        if (additionalHeight == 0 && currentAdditionalHeight != 0) {
-            currentAdditionalHeight = 0;
-            recyclerView.requestLayout();
-        } else if (additionalHeight > currentAdditionalHeight) {
-            currentAdditionalHeight = additionalHeight;
-            recyclerView.requestLayout();
+    public void setPaddings(int paddingTop, float paddingBottomAnimated, boolean allowScrollCompensation) {
+        final int paddingBottom = Math.round(paddingBottomAnimated);
+        final int dy = recyclerView.getPaddingTop() - paddingTop;
+        if (!allowScrollCompensation && pendingTopOffset != 0) {
+            pendingTopOffset = 0;
+            recyclerView.removeOnLayoutChangeListener(applyTopOffset);
         }
+        if (dy == 0 && recyclerView.getPaddingBottom() == paddingBottom) return;
 
-        final int paddingTop = paddingTopTarget; // + currentAdditionalHeight;
-        final int paddingBottom = (int) paddingBottomAnimated; // paddingBottomTarget;
+        if (allowScrollCompensation && dy != 0
+                && recyclerView.canScrollVertically(dy < 0 ? 1 : -1)) {
+            if (pendingTopOffset == 0) recyclerView.addOnLayoutChangeListener(applyTopOffset);
+            pendingTopOffset += dy;
+            if (pendingTopOffset == 0) recyclerView.removeOnLayoutChangeListener(applyTopOffset);
+        }
+        recyclerView.setPadding(recyclerView.getPaddingLeft(), paddingTop, recyclerView.getPaddingRight(), paddingBottom);
+    }
 
-        final int paddingTopOld = recyclerView.getPaddingTop();
-        final int paddingBottomOld = recyclerView.getPaddingBottom();
-
-        //recyclerView.setTranslationY(translationY);
-        if (paddingTopOld != paddingTop || paddingBottomOld != paddingBottom) {
-            final int dy = paddingTopOld - paddingTop;
-
-
-            if (allowScrollCompensation && dy != 0) {
-                final boolean canScrollDown = recyclerView.canScrollVertically(1);
-                final boolean canScrollUp = recyclerView.canScrollVertically(-1);
-                if (dy < 0 && !canScrollDown || dy > 0 && !canScrollUp) {
-
-                } else {
-                    AndroidUtilities.doOnLayout(recyclerView, () -> {
-                        try {
-                            recyclerView.scrollBy(0, dy);
-                        } catch (Throwable t) {
-                            FileLog.e(t);
-                        }
-                    });
-                }
-            }
-
-            recyclerView.setPadding(
-                    recyclerView.getPaddingLeft(),
-                    paddingTop,
-                    recyclerView.getPaddingRight(),
-                    paddingBottom
-            );
+    private void applyPendingOffset() {
+        recyclerView.removeOnLayoutChangeListener(applyTopOffset);
+        final int dy = pendingTopOffset;
+        pendingTopOffset = 0;
+        if (dy == 0) return;
+        try {
+            recyclerView.scrollBy(0, dy);
+        } catch (RuntimeException error) {
+            FileLog.e(error);
         }
     }
 
     public int getCurrentAdditionalHeight() {
-        return currentAdditionalHeight;
+        return 0;
     }
 }

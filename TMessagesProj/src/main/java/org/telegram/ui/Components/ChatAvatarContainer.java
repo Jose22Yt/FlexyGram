@@ -864,6 +864,8 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     private android.widget.ImageView signatureMore, signatureCall;
     private android.graphics.Path signaturePhotoClip;
     private boolean signatureMeasured;
+    private int signatureActionTint;
+    private boolean signatureActionTintReady;
     private boolean measuredFloatingPhoto;
 
     private void refreshFloatingPhotoLayout() {
@@ -958,7 +960,12 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             signatureMore.measure(MeasureSpec.makeMeasureSpec(Math.round(g.more.width()), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(Math.round(g.more.height()), MeasureSpec.EXACTLY));
             signatureCall.measure(MeasureSpec.makeMeasureSpec(Math.round(g.call.width()), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(Math.round(g.call.height()), MeasureSpec.EXACTLY));
             int tint = getThemedColor(Theme.key_actionBarDefaultTitle);
-            signatureMore.setColorFilter(tint); signatureCall.setColorFilter(tint);
+            if (!signatureActionTintReady || signatureActionTint != tint) {
+                signatureActionTintReady = true;
+                signatureActionTint = tint;
+                signatureMore.setColorFilter(tint);
+                signatureCall.setColorFilter(tint);
+            }
         }
         if (timeItem != null) timeItem.measure(MeasureSpec.makeMeasureSpec(dp(34), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(34), MeasureSpec.EXACTLY));
         if (communityItem != null) communityItem.measure(MeasureSpec.makeMeasureSpec(dp(14), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(14), MeasureSpec.EXACTLY));

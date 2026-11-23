@@ -65,8 +65,10 @@ public final class SignatureChatHeader {
             String str = value > 99 ? "99+" : Integer.toString(value);
             unreadPaint.set(Theme.dialogs_countTextPaint);
             int countWidth = (int) Math.ceil(unreadPaint.measureText(str));
+            int previousWidth = unreadLayout == null ? -1 : unreadLayout.getWidth();
             unreadLayout = new android.text.StaticLayout(str, unreadPaint, countWidth, android.text.Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
-            changed();
+            if (previousWidth == countWidth) bar.invalidate();
+            else changed();
         }
     }
     public void changed() { avatar.requestLayout(); bar.requestLayout(); bar.invalidate(); }

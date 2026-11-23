@@ -256,21 +256,13 @@ public class ChatInputViewsContainer extends FrameLayout {
         }
     }
 
-    private final Path underKeyboardPath = new Path();
-
     private int currentBlurredHeight;
-    private void checkBlurredHeight(boolean force) {
+
+    private void updateInputGeometry() {
         checkViewsPositions();
-
         final int blurredHeight = inputBubbleHeightRound + dp(INPUT_BUBBLE_BOTTOM) + Math.round(maxBottomInset);
-        if (currentBlurredHeight != blurredHeight || force) {
+        if (currentBlurredHeight != blurredHeight) {
             currentBlurredHeight = blurredHeight;
-
-            final int r = dp(INPUT_KEYBOARD_RADIUS);
-            tmpRectF.set(0, getMeasuredHeight() - imeBottomInset, getMeasuredWidth(), getMeasuredHeight());
-            underKeyboardPath.rewind();
-            underKeyboardPath.addRoundRect(tmpRectF, new float[] {r, r, r, r, 0, 0, 0, 0}, Path.Direction.CW);
-            underKeyboardPath.close();
             invalidate();
         }
     }
@@ -281,16 +273,24 @@ public class ChatInputViewsContainer extends FrameLayout {
 
     public void checkInsets() {
         maxBottomInset = windowInsetsProvider.getAnimatedMaxBottomInset();
-        imeBottomInset = windowInsetsProvider.getAnimatedImeBottomInset();
-
-        needDrawInAppKeyboard = windowInsetsProvider.inAppViewIsVisible();
+        final float nextImeInset = windowInsetsProvider.getAnimatedImeBottomInset();
+        final boolean showInAppKeyboard = windowInsetsProvider.inAppViewIsVisible();
+        final boolean keyboardSurfaceChanged = needDrawInAppKeyboard != showInAppKeyboard
+                || showInAppKeyboard && (int) imeBottomInset != (int) nextImeInset;
+        if (needDrawInAppKeyboard && !showInAppKeyboard && underKeyboardBackgroundDrawable != null) {
+            underKeyboardBackgroundDrawable.setBounds(0, 0, 0, 0);
+        }
+        imeBottomInset = nextImeInset;
+        needDrawInAppKeyboard = showInAppKeyboard;
+        // During an IME/emoji handoff the composer inset can stay fixed while the panel moves.
+        if (keyboardSurfaceChanged) invalidate();
 
         if ((inAppKeyboardBubbleContainer.getVisibility() == VISIBLE) != needDrawInAppKeyboard) {
             inAppKeyboardBubbleContainer.setVisibility(needDrawInAppKeyboard ? VISIBLE : GONE);
         }
 
         checkInAppKeyboardViewHeight();
-        checkBlurredHeight(false);
+        updateInputGeometry();
         checkInAppKeyboardChild();
 
         if (underKeyboardBackgroundDrawable != null) {
@@ -319,7 +319,7 @@ public class ChatInputViewsContainer extends FrameLayout {
 
     private void checkInAppKeyboardChild() {
         final int navbarHeight = windowInsetsProvider.getCurrentNavigationBarInset();
-        final float keyboardHeight = windowInsetsProvider.getAnimatedImeBottomInset();
+        final float keyboardHeight = imeBottomInset;
 
         for (int a = 0, N = inAppKeyboardBubbleContainer.getChildCount(); a < N; a++) {
             final View child = inAppKeyboardBubbleContainer.getChildAt(a);
@@ -343,10 +343,11 @@ public class ChatInputViewsContainer extends FrameLayout {
     public void setInputBubbleHeight(float height) {
         inputBubbleHeight = height;
         inputBubbleHeightRound = Math.round(inputBubbleHeight);
-        checkBlurredHeight(false);
+        updateInputGeometry();
     }
 
     public void setInputBubbleOffsets(float left, float right) {
+        if (inputBubbleOffsetLeft == left && inputBubbleOffsetRight == right) return;
         inputBubbleOffsetLeft = left;
         inputBubbleOffsetRight = right;
         invalidate();
@@ -367,10 +368,8 @@ public class ChatInputViewsContainer extends FrameLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        checkBlurredHeight(true);
+        updateInputGeometry();
         checkDrawableBounds();
-        checkViewsPositions();
-        checkInAppKeyboardChild();
     }
 
     /* Render */
@@ -393,12 +392,11 @@ public class ChatInputViewsContainer extends FrameLayout {
             }
         }
         try {
-            underKeyboardBackgroundDrawable.setBounds(
-                0,
-                getMeasuredHeight() - (int) imeBottomInset,
-                getMeasuredWidth(),
-                Math.max(getMeasuredHeight(), getMeasuredHeight() - (int) imeBottomInset + dp(INPUT_KEYBOARD_RADIUS * 2))
-            );
+            if (needDrawInAppKeyboard && underKeyboardBackgroundDrawable != null) {
+                final int panelTop = getMeasuredHeight() - (int) imeBottomInset;
+                underKeyboardBackgroundDrawable.setBounds(0, panelTop, getMeasuredWidth(),
+                        Math.max(getMeasuredHeight(), panelTop + dp(INPUT_KEYBOARD_RADIUS * 2)));
+            }
 
             flexyNativeGlassDrawn = false;
             flexyVoiceDrawn = false;
@@ -437,7 +435,7 @@ public class ChatInputViewsContainer extends FrameLayout {
                 flexyComposer.setFlexyVoiceBackdropDrawn(flexyVoiceDrawn);
                 flexyComposer.setFlexySendBackdropDrawn(flexySendDrawn);
             }
-            if (needDrawInAppKeyboard) {
+            if (needDrawInAppKeyboard && underKeyboardBackgroundDrawable != null) {
                 underKeyboardBackgroundDrawable.draw(canvas);
             }
 
@@ -646,7 +644,7 @@ public class ChatInputViewsContainer extends FrameLayout {
 
     @Override
     protected boolean drawChild(@NonNull Canvas canvas, View child, long drawingTime) {
-        final boolean needClip = child == inAppKeyboardBubbleContainer;
+        final boolean needClip = child == inAppKeyboardBubbleContainer && underKeyboardBackgroundDrawable != null;
         if (needClip) {
             canvas.save();
             canvas.clipPath(underKeyboardBackgroundDrawable.getPath());
@@ -680,6 +678,7 @@ public class ChatInputViewsContainer extends FrameLayout {
 
     private float bubbleInputTranlationY;
     public void setInputBubbleTranslationY(float translationY) {
+        if (bubbleInputTranlationY == translationY) return;
         this.bubbleInputTranlationY = translationY;
         invalidate();
     }
@@ -718,7 +717,8 @@ public class ChatInputViewsContainer extends FrameLayout {
             final int y = (int) event.getY();
 
             captured = blurredBackgroundDrawable != null && blurredBackgroundDrawable.getAlpha() == 255 && blurredBackgroundDrawable.getBounds().contains(x, y)
-                || underKeyboardBackgroundDrawable != null && underKeyboardBackgroundDrawable.getBounds().contains(x, y);
+                || needDrawInAppKeyboard && underKeyboardBackgroundDrawable != null
+                    && underKeyboardBackgroundDrawable.getBounds().contains(x, y);
 
         }
         if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
