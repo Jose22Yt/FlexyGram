@@ -74,7 +74,7 @@ import static org.telegram.messenger.AndroidUtilities.dp;import static org.teleg
 import android.content.Context;import android.graphics.Canvas;import android.view.*;import android.widget.*;import org.telegram.messenger.*;import org.telegram.ui.ActionBar.Theme;import org.telegram.ui.ActionBar.ActionBar;
 public class ChatAvatarContainer extends FrameLayout{
  private app.flexygram.header.SignatureChatHeader signatureHeader;private ImageView signatureMore,signatureCall;
- private app.flexygram.header.fusion.SignatureFusionAvatarMask signaturePhotoMask;private android.graphics.Path signaturePhotoClip;
+ private android.graphics.Path signaturePhotoClip;private boolean measuredFloatingPhoto;
  public int profiles,menus,calls;public boolean callable,searchingAllowed,glassMode,pressed;
  static class Bounce {void setPressed(boolean p){}float getScale(float n){return 1;}}private final Bounce bounce=new Bounce();
  private final Runnable onLongClick=()->{};private boolean canSearch(){return searchingAllowed;}private boolean isCentered(){return false;}private void openProfile(boolean avatar){profiles++;}

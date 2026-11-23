@@ -79,12 +79,6 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
                 text.setTextSize(subtitlePx); scratchPaint.set(text); displayStatus=android.text.TextUtils.ellipsize(previewFloating()?LocaleController.getString(R.string.FlexyHeaderFloatingPreviewStatus):status,scratchPaint,g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
                 fusionStatusX=g.text.centerX();
                 fusion.clip.rewind();fusion.clip.addRoundRect(g.center.left,g.center.top,g.center.right,g.center.bottom,g.center.height()/2,g.center.height()/2,android.graphics.Path.Direction.CW);
-                // Preview contact has initials only: keep the initial in the small native left slot.
-                float placeholderW = Math.min(g.portrait.width(), AndroidUtilities.dp(73));
-                float previewStart = g.rtl ? g.portrait.width()-placeholderW*.45f : placeholderW*.55f;
-                float previewEnd = g.rtl ? g.portrait.width()-placeholderW : placeholderW;
-                if(previewFloating())fusion.mask.prepare(g.fadeStartX,g.fadeEndX,g.fadeSafeStop,g.rtl);
-                else if (!previewPortrait()) fusion.mask.prepare(previewStart,previewEnd,.9f,g.rtl);
                 return;
             }
         }
@@ -173,14 +167,16 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         int outer=canvas.save();canvas.translate(0,fusionTop);
         fusion.surface.drawBackdrop(canvas,g,fill,edge,edge,d);
         int clip=canvas.save();canvas.clipPath(fusion.clip);
-        int photoLayer=previewFloating()?fusion.mask.begin(canvas,g.portrait.left,g.portrait.top,g.portrait.right,g.portrait.bottom):0;
+        float diameter = previewFloating() ? Math.min(AndroidUtilities.dp(38), g.portrait.height()) : g.portrait.height();
+        float left = previewFloating() && g.rtl ? g.portrait.right - diameter : g.portrait.left;
+        float photoTop = g.portrait.centerY() - diameter * .5f;
+        canvas.translate(left, photoTop);
+        int photoLayer = previewFloating() ? fusion.mask.begin(canvas, 0, 0, diameter, diameter) : 0;
         avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));
-        if(previewFloating())canvas.drawRect(g.portrait.left,g.portrait.top,g.portrait.right,g.portrait.bottom,avatar);
-        else canvas.drawCircle(g.portrait.centerX(),g.portrait.centerY(),g.portrait.height()*.5f,avatar);
+        canvas.drawCircle(diameter * .5f, diameter * .5f, diameter * .5f, avatar);
         text.setTextSize(AndroidUtilities.dp(20));text.setColor(0xffffffff);
-        float initialX=previewFloating()?(g.rtl?g.portrait.right-g.portrait.height()/2:g.portrait.left+g.portrait.height()/2):g.portrait.centerX();
-        canvas.drawText("A",initialX,g.portrait.centerY()+AndroidUtilities.dp(7),text);
-        if(previewFloating())fusion.mask.finish(canvas,photoLayer,g.portrait.right,g.portrait.bottom,g.fadeStartX,g.fadeEndX,g.fadeSafeStop,g.rtl);
+        canvas.drawText("A",diameter * .5f,diameter * .5f+AndroidUtilities.dp(7),text);
+        if (previewFloating()) fusion.mask.finishFloating(canvas, photoLayer, diameter, diameter, g.rtl);
         canvas.restoreToCount(clip);
         text.setColor(color);text.setTextSize(titlePx);float th=text.descent()-text.ascent(),ta=text.ascent();text.setTextSize(subtitlePx);float sh=text.descent()-text.ascent();
         float top=g.text.centerY()-(th+sh+AndroidUtilities.dp(2))/2;

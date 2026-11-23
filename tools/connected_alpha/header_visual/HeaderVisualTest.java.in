@@ -163,7 +163,7 @@ public class HeaderVisualTest {
   try(var out=new java.io.FileOutputStream(new java.io.File(System.getProperty("probe.root"),"signature-header-portrait-synthetic.png"))){assertTrue(evidence.compress(Bitmap.CompressFormat.PNG,100,out));}evidence.recycle();
  }
  @Test public void defaultAdaptiveAllocatesNoFusionControllerOrControls()throws Exception{
-  HeaderConfig.style(0);ActionBar bar=new ActionBar(context(1));ChatAvatarContainer avatar=new ChatAvatarContainer(bar.getContext());bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,401);assertNull(field(header,"fusion"));assertNull(field(avatar,"signatureCall"));assertNull(field(avatar,"signaturePhotoMask"));
+  HeaderConfig.style(0);ActionBar bar=new ActionBar(context(1));ChatAvatarContainer avatar=new ChatAvatarContainer(bar.getContext());bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,401);assertNull(field(header,"fusion"));assertNull(field(avatar,"signatureCall"));assertNull(field(avatar,"signaturePhotoClip"));
  }
 
  @Test public void liveFusionCompositesOnlyExistingPortraitAndPreviewDrawsTheSameGeometry()throws Exception{

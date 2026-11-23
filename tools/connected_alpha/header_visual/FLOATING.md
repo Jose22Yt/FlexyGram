@@ -5,11 +5,10 @@ Style ID 4 is preserved; no preference migration or additional setting is needed
 - The center card is 48dp high, with the existing width and 48dp native action targets.
 - Name (15sp) and native subtitle (10sp) share the entire card center axis.
 - Both lines are inside the card. The detached status surface/reveal is removed.
-- The photo fade crosses behind both labels, independently of their measured width.
-- The native ImageReceiver draws a fitted foreground and a fading continuation of the
-  same picture. No second receiver, bitmap capture, image download or blur pipeline.
+- The native ImageReceiver draws one fitted portrait. Its inward edge fades across the final 65% of the visible image width.
+- Missing and pending photos use a compact circular placeholder with the same directional fade.
 - Rendering restores receiver coordinates/aspect-fit state, supports RTL and uses
-  the existing full-card alpha mask. Large fonts/narrow layouts retain Adaptive fallback.
+  the portrait-sized alpha mask. Large fonts/narrow layouts retain Adaptive fallback.
 - The settings preview shares the same geometry/font sizes; its avatar remains synthetic.
 
 Run isolated Android layout and raster tests (not an APK build):

@@ -49,14 +49,21 @@ public class FloatingHeaderTest {
    Bitmap output=Bitmap.createBitmap(width,preview.getHeight(),Bitmap.Config.ARGB_8888);preview.draw(new Canvas(output));output.recycle();
   }
  }
- @Test public void fadeLeavesPhotoBehindCardCenterInBothThemesAndDirections(){
-  var mask=new app.flexygram.header.fusion.SignatureFusionAvatarMask();
-  for(boolean rtl:new boolean[]{false,true})for(int surface:new int[]{Color.WHITE,Color.BLACK}){
-   Bitmap result=Bitmap.createBitmap(200,48,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(result);canvas.drawColor(surface);
-   int layer=mask.begin(canvas,0,0,164,48);Paint photo=new Paint();photo.setColor(Color.RED);canvas.drawRect(0,0,164,48,photo);
-   mask.finish(canvas,layer,164,48,164*.15f,164*.85f,.86f,rtl);
-   int center=rtl?64:100;assertNotEquals("photo continues behind centered labels",surface,result.getPixel(center,24));
-   assertEquals("fully transparent inner edge",surface,result.getPixel(rtl?0:163,24));result.recycle();
+ @Test public void singlePortraitFadesAcrossItsOwnWidthOnBothSides(){
+  for(boolean rtl:new boolean[]{false,true})for(int surface:new int[]{Color.WHITE,Color.BLACK})
+  for(int placeholder:new int[]{0,38}){
+   var receiver=new ImageReceiver();receiver.bitmap=Bitmap.createBitmap(120,120,Bitmap.Config.ARGB_8888);
+   receiver.bitmap.eraseColor(Color.RED);
+   Bitmap result=Bitmap.createBitmap(180,48,Bitmap.Config.ARGB_8888);
+   Canvas canvas=new Canvas(result);canvas.drawColor(surface);
+   new app.flexygram.header.fusion.SignatureFloatingPhoto().draw(canvas,receiver,180,48,rtl,placeholder);
+   int width=placeholder==0?48:38;
+   int x=rtl?179-width/2:width/2;
+   int blended=result.getPixel(x,24);
+   assertNotEquals(Color.RED,blended);assertNotEquals(surface,blended);
+   assertEquals(surface,result.getPixel(rtl?179-width:width,24));
+   assertEquals(surface,result.getPixel(90,24));assertEquals(1,receiver.draws);
+   result.recycle();receiver.bitmap.recycle();
   }
  }
  @Test public void fittedPhotoPreservesTopAndBottomAndRestoresNativeReceiverState(){
@@ -69,8 +76,8 @@ public class FloatingHeaderTest {
    renderer.draw(canvas,receiver,180,48,rtl);
    assertEquals(saves,canvas.getSaveCount());assertTrue(receiver.isAspectFit());
    assertEquals(7,receiver.getImageX(),0);assertEquals(9,receiver.getImageY(),0);assertEquals(11,receiver.getImageWidth(),0);assertEquals(13,receiver.getImageHeight(),0);
-   assertEquals(2,receiver.draws);float fitted=app.flexygram.header.fusion.SignatureFloatingPhoto.fittedWidth(180,48,iw,120);
-   int x=(int)(rtl?180-fitted*.5f:fitted*.5f);
+   assertEquals(1,receiver.draws);float fitted=app.flexygram.header.fusion.SignatureFloatingPhoto.fittedWidth(180,48,iw,120);
+   int x=(int)(rtl?180-fitted*.2f:fitted*.2f);
    assertEquals("whole top preserved",Color.RED,result.getPixel(x,4));
    assertEquals("whole bottom preserved",Color.BLUE,result.getPixel(x,44));
    result.recycle();receiver.bitmap.recycle();

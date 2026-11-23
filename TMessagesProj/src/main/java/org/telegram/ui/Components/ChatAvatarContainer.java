@@ -250,12 +250,19 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                     }
 
                     StoriesUtilities.drawAvatarWithStory(dialogId, canvas, imageReceiver, params);
-                } else if (signatureFusionActive() && signatureHeader.fusionGeometry().floatingStatus
-                        && signatureFusionHasPhoto() && animatedEmojiDrawable == null) {
+                } else if (signatureFusionActive() && signatureHeader.fusionGeometry().floatingStatus) {
                     if (signatureFloatingPhoto == null)
                         signatureFloatingPhoto = new app.flexygram.header.fusion.SignatureFloatingPhoto();
-                    imageReceiver.setImageCoords(0, 0, getWidth(), getHeight());
-                    signatureFloatingPhoto.draw(canvas, imageReceiver, getWidth(), getHeight(), LocaleController.isRTL);
+                    ImageReceiver portrait = animatedEmojiDrawable == null ? imageReceiver : animatedEmojiDrawable.getImageReceiver();
+                    if (animatedEmojiDrawable != null && animatedEmojiDrawableColorFilter != null) {
+                        animatedEmojiDrawable.setColorFilter(animatedEmojiDrawableColorFilter);
+                    }
+                    if (portrait == null) return;
+                    portrait.setImageCoords(0, 0, getWidth(), getHeight());
+                    Drawable content = portrait.getDrawable();
+                    boolean placeholder = animatedEmojiDrawable != null || content == null || content instanceof AvatarDrawable;
+                    signatureFloatingPhoto.draw(canvas, portrait, getWidth(), getHeight(), LocaleController.isRTL,
+                            placeholder ? dp(38) : 0);
                 } else {
                     super.onDraw(canvas);
                 }
@@ -528,14 +535,12 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     @Override
     protected boolean drawChild(@NonNull Canvas canvas, View child, long drawingTime) {
         final boolean floating = signatureFusionActive() && signatureHeader.fusionGeometry().floatingStatus;
-        final boolean fusionPhoto = floating && child == avatarImageView && signatureFusionHasPhoto();
-        int fusionSave = 0, fusionLayer = 0;
+        final boolean fusionPhoto = floating && child == avatarImageView;
+        int fusionSave = 0;
         if (fusionPhoto) {
-            fusionSave = canvas.save(); canvas.clipPath(signaturePhotoClip);
-            fusionLayer = signaturePhotoMask.begin(canvas, child.getX(), child.getY(),
-                    child.getX() + child.getWidth(), child.getY() + child.getHeight());
+            fusionSave = canvas.save();
+            canvas.clipPath(signaturePhotoClip);
         }
-        final boolean unscaleAvatar = false;
         final boolean b;
         if (child == avatarImageView) {
             final boolean hasTimer = timeItem != null && timeItem.getVisibility() == VISIBLE;
@@ -564,19 +569,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         } else {
             b = super.drawChild(canvas, child, drawingTime);
         }
-        if (unscaleAvatar) {
-            canvas.restore();
-        }
-        if (fusionPhoto) {
-            var g = signatureHeader.fusionGeometry();
-            canvas.translate(child.getX(), child.getY());
-            boolean initials = child.getWidth() < g.portrait.width() - 1f;
-            float start = initials ? child.getWidth() * (g.rtl ? .45f : .55f) : g.fadeStartX - child.getX();
-            float end = initials ? (g.rtl ? 0f : child.getWidth()) : g.fadeEndX - child.getX();
-            signaturePhotoMask.finish(canvas, fusionLayer, child.getWidth(), child.getHeight(),
-                    start, end, initials ? .9f : g.fadeSafeStop, g.rtl);
-            canvas.restoreToCount(fusionSave);
-        }
+        if (fusionPhoto) canvas.restoreToCount(fusionSave);
         return b;
     }
 
@@ -869,9 +862,15 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
 
     private app.flexygram.header.SignatureChatHeader signatureHeader;
     private android.widget.ImageView signatureMore, signatureCall;
-    private app.flexygram.header.fusion.SignatureFusionAvatarMask signaturePhotoMask;
     private android.graphics.Path signaturePhotoClip;
     private boolean signatureMeasured;
+    private boolean measuredFloatingPhoto;
+
+    private void refreshFloatingPhotoLayout() {
+        if (signatureFusionActive() && signatureHeader.fusionGeometry().floatingStatus
+                && measuredFloatingPhoto != signatureFusionHasPhoto()) requestLayout();
+    }
+
     private app.flexygram.header.fusion.SignatureFloatingPhoto signatureFloatingPhoto;
     protected boolean isSignatureCallAvailable() { return false; }
     protected void onSignatureCallClick() { }
@@ -888,7 +887,6 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     }
     private void prepareFusionControls() {
         if (signatureMore != null) return;
-        signaturePhotoMask = new app.flexygram.header.fusion.SignatureFusionAvatarMask();
         signaturePhotoClip = new android.graphics.Path();
         signatureMore = new android.widget.ImageView(getContext()); signatureMore.setImageDrawable(app.flexygram.icons.ConversationControlIcons.loadBitmap(getContext(),R.drawable.ic_ab_other));
         signatureMore.setRotation(app.flexygram.icons.ExactIcons.isEnabled()?0:90); signatureMore.setScaleType(android.widget.ImageView.ScaleType.CENTER);
@@ -950,6 +948,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         getSubtitleTextView().measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), signatureHeader.subtitleFits ? MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.subtitlePx) + dp(8), MeasureSpec.AT_MOST) : MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY));
         int photo = Math.max(1, Math.round(signatureHeader.height) - dp(2));
         boolean fullPhoto = floating && signatureFusionHasPhoto();
+        measuredFloatingPhoto = fullPhoto;
         int photoWidth = fusion ? Math.round(fullPhoto || !floating ? signatureHeader.geometry.avatar.width() : dp(38)) : photo;
         int photoHeight = fusion ? Math.round(fullPhoto || !floating ? signatureHeader.geometry.avatar.height() : dp(38)) : photo;
         avatarImageView.measure(MeasureSpec.makeMeasureSpec(photoWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(photoHeight, MeasureSpec.EXACTLY));
@@ -995,12 +994,6 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             signaturePhotoClip.rewind();
             signaturePhotoClip.addRoundRect(g.center.left,g.center.top+offset,g.center.right,g.center.bottom+offset,
                     g.center.height()/2,g.center.height()/2,android.graphics.Path.Direction.CW);
-            boolean initials = avatarImageView.getMeasuredWidth() < g.portrait.width() - 1f;
-            float fadeStart = initials ? avatarImageView.getMeasuredWidth() * (g.rtl ? .45f : .55f)
-                    : g.fadeStartX - avatarImageView.getLeft();
-            float fadeEnd = initials ? (g.rtl ? 0f : avatarImageView.getMeasuredWidth())
-                    : g.fadeEndX - avatarImageView.getLeft();
-            signaturePhotoMask.prepare(fadeStart,fadeEnd,initials ? .9f : g.fadeSafeStop,g.rtl);
         }
         if (timeItem != null) { int tx = Math.round(a.left) - dp(6), ty = Math.round(a.top) - dp(4); timeItem.layout(tx, ty, tx + dp(34), ty + dp(34)); }
         if (communityItem != null) { int tx = Math.round(a.right) - dp(14), ty = Math.round(a.bottom) - dp(14); communityItem.layout(tx, ty, tx + dp(14), ty + dp(14)); }
@@ -1823,6 +1816,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             avatarImageView.getImageReceiver().setAvatarCornersApplied(true);
             applyAvatarRadius(avatarSizeInDp, ChatObject.isForum(chat), ChatObject.hasStories(chat));
         }
+        refreshFloatingPhotoLayout();
     }
 
     public void setUserAvatar(TLRPC.User user) {
@@ -1855,6 +1849,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                 avatarImageView.setForUserOrChat(user, avatarDrawable);
             }
         }
+        refreshFloatingPhotoLayout();
     }
 
     public void checkAndUpdateAvatar() {
@@ -1942,6 +1937,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                 applyAvatarRadius(avatarSizeInDp, chat.forum, ChatObject.hasStories(chat));
             }
         }
+        refreshFloatingPhotoLayout();
     }
 
     public void updateOnlineCount() {

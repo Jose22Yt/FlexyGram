@@ -139,3 +139,47 @@ def test_adaptive_contact_pill_tracks_name_in_both_directions(tmp_path):
           }
         }}'''
     }, [JAVA/'app/flexygram/header/HeaderGeometry.java'])
+
+
+def test_floating_draws_one_fitted_avatar_and_one_local_fade(tmp_path):
+    probe(tmp_path, {
+        'android/graphics/Canvas.java': '''package android.graphics;public class Canvas{
+          public int depth;public float x,y;
+          public int save(){return ++depth;} public void translate(float x,float y){this.x=x;this.y=y;}
+          public void clipPath(Path p){} public void restoreToCount(int n){depth=n-1;}
+        }''',
+        'android/graphics/Path.java': '''package android.graphics;public class Path{
+          public enum Direction{CW}public void rewind(){}public void addCircle(float x,float y,float r,Direction d){}
+        }''',
+        'org/telegram/messenger/ImageReceiver.java': '''package org.telegram.messenger;
+        public class ImageReceiver{
+          public int iw,ih,draws;public float w=12,h=14,x=2,y=3,drawWidth,drawHeight;public boolean fit;
+          public int getBitmapWidth(){return iw;}public int getBitmapHeight(){return ih;}
+          public float getImageX(){return x;}public float getImageY(){return y;}
+          public float getImageWidth(){return w;}public float getImageHeight(){return h;}
+          public boolean isAspectFit(){return fit;}public void setAspectFit(boolean f){fit=f;}
+          public void setImageCoords(float a,float b,float c,float d){x=a;y=b;w=c;h=d;}
+          public void draw(android.graphics.Canvas c){if(!fit)throw new AssertionError();draws++;drawWidth=w;drawHeight=h;}
+        }''',
+        'app/flexygram/header/fusion/SignatureFusionAvatarMask.java': '''package app.flexygram.header.fusion;
+        import android.graphics.Canvas;public class SignatureFusionAvatarMask{
+          public static int layers;public static float width,height;
+          public int begin(Canvas c,float x,float y,float r,float b){layers++;width=r-x;height=b-y;return c.save();}
+          public void finishFloating(Canvas c,int n,float w,float h,boolean rtl){
+            if(w!=width||h!=height)throw new AssertionError();c.restoreToCount(n);}
+        }''',
+        'Probe.java': '''import android.graphics.Canvas;import app.flexygram.header.fusion.*;import org.telegram.messenger.ImageReceiver;
+        public class Probe{ public static void main(String[]args){
+          SignatureFloatingPhoto renderer=new SignatureFloatingPhoto();
+          ImageReceiver r=new ImageReceiver();Canvas c=new Canvas();int frames=0;
+          for(boolean rtl:new boolean[]{false,true})for(int w:new int[]{60,120,240,600})
+          for(int placeholder:new int[]{38,0,38}){
+            r.iw=w;r.ih=120; renderer.draw(c,r,180,48,rtl,placeholder);frames++;
+            float expected=placeholder==0?Math.min(180,48f*w/120):38;
+            if(r.draws!=frames||SignatureFusionAvatarMask.layers!=frames||r.drawWidth!=expected
+              ||r.drawHeight!=(placeholder==0?48:38)||SignatureFusionAvatarMask.width!=expected
+              ||c.x!=(rtl?180-expected:0)||c.y!=(placeholder==0?0:5)||c.depth!=0
+              ||r.x!=2||r.y!=3||r.w!=12||r.h!=14||r.fit)throw new AssertionError();
+          }
+        }}'''
+    }, [JAVA/'app/flexygram/header/fusion/SignatureFloatingPhoto.java'])

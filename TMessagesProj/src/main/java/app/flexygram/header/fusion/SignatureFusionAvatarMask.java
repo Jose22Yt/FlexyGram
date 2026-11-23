@@ -59,6 +59,12 @@ public final class SignatureFusionAvatarMask {
         }
     }
 
+    /** Keep the outer part readable, then fade to zero at the actual image boundary. */
+    public void finishFloating(Canvas canvas, int layer, float width, float height, boolean rtl) {
+        finish(canvas, layer, width, height, rtl ? 0 : width * .35f,
+                rtl ? width * .65f : width, .80f, rtl);
+    }
+
     /** Local x positions of fade start/end relative to the avatar panel. */
     public void finish(Canvas canvas, int saveCount, float width, float height,
                        float fadeStart, float fadeEnd, boolean rtl) {

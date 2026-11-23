@@ -1,14 +1,15 @@
 package app.flexygram.header.fusion;
 
 import android.graphics.Canvas;
+import android.graphics.Path;
 import org.telegram.messenger.ImageReceiver;
 
-/** Fits the native portrait over a fading continuation of the same picture.
- * No second image request, bitmap ownership, blur capture or animation loop.
- * The host applies the full-panel alpha mask after this local composition.
- */
+/** Draws the native portrait once and fades its inward edge into the header. */
 public final class SignatureFloatingPhoto {
-    private final SignatureFusionAvatarMask join = new SignatureFusionAvatarMask();
+    private final SignatureFusionAvatarMask mask = new SignatureFusionAvatarMask();
+
+    private final Path placeholderClip = new Path();
+    private float clipDiameter;
 
     public static float fittedWidth(float width, float height, int imageWidth, int imageHeight) {
         if (width <= 0 || height <= 0) return 0;
@@ -17,31 +18,38 @@ public final class SignatureFloatingPhoto {
     }
 
     public void draw(Canvas canvas, ImageReceiver receiver, float width, float height, boolean rtl) {
-        if (width <= 0 || height <= 0) return;
+        draw(canvas, receiver, width, height, rtl, 0);
+    }
+
+    public void draw(Canvas canvas, ImageReceiver receiver, float width, float height, boolean rtl,
+                     float placeholderDiameter) {
+        if (width <= 0 || height <= 0 || receiver == null) return;
+        float h = placeholderDiameter > 0 ? Math.min(Math.min(width, height), placeholderDiameter) : height;
+        float w = placeholderDiameter > 0 ? h :
+                fittedWidth(width, h, receiver.getBitmapWidth(), receiver.getBitmapHeight());
         boolean aspectFit = receiver.isAspectFit();
         float x = receiver.getImageX(), y = receiver.getImageY();
-        float w = receiver.getImageWidth(), h = receiver.getImageHeight();
-        int outer = canvas.save();
+        float oldWidth = receiver.getImageWidth(), oldHeight = receiver.getImageHeight();
+        int save = canvas.save();
         try {
-            // A continuation behind the text; the fitted foreground preserves
-            // the complete original composition instead of zooming into a face.
-            receiver.setAspectFit(false);
-            receiver.setImageCoords(0, 0, width, height);
-            receiver.draw(canvas);
-            float fitted = fittedWidth(width, height, receiver.getBitmapWidth(), receiver.getBitmapHeight());
-            float left = rtl ? width - fitted : 0;
-            canvas.translate(left, 0);
-            int layer = join.begin(canvas, 0, 0, fitted, height);
+            canvas.translate(rtl ? width - w : 0, (height - h) * .5f);
+            if (placeholderDiameter > 0) {
+                if (clipDiameter != h) {
+                    placeholderClip.rewind();
+                    placeholderClip.addCircle(h * .5f, h * .5f, h * .5f, Path.Direction.CW);
+                    clipDiameter = h;
+                }
+                canvas.clipPath(placeholderClip);
+            }
+            int layer = mask.begin(canvas, 0, 0, w, h);
             receiver.setAspectFit(true);
-            receiver.setImageCoords(0, 0, fitted, height);
+            receiver.setImageCoords(0, 0, w, h);
             receiver.draw(canvas);
-            // Only the inner edge blends into the continuation, in both directions.
-            join.finish(canvas, layer, fitted, height,
-                    rtl ? 0 : fitted * .8f, rtl ? fitted * .2f : fitted, .86f, rtl);
+            mask.finishFloating(canvas, layer, w, h, rtl);
         } finally {
-            canvas.restoreToCount(outer);
+            canvas.restoreToCount(save);
             receiver.setAspectFit(aspectFit);
-            receiver.setImageCoords(x, y, w, h);
+            receiver.setImageCoords(x, y, oldWidth, oldHeight);
         }
     }
 }
