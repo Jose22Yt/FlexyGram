@@ -17327,6 +17327,7 @@ public class MessagesStorage extends BaseController {
                     }
 
                     ArrayList<Pair<Long, Long>> dialogsToLoadGroupMessages = new ArrayList<>();
+                    LongSparseArray<TLRPC.Dialog> dialogsWithAlbums = null;
                     cursor = database.queryFinalized(String.format(Locale.US, "SELECT d.did, d.last_mid, d.unread_count, d.date, m.data, m.read_state, m.mid, m.send_state, s.flags, m.date, d.pts, d.inbox_max, d.outbox_max, m.replydata, d.pinned, d.unread_count_i, d.flags, d.folder_id, d.data, d.unread_reactions, d.last_mid_group, d.ttl_period, d.unread_poll_votes FROM dialogs as d LEFT JOIN messages_v2 as m ON d.last_mid = m.mid AND d.did = m.uid AND d.last_mid_group IS NULL LEFT JOIN dialog_settings as s ON d.did = s.did WHERE d.folder_id = %d ORDER BY d.pinned DESC, d.date DESC LIMIT %d,%d", fid, off, cnt));
                     while (cursor.next()) {
                         long dialogId = cursor.longValue(0);
@@ -17381,6 +17382,8 @@ public class MessagesStorage extends BaseController {
                         long groupMessagesId = cursor.longValue(20);
                         if (groupMessagesId != 0) {
                             dialogsToLoadGroupMessages.add(new Pair<>(dialogId, groupMessagesId));
+                            if (dialogsWithAlbums == null) dialogsWithAlbums = new LongSparseArray<>();
+                            dialogsWithAlbums.put(dialogId, dialog);
                         }
                         dialog.ttl_period = cursor.intValue(21);
                         dialog.unread_poll_votes_count = cursor.intValue(22);
@@ -17458,7 +17461,7 @@ public class MessagesStorage extends BaseController {
                     cursor.dispose();
                     cursor = null;
 
-                    if (!dialogsToLoadGroupMessages.isEmpty()) {
+                    if (dialogsWithAlbums != null) {
                         StringBuilder whereClause = new StringBuilder();
                         for (int i = 0; i < dialogsToLoadGroupMessages.size(); ++i) {
                             Pair<Long, Long> pair = dialogsToLoadGroupMessages.get(i);
@@ -17468,22 +17471,13 @@ public class MessagesStorage extends BaseController {
                             }
                         }
                         cursor = database.queryFinalized(String.format(Locale.US, "SELECT uid, data, read_state, mid, send_state, date, replydata, group_id FROM messages_v2 WHERE %s ORDER BY date DESC", whereClause));
-                        int COUNT = 0;
                         while (cursor.next()) {
-                            COUNT++;
                             long did = cursor.longValue(0);
-                            NativeByteBuffer data = cursor.byteBufferValue(1);
-                            TLRPC.Dialog dialog = null;
-                            for (int i = 0; i < dialogs.dialogs.size(); ++i) {
-                                TLRPC.Dialog d = dialogs.dialogs.get(i);
-                                if (d != null && d.id == did) {
-                                    dialog = d;
-                                    break;
-                                }
-                            }
+                            TLRPC.Dialog dialog = dialogsWithAlbums.get(did);
                             if (dialog == null) {
                                 continue;
                             }
+                            NativeByteBuffer data = cursor.byteBufferValue(1);
                             if (data != null) {
                                 TLRPC.Message message = TLRPC.Message.TLdeserialize(data, data.readInt32(false), false);
                                 if (message != null) {

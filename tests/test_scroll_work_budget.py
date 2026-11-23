@@ -211,6 +211,54 @@ public class Probe {
   p.recyclerView.positions=new int[]{-1,-1};p.scroll();check(p.first==-1&&p.last==-1&&p.firstChild==null);
  }
 }'''.replace('SCAN',scan).replace('GUARDS',load[load.index('load &='):load.index('if (load || loadArchived)')])})
+def test_empty_dialog_filter_loads_cache_then_server_and_respects_archive_setting(tmp_path):
+    source = (JAVA/'org/telegram/ui/DialogsActivity.java').read_text()
+    load = method(source, 'private void checkListLoad(ViewPage viewPage, int firstVisibleItem, int lastVisibleItem, boolean loadAll)')
+    probe(tmp_path, {'Probe.java': '''import java.util.*;
+public class Probe {
+ static final int DIALOGS_TYPE_FOLDER1=7,DIALOGS_TYPE_FOLDER2=8;
+ static class View {static final int VISIBLE=0;int getVisibility(){return VISIBLE;}}
+ static class Tabs extends View {boolean isAnimatingIndicator(){return false;}}
+ static class RecyclerView {
+  static final int NO_POSITION=-1;
+  static class ViewHolder {int getItemViewType(){return 0;}}
+  ViewHolder findViewHolderForAdapterPosition(int value){return null;}
+ }
+ static class ViewPage {int dialogsType=7,selectedType;RecyclerView listView=new RecyclerView();}
+ static class AndroidUtilities {static void runOnUIThread(Runnable work){work.run();}}
+ static class MessagesController {
+  static final int DIALOG_FILTER_FLAG_EXCLUDE_ARCHIVED=1;
+  static class DialogFilter {int flags;}
+  final ArrayList<DialogFilter> filters=new ArrayList<>(List.of(new DialogFilter()));
+  final boolean[] cacheEnd={false,false},serverEnd={false,false},loading={false,false};
+  final List<String> loads=new ArrayList<>();int dialogFiltersChatsLimitPremium,dialogFiltersChatsLimitDefault;
+  ArrayList<DialogFilter> getDialogFilters(){return filters;}
+  boolean isDialogsEndReached(int folder){return cacheEnd[folder];}
+  boolean isServerDialogsEndReached(int folder){return serverEnd[folder];}
+  boolean isLoadingDialogs(int folder){return loading[folder];}
+  void loadDialogs(int folder,int offset,int count,boolean cache){loads.add(folder+":"+cache);}
+ }
+ static class UserConfig {boolean isPremium(){return false;}}
+ final MessagesController controller=new MessagesController();
+ MessagesController getMessagesController(){return controller;} UserConfig getUserConfig(){return new UserConfig();}
+ boolean tabsAnimationInProgress,startedTracking,floatingForceVisible,dialogsListFrozen; int folderId,currentAccount;
+ Tabs filterTabsView;void hideFloatingButton(boolean value){}
+ int getPaginationDialogCount(ViewPage page){return 300;}
+ List<Integer> getDialogsArray(int a,int type,int folder,boolean frozen){return Collections.nCopies(300,0);}
+ LOAD
+ static void check(boolean valid){if(!valid)throw new AssertionError();}
+ public static void main(String[] args){
+  Probe p=new Probe();ViewPage f=new ViewPage();p.checkListLoad(f,-1,-1,false);
+  check(p.controller.loads.equals(List.of("0:true","1:true")));p.controller.loads.clear();
+  p.controller.filters.get(0).flags=1;p.controller.cacheEnd[0]=true;
+  p.checkListLoad(f,-1,-1,false);check(p.controller.loads.equals(List.of("0:false")));p.controller.loads.clear();
+  p.controller.serverEnd[0]=true;p.checkListLoad(f,-1,-1,false);check(p.controller.loads.isEmpty());
+  f.dialogsType=0;p.controller.cacheEnd[0]=p.controller.serverEnd[0]=false;
+  p.checkListLoad(f,-1,-1,false);check(p.controller.loads.isEmpty());
+ }
+}'''.replace('LOAD', load)})
+
+
 def test_selector_pagination_uses_the_adapter_snapshot_without_rebuilding_the_list(tmp_path):
     source = (JAVA/'org/telegram/ui/DialogsActivity.java').read_text()
     count = method(source, 'private int getPaginationDialogCount(ViewPage page)')

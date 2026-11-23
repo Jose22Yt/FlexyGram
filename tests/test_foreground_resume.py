@@ -20,9 +20,9 @@ def diff_hosts():
         'private static final class DiffItem', 'private DiffItem[] snapshotDiffItems(', 'private static boolean preservesRowPositions(',
         'public void updateList(Runnable saveScrollPosition)', 'private void applyListDiff(', 'public void notifyDataSetChanged()'])
     host = '''import java.util.*;import androidx.recyclerview.widget.*;
-class Queue{ArrayDeque<Runnable>jobs=new ArrayDeque<>();void postRunnable(Runnable r){jobs.add(r);}
+class Queue{ArrayDeque<Runnable>jobs=new ArrayDeque<>();boolean accept=true;boolean postRunnable(Runnable r){if(!accept)return false;jobs.add(r);return true;}
  void worker()throws Exception{Runnable r=jobs.remove();Throwable[]error={null};Thread t=new Thread(()->{try{r.run();}catch(Throwable e){error[0]=e;}},"diff-worker");t.start();t.join();if(error[0]!=null)throw new AssertionError(error[0]);}}
-class Utilities{static Queue searchQueue=new Queue();}class AndroidUtilities{static ArrayDeque<Runnable>ui=new ArrayDeque<>();static void runOnUIThread(Runnable r){ui.add(r);}}
+class DialogDiffQueue{static Queue queue=new Queue();}class AndroidUtilities{static ArrayDeque<Runnable>ui=new ArrayDeque<>();static void runOnUIThread(Runnable r){ui.add(r);}}
 class FileLog{static void e(Throwable e){throw new AssertionError(e);}}
 public class Probe extends RecyclerView.Adapter{
  static final int VIEW_TYPE_DIALOG=0,VIEW_TYPE_HEADER_2=1,VIEW_TYPE_ME_URL=2,VIEW_TYPE_USER=3,VIEW_TYPE_EMPTY=4,VIEW_TYPE_LAST_EMPTY=5;
@@ -30,12 +30,13 @@ public class Probe extends RecyclerView.Adapter{
  static class ItemInternal{int viewType,emptyType;boolean isFolder,isForumCell,pinned;Dialog dialog;Contact contact;Url recentMeUrl;
  ItemInternal(long id){dialog=new Dialog(id);}}
  ArrayList<ItemInternal>itemInternals=new ArrayList<>(),source=new ArrayList<>();boolean isCalculatingDiff,updateListPending;long diffGeneration;Runnable pendingScrollPosition;
+ int committedRowsRefreshes;void refreshCommittedRows(){committedRowsRefreshes++;}
  void updateItemList(){itemInternals.clear();itemInternals.addAll(source);}
  ACTUAL
  static void check(boolean value){if(!value)throw new AssertionError();}
  void source(int first,int count){source=new ArrayList<>();for(int i=0;i<count;i++)source.add(new ItemInternal(first+i));}
  void initial(int count){source(0,count);itemInternals=new ArrayList<>(source);}
- static void complete()throws Exception{Utilities.searchQueue.worker();check(AndroidUtilities.ui.size()==1);AndroidUtilities.ui.remove().run();}
+ static void complete()throws Exception{DialogDiffQueue.queue.worker();check(AndroidUtilities.ui.size()==1);AndroidUtilities.ui.remove().run();}
  public static void main(String[]a)throws Exception{BODY}
 }'''.replace('ACTUAL', actual)
     native = [JAVA / f'androidx/recyclerview/widget/{name}.java' for name in ['DiffUtil', 'ListUpdateCallback', 'AdapterListUpdateCallback', 'BatchingListUpdateCallback']]
@@ -51,12 +52,12 @@ def run_diff(tmp_path, body):
 def test_large_production_lists_diff_on_worker_and_dispatch_only_on_ui(tmp_path):
     run_diff(tmp_path, '''Probe p=new Probe();p.initial(1000);var visible=p.itemInternals;p.source(20,1200);int[]saved={0};
  p.updateList(()->saved[0]++);check(p.isCalculatingDiff&&p.events==0&&p.itemInternals==visible&&saved[0]==0);
- check(Utilities.searchQueue.jobs.size()==1&&AndroidUtilities.ui.isEmpty());Utilities.searchQueue.worker();
+ check(DialogDiffQueue.queue.jobs.size()==1&&AndroidUtilities.ui.isEmpty());DialogDiffQueue.queue.worker();
  check(p.itemInternals==visible&&p.events==0&&saved[0]==0);AndroidUtilities.ui.remove().run();
  check(!p.isCalculatingDiff&&p.itemInternals.size()==1200&&p.itemInternals.get(0).dialog.id==20&&saved[0]==1&&p.events>0);
- p.source(30,2);p.updateList(null);check(Utilities.searchQueue.jobs.size()==1);complete();
+ p.source(30,2);p.updateList(null);check(DialogDiffQueue.queue.jobs.size()==1);complete();
  check(p.itemInternals.size()==2&&!p.isCalculatingDiff); // Large removal also stays off UI.
- p.source(40,4);p.updateList(null);check(Utilities.searchQueue.jobs.isEmpty()&&!p.isCalculatingDiff&&p.itemInternals.size()==4);
+ p.source(40,4);p.updateList(null);check(DialogDiffQueue.queue.jobs.isEmpty()&&!p.isCalculatingDiff&&p.itemInternals.size()==4);
  ''')
 
 
@@ -64,16 +65,29 @@ def test_old_worker_cannot_replace_a_full_refresh_or_a_new_inflight_generation(t
     run_diff(tmp_path, '''Probe p=new Probe();p.initial(80);p.source(10,90);int[]staleSaved={0};p.updateList(()->staleSaved[0]++);
  p.source(100,85);p.notifyDataSetChanged();check(p.full==1&&!p.isCalculatingDiff&&p.itemInternals.get(0).dialog.id==100);
  p.source(200,95);p.updateList(null);long current=p.diffGeneration;int events=p.events;
- complete();check(p.diffGeneration==current&&p.isCalculatingDiff&&p.itemInternals.get(0).dialog.id==100&&p.events==events&&staleSaved[0]==0);
+ DialogDiffQueue.queue.worker();check(AndroidUtilities.ui.isEmpty());
+ check(p.diffGeneration==current&&p.isCalculatingDiff&&p.itemInternals.get(0).dialog.id==100&&p.events==events&&staleSaved[0]==0);
  complete();check(!p.isCalculatingDiff&&p.itemInternals.get(0).dialog.id==200&&p.itemInternals.size()==95);
+ ''')
+
+
+def test_first_dialog_page_publishes_without_worker_and_rejected_diff_recovers(tmp_path):
+    run_diff(tmp_path, '''Probe p=new Probe();p.source(40,100);p.updateList(null);
+ check(p.itemInternals.size()==100&&p.events==1&&p.committedRowsRefreshes==1);
+ check(!p.isCalculatingDiff&&DialogDiffQueue.queue.jobs.isEmpty());
+ DialogDiffQueue.queue.accept=false;p.source(50,110);p.updateList(null);
+ check(!p.isCalculatingDiff&&p.full==1&&p.itemInternals.get(0).dialog.id==50);
+ DialogDiffQueue.queue.accept=true;p.source(60,130);p.updateList(null);
+ check(p.committedRowsRefreshes==1);complete();
+ check(p.committedRowsRefreshes==2&&p.itemInternals.get(0).dialog.id==60);
  ''')
 
 
 def test_repeated_refresh_requests_coalesce_and_keep_latest_scroll_callback(tmp_path):
     run_diff(tmp_path, '''Probe p=new Probe();p.initial(100);int[]first={0},discarded={0},latest={0};
  p.source(10,110);p.updateList(()->first[0]++);p.source(20,120);p.updateList(()->discarded[0]++);
- p.source(30,130);p.updateList(()->latest[0]++);check(Utilities.searchQueue.jobs.size()==1);
- complete();check(first[0]==1&&discarded[0]==0&&latest[0]==0&&p.isCalculatingDiff&&Utilities.searchQueue.jobs.size()==1);
+ p.source(30,130);p.updateList(()->latest[0]++);check(DialogDiffQueue.queue.jobs.size()==1);
+ complete();check(first[0]==1&&discarded[0]==0&&latest[0]==0&&p.isCalculatingDiff&&DialogDiffQueue.queue.jobs.size()==1);
  complete();check(!p.isCalculatingDiff&&p.itemInternals.get(0).dialog.id==30&&p.itemInternals.size()==130&&latest[0]==1&&discarded[0]==0);
  ''')
 
@@ -94,7 +108,7 @@ def test_reentrant_full_refresh_and_failed_scroll_save_release_diff_state(tmp_pa
  p.updateList(()->{p.source(200,100);p.notifyDataSetChanged();});complete();
  check(p.itemInternals.size()==100&&p.itemInternals.get(0).dialog.id==200&&!p.isCalculatingDiff&&p.events==0);
  p.source(20,110);p.updateList(()->{throw new IllegalStateException("scroll callback");});
- Utilities.searchQueue.worker();try{AndroidUtilities.ui.remove().run();throw new AssertionError();}catch(IllegalStateException expected){}
+ DialogDiffQueue.queue.worker();try{AndroidUtilities.ui.remove().run();throw new AssertionError();}catch(IllegalStateException expected){}
  check(!p.isCalculatingDiff);p.updateList(null);complete();check(p.itemInternals.size()==110&&!p.isCalculatingDiff);
  ''')
 

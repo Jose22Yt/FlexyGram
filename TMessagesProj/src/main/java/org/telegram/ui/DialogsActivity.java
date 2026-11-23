@@ -456,9 +456,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         Runnable updateListRunnable = () -> {
             dialogsAdapter.updateList(saveScrollPositionRunnable);
             invalidateScrollY = true;
-            listView.updateDialogsOnNextDraw = true;
             updating = false;
-            listView.invalidate();
         };
 
         @Override
@@ -8363,7 +8361,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (tabsAnimationInProgress || startedTracking || filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE && filterTabsView.isAnimatingIndicator()) {
             return;
         }
-        int visibleItemCount = Math.abs(lastVisibleItem - firstVisibleItem) + 1;
+        final boolean hasVisibleDialogs = firstVisibleItem != RecyclerView.NO_POSITION && lastVisibleItem != RecyclerView.NO_POSITION;
         if (lastVisibleItem != RecyclerView.NO_POSITION) {
             RecyclerView.ViewHolder holder = viewPage.listView.findViewHolderForAdapterPosition(lastVisibleItem);
             if (floatingForceVisible = holder != null && holder.getItemViewType() == 11) {
@@ -8376,13 +8374,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         boolean loadArchivedFromCache = false;
         boolean load = false;
         boolean loadFromCache = false;
-        if (viewPage.dialogsType == DIALOGS_TYPE_FOLDER1 || viewPage.dialogsType == DIALOGS_TYPE_FOLDER2) {
+        final boolean isFilter = viewPage.dialogsType == DIALOGS_TYPE_FOLDER1 || viewPage.dialogsType == DIALOGS_TYPE_FOLDER2;
+        if (isFilter) {
             ArrayList<MessagesController.DialogFilter> dialogFilters = getMessagesController().getDialogFilters();
             if (viewPage.selectedType >= 0 && viewPage.selectedType < dialogFilters.size()) {
                 MessagesController.DialogFilter filter = dialogFilters.get(viewPage.selectedType);
                 if ((filter.flags & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_ARCHIVED) == 0) {
-                    if (visibleItemCount > 0 && lastVisibleItem >= getDialogsArray(currentAccount, viewPage.dialogsType, 1, dialogsListFrozen).size() - 10 ||
-                            visibleItemCount == 0 && !getMessagesController().isDialogsEndReached(1)) {
+                    if (!hasVisibleDialogs || lastVisibleItem >= getDialogsArray(currentAccount, viewPage.dialogsType, 1, dialogsListFrozen).size() - 10) {
                         loadArchivedFromCache = !getMessagesController().isDialogsEndReached(1);
                         if (loadArchivedFromCache || !getMessagesController().isServerDialogsEndReached(1)) {
                             loadArchived = true;
@@ -8391,8 +8389,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
             }
         }
-        if (loadAll || visibleItemCount > 0 && lastVisibleItem >= getPaginationDialogCount(viewPage) - 10 ||
-                visibleItemCount == 0 && (viewPage.dialogsType == 7 || viewPage.dialogsType == 8) && !getMessagesController().isDialogsEndReached(folderId)) {
+        if (loadAll || (hasVisibleDialogs ? lastVisibleItem >= getPaginationDialogCount(viewPage) - 10
+                : isFilter || getPaginationDialogCount(viewPage) == 0)) {
             loadFromCache = !getMessagesController().isDialogsEndReached(folderId);
             if (loadFromCache || !getMessagesController().isServerDialogsEndReached(folderId)) {
                 load = true;

@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.DispatchQueue;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.ContactsController;
@@ -44,7 +45,6 @@ import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
-import org.telegram.messenger.Utilities;
 import org.telegram.messenger.support.LongSparseIntArray;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
@@ -134,7 +134,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
     private long lastSortTime;
     private boolean collapsedView;
     private boolean firstUpdate = true;
-    RecyclerListView recyclerListView;
+    DialogsActivity.DialogsRecyclerView recyclerListView;
     private PullForegroundDrawable pullForegroundDrawable;
     ArrayList<ItemInternal> itemInternals = new ArrayList<>();
 
@@ -168,7 +168,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         this.requestPeerType = requestPeerType;
     }
 
-    public void setRecyclerListView(RecyclerListView recyclerListView) {
+    public void setRecyclerListView(DialogsActivity.DialogsRecyclerView recyclerListView) {
         this.recyclerListView = recyclerListView;
     }
 
@@ -517,8 +517,19 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
 
     boolean isCalculatingDiff;
     boolean updateListPending;
-    private long diffGeneration;
+    private volatile long diffGeneration;
     private Runnable pendingScrollPosition;
+
+    private static final class DialogDiffQueue {
+        static final DispatchQueue queue = new DispatchQueue("dialogsDiffQueue", true, android.os.Process.THREAD_PRIORITY_BACKGROUND);
+    }
+
+    private void refreshCommittedRows() {
+        if (recyclerListView != null) {
+            recyclerListView.updateDialogsOnNextDraw = true;
+            recyclerListView.invalidate();
+        }
+    }
 
     /** UI-captured primitives only: the worker must never read mutable Telegram objects. */
     private static final class DiffItem {
@@ -574,10 +585,18 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         updateListPending = false; pendingScrollPosition = null;
         final long generation = ++diffGeneration;
         final ArrayList<ItemInternal> oldItems = itemInternals;
-        final DiffItem[] before = snapshotDiffItems(oldItems);
+        final DiffItem[] before = oldItems.isEmpty() ? null : snapshotDiffItems(oldItems);
         itemInternals = new ArrayList<>();
         updateItemList();
         final ArrayList<ItemInternal> newItems = itemInternals;
+        if (before == null) {
+            isCalculatingDiff = false;
+            if (!newItems.isEmpty()) {
+                notifyItemRangeInserted(0, newItems.size());
+                refreshCommittedRows();
+            }
+            return;
+        }
         final DiffItem[] after = snapshotDiffItems(newItems);
         final Runnable restoreScroll = preservesRowPositions(before, after) ? null : saveScrollPosition;
         itemInternals = oldItems;
@@ -606,7 +625,8 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         if (Math.max(before.length, after.length) < 50) {
             applyListDiff(generation, newItems, DiffUtil.calculateDiff(callback), restoreScroll);
         } else {
-            Utilities.searchQueue.postRunnable(() -> {
+            if (!DialogDiffQueue.queue.postRunnable(() -> {
+                if (generation != diffGeneration) return;
                 DiffUtil.DiffResult result;
                 try { result = DiffUtil.calculateDiff(callback); }
                 catch (RuntimeException error) {
@@ -617,7 +637,9 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
                     return;
                 }
                 AndroidUtilities.runOnUIThread(() -> applyListDiff(generation, newItems, result, restoreScroll));
-            });
+            })) {
+                notifyDataSetChanged();
+            }
         }
     }
 
@@ -628,6 +650,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
             if (generation != diffGeneration) return;
             itemInternals = newItems;
             result.dispatchUpdatesTo(this);
+            refreshCommittedRows();
         } finally {
             if (generation == diffGeneration) {
                 isCalculatingDiff = false;
