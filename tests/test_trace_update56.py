@@ -37,7 +37,7 @@ def test_global_preferences_do_not_construct_account_controller_and_keep_live_id
 
 def test_dock_capture_visibility_tracks_actual_views_and_partial_fade(tmp_path):
     source=(JAVA/'org/telegram/ui/MainTabsActivity.java').read_text()
-    visible=method(source,'public boolean hasVisibleTabsSurface()')
+    visible=method(source,'private boolean hasVisibleTabsSurface()')
     probe(tmp_path,{'Probe.java':'''public class Probe{
  static class View{static final int VISIBLE=0;int visibility;float alpha=1;int getVisibility(){return visibility;}float getAlpha(){return alpha;}}
  View tabsView=new View(),tabsViewWrapper=new View();VISIBLE
@@ -49,6 +49,48 @@ def test_dock_capture_visibility_tracks_actual_views_and_partial_fade(tmp_path):
  p.tabsView=null;check(!p.hasVisibleTabsSurface());
  }
 }'''.replace('VISIBLE\n',visible+'\n')})
+
+
+def test_native_tab_glass_skips_hidden_and_kyant_surfaces(tmp_path):
+    source=(JAVA/'org/telegram/ui/MainTabsActivity.java').read_text()
+    methods='\n'.join(method(source, signature) for signature in (
+        'private boolean hasVisibleTabsSurface()', 'private void blur3_invalidateBlur()',
+    ))
+    position=method(source,'private void checkUi_tabsPosition()')
+    assert 'final boolean interactive = factor >= 1f;' in position
+    kotlin=(JAVA.parents[0]/'kotlin/app/flexygram/kyant/KyantDockView.kt').read_text()
+    assert '!LiteMode.isThermalPressureHigh()' in kotlin
+    probe(tmp_path,{'Probe.java':'''public class Probe {
+ static class View {
+  static final int VISIBLE=0; int visibility,windowVisibility; float alpha=1; boolean shown=true;
+  int getVisibility(){return visibility;} float getAlpha(){return alpha;} boolean isShown(){return shown;}
+  int getWindowVisibility(){return windowVisibility;}
+  int getMeasuredWidth(){return 100;} int getMeasuredHeight(){return 200;}
+ }
+ static class Build {
+  static class VERSION {static int SDK_INT=35;}
+  static class VERSION_CODES {static final int S=31;}
+ }
+ static class SharedConfig {static boolean enabled=true;static boolean chatBlurEnabled(){return enabled;}}
+ static class Dock {boolean rendering;boolean isRendering(){return rendering;}}
+ static class Source {
+  int updates;void setSize(int w,int h){check(w==100&&h==200);}void updateDisplayListIfNeeded(){updates++;}
+ }
+ Dock kyantDockView=new Dock(); Source iBlur3SourceTabGlass=new Source();
+ View tabsView=new View(),tabsViewWrapper=new View(),fragmentView=new View();
+ METHODS
+ static void check(boolean valid){if(!valid)throw new AssertionError();}
+ public static void main(String[] args){
+  Probe p=new Probe();p.blur3_invalidateBlur();check(p.iBlur3SourceTabGlass.updates==1);
+  p.tabsViewWrapper.alpha=0;p.blur3_invalidateBlur();p.tabsViewWrapper.alpha=1;
+  p.tabsView.shown=false;p.blur3_invalidateBlur();p.tabsView.shown=true;
+  p.tabsView.windowVisibility=8;p.blur3_invalidateBlur();p.tabsView.windowVisibility=0;
+  p.kyantDockView.rendering=true;p.blur3_invalidateBlur();p.kyantDockView.rendering=false;
+  SharedConfig.enabled=false;p.blur3_invalidateBlur();SharedConfig.enabled=true;
+  check(p.iBlur3SourceTabGlass.updates==1);p.tabsView.alpha=.4f;p.blur3_invalidateBlur();
+  check(p.iBlur3SourceTabGlass.updates==2);
+ }
+}'''.replace('METHODS',methods)})
 
 
 def test_real_icon_resources_preload_cache_cancel_configuration_and_independent_drawables(tmp_path):

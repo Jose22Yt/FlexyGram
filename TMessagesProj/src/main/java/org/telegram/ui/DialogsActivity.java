@@ -63,6 +63,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -453,11 +454,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         };
 
-        Runnable updateListRunnable = () -> {
-            dialogsAdapter.updateList(saveScrollPositionRunnable);
-            invalidateScrollY = true;
+        final Runnable updateListRunnable = () -> {
+            if (!isPaused && !isFinished) {
+                dialogsAdapter.updateList(saveScrollPositionRunnable);
+                invalidateScrollY = true;
+            }
             updating = false;
         };
+
+        private void cancelListUpdate() {
+            AndroidUtilities.cancelRunOnUIThread(updateListRunnable);
+            updating = false;
+        }
 
         @Override
         public void setTranslationY(float translationY) {
@@ -1791,8 +1799,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         private RecyclerListView animationSupportListView;
         LongSparseArray<View> animationSupportViewsByDialogId;
         private Paint selectorPaint;
-        float lastDrawSelectorY;
-        float selectorPositionProgress = 1f;
+        float lastDrawSelectorY = Integer.MIN_VALUE;
+        private long selectorAnimationStartedAt = -1L;
         float animateFromSelectorPosition;
         boolean animateSwitchingSelector;
         UserListPoller poller;
@@ -1806,9 +1814,17 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         public void prepareSelectorForAnimation() {
-            selectorPositionProgress = 0;
+            selectorAnimationStartedAt = SystemClock.uptimeMillis();
             animateFromSelectorPosition = lastDrawSelectorY;
             animateSwitchingSelector = rightFragmentOpenedProgress != 0;
+        }
+
+        private float updateSelectorPositionProgress(long now) {
+            if (selectorAnimationStartedAt < 0) return 1f;
+            final float progress = Math.min(1f, (now - selectorAnimationStartedAt) / 200f);
+            if (progress < 1f) invalidate();
+            else selectorAnimationStartedAt = -1L;
+            return progress;
         }
 
         @Override
@@ -1977,16 +1993,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
 
             if (selectedCell != null) {
-                canvas.save();
                 lastDrawSelectorY = selectedCell.getY() + selectedCell.collapseOffset + selectedCell.avatarImage.getImageY();
                 selectedCell.collapseOffset = 0;
                 selectedCell.rightFragmentOffset = 0;
-                if (selectorPositionProgress != 1f) {
-                    selectorPositionProgress += 16 / 200f;
-                    selectorPositionProgress = Utilities.clamp(selectorPositionProgress, 1f, 0f);
-                    invalidate();
-                }
-                float selectorPositionProgress = CubicBezierInterpolator.DEFAULT.getInterpolation(this.selectorPositionProgress);
+                float selectorPositionProgress = CubicBezierInterpolator.DEFAULT.getInterpolation(
+                        updateSelectorPositionProgress(SystemClock.uptimeMillis()));
                 boolean animateInOut = false;
                 if (selectorPositionProgress != 1f && animateFromSelectorPosition != Integer.MIN_VALUE) {
                     if (Math.abs(animateFromSelectorPosition - lastDrawSelectorY) < getMeasuredHeight() * 0.4f) {
@@ -1996,18 +2007,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                 }
 
-                float hideProgrss = animateSwitchingSelector && (animateInOut || animateFromSelectorPosition == Integer.MIN_VALUE) ? (1f - selectorPositionProgress) : (1f - rightFragmentOpenedProgress);
-                if (hideProgrss == 1f) {
+                float hideProgress = animateSwitchingSelector && (animateInOut || animateFromSelectorPosition == Integer.MIN_VALUE) ? (1f - selectorPositionProgress) : (1f - rightFragmentOpenedProgress);
+                if (hideProgress == 1f) {
                     lastDrawSelectorY = Integer.MIN_VALUE;
+                } else {
+                    float xOffset = -dp(5) * hideProgress;
+                    AndroidUtilities.rectTmp.set(-dp(4) + xOffset, lastDrawSelectorY - dp(1), dp(4) + xOffset, lastDrawSelectorY + selectedCell.avatarImage.getImageHeight() + dp(1));
+                    if (selectorPaint == null) {
+                        selectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                    }
+                    selectorPaint.setColor(getThemedColor(Theme.key_featuredStickers_addButton));
+                    canvas.drawRoundRect(AndroidUtilities.rectTmp, dp(4), dp(4), selectorPaint);
                 }
-                float xOffset = -dp(5) * hideProgrss;
-                AndroidUtilities.rectTmp.set(-dp(4) + xOffset, lastDrawSelectorY - dp(1), dp(4) + xOffset, lastDrawSelectorY + selectedCell.avatarImage.getImageHeight() + dp(1));
-                if (selectorPaint == null) {
-                    selectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                }
-                selectorPaint.setColor(getThemedColor(Theme.key_featuredStickers_addButton));
-                canvas.drawRoundRect(AndroidUtilities.rectTmp, dp(4), dp(4), selectorPaint);
-                canvas.restore();
             } else {
                 lastDrawSelectorY = Integer.MIN_VALUE;
             }
@@ -2459,7 +2470,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                 }
             }
-            if (selectedDialogView != null && getAdapter().getItemCount() * dp(70) > getMeasuredHeight() && (anchorView.getTop() - getPaddingTop()) > (getMeasuredHeight() - getPaddingTop()) / 2f) {
+            if (selectedDialogView != null && (anchorView == null || getAdapter().getItemCount() * dp(70) > getMeasuredHeight()
+                    && anchorView.getTop() - getPaddingTop() > (getMeasuredHeight() - getPaddingTop()) / 2f)) {
                 anchorView = selectedDialogView;
             }
             this.animationSupportListView = animationSupportListView;
@@ -3250,6 +3262,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onFragmentDestroy() {
         historyWarmup.cancel();
+        cancelUnreadDialogsReload();
+        if (viewPages != null) {
+            for (ViewPage page : viewPages) page.cancelListUpdate();
+        }
+        AndroidUtilities.cancelRunOnUIThread(loadPendingDialogPages);
+        pendingDialogLoad = pendingArchiveLoad = pendingLoadAllDialogs = false;
         clearPreviewBlur();
         chatOpenGeneration++;
         LiteMode.removeOnPowerSaverAppliedListener(nativeGlassPowerListener);
@@ -3976,7 +3994,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     if (tabId < 0 || tabId >= dialogFilters.size()) {
                         return 0;
                     }
-                    return getMessagesController().getDialogFilters().get(tabId).unreadCount;
+                    return dialogFilters.get(tabId).unreadCount;
                 }
 
                 @Override
@@ -4867,8 +4885,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                 private boolean wasManualScroll;
 
-                private boolean stoppedAllHeavyOperations;
-
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) historyWarmup.request(); else historyWarmup.cancel();
@@ -4885,17 +4901,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     } else {
                         scrollingManually = false;
                     }
-                    if (newState == RecyclerView.SCROLL_STATE_DRAGGING || newState == RecyclerView.SCROLL_STATE_SETTLING) {
-                        if (!stoppedAllHeavyOperations) {
-                            stoppedAllHeavyOperations = true;
-                            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.stopAllHeavyOperations, 512);
-                        }
-                    }
+                    // RecyclerListView owns the pause and resumes work even on detach.
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        if (stoppedAllHeavyOperations) {
-                            stoppedAllHeavyOperations = false;
-                            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 512);
-                        }
                         wasManualScroll = false;
                         disableActionBarScrolling = false;
                         if (waitingForScrollFinished) {
@@ -4981,27 +4988,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 }
                             }
                         }
-                        float currentTranslation = scrollYOffset;
-                        float newTranslation = currentTranslation - dy;
-                        boolean applyScrollY = true;
-                        applyScrollY = false;
-                        invalidateScrollY = true;
                         if (fragmentView != null) {
                             fragmentView.invalidate();
-                        }
-                        if (applyScrollY) {
-                            int maxScrollYOffset = getMaxScrollYOffset();
-                            if (!(filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE && animatorFilterTabsVisible.getValue())) {
-                                maxScrollYOffset = getIdleSearchFieldHeight();
-                            }
-                            if (newTranslation < -maxScrollYOffset) {
-                                newTranslation = -maxScrollYOffset;
-                            } else if (newTranslation > 0) {
-                                newTranslation = 0;
-                            }
-                            if (newTranslation != currentTranslation) {
-                                setScrollY(newTranslation);
-                            }
                         }
                     }
                     if (fragmentView != null) {
@@ -7493,7 +7481,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         refreshNativeGlassPolicy();
         updateSeparateSearchVisibility(mainTabsActivityController != null && app.flexygram.navigation.LiquidNavigationConfig.isEnabled()
                 && app.flexygram.navigation.LiquidNavigationConfig.separateSearch());
-        if(filterTabsView!=null)filterTabsView.updateColors();
+        if (filterTabsView != null) {
+            filterTabsView.updateColors();
+            if (filterTabsView.getVisibility() == View.VISIBLE) filterTabsView.checkTabsCounter();
+        }
         if (dialogStoriesCell != null) {
             dialogStoriesCell.onResume();
         }
@@ -7784,8 +7775,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         Bulletin.removeDelegate(this);
 
+        cancelUnreadDialogsReload();
         if (viewPages != null) {
             for (int a = 0; a < viewPages.length; a++) {
+                viewPages[a].cancelListUpdate();
                 viewPages[a].dialogsAdapter.pause();
             }
         }
@@ -8358,7 +8351,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     private void checkListLoad(ViewPage viewPage, int firstVisibleItem, int lastVisibleItem, boolean loadAll) {
-        if (tabsAnimationInProgress || startedTracking || filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE && filterTabsView.isAnimatingIndicator()) {
+        if (isFinished || tabsAnimationInProgress || startedTracking || filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE && filterTabsView.isAnimatingIndicator()) {
             return;
         }
         final boolean hasVisibleDialogs = firstVisibleItem != RecyclerView.NO_POSITION && lastVisibleItem != RecyclerView.NO_POSITION;
@@ -8370,53 +8363,61 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         } else {
             floatingForceVisible = false;
         }
-        boolean loadArchived = false;
-        boolean loadArchivedFromCache = false;
-        boolean load = false;
-        boolean loadFromCache = false;
         final boolean isFilter = viewPage.dialogsType == DIALOGS_TYPE_FOLDER1 || viewPage.dialogsType == DIALOGS_TYPE_FOLDER2;
-        if (isFilter) {
-            ArrayList<MessagesController.DialogFilter> dialogFilters = getMessagesController().getDialogFilters();
+        final MessagesController controller = getMessagesController();
+        boolean loadArchived = false;
+        if (isFilter && !pendingArchiveLoad && canLoadDialogPage(controller, 1)) {
+            ArrayList<MessagesController.DialogFilter> dialogFilters = controller.getDialogFilters();
             if (viewPage.selectedType >= 0 && viewPage.selectedType < dialogFilters.size()) {
                 MessagesController.DialogFilter filter = dialogFilters.get(viewPage.selectedType);
                 if ((filter.flags & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_ARCHIVED) == 0) {
-                    if (!hasVisibleDialogs || lastVisibleItem >= getDialogsArray(currentAccount, viewPage.dialogsType, 1, dialogsListFrozen).size() - 10) {
-                        loadArchivedFromCache = !getMessagesController().isDialogsEndReached(1);
-                        if (loadArchivedFromCache || !getMessagesController().isServerDialogsEndReached(1)) {
-                            loadArchived = true;
-                        }
-                    }
+                    loadArchived = !hasVisibleDialogs
+                            || lastVisibleItem >= getDialogsArray(currentAccount, viewPage.dialogsType, 1, dialogsListFrozen).size() - 10;
                 }
             }
         }
-        if (loadAll || (hasVisibleDialogs ? lastVisibleItem >= getPaginationDialogCount(viewPage) - 10
-                : isFilter || getPaginationDialogCount(viewPage) == 0)) {
-            loadFromCache = !getMessagesController().isDialogsEndReached(folderId);
-            if (loadFromCache || !getMessagesController().isServerDialogsEndReached(folderId)) {
-                load = true;
+        final boolean load = !pendingDialogLoad && canLoadDialogPage(controller, folderId)
+                && (loadAll || (hasVisibleDialogs ? lastVisibleItem >= getPaginationDialogCount(viewPage) - 10
+                : isFilter || getPaginationDialogCount(viewPage) == 0));
+        if (loadAll && (pendingDialogLoad || load)) {
+            pendingLoadAllDialogs = true;
+        }
+        final boolean alreadyScheduled = pendingDialogLoad || pendingArchiveLoad;
+        pendingDialogLoad |= load;
+        pendingArchiveLoad |= loadArchived;
+        // The call can arrive during a RecyclerView layout. Dispatch once after it returns.
+        if (!alreadyScheduled && (pendingDialogLoad || pendingArchiveLoad)) {
+            AndroidUtilities.runOnUIThread(loadPendingDialogPages);
+        }
+    }
+
+    private boolean pendingDialogLoad, pendingArchiveLoad, pendingLoadAllDialogs;
+    private final Runnable loadPendingDialogPages = this::dispatchPendingDialogLoads;
+
+    private void dispatchPendingDialogLoads() {
+        final boolean load = pendingDialogLoad;
+        final boolean loadArchive = pendingArchiveLoad;
+        final boolean loadAll = pendingLoadAllDialogs;
+        pendingDialogLoad = pendingArchiveLoad = pendingLoadAllDialogs = false;
+        if (isFinished) return;
+
+        final MessagesController controller = getMessagesController();
+        if (load && canLoadDialogPage(controller, folderId)) {
+            int count = 100;
+            if (loadAll) {
+                count = getUserConfig().isPremium() ? controller.dialogFiltersChatsLimitPremium
+                        : controller.dialogFiltersChatsLimitDefault;
             }
+            controller.loadDialogs(folderId, -1, count, !controller.isDialogsEndReached(folderId));
         }
-        // The controller already owns in-flight requests; do not queue another check each pixel.
-        load &= !getMessagesController().isLoadingDialogs(folderId);
-        loadArchived &= !getMessagesController().isLoadingDialogs(1);
-        if (load || loadArchived) {
-            boolean loadFinal = load;
-            boolean loadFromCacheFinal = loadFromCache;
-            boolean loadArchivedFinal = loadArchived;
-            boolean loadArchivedFromCacheFinal = loadArchivedFromCache;
-            AndroidUtilities.runOnUIThread(() -> {
-                if (loadFinal) {
-                    int count = 100;
-                    if (loadAll) {
-                        count = getUserConfig().isPremium() ? getMessagesController().dialogFiltersChatsLimitPremium : getMessagesController().dialogFiltersChatsLimitDefault;
-                    }
-                    getMessagesController().loadDialogs(folderId, -1, count, loadFromCacheFinal);
-                }
-                if (loadArchivedFinal) {
-                    getMessagesController().loadDialogs(1, -1, 100, loadArchivedFromCacheFinal);
-                }
-            });
+        if (!isFinished && loadArchive && (!load || folderId != 1) && canLoadDialogPage(controller, 1)) {
+            controller.loadDialogs(1, -1, 100, !controller.isDialogsEndReached(1));
         }
+    }
+
+    private static boolean canLoadDialogPage(MessagesController controller, int folder) {
+        return !controller.isLoadingDialogs(folder)
+                && (!controller.isDialogsEndReached(folder) || !controller.isServerDialogsEndReached(folder));
     }
 
     private int getPaginationDialogCount(ViewPage page) {
@@ -11172,38 +11173,60 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         updateFloatingButtonOffset();
     }
 
+    private boolean unreadDialogsReloadPending, unreadDialogsReloadHasNewMessage;
+    private final Runnable reloadUnreadDialogs = this::dispatchUnreadDialogsReload;
+
+    private void dispatchUnreadDialogsReload() {
+        final boolean newMessage = unreadDialogsReloadHasNewMessage;
+        unreadDialogsReloadPending = unreadDialogsReloadHasNewMessage = false;
+        if (!isPaused && !isFinished) reloadDialogsPages(newMessage);
+    }
+
+    private void cancelUnreadDialogsReload() {
+        AndroidUtilities.cancelRunOnUIThread(reloadUnreadDialogs);
+        unreadDialogsReloadPending = unreadDialogsReloadHasNewMessage = slowedReloadAfterDialogClick = false;
+    }
+
+    private void reloadDialogsPages(boolean newMessage) {
+        if (viewPages == null || dialogsListFrozen) return;
+        for (ViewPage page : viewPages) reloadViewPageDialogs(page, newMessage);
+        if (filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE) {
+            filterTabsView.checkTabsCounter();
+        }
+    }
+
+    private void onDialogListReload(boolean newMessage) {
+        if (isFinished) return;
+        historyWarmup.request();
+        if (viewPages == null || dialogsListFrozen) return;
+        final boolean protectTappedRow = slowedReloadAfterDialogClick;
+        slowedReloadAfterDialogClick = false;
+        if (unreadDialogsReloadPending) {
+            unreadDialogsReloadHasNewMessage |= newMessage;
+            return;
+        }
+        if (!isPaused && protectTappedRow) {
+            final int type = viewPages[0].dialogsType;
+            if (type == DIALOGS_TYPE_FOLDER1 || type == DIALOGS_TYPE_FOLDER2) {
+                final MessagesController.DialogFilter filter = getMessagesController().selectedDialogFilter[type == DIALOGS_TYPE_FOLDER2 ? 1 : 0];
+                if (filter != null && (filter.flags & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ) != 0) {
+                    // Keep the tapped row in place through the start of the chat transition.
+                    unreadDialogsReloadPending = true;
+                    unreadDialogsReloadHasNewMessage = newMessage;
+                    AndroidUtilities.runOnUIThread(reloadUnreadDialogs, 160);
+                    return;
+                }
+            }
+        }
+        reloadDialogsPages(newMessage);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
 
         if (id == NotificationCenter.dialogsNeedReload) {
-            historyWarmup.request();
-            if (viewPages == null || dialogsListFrozen) {
-                return;
-            }
-            for (int a = 0; a < viewPages.length; a++) {
-                final ViewPage viewPage = viewPages[a];
-                MessagesController.DialogFilter filter = null;
-                if (viewPages[0].dialogsType == 7 || viewPages[0].dialogsType == 8) {
-                    filter = getMessagesController().selectedDialogFilter[viewPages[0].dialogsType == 8 ? 1 : 0];
-                }
-                boolean isUnread = filter != null && (filter.flags & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ) != 0;
-                if (slowedReloadAfterDialogClick && isUnread) {
-                    // in unread tab dialogs reload too instantly removes dialog from folder after clicking on it
-                    AndroidUtilities.runOnUIThread(() -> {
-                        reloadViewPageDialogs(viewPage, args.length > 0);
-                        if (filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE) {
-                            filterTabsView.checkTabsCounter();
-                        }
-                    }, 160);
-                } else {
-                    reloadViewPageDialogs(viewPage, args.length > 0);
-                }
-            }
-            if (filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE) {
-                filterTabsView.checkTabsCounter();
-            }
-            slowedReloadAfterDialogClick = false;
+            onDialogListReload(args.length > 0);
         } else if (id == NotificationCenter.topicsDidLoaded) {
             updateVisibleRows(0);
         } else if (id == NotificationCenter.chatInfoDidLoad) {
@@ -15103,6 +15126,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (LiteMode.isPowerSaverApplied() || LiteMode.isThermalPressureHigh()) historyWarmup.cancel();
         boolean liquid = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
         boolean blur = SharedConfig.chatBlurEnabled();
+        if (!blur && (previewBlurPending || blurredView != null && blurredView.getVisibility() == View.VISIBLE)) {
+            clearPreviewBlur();
+            checkUi_mainTabsVisible();
+        }
         if (appliedGlassPolicyInitialized && appliedLiquidGlassPolicy == liquid && appliedBlurPolicy == blur) return;
         appliedGlassPolicyInitialized = true;
         appliedLiquidGlassPolicy = liquid;

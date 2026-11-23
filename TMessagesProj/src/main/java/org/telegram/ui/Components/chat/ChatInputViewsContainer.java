@@ -166,10 +166,12 @@ public class ChatInputViewsContainer extends FrameLayout {
 
     private boolean canDrawCompactGlass(Canvas canvas) {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && canvas.isHardwareAccelerated()
-                && compactGlassFactory != null && compactGlassColors.isBlurEnabled();
+                && compactGlassFactory != null && compactGlassColors != null && compactGlassColors.isBlurEnabled();
     }
 
     private void drawCompactGlass(Canvas canvas, int index, RectF bounds, float radius) {
+        final int alpha = blurredBackgroundDrawable.getAlpha();
+        if (alpha == 0 || bounds.isEmpty()) return;
         compactGlassDrawn[index] = true;
         BlurredBackgroundDrawable drawable = compactGlass[index];
         if (drawable == null) {
@@ -180,7 +182,7 @@ public class ChatInputViewsContainer extends FrameLayout {
             compactGlassRadius[index] = radius;
             drawable.setRadius(radius);
         }
-        drawable.setAlpha(blurredBackgroundDrawable.getAlpha());
+        drawable.setAlpha(alpha);
         drawable.setBounds(Math.round(bounds.left), Math.round(bounds.top), Math.round(bounds.right), Math.round(bounds.bottom));
         drawChatBackground(canvas, drawable);
     }

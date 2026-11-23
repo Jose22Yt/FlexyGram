@@ -711,7 +711,8 @@ public class ChatActivity extends BaseFragment implements
     private ChannelBoostsController.CanApplyBoost canApplyBoosts;
 
     private boolean showTapForForwardingOptionsHit;
-    private Runnable tapForForwardingOptionsHitRunnable;
+    private boolean forwardingHintEnabled;
+    private final Runnable forwardingHintTick = this::animateForwardingHint;
     private ImageView replyCloseImageView;
     private MentionsContainerView mentionContainer;
     private AnimatorSet mentionListAnimation;
@@ -2770,6 +2771,7 @@ public class ChatActivity extends BaseFragment implements
                 }
             }
             if (!loading) {
+                stopEditTimer();
                 if (mentionContainer != null) {
                     mentionContainer.getAdapter().setNeedBotContext(true);
                 }
@@ -3862,6 +3864,9 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onFragmentDestroy() {
+        stopEditTimer();
+        cancelPendingReactionPresentation();
+        AndroidUtilities.cancelRunOnUIThread(forwardingHintTick);
         if (viewPositionWatcher != null) {
             viewPositionWatcher.shutdown();
             viewPositionWatcher = null;
@@ -17217,32 +17222,20 @@ public class ChatActivity extends BaseFragment implements
             updateBottomOverlay();
         }
 
-        if (showHint) {
-            if (tapForForwardingOptionsHitRunnable == null) {
-                AndroidUtilities.runOnUIThread(tapForForwardingOptionsHitRunnable = () -> {
-                    final SimpleTextView replyObjectTextView = replyLayout.current().obj;
-                    final SimpleTextView replyObjectHintTextView = replyLayout.current().objHint;
-
-                    showTapForForwardingOptionsHit = !showTapForForwardingOptionsHit;
-                    replyObjectTextView.setPivotX(0);
-                    replyObjectHintTextView.setPivotX(0);
-                    if (showTapForForwardingOptionsHit) {
-                        replyObjectTextView.animate().alpha(0f).scaleX(0.98f).scaleY(0.98f).setDuration(150).start();
-                        replyObjectHintTextView.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(150).start();
-                    } else {
-                        replyObjectTextView.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(150).start();
-                        replyObjectHintTextView.animate().alpha(0f).scaleX(0.98f).scaleY(0.98f).setDuration(150).start();
-                    }
-                    AndroidUtilities.runOnUIThread(tapForForwardingOptionsHitRunnable, 6000);
-                }, 6000);
-            }
-        } else {
+        if (forwardingHintEnabled != showHint) {
+            forwardingHintEnabled = showHint;
+            if (showHint) scheduleForwardingHint();
+            else AndroidUtilities.cancelRunOnUIThread(forwardingHintTick);
+        }
+        if (!showHint) {
             final SimpleTextView replyObjectTextView = replyLayout.current().obj;
             final SimpleTextView replyObjectHintTextView = replyLayout.current().objHint;
-
-            if (tapForForwardingOptionsHitRunnable != null) {
-                AndroidUtilities.cancelRunOnUIThread(tapForForwardingOptionsHitRunnable);
-                tapForForwardingOptionsHitRunnable = null;
+            if (showTapForForwardingOptionsHit) {
+                replyObjectTextView.animate().cancel();
+                replyObjectHintTextView.animate().cancel();
+                replyObjectTextView.setScaleX(1f);
+                replyObjectTextView.setScaleY(1f);
+                showTapForForwardingOptionsHit = false;
             }
             replyObjectTextView.setAlpha(1f);
             replyObjectHintTextView.setAlpha(0);
@@ -17250,6 +17243,28 @@ public class ChatActivity extends BaseFragment implements
         if (chatActivityEnterView != null) {
             chatActivityEnterView.updateSendButtonPaid();
         }
+    }
+
+    private void scheduleForwardingHint() {
+        if (!paused && !isFinished && forwardingHintEnabled) {
+            AndroidUtilities.cancelRunOnUIThread(forwardingHintTick);
+            AndroidUtilities.runOnUIThread(forwardingHintTick, 6000);
+        }
+    }
+
+    private void animateForwardingHint() {
+        if (paused || isFinished || !forwardingHintEnabled) return;
+        final SimpleTextView text = replyLayout.current().obj;
+        final SimpleTextView hint = replyLayout.current().objHint;
+        showTapForForwardingOptionsHit = !showTapForForwardingOptionsHit;
+        final boolean showHint = showTapForForwardingOptionsHit;
+        text.setPivotX(0);
+        hint.setPivotX(0);
+        final float textScale = showHint ? 0.98f : 1f;
+        final float hintScale = showHint ? 1f : 0.98f;
+        text.animate().alpha(showHint ? 0f : 1f).scaleX(textScale).scaleY(textScale).setDuration(150).start();
+        hint.animate().alpha(showHint ? 1f : 0f).scaleX(hintScale).scaleY(hintScale).setDuration(150).start();
+        AndroidUtilities.runOnUIThread(forwardingHintTick, 6000);
     }
 
     private void moveScrollToLastMessage(boolean skipSponsored) {
@@ -32524,6 +32539,11 @@ public class ChatActivity extends BaseFragment implements
         if (chatActivityEnterView != null) {
             chatActivityEnterView.onResume();
         }
+        if (timedEditMessage != null) {
+            AndroidUtilities.cancelRunOnUIThread(editTimerCheck);
+            checkEditTimer();
+        }
+        scheduleForwardingHint();
         if (currentUser != null) {
             chatEnterTime = System.currentTimeMillis();
             chatLeaveTime = 0;
@@ -32620,6 +32640,10 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onPause() {
+        AndroidUtilities.cancelRunOnUIThread(editTimerCheck);
+        AndroidUtilities.cancelRunOnUIThread(forwardingHintTick);
+        cancelPendingReactionPresentation();
+        ReactionsEffectOverlay.dismissByFragment(this);
         cancelFolderUnreadBadgeUpdate();
         cancelScrollHintChecks();
         cancelPendingScrollHistory();
@@ -35075,20 +35099,13 @@ public class ChatActivity extends BaseFragment implements
                 scrimPopupContainerLayout.addView(optionsView);
             } else {
                 final boolean tags = getUserConfig().getClientUserId() == getDialogId();
-                reactionsLayout = new ReactionsContainerLayout(tags ? ReactionsContainerLayout.TYPE_TAGS : ReactionsContainerLayout.TYPE_DEFAULT, ChatActivity.this, contentView.getContext(), currentAccount, getResourceProvider());
-                reactionsLayout.setBackgroundFactory(scrimBlur3Factory, BlurredBackgroundProviderImpl.messageMenuReactionsBackground(resourceProvider));
-                if (tags) {
-                    reactionsLayout.setHint(getUserConfig().isPremium() ? LocaleController.getString(R.string.SavedTagReactionsHint2) : AndroidUtilities.replaceSingleTag(LocaleController.getString(R.string.SavedTagReactionsPremiumHint), Theme.key_windowBackgroundWhiteBlueText2, 0, () -> {
-                        closeMenu(false);
-                        PremiumFeatureBottomSheet sheet = new PremiumFeatureBottomSheet(ChatActivity.this, PremiumPreviewFragment.PREMIUM_FEATURE_SAVED_TAGS, true);
-                        sheet.setDimBehind(false);
-                        sheet.setOnHideListener(d -> {
-                            dimBehindView(false);
-                        });
-                        sheet.show();
-                    }));
-                }
-                if (isReactionsAvailable && (!tags || (!getMessagesController().premiumFeaturesBlocked() && (getUserConfig().isPremium())))) {
+                final boolean showReactions = isReactionsAvailable
+                        && (!tags || (!getMessagesController().premiumFeaturesBlocked() && getUserConfig().isPremium()));
+                if (showReactions) {
+                    reactionsLayout = new ReactionsContainerLayout(tags ? ReactionsContainerLayout.TYPE_TAGS : ReactionsContainerLayout.TYPE_DEFAULT,
+                            this, contentView.getContext(), currentAccount, getResourceProvider());
+                    reactionsLayout.setBackgroundFactory(scrimBlur3Factory, BlurredBackgroundProviderImpl.messageMenuReactionsBackground(resourceProvider));
+                    if (tags) reactionsLayout.setHint(getString(R.string.SavedTagReactionsHint2));
                     int pad = 22;
                     int sPad = 24;
                     reactionsLayout.setPadding(dp(4) + (LocaleController.isRTL ? 0 : sPad), dp(4), dp(4) + (LocaleController.isRTL ? sPad : 0), dp(pad));
@@ -35174,7 +35191,7 @@ public class ChatActivity extends BaseFragment implements
                     scrimPopupContainerLayout.addView(signatureMessageGap,
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0));
                 }
-                scrimPopupContainerLayout.addView(popupLayout, LayoutHelper.createLinearRelatively(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT, isReactionsAvailable ? 16 : 0, 0, isReactionsAvailable ? 36 : 0, 0));
+                scrimPopupContainerLayout.addView(popupLayout, LayoutHelper.createLinearRelatively(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT, showReactions ? 16 : 0, 0, showReactions ? 36 : 0, 0));
                 scrimPopupContainerLayout.setPopupWindowLayout(popupLayout);
                 if (showNoForwards) {
                     popupLayout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
@@ -35213,7 +35230,7 @@ public class ChatActivity extends BaseFragment implements
                         fl.setBackground(shadowDrawable2);
                     }
                     fl.addView(tv, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 11, 11, 11, 11));
-                    scrimPopupContainerLayout.addView(fl, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT, isReactionsAvailable ? 16 : 0, -8, isReactionsAvailable ? 36 : 0, 0));
+                    scrimPopupContainerLayout.addView(fl, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT, showReactions ? 16 : 0, -8, showReactions ? 36 : 0, 0));
                     scrimPopupContainerLayout.applyViewBottom(fl);
                 }
 
@@ -35241,7 +35258,7 @@ public class ChatActivity extends BaseFragment implements
                         fl.setBackground(shadowDrawable2);
                     }
                     fl.addView(tv, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 11, 11, 11, 11));
-                    scrimPopupContainerLayout.addView(fl, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT, isReactionsAvailable ? 16 : 0, -8, isReactionsAvailable ? 36 : 0, 0));
+                    scrimPopupContainerLayout.addView(fl, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT, showReactions ? 16 : 0, -8, showReactions ? 36 : 0, 0));
                     scrimPopupContainerLayout.applyViewBottom(fl);
                 }
 
@@ -35983,7 +36000,20 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
-    Runnable updateReactionRunnable;
+    private Runnable updateReactionRunnable;
+    private long reactionPresentationGeneration;
+
+    private void cancelPendingReactionPresentation() {
+        reactionPresentationGeneration++;
+        if (updateReactionRunnable != null) {
+            AndroidUtilities.cancelRunOnUIThread(updateReactionRunnable);
+            updateReactionRunnable = null;
+        }
+    }
+
+    private boolean canPresentReaction(long generation) {
+        return generation == reactionPresentationGeneration && !paused && !isFinished;
+    }
 
     private void showMultipleReactionsPromo(View cell, ReactionsLayoutInBubble.VisibleReaction visibleReaction, int currentChosenReactions) {
         if (SharedConfig.multipleReactionsPromoShowed || cell == null || visibleReaction == null || getUserConfig().isPremium()) {
@@ -36020,6 +36050,7 @@ public class ChatActivity extends BaseFragment implements
             return;
         }
         if (visibleReaction != null && visibleReaction.isStar) {
+            cancelPendingReactionPresentation();
             closeMenu();
             if (cell == null) {
                 cell = findMessageCell(primaryMessage.getId(), true);
@@ -36084,6 +36115,8 @@ public class ChatActivity extends BaseFragment implements
         }
 
         ReactionsEffectOverlay.removeCurrent(false);
+        cancelPendingReactionPresentation();
+        final long presentationGeneration = reactionPresentationGeneration;
         chatMessagesMetadataController.cancelReactionsRequests();
         final int currentChosenReactions = primaryMessage.getChoosenReactions().size();
         final boolean added = primaryMessage.selectReaction(visibleReaction, bigEmoji, fromDoubleTap);
@@ -36101,57 +36134,53 @@ public class ChatActivity extends BaseFragment implements
         if (added) {
             cell = findMessageCell(finalMessageIdForCell, true);
             showMultipleReactionsPromo(cell, visibleReaction, currentChosenReactions);
-            if (!fromDoubleTap) {
+            if (!fromDoubleTap && !withoutAnimation) {
                 ReactionsEffectOverlay.show(ChatActivity.this, reactionsLayout, cell, fromView, x, y, visibleReaction, currentAccount, reactionsLayout != null ? (bigEmoji ? ReactionsEffectOverlay.LONG_ANIMATION : ReactionsEffectOverlay.ONLY_MOVE_ANIMATION) : ReactionsEffectOverlay.SHORT_ANIMATION);
             }
         }
         if (added && visibleReaction != null && visibleReaction.emojicon != null) {
             AndroidUtilities.makeAccessibilityAnnouncement(LocaleController.formatString(R.string.AccDescrYouReactedWith, visibleReaction.emojicon));
         }
-        ArrayList<ReactionsLayoutInBubble.VisibleReaction> visibleReactions = new ArrayList<>();
-        visibleReactions.addAll(primaryMessage.getChoosenReactions());
-        getSendMessagesHelper().sendReaction(primaryMessage, visibleReactions, added ? visibleReaction : null, bigEmoji, addToRecent, ChatActivity.this, updateReactionRunnable = new Runnable() {
+        final ArrayList<ReactionsLayoutInBubble.VisibleReaction> visibleReactions = new ArrayList<>(primaryMessage.getChoosenReactions());
+        final Runnable presentReaction = withoutAnimation ? null : new Runnable() {
             @Override
             public void run() {
-                if (withoutAnimation) {
-                    return;
-                }
-                if (updateReactionRunnable != null) {
-                    updateReactionRunnable = null;
-                    if (fromDoubleTap) {
-                        doOnIdle(() -> {
-                            AndroidUtilities.runOnUIThread(() -> {
-                                BaseCell cell = findMessageCell(finalMessageIdForCell, true);
-                                if (added) {
-                                    ReactionsEffectOverlay.show(ChatActivity.this, reactionsLayout, cell, null, x, y, visibleReaction, currentAccount, ReactionsEffectOverlay.SHORT_ANIMATION);
-                                    ReactionsEffectOverlay.startAnimation();
-                                }
-                            }, 50);
-                        });
-                    } else {
-                        doOnIdle(() -> {
-                            MessageObject messageToUpdate = primaryMessage;
-                            MessageObject messageInDict = messagesDict[0].get(primaryMessage.getId());
-                            if (messageInDict != null && messageInDict != primaryMessage) {
-                                messageToUpdate = messagesDict[0].get(primaryMessage.getId());
-                                messageToUpdate.messageOwner.reactions = primaryMessage.messageOwner.reactions;
-                            }
-
-                            updateMessageAnimated(messageToUpdate, true);
+                if (updateReactionRunnable != this) return;
+                updateReactionRunnable = null;
+                AndroidUtilities.cancelRunOnUIThread(this);
+                if (!canPresentReaction(presentationGeneration)) return;
+                if (fromDoubleTap) {
+                    if (added) doOnIdle(() -> AndroidUtilities.runOnUIThread(() -> {
+                        if (canPresentReaction(presentationGeneration)) {
+                            BaseCell cell = findMessageCell(finalMessageIdForCell, true);
+                            if (cell == null) return;
+                            ReactionsEffectOverlay.show(ChatActivity.this, reactionsLayout, cell, null, x, y, visibleReaction, currentAccount, ReactionsEffectOverlay.SHORT_ANIMATION);
                             ReactionsEffectOverlay.startAnimation();
-                        });
-                    }
-                    closeMenu();
+                        }
+                    }, 50));
+                } else {
+                    doOnIdle(() -> {
+                        if (!canPresentReaction(presentationGeneration)) return;
+                        MessageObject messageInDict = messagesDict[0].get(primaryMessage.getId());
+                        if (messageInDict != null && messageInDict != primaryMessage) {
+                            messageInDict.messageOwner.reactions = primaryMessage.messageOwner.reactions;
+                        }
+                        updateMessageAnimated(messageInDict != null ? messageInDict : primaryMessage, true);
+                        ReactionsEffectOverlay.startAnimation();
+                    });
                 }
+                closeMenu();
             }
-        });
+        };
+        updateReactionRunnable = presentReaction;
+        getSendMessagesHelper().sendReaction(primaryMessage, visibleReactions, added ? visibleReaction : null,
+                bigEmoji, addToRecent, this, presentReaction);
 
         if (fromDoubleTap || withoutAnimation) {
             updateMessageAnimated(primaryMessage, true);
-            updateReactionRunnable.run();
-        }
-        if (!withoutAnimation) {
-            AndroidUtilities.runOnUIThread(updateReactionRunnable, 50);
+            if (presentReaction != null) presentReaction.run();
+        } else {
+            AndroidUtilities.runOnUIThread(presentReaction, 50);
         }
     }
 
@@ -36289,9 +36318,9 @@ public class ChatActivity extends BaseFragment implements
         chatActivityEnterView.setVisibility(View.VISIBLE);
         showFieldPanelForEdit(true, messageObject);
         updateBottomOverlay();
-        if (!asSuggestion) {
-            checkEditTimer();
-        }
+        stopEditTimer();
+        timedEditMessage = asSuggestion ? null : chatActivityEnterView.getEditingMessageObject();
+        if (timedEditMessage != null) checkEditTimer();
         if (asSuggestion) {
             messageSuggestionParams = MessageSuggestionParams.of(messageObject.messageOwner.suggested_post);
         }
@@ -38515,25 +38544,37 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
+    private static final int EDIT_COUNTDOWN_SECONDS = 5 * 60;
+    private MessageObject timedEditMessage;
+    private final Runnable editTimerCheck = this::checkEditTimer;
+
+    private void stopEditTimer() {
+        if (timedEditMessage != null) {
+            AndroidUtilities.cancelRunOnUIThread(editTimerCheck);
+            timedEditMessage = null;
+        }
+    }
+
     private void checkEditTimer() {
-        if (chatActivityEnterView == null) {
-            return;
-        }
-        MessageObject messageObject = chatActivityEnterView.getEditingMessageObject();
-        if (messageObject == null || messageObject.scheduled) {
-            return;
-        }
-        if (currentUser != null && currentUser.self) {
+        if (paused || isFinished || timedEditMessage == null) return;
+
+        final MessageObject messageObject = timedEditMessage;
+        if (chatActivityEnterView == null || chatActivityEnterView.getEditingMessageObject() != messageObject
+                || messageObject.scheduled || (currentUser != null && currentUser.self)
+                || messageObject.canEditMessageAnytime(currentChat)) {
+            timedEditMessage = null;
             return;
         }
         final SimpleTextView replyObjectTextView = replyLayout.current().obj;
-        int dt = messageObject.canEditMessageAnytime(currentChat) ? 6 * 60 : getMessagesController().maxEditTime + 5 * 60 - Math.abs(getConnectionsManager().getCurrentTime() - messageObject.messageOwner.date);
+        final long dt = getMessagesController().maxEditTime + (long) EDIT_COUNTDOWN_SECONDS
+                - Math.abs((long) getConnectionsManager().getCurrentTime() - messageObject.messageOwner.date);
         if (dt > 0) {
-            if (dt <= 5 * 60) {
-                replyObjectTextView.setText(LocaleController.formatString("TimeToEdit", R.string.TimeToEdit, AndroidUtilities.formatShortDuration(dt)));
+            if (dt <= EDIT_COUNTDOWN_SECONDS) {
+                replyObjectTextView.setText(LocaleController.formatString("TimeToEdit", R.string.TimeToEdit, AndroidUtilities.formatShortDuration((int) dt)));
             }
-            AndroidUtilities.runOnUIThread(this::checkEditTimer, 1000);
+            AndroidUtilities.runOnUIThread(editTimerCheck, Math.max(1, dt - EDIT_COUNTDOWN_SECONDS) * 1000);
         } else {
+            timedEditMessage = null;
             chatActivityEnterView.onEditTimeExpired();
             replyObjectTextView.setText(LocaleController.formatString("TimeToEditExpired", R.string.TimeToEditExpired));
         }
@@ -53113,20 +53154,18 @@ public class ChatActivity extends BaseFragment implements
 
     private int getMergedVisibleBlurredPositions(List<RectF> positions) {
         final int positionsCount = getVisibleBlurredPositions(glassDrawablesPositions);
-        final int mergedPositionsCount = RectFMergeBounding.mergeOverlapping(glassDrawablesPositions, positionsCount, positions);
-        final int maxX = contentView.getMeasuredWidth();
-        for (int a = 0; a < mergedPositionsCount; a++) {
-            final RectF position = positions.get(a);
-            position.left = androidx.core.math.MathUtils.clamp(position.left, 0, maxX);
-            position.top = Math.max(chatListView.getY(), position.top);
-            position.right = androidx.core.math.MathUtils.clamp(position.right, 0, maxX);
-            position.bottom = Math.min(chatListView.getY() + chatListView.getMeasuredHeight(), position.bottom);
-            /*if (drawDebug) {
-                ((Canvas) null).drawRect(position, Theme.DEBUG_GREEN_STROKE);
-            }*/
+        final int width = contentView.getMeasuredWidth();
+        final float top = chatListView.getY();
+        final float bottom = top + chatListView.getMeasuredHeight();
+        int clippedCount = 0;
+        for (int a = 0; a < positionsCount; a++) {
+            final RectF position = glassDrawablesPositions.get(a);
+            if (position.intersect(0, top, width, bottom) && !position.isEmpty()) {
+                if (clippedCount != a) glassDrawablesPositions.get(clippedCount).set(position);
+                clippedCount++;
+            }
         }
-
-        return mergedPositionsCount;
+        return RectFMergeBounding.mergeOverlapping(glassDrawablesPositions, clippedCount, positions);
     }
 
     private int getVisibleBlurredPositions(List<RectF> positions) {

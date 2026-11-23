@@ -187,33 +187,37 @@ public class Probe {
 }'''.replace('FIELDS',fields).replace('SCHEDULE',schedule).replace('IDLE_GUARD',idle_guard)})
 
 
-def test_dialog_scroll_reuses_range_and_skips_inflight_folder_loads(tmp_path):
+def test_dialog_scroll_reuses_visible_range(tmp_path):
     source = (JAVA/'org/telegram/ui/DialogsActivity.java').read_text()
+    listener_start = source.index('viewPage.listView.setOnScrollListener(new RecyclerView.OnScrollListener()')
+    listener = source[listener_start:source.index('viewPage.archivePullViewState =', listener_start)]
+    assert 'viewPage.listView.setAllowStopHeaveOperations(true)' in source
+    assert 'stopAllHeavyOperations' not in listener and 'startAllHeavyOperations' not in listener
+    list_source = (JAVA/'org/telegram/ui/Components/RecyclerListView.java').read_text()
+    assert 'checkStopHeavyOperations(newState)' in list_source
+    assert 'startAllHeavyOperations' in method(list_source, 'protected void onDetachedFromWindow()')
     start = source.index('viewPage.dialogsItemAnimator.onListScroll(-dy);')
     scan = source[source.index('int firstVisiblePosition', start):source.index('invalidateScrollY = true;', start)]
-    load = method(source, 'private void checkListLoad(ViewPage viewPage, int firstVisibleItem, int lastVisibleItem, boolean loadAll)')
     probe(tmp_path, {'Probe.java': '''import java.util.*;
 public class Probe {
  static class View {final int position;View(int position){this.position=position;}}
  static class RecyclerView {static final int NO_POSITION=-1;int visits;int[] positions={-1,70,71,72,73,74,75,76,77,78,79};int getChildCount(){return positions.length;}View getChildAt(int i){visits++;return new View(positions[i]);}int getChildAdapterPosition(View v){return v.position;}}
- RecyclerView recyclerView=new RecyclerView();Object viewPage=new Object();int first,last,loads;View firstChild;
+ RecyclerView recyclerView=new RecyclerView();Object viewPage=new Object();int first,last;View firstChild;
  void checkListLoad(Object page,int first,int last){this.first=first;this.last=last;}
  void scroll(){SCAN firstChild=firstVisibleChild;}
- void run(boolean load,boolean loadArchived,int folderId){GUARDS if(load)loads++;if(loadArchived)loads++;}
- static class Controller {boolean[] loading={false,false};boolean isLoadingDialogs(int folder){return loading[folder];}}
- Controller controller=new Controller();Controller getMessagesController(){return controller;}
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[] args){Probe p=new Probe();p.scroll();check(p.first==70&&p.last==79&&p.firstChild.position==70&&p.recyclerView.visits==11);
-  p.controller.loading[0]=true;p.controller.loading[1]=true;
-  for(int i=0;i<10000;i++)p.run(true,true,0);check(p.loads==0);
-  p.controller.loading[1]=false;p.run(true,true,0);check(p.loads==1);
-  p.controller.loading[0]=false;p.run(true,false,0);check(p.loads==2);
   p.recyclerView.positions=new int[]{-1,-1};p.scroll();check(p.first==-1&&p.last==-1&&p.firstChild==null);
  }
-}'''.replace('SCAN',scan).replace('GUARDS',load[load.index('load &='):load.index('if (load || loadArchived)')])})
-def test_empty_dialog_filter_loads_cache_then_server_and_respects_archive_setting(tmp_path):
+}'''.replace('SCAN',scan)})
+def test_dialog_pagination_coalesces_requests_and_respects_current_folder_state(tmp_path):
     source = (JAVA/'org/telegram/ui/DialogsActivity.java').read_text()
-    load = method(source, 'private void checkListLoad(ViewPage viewPage, int firstVisibleItem, int lastVisibleItem, boolean loadAll)')
+    load = '\n'.join(method(source, signature) for signature in (
+        'private void checkListLoad(ViewPage viewPage, int firstVisibleItem, int lastVisibleItem, boolean loadAll)',
+        'private void dispatchPendingDialogLoads()',
+        'private static boolean canLoadDialogPage(MessagesController controller, int folder)',
+    ))
+    fields = source[source.index('    private boolean pendingDialogLoad,'):source.index('    private void dispatchPendingDialogLoads()')]
     probe(tmp_path, {'Probe.java': '''import java.util.*;
 public class Probe {
  static final int DIALOGS_TYPE_FOLDER1=7,DIALOGS_TYPE_FOLDER2=8;
@@ -225,38 +229,54 @@ public class Probe {
   ViewHolder findViewHolderForAdapterPosition(int value){return null;}
  }
  static class ViewPage {int dialogsType=7,selectedType;RecyclerView listView=new RecyclerView();}
- static class AndroidUtilities {static void runOnUIThread(Runnable work){work.run();}}
+ static class AndroidUtilities {
+  static final ArrayDeque<Runnable> queue=new ArrayDeque<>();
+  static void runOnUIThread(Runnable work){queue.add(work);}
+  static void drain(){while(!queue.isEmpty())queue.remove().run();}
+ }
  static class MessagesController {
   static final int DIALOG_FILTER_FLAG_EXCLUDE_ARCHIVED=1;
   static class DialogFilter {int flags;}
   final ArrayList<DialogFilter> filters=new ArrayList<>(List.of(new DialogFilter()));
   final boolean[] cacheEnd={false,false},serverEnd={false,false},loading={false,false};
-  final List<String> loads=new ArrayList<>();int dialogFiltersChatsLimitPremium,dialogFiltersChatsLimitDefault;
+  final List<String> loads=new ArrayList<>();int dialogFiltersChatsLimitPremium=200,dialogFiltersChatsLimitDefault=150;
   ArrayList<DialogFilter> getDialogFilters(){return filters;}
   boolean isDialogsEndReached(int folder){return cacheEnd[folder];}
   boolean isServerDialogsEndReached(int folder){return serverEnd[folder];}
   boolean isLoadingDialogs(int folder){return loading[folder];}
-  void loadDialogs(int folder,int offset,int count,boolean cache){loads.add(folder+":"+cache);}
+  void loadDialogs(int folder,int offset,int count,boolean cache){loads.add(folder+":"+cache+":"+count);}
  }
  static class UserConfig {boolean isPremium(){return false;}}
  final MessagesController controller=new MessagesController();
  MessagesController getMessagesController(){return controller;} UserConfig getUserConfig(){return new UserConfig();}
- boolean tabsAnimationInProgress,startedTracking,floatingForceVisible,dialogsListFrozen; int folderId,currentAccount;
+ boolean tabsAnimationInProgress,startedTracking,floatingForceVisible,dialogsListFrozen,isFinished; int folderId,currentAccount;
  Tabs filterTabsView;void hideFloatingButton(boolean value){}
  int getPaginationDialogCount(ViewPage page){return 300;}
  List<Integer> getDialogsArray(int a,int type,int folder,boolean frozen){return Collections.nCopies(300,0);}
- LOAD
+ FIELDS LOAD
  static void check(boolean valid){if(!valid)throw new AssertionError();}
  public static void main(String[] args){
-  Probe p=new Probe();ViewPage f=new ViewPage();p.checkListLoad(f,-1,-1,false);
-  check(p.controller.loads.equals(List.of("0:true","1:true")));p.controller.loads.clear();
-  p.controller.filters.get(0).flags=1;p.controller.cacheEnd[0]=true;
-  p.checkListLoad(f,-1,-1,false);check(p.controller.loads.equals(List.of("0:false")));p.controller.loads.clear();
-  p.controller.serverEnd[0]=true;p.checkListLoad(f,-1,-1,false);check(p.controller.loads.isEmpty());
+  Probe p=new Probe();ViewPage f=new ViewPage();
+  for(int i=0;i<10000;i++)p.checkListLoad(f,-1,-1,false);
+  check(AndroidUtilities.queue.size()==1&&p.controller.loads.isEmpty());
+  AndroidUtilities.drain();
+  check(p.controller.loads.equals(List.of("0:true:100","1:true:100")));p.controller.loads.clear();
+  p.controller.filters.get(0).flags=1;
+  p.checkListLoad(f,-1,-1,false);p.checkListLoad(f,-1,-1,true);p.controller.cacheEnd[0]=true;
+  check(AndroidUtilities.queue.size()==1);AndroidUtilities.drain();
+  check(p.controller.loads.equals(List.of("0:false:150")));p.controller.loads.clear();
+  p.controller.serverEnd[0]=true;p.checkListLoad(f,-1,-1,false);check(AndroidUtilities.queue.isEmpty());
   f.dialogsType=0;p.controller.cacheEnd[0]=p.controller.serverEnd[0]=false;
-  p.checkListLoad(f,-1,-1,false);check(p.controller.loads.isEmpty());
+  p.checkListLoad(f,-1,-1,false);check(AndroidUtilities.queue.isEmpty());
+  f.dialogsType=7;p.controller.loading[0]=true;
+  for(int i=0;i<10000;i++)p.checkListLoad(f,-1,-1,false);
+  check(AndroidUtilities.queue.isEmpty());
+  p.controller.loading[0]=false;p.checkListLoad(f,-1,-1,false);
+  p.controller.loading[0]=true;AndroidUtilities.drain();check(p.controller.loads.isEmpty());
+  p.controller.loading[0]=false;p.checkListLoad(f,-1,-1,false);
+  p.isFinished=true;AndroidUtilities.drain();check(p.controller.loads.isEmpty());
  }
-}'''.replace('LOAD', load)})
+}'''.replace('FIELDS',fields).replace('LOAD', load)})
 
 
 def test_selector_pagination_uses_the_adapter_snapshot_without_rebuilding_the_list(tmp_path):

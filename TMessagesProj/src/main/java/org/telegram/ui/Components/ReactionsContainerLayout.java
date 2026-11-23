@@ -593,6 +593,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
     }
 
     public void setMirrorX(boolean mirrorX) {
+        if (this.mirrorX == mirrorX) return;
         this.mirrorX = mirrorX;
         invalidate();
     }

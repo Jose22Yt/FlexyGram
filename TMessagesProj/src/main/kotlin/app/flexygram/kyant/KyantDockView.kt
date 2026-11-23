@@ -103,9 +103,27 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
     }
 
     fun syncFromNative() {
-        subtleEdge = ChatEdgeStyle.isSubtle()
         val wasRendering = isRendering()
         val wasAvailable = available
+        available = isAttachedToWindow && windowVisibility == VISIBLE && isShown && dock.isShown &&
+            dock.alpha > 0f && isHardwareAccelerated && KyantDockConfig.isEnabled() &&
+            !LiteMode.isPowerSaverApplied() && !LiteMode.isThermalPressureHigh()
+        if (!available) {
+            if (wasAvailable) {
+                ready = false
+                removeCallbacks(longPress); gesture = false; longPressTab = null
+                removeCallbacks(frame); framePending = false
+                source.release()
+                iconSnapshots.values.forEach { it.release() }
+                iconSnapshots.clear()
+                if (wasRendering) tabs.forEach { it.setSkipDrawSelector(false) }
+                dock.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+                dock.invalidate()
+            }
+            return
+        }
+
+        subtleEdge = ChatEdgeStyle.isSubtle()
         visibleScratch.clear()
         for (i in 0 until dock.childCount) {
             val tab = dock.getChildAt(i) as? GlassTabView ?: continue
@@ -115,7 +133,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         if (LocaleController.isRTL) visibleScratch.reverse()
         val visible = visibleScratch
         if (tabs != visible) {
-            tabs.forEach { it.setSkipDrawSelector(false) }
+            if (wasRendering) tabs.forEach { it.setSkipDrawSelector(false) }
             iconSnapshots.values.forEach { it.release() }
             iconSnapshots.clear()
             tabs = visible.toList()
@@ -126,23 +144,11 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         alpha = dock.alpha
         if (geometry.update(dock.x - x, dock.y - y, dock.width, dock.height, dock.paddingTop, dock.paddingBottom,
                 LocaleController.isRTL, Theme.isCurrentThemeDark())) geometryRevision++
-        available = isShown && dock.isShown && dock.visibility == VISIBLE && dock.alpha > 0f &&
-            windowVisibility == VISIBLE && isHardwareAccelerated &&
-            KyantDockConfig.isEnabled() && !LiteMode.isPowerSaverApplied()
         val importance = if (isRendering()) View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
             else View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
         if (dock.importantForAccessibility != importance) dock.importantForAccessibility = importance
-        visible.forEach { it.setSkipDrawSelector(available && visible.size >= 2) }
-        if (!available) {
-            ready = false
-            removeCallbacks(longPress); gesture = false; longPressTab = null
-            removeCallbacks(frame); framePending = false
-            if (wasAvailable) {
-                source.release()
-                iconSnapshots.values.forEach { it.release() }
-                iconSnapshots.clear()
-            }
-        }
+        if (ready) visible.forEach { it.setSkipDrawSelector(true) }
+        if (!wasAvailable) backdropChanged()
         if (wasRendering != isRendering()) dock.invalidate()
     }
 
@@ -158,6 +164,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         if (available) backdropChanged()
     }
     override fun onDetachedFromWindow() {
+        available = false
         LiteMode.removeOnPowerSaverAppliedListener(powerListener)
         KyantDockConfig.removeListener(configListener)
         iconSnapshots.values.forEach { it.release() }
@@ -257,7 +264,12 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
             }
         }
         SideEffect {
-            if (available && tabs.size >= 2 && !ready) { ready = true; dock.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS; dock.invalidate() }
+            if (available && tabs.size >= 2 && !ready) {
+                ready = true
+                tabs.forEach { it.setSkipDrawSelector(true) }
+                dock.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+                dock.invalidate()
+            }
         }
     }
 }

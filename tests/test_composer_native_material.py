@@ -12,6 +12,7 @@ def test_composer_native_islands_do_not_overpaint_the_native_material(tmp_path):
             RectF(){}RectF(float l,float t,float r,float b){left=l;top=t;right=r;bottom=b;}
             void offset(float x,float y){left+=x;right+=x;top+=y;bottom+=y;}
             void setEmpty(){left=top=right=bottom=0;}
+            boolean isEmpty(){return left>=right||top>=bottom;}
         }
         // The compositor may only invoke the native drawables. A manual Canvas
         // paint here would require a second material layer and fail this compile.
@@ -49,6 +50,11 @@ def test_composer_native_islands_do_not_overpaint_the_native_material(tmp_path):
                     Probe p=new Probe();p.flexyComposer.voice=voice;p.flexyComposer.send=send;p.blurredBackgroundDrawable.alpha=alpha;
                     for(BlurredBackgroundDrawable d:p.compactGlass)d.material=material;
                     Canvas c=new Canvas();p.drawFlexyNativeGlassIslands(c,5,10,20,attach);
+                    if(alpha==0){
+                        check(c.calls==0);
+                        for(BlurredBackgroundDrawable d:p.compactGlass)check(d.radiusChanges==0);
+                        continue;
+                    }
                     check(c.calls==1+(voice?1:0)+(send?1:0)+(attach?1:0));
                     check(p.flexyNativeGlassDrawn&&p.flexyVoiceDrawn==voice&&p.flexySendDrawn==send);
                     for(int i=0;i<4;i++)if(p.compactGlassDrawn[i])check(c.material[i]==material&&p.compactGlass[i].alpha==alpha);

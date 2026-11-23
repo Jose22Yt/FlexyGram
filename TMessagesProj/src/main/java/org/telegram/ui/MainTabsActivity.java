@@ -305,7 +305,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
                 super.dispatchDraw(canvas);
                 blur3_invalidateBlur();
-                blur3_updateFadeColors();
+                blur3_updateFadeColors(color);
                 if (kyantInitWork != null) kyantInitWork.afterDraw();
             }
         };
@@ -1426,11 +1426,11 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         final int hiddenY = normalY + dp(MainTabsHelper.isMainTabsHideTitleStyle() ? 30 : 40);
 
         final float factor = animatorTabsVisible.getFloatValue();
-        final float scale = lerp(0.85f, 1f, factor);
 
         tabsViewWrapper.setTranslationY(lerp(hiddenY, normalY, factor));
-        tabsView.setClickable(factor > 1);
-        tabsView.setEnabled(factor > 1);
+        final boolean interactive = factor >= 1f;
+        tabsView.setClickable(interactive);
+        tabsView.setEnabled(interactive);
         tabsView.setAlpha(factor);
         tabsView.setVisibility(factor > 0 ? View.VISIBLE : View.GONE);
         if (kyantDockView != null) kyantDockView.syncFromNative();
@@ -1493,12 +1493,16 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     /* * */
 
+    private boolean hasVisibleTabsSurface() {
+        return tabsView != null && tabsView.getVisibility() == View.VISIBLE && tabsView.getAlpha() > 0f
+                && tabsViewWrapper != null && tabsViewWrapper.getVisibility() == View.VISIBLE
+                && tabsViewWrapper.getAlpha() > 0f;
+    }
+
     private class MainTabsActivityControllerImpl implements MainTabsActivityController {
         @Override
         public boolean hasVisibleTabsSurface() {
-            return tabsView != null && tabsView.getVisibility() == View.VISIBLE && tabsView.getAlpha() > 0f
-                    && tabsViewWrapper != null && tabsViewWrapper.getVisibility() == View.VISIBLE
-                    && tabsViewWrapper.getAlpha() > 0f;
+            return MainTabsActivity.this.hasVisibleTabsSurface();
         }
 
         @Override
@@ -1605,6 +1609,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private void blur3_invalidateBlur() {
         if (kyantDockView != null && kyantDockView.isRendering()) return;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || iBlur3SourceTabGlass == null || fragmentView == null
+                || !hasVisibleTabsSurface() || !tabsView.isShown() || tabsView.getWindowVisibility() != View.VISIBLE
                 || !SharedConfig.chatBlurEnabled()) {
             return;
         }
@@ -1616,8 +1621,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         iBlur3SourceTabGlass.updateDisplayListIfNeeded();
     }
 
-    private void blur3_updateFadeColors() {
-        final int color = getEstBackgroundColor();
+    private void blur3_updateFadeColors(int color) {
         if (iBlur3SourceColor.getColor() == color) return;
         iBlur3SourceColor.setColor(color);
         if (fadeView != null) {
@@ -1627,7 +1631,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     private void blur3_updateColors() {
         if (kyantDockView != null) kyantDockView.backdropChanged();
-        blur3_updateFadeColors();
+        blur3_updateFadeColors(getEstBackgroundColor());
         if (tabsViewBackground != null) {
             tabsViewBackground.updateColors();
         }

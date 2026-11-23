@@ -1,12 +1,11 @@
 package org.telegram.ui.Components.Reactions;
 
-import static org.telegram.ui.ChatActivity.MODE_DEFAULT;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -46,6 +45,13 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
     private float translationOffsetY;
     private long lastUpdate;
     private boolean hiddenByScroll;
+    private boolean positionFramePending;
+    private ValueAnimator hideAnimator;
+    private final Runnable positionFrame = () -> {
+        positionFramePending = false;
+        invalidatePosition();
+    };
+    private final Runnable showMenu = this::showSelectedMessageMenu;
 
     private boolean messageSet;
 
@@ -61,7 +67,7 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
         fragment.getChatListView().addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                invalidatePosition();
+                if (isVisible()) schedulePositionFrame();
             }
         });
     }
@@ -80,13 +86,16 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
 
                 @Override
                 public void draw(Canvas canvas) {
-                    long dt = Math.min(16, System.currentTimeMillis() - lastUpdate);
-                    lastUpdate = System.currentTimeMillis();
-
-                    AndroidUtilities.rectTmp.set(0, 0, getWidth(), getHeight());
-                    canvas.saveLayerAlpha(AndroidUtilities.rectTmp, (int) (0xFF * enabledAlpha), Canvas.ALL_SAVE_FLAG);
-                    super.draw(canvas);
-                    canvas.restore();
+                    final long now = SystemClock.uptimeMillis();
+                    final long dt = lastUpdate == 0 ? 0 : now - lastUpdate;
+                    lastUpdate = now;
+                    if (enabledAlpha == 1f) {
+                        super.draw(canvas);
+                    } else if (enabledAlpha > 0f) {
+                        final int save = canvas.saveLayerAlpha(0, 0, getWidth(), getHeight(), (int) (0xFF * enabledAlpha));
+                        super.draw(canvas);
+                        canvas.restoreToCount(save);
+                    }
 
                     if (!isEnabled() && enabledAlpha != 0f) {
                         enabledAlpha = Math.max(0, enabledAlpha - dt / 150f);
@@ -102,6 +111,12 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
                 }
 
                 @Override
+                public void setEnabled(boolean enabled) {
+                    if (isEnabled() != enabled) lastUpdate = SystemClock.uptimeMillis();
+                    super.setEnabled(enabled);
+                }
+
+                @Override
                 public void setVisibility(int visibility) {
                     super.setVisibility(visibility);
 
@@ -114,11 +129,12 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
             reactionsContainerLayout.setDelegate(new ReactionsContainerLayout.ReactionsContainerDelegate() {
                 @Override
                 public void onReactionClicked(View view, ReactionsLayoutInBubble.VisibleReaction visibleReaction, boolean longpress, boolean addToRecent) {
-                    parentFragment.selectReaction(null, currentPrimaryObject, reactionsContainerLayout, view, 0, 0, visibleReaction, false, longpress, addToRecent, false);
+                    final MessageObject message = currentPrimaryObject;
+                    final ReactionsContainerLayout menu = reactionsContainerLayout;
+                    parentFragment.selectReaction(null, message, menu, view, 0, 0, visibleReaction, false, longpress, addToRecent, false);
                     AndroidUtilities.runOnUIThread(() -> {
-                        if (reactionsContainerLayout != null) {
-                            reactionsContainerLayout.dismissParent(true);
-                        }
+                        if (menu == null || menu != reactionsContainerLayout || message != currentPrimaryObject) return;
+                        menu.dismissParent(true);
                         hideMenu();
                     });
                 }
@@ -144,35 +160,27 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
 
     private int[] pos = new int[2];
     public void invalidatePosition(boolean animate) {
-        if (!isVisible || currentPrimaryObject == null || reactionsContainerLayout == null) {
+        if (!isVisible() || currentPrimaryObject == null || reactionsContainerLayout == null) {
             return;
         }
-
-        long dt = Math.min(16, System.currentTimeMillis() - lastUpdate);
-        lastUpdate = System.currentTimeMillis();
-        if (currentOffsetY != toOffsetY) {
-            float a = dt / 220f;
-            if (toOffsetY > currentOffsetY) {
-                currentOffsetY = Math.min(currentOffsetY + a, toOffsetY);
-            } else if (toOffsetY < currentOffsetY) {
-                currentOffsetY = Math.max(currentOffsetY - a, toOffsetY);
-            }
-            AndroidUtilities.runOnUIThread(this::invalidatePosition);
-        }
+        final long now = SystemClock.uptimeMillis();
+        final long dt = lastUpdate == 0 ? 0 : now - lastUpdate;
+        final boolean offsetWasAnimating = currentOffsetY != toOffsetY;
+        lastUpdate = now;
 
         RecyclerListView listView = parentFragment.getChatListView();
-        listView.getLocationInWindow(pos);
-        float listY = pos[1];
-        getLocationInWindow(pos);
-        float offsetY = listY - pos[1] - parentFragment.getPullingDownOffset();
-
         for (int i = 0; i < listView.getChildCount(); i++) {
             View ch = listView.getChildAt(i);
             if (ch instanceof ChatMessageCell) {
                 ChatMessageCell cell = (ChatMessageCell) ch;
 
                 MessageObject obj = cell.getMessageObject();
-                if (obj.getId() == currentPrimaryObject.getId()) {
+                if (obj != null && obj.getId() == currentPrimaryObject.getId()
+                        && obj.getDialogId() == currentPrimaryObject.getDialogId()) {
+                    listView.getLocationInWindow(pos);
+                    final float listY = pos[1];
+                    getLocationInWindow(pos);
+                    final float offsetY = listY - pos[1] - parentFragment.getPullingDownOffset();
                     boolean mirrorX = obj.isOutOwner();
                     if (reactionsContainerLayout != null) {
                         reactionsContainerLayout.setMirrorX(mirrorX);
@@ -181,8 +189,8 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
                     int height = getHeight() != 0 ? getHeight() : listView.getHeight();
                     int groupHeight;
 
-                    if (cell.getCurrentMessagesGroup() != null) {
-                        MessageObject.GroupedMessages group = cell.getCurrentMessagesGroup();
+                    final MessageObject.GroupedMessages group = cell.getCurrentMessagesGroup();
+                    if (group != null) {
                         groupHeight = group.transitionParams.bottom - group.transitionParams.top;
                     } else {
                         groupHeight = cell.getHeight();
@@ -211,6 +219,10 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
                     }
                     if (!animate) {
                         currentOffsetY = toOffsetY;
+                    } else if (offsetWasAnimating && currentOffsetY != toOffsetY) {
+                        final float step = dt / 220f;
+                        currentOffsetY = toOffsetY > currentOffsetY ? Math.min(currentOffsetY + step, toOffsetY)
+                                : Math.max(currentOffsetY - step, toOffsetY);
                     }
 
                     y += CubicBezierInterpolator.DEFAULT.getInterpolation(currentOffsetY) * translationOffsetY;
@@ -219,7 +231,9 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
                     }
                     if (flippedVertically != reactionsContainerLayout.isFlippedVertically()) {
                         reactionsContainerLayout.setFlippedVertically(flippedVertically);
-                        AndroidUtilities.runOnUIThread(this::invalidatePosition);
+                    }
+                    if (newVisibleOffset && currentOffsetY != toOffsetY) {
+                        schedulePositionFrame();
                     }
                     if (newVisibleOffset != reactionsContainerLayout.isEnabled()) {
                         reactionsContainerLayout.setEnabled(newVisibleOffset);
@@ -233,12 +247,13 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
                         }
                     }
                     reactionsContainerLayout.setTranslationY(MathUtils.clamp(y, min, max));
-                    reactionsContainerLayout.setTranslationX(cell.getNonAnimationTranslationX(true));
+                    final float cellTranslationX = cell.getNonAnimationTranslationX(true);
+                    reactionsContainerLayout.setTranslationX(cellTranslationX);
 
                     boolean invalidate = false;
                     LayoutParams params = (LayoutParams) reactionsContainerLayout.getLayoutParams();
                     int left = Math.max(0, cell.getBackgroundDrawableLeft() - AndroidUtilities.dp(32));
-                    int right = Math.max((int) cell.getNonAnimationTranslationX(true), cell.getWidth() - cell.getBackgroundDrawableRight() - AndroidUtilities.dp(32));
+                    int right = Math.max((int) cellTranslationX, cell.getWidth() - cell.getBackgroundDrawableRight() - AndroidUtilities.dp(32));
 
                     int minWidth = AndroidUtilities.dp(40) * 8;
                     if (getWidth() - right - left < minWidth) {
@@ -274,6 +289,13 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
 
         if (reactionsContainerLayout != null && reactionsContainerLayout.isEnabled()) {
             reactionsContainerLayout.setEnabled(false);
+        }
+    }
+
+    private void schedulePositionFrame() {
+        if (!positionFramePending && isAttachedToWindow()) {
+            positionFramePending = true;
+            postOnAnimation(positionFrame);
         }
     }
 
@@ -346,25 +368,17 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
     }
 
     private void animateVisible(boolean visible) {
+        cancelMenuTransition();
         if (visible) {
             setVisibility(VISIBLE);
-            post(() -> {
-                currentPrimaryObject = findPrimaryObject();
-                checkCreateReactionsLayout();
-                invalidatePosition(false);
-
-                if (reactionsContainerLayout.isEnabled()) {
-                    messageSet = true;
-                    reactionsContainerLayout.setMessage(currentPrimaryObject, parentFragment.getCurrentChatInfo(), true);
-                    reactionsContainerLayout.startEnterAnimation(false);
-                } else {
-                    messageSet = false;
-                    reactionsContainerLayout.setTransitionProgress(1f);
-                }
-            });
+            post(showMenu);
         } else {
             messageSet = false;
-            ValueAnimator animator = ValueAnimator.ofFloat(1, 0).setDuration(150);
+            if (reactionsContainerLayout == null || !isAttachedToWindow()) {
+                clearMenu();
+                return;
+            }
+            ValueAnimator animator = hideAnimator = ValueAnimator.ofFloat(reactionsContainerLayout.getAlpha(), 0).setDuration(150);
             animator.addUpdateListener(animation -> {
                 float val = (float) animation.getAnimatedValue();
                 if (reactionsContainerLayout != null) {
@@ -374,16 +388,68 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    setVisibility(GONE);
-                    if (reactionsContainerLayout != null) {
-                        removeView(reactionsContainerLayout);
-                        reactionsContainerLayout = null;
-                    }
-                    currentPrimaryObject = null;
+                    hideAnimator = null;
+                    clearMenu();
                 }
             });
             animator.start();
         }
+    }
+
+    private void showSelectedMessageMenu() {
+        if (!isVisible() || !isAttachedToWindow()) return;
+        currentPrimaryObject = findPrimaryObject();
+        if (currentPrimaryObject == null) return;
+        checkCreateReactionsLayout();
+        reactionsContainerLayout.setAlpha(1f);
+        invalidatePosition(false);
+        if (reactionsContainerLayout.isEnabled()) {
+            if (!messageSet) {
+                messageSet = true;
+                reactionsContainerLayout.setMessage(currentPrimaryObject, parentFragment.getCurrentChatInfo(), true);
+            }
+            reactionsContainerLayout.startEnterAnimation(false);
+        } else {
+            messageSet = false;
+            reactionsContainerLayout.setTransitionProgress(1f);
+        }
+    }
+
+    private void cancelMenuTransition() {
+        removeCallbacks(showMenu);
+        removeCallbacks(positionFrame);
+        positionFramePending = false;
+        lastUpdate = 0;
+        if (hideAnimator != null) {
+            hideAnimator.removeAllListeners();
+            hideAnimator.cancel();
+            hideAnimator = null;
+        }
+    }
+
+    private void clearMenu() {
+        setVisibility(GONE);
+        if (reactionsContainerLayout != null) {
+            final CustomEmojiReactionsWindow window = reactionsContainerLayout.getReactionsWindow();
+            if (window != null) window.dismiss(false);
+            removeView(reactionsContainerLayout);
+            reactionsContainerLayout = null;
+        }
+        currentPrimaryObject = null;
+        messageSet = false;
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        if (isVisible()) animateVisible(true);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        cancelMenuTransition();
+        clearMenu();
+        super.onDetachedFromWindow();
     }
 
     public boolean onBackPressed(boolean invoked) {
@@ -395,10 +461,9 @@ public class ChatSelectionReactionMenuOverlay extends FrameLayout {
     }
 
     public void setHiddenByScroll(boolean hiddenByScroll) {
+        if (this.hiddenByScroll == hiddenByScroll) return;
         this.hiddenByScroll = hiddenByScroll;
 
-        if (hiddenByScroll) {
-            animateVisible(false);
-        }
+        if (isVisible) animateVisible(!hiddenByScroll);
     }
 }

@@ -3,6 +3,119 @@ from test_composer_layout import method
 from test_render_work_reuse import JAVA, probe
 
 
+def test_reaction_callbacks_only_present_their_owned_generation(tmp_path):
+    source = (JAVA/'org/telegram/ui/ChatActivity.java').read_text()
+    methods = '\n'.join(method(source, name) for name in (
+        'private void cancelPendingReactionPresentation()', 'private boolean canPresentReaction(long generation)',
+    ))
+    select = method(source, 'public void selectReaction(')
+    presentation = select[select.index('final Runnable presentReaction'):select.index('getSendMessagesHelper().sendReaction(primaryMessage, visibleReactions,')]
+    probe(tmp_path, {'Probe.java': '''import java.util.*;
+public class Probe {public static void main(String[] args){ChatActivity.main(args);}}
+class ChatActivity {
+ static class AndroidUtilities {
+  static Queue<Runnable> ui=new ArrayDeque<>();
+  static void cancelRunOnUIThread(Runnable work){ui.remove(work);}
+  static void runOnUIThread(Runnable work,long delay){ui.add(work);}
+ }
+ static class ReactionsEffectOverlay {
+  static int SHORT_ANIMATION,starts;
+  static void show(Object... value){}
+  static void startAnimation(){starts++;}
+ }
+ static class BaseCell {}
+ static class MessageObject {
+  static class Owner { Object reactions; }
+  Owner messageOwner=new Owner();
+  int getId(){return 23;}
+ }
+ Object reactionsLayout,visibleReaction;float x,y;int currentAccount,finalMessageIdForCell,closed,updates;
+ boolean paused,isFinished;Runnable updateReactionRunnable;long reactionPresentationGeneration;
+ List<Map<Integer,MessageObject>> messagesDictList=List.of(new HashMap<>());
+ @SuppressWarnings("unchecked")
+ Map<Integer,MessageObject>[] messagesDict=messagesDictList.toArray(new Map[0]);
+ Queue<Runnable> idle=new ArrayDeque<>();
+ void closeMenu(){closed++;}
+ void doOnIdle(Runnable work){idle.add(work);}
+ void updateMessageAnimated(MessageObject value,boolean reactions){updates++;}
+ BaseCell findMessageCell(int id,boolean visible){return new BaseCell();}
+ METHODS
+ Runnable begin(boolean fromDoubleTap,boolean withoutAnimation){
+  cancelPendingReactionPresentation();
+  final long presentationGeneration=reactionPresentationGeneration;
+  final boolean added=true;final MessageObject primaryMessage=new MessageObject();
+  PRESENTATION
+  return presentReaction;
+ }
+ static void check(boolean value){if(!value)throw new AssertionError();}
+ public static void main(String[] args){
+  ChatActivity p=new ChatActivity();
+  Runnable old=p.begin(false,false);AndroidUtilities.ui.add(old);
+  Runnable current=p.begin(false,false);check(AndroidUtilities.ui.isEmpty());
+  old.run();check(p.closed==0&&p.updateReactionRunnable==current);
+  AndroidUtilities.ui.add(current);current.run();current.run();
+  check(AndroidUtilities.ui.isEmpty()&&p.closed==1&&p.idle.size()==1);
+  p.idle.remove().run();check(p.updates==1&&ReactionsEffectOverlay.starts==1);
+  Runnable doubleTap=p.begin(true,false);doubleTap.run();p.idle.remove().run();
+  p.paused=true;p.cancelPendingReactionPresentation();AndroidUtilities.ui.remove().run();
+  check(ReactionsEffectOverlay.starts==1&&p.closed==2);
+  check(p.begin(false,true)==null&&p.updateReactionRunnable==null);
+ }
+}'''.replace('METHODS', methods).replace('PRESENTATION', presentation)})
+
+
+def test_selection_menu_owns_one_frame_and_cancels_previous_hide(tmp_path):
+    source = (JAVA/'org/telegram/ui/Components/Reactions/ChatSelectionReactionMenuOverlay.java').read_text()
+    methods = '\n'.join(method(source, name) for name in (
+        'private void schedulePositionFrame()', 'private void cancelMenuTransition()', 'private void animateVisible(boolean visible)',
+    ))
+    fields = source[source.index('    private boolean positionFramePending;'):source.index('    private boolean messageSet;')]
+    probe(tmp_path, {'Probe.java': '''import java.util.*;
+public class Probe {
+ static final int VISIBLE=0;
+ static class Animator {}
+ static class AnimatorListenerAdapter {public void onAnimationEnd(Animator a){}}
+ static class ValueAnimator extends Animator {
+  AnimatorListenerAdapter listener;boolean cancelled;
+  static ValueAnimator ofFloat(float from,float to){return new ValueAnimator();}
+  ValueAnimator setDuration(long millis){return this;}
+  void addUpdateListener(java.util.function.Consumer<ValueAnimator> update){}
+  void addListener(AnimatorListenerAdapter value){listener=value;}
+  void removeAllListeners(){listener=null;}
+  void cancel(){cancelled=true;if(listener!=null)listener.onAnimationEnd(this);}
+  void start(){}
+  Object getAnimatedValue(){return 0f;}
+ }
+ static class Reactions {float getAlpha(){return 1f;}void setAlpha(float alpha){}}
+ Reactions reactionsContainerLayout=new Reactions();
+ boolean messageSet,attached=true;
+ long lastUpdate;
+ int positions,shown,cleared;
+ List<Runnable> queued=new ArrayList<>();
+ void invalidatePosition(){positions++;}
+ void showSelectedMessageMenu(){shown++;}
+ void clearMenu(){cleared++;}
+ void setVisibility(int visibility){}
+ boolean isAttachedToWindow(){return attached;}
+ void postOnAnimation(Runnable work){queued.add(work);}
+ void post(Runnable work){queued.add(work);}
+ void removeCallbacks(Runnable work){queued.remove(work);}
+ FIELDS
+ METHODS
+ static void check(boolean value){if(!value)throw new AssertionError();}
+ public static void main(String[] args){
+  Probe p=new Probe();
+  for(int i=0;i<10000;i++)p.schedulePositionFrame();check(p.queued.size()==1);
+  p.queued.remove(0).run();check(p.positions==1&&!p.positionFramePending);
+  p.animateVisible(true);p.animateVisible(false);ValueAnimator old=p.hideAnimator;
+  check(p.queued.isEmpty()&&old!=null);
+  p.animateVisible(true);check(old.cancelled&&p.cleared==0&&p.queued.size()==1);
+  p.queued.remove(0).run();check(p.shown==1);
+  p.attached=false;p.schedulePositionFrame();check(p.queued.isEmpty());
+ }
+}'''.replace('FIELDS', fields).replace('METHODS', methods)})
+
+
 def test_hw_emoji_owner_does_not_release_new_popup_and_reentrant_task_is_preserved(tmp_path):
     probe(tmp_path,{
       'android/view/View.java':'package android.view;public class View{public int invalidations;public void invalidate(){invalidations++;}}',

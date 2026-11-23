@@ -2020,7 +2020,8 @@ public class FilterTabsView extends FrameLayout {
         for (int a = 0, N = tabs.size(); a < N; a++) {
             Tab tab = tabs.get(a);
             if(tab.shortcutOnly)continue;
-            if (tab.counter == delegate.getTabCounter(tab.id) || delegate.getTabCounter(tab.id) < 0) {
+            final int counter = delegate.getTabCounter(tab.id);
+            if (counter < 0 || tab.counter == counter) {
                 continue;
             }
             changed = true;

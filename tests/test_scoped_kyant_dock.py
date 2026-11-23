@@ -100,7 +100,7 @@ public class Probe extends Base{
  static class Work{void afterDraw(){events.add("kyant");}}
  Dock kyantDockView=new Dock();Work kyantInitWork=new Work();
  int getEstBackgroundColor(){return 0;}void checkUi_tabsPosition(){}void checkUi_fadeView(){}
- void blur3_invalidateBlur(){events.add("blur");}void blur3_updateFadeColors(){events.add("fade");}
+ void blur3_invalidateBlur(){events.add("blur");}void blur3_updateFadeColors(int color){events.add("fade");}
  CREATE
  public static void main(String[]args){Probe p=new Probe();FrameLayout view=p.createContentView(new Context());
  view.dispatchDraw(new Canvas());if(!events.equals(List.of("left","right","children","blur","fade","kyant")))throw new AssertionError(events.toString());

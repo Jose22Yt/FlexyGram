@@ -6,6 +6,54 @@ ROOT = Path(__file__).resolve().parents[1]
 JAVA = ROOT / "TMessagesProj/src/main/java"
 
 
+def test_chat_glass_clips_capture_regions_before_merging(tmp_path):
+    from test_composer_layout import method
+    from test_render_work_reuse import probe
+
+    source = (JAVA / 'org/telegram/ui/ChatActivity.java').read_text()
+    merge = method(source, 'private int getMergedVisibleBlurredPositions(List<RectF> positions)')
+    probe(tmp_path, {
+        'android/graphics/RectF.java': '''package android.graphics;
+public class RectF {
+ public float left,top,right,bottom;
+ public void set(float l,float t,float r,float b){left=l;top=t;right=r;bottom=b;}
+ public void set(RectF value){set(value.left,value.top,value.right,value.bottom);}
+ public boolean intersect(float l,float t,float r,float b){
+  if(left>=r||l>=right||top>=b||t>=bottom)return false;
+  set(Math.max(left,l),Math.max(top,t),Math.min(right,r),Math.min(bottom,b));return true;
+ }
+ public boolean isEmpty(){return left>=right||top>=bottom;}
+}''',
+        'Probe.java': '''import android.graphics.RectF;
+import org.telegram.messenger.utils.RectFMergeBounding;
+import java.util.*;
+public class Probe {
+ static class View {int getMeasuredWidth(){return 100;}int getMeasuredHeight(){return 80;}float getY(){return 10;}}
+ final View contentView=new View(),chatListView=new View();
+ final List<RectF> glassDrawablesPositions=new ArrayList<>();
+ int getVisibleBlurredPositions(List<RectF> positions){
+  int[][] bounds={{-10,-30,110,5},{-20,-10,20,40},{60,-10,120,40},{4,91,90,120},{105,11,140,70}};
+  for(int i=0;i<bounds.length;i++){
+   if(positions.size()<=i)positions.add(new RectF());
+   int[] b=bounds[i];positions.get(i).set(b[0],b[1],b[2],b[3]);
+  }
+  return bounds.length;
+ }
+ MERGE
+ static void check(boolean valid){if(!valid)throw new AssertionError();}
+ public static void main(String[] args){
+  Probe p=new Probe();List<RectF> out=new ArrayList<>();
+  for(int frame=0;frame<10000;frame++){
+   check(p.getMergedVisibleBlurredPositions(out)==2);
+   RectF a=out.get(0),b=out.get(1);
+   check(a.left==0&&a.top==10&&a.right==20&&a.bottom==40);
+   check(b.left==60&&b.top==10&&b.right==100&&b.bottom==40);
+  }
+ }
+}'''.replace('MERGE', merge),
+    }, [JAVA / 'org/telegram/messenger/utils/RectFMergeBounding.java'])
+
+
 def test_native_liquid_flag_respects_saved_preferences(tmp_path):
     """Run the production flag-query methods against old and mixed saved bitmasks."""
     if not shutil.which("java") or "jdk.compiler@" not in subprocess.check_output(["java", "--list-modules"], text=True):

@@ -3,6 +3,30 @@ from test_composer_layout import method
 from test_render_work_reuse import JAVA, probe
 
 
+def test_dialog_selector_tracks_time_and_survives_a_missing_anchor(tmp_path):
+    source=(JAVA/'org/telegram/ui/DialogsActivity.java').read_text()
+    progress=method(source,'private float updateSelectorPositionProgress(')
+    support=method(source,'public void setAnimationSupportView(')
+    assert 'selectedDialogView != null && (anchorView == null ||' in support
+    probe(tmp_path,{'Probe.java':'''public class Probe {
+ long selectorAnimationStartedAt=-1;
+ int invalidations;
+ void invalidate(){invalidations++;}
+ PROGRESS
+ static void check(boolean valid){if(!valid)throw new AssertionError();}
+ public static void main(String[] args){
+  Probe sixty=new Probe(), oneTwenty=new Probe();
+  check(sixty.updateSelectorPositionProgress(1000)==1f&&sixty.invalidations==0);
+  sixty.selectorAnimationStartedAt=oneTwenty.selectorAnimationStartedAt=1000;
+  for(int i=0;i<6;i++)sixty.updateSelectorPositionProgress(1000+16*i);
+  for(int i=0;i<12;i++)oneTwenty.updateSelectorPositionProgress(1000+8*i);
+  check(sixty.updateSelectorPositionProgress(1096)==oneTwenty.updateSelectorPositionProgress(1096));
+  check(sixty.updateSelectorPositionProgress(1200)==1f&&sixty.selectorAnimationStartedAt==-1);
+  check(oneTwenty.updateSelectorPositionProgress(1400)==1f&&oneTwenty.selectorAnimationStartedAt==-1);
+ }
+}'''.replace('PROGRESS',progress)})
+
+
 def test_navigation_counts_one_open_and_owns_the_correct_swipe_pointer(tmp_path):
     source = (JAVA / 'org/telegram/ui/ActionBar/ActionBarLayout.java').read_text()
     methods = '\n'.join(method(source, signature) for signature in (

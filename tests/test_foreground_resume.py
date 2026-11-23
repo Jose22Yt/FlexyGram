@@ -132,6 +132,159 @@ public class Probe{ViewPage[]viewPages;Parent parentLayout=new Parent();int full
     assert resume.count('refreshDialogsOnResume()') == 1
 
 
+def test_unread_folder_batches_reload_and_cancels_it_when_leaving(tmp_path):
+    source = (JAVA / 'org/telegram/ui/DialogsActivity.java').read_text()
+    signatures = ('private void dispatchUnreadDialogsReload()', 'private void cancelUnreadDialogsReload()',
+                  'private void reloadDialogsPages(boolean newMessage)', 'private void onDialogListReload(boolean newMessage)')
+    fields = source[source.index('    private boolean unreadDialogsReloadPending,'):
+                    source.index('    private void dispatchUnreadDialogsReload()')]
+    actual = fields + '\n'.join(method(source, signature) for signature in signatures)
+    probe(tmp_path, {'Probe.java': '''import java.util.ArrayDeque;
+public class Probe {
+ static class AndroidUtilities {
+  static ArrayDeque<Runnable> queue=new ArrayDeque<>();
+  static void runOnUIThread(Runnable callback,long delay){check(delay==160);queue.add(callback);}
+  static void cancelRunOnUIThread(Runnable callback){queue.remove(callback);}
+ }
+ static final int DIALOGS_TYPE_FOLDER1=7,DIALOGS_TYPE_FOLDER2=8;
+ static class ViewPage {int dialogsType=7;}
+ static class View {static final int VISIBLE=0;int getVisibility(){return VISIBLE;}}
+ static class Tabs extends View {int checks;void checkTabsCounter(){checks++;}}
+ static class MessagesController {
+  static final int DIALOG_FILTER_FLAG_EXCLUDE_READ=1;
+  static class DialogFilter {int flags=1;}
+  DialogFilter[] selectedDialogFilter={new DialogFilter(),new DialogFilter()};
+ }
+ static class Warmup {void request(){}}
+ Warmup historyWarmup=new Warmup();
+ MessagesController controller=new MessagesController();
+ MessagesController getMessagesController(){return controller;}
+ ViewPage[] viewPages={new ViewPage(),new ViewPage()};
+ Tabs filterTabsView=new Tabs();
+ boolean isFinished,isPaused,dialogsListFrozen,slowedReloadAfterDialogClick;
+ int reloads;
+ boolean sawNewMessage;
+ void reloadViewPageDialogs(ViewPage page,boolean newMessage){reloads++;sawNewMessage|=newMessage;}
+ ACTUAL
+ static void check(boolean valid){if(!valid)throw new AssertionError();}
+ public static void main(String[] args){
+  Probe p=new Probe();p.slowedReloadAfterDialogClick=true;p.onDialogListReload(false);
+  for(int i=0;i<10000;i++)p.onDialogListReload(i==0);
+  check(AndroidUtilities.queue.size()==1&&p.reloads==0);
+  AndroidUtilities.queue.remove().run();
+  check(p.reloads==2&&p.filterTabsView.checks==1&&p.sawNewMessage);
+  p.slowedReloadAfterDialogClick=true;p.onDialogListReload(true);p.isPaused=true;
+  p.cancelUnreadDialogsReload();check(AndroidUtilities.queue.isEmpty()&&p.reloads==2);
+  p.isPaused=false;p.onDialogListReload(false);check(p.reloads==4&&p.filterTabsView.checks==2);
+  p.slowedReloadAfterDialogClick=true;p.viewPages[0].dialogsType=0;
+  p.onDialogListReload(false);check(p.reloads==6&&AndroidUtilities.queue.isEmpty());
+ }
+}'''.replace('ACTUAL', actual)})
+
+
+def test_edit_timer_sleeps_until_visible_countdown_and_rechecks_after_pause(tmp_path):
+    source = (JAVA / 'org/telegram/ui/ChatActivity.java').read_text()
+    fields = source[source.index('    private static final int EDIT_COUNTDOWN_SECONDS'):
+                    source.index('    private void stopEditTimer()')]
+    actual = fields + method(source, 'private void stopEditTimer()') + method(source, 'private void checkEditTimer()')
+    assert 'cancelRunOnUIThread(editTimerCheck)' in method(source, 'public void onPause()')
+    assert 'stopEditTimer()' in method(source, 'public void onFragmentDestroy()')
+    probe(tmp_path, {'Probe.java': '''public class Probe {
+ static class AndroidUtilities {
+  static long delay;static Runnable pending;
+  static void runOnUIThread(Runnable callback,long milliseconds){
+   check(pending==null);delay=milliseconds;pending=callback;
+  }
+  static void cancelRunOnUIThread(Runnable callback){if(pending==callback)pending=null;}
+  static String formatShortDuration(int seconds){return Integer.toString(seconds);}
+  static void fire(){Runnable callback=pending;pending=null;callback.run();}
+ }
+ static class R {static class string {static int TimeToEdit=1,TimeToEditExpired=2;}}
+ static class LocaleController {
+  static String formatString(String key,int id,String... values){return values.length==0?key:values[0];}
+ }
+ static class User {boolean self;}
+ static class Owner {int date;}
+ static class MessageObject {
+  boolean scheduled,unlimited;Owner messageOwner=new Owner();
+  boolean canEditMessageAnytime(Object chat){return unlimited;}
+ }
+ static class Enter {
+  MessageObject editing=new MessageObject();int expired;
+  MessageObject getEditingMessageObject(){return editing;}
+  void onEditTimeExpired(){expired++;}
+ }
+ static class Manager {int now;int getCurrentTime(){return now;}}
+ static class Controller {int maxEditTime=1000;}
+ static class SimpleTextView {String text;void setText(String value){text=value;}}
+ static class Layout {SimpleTextView obj=new SimpleTextView();Layout current(){return this;}}
+ boolean paused,isFinished;User currentUser;Object currentChat;
+ Enter chatActivityEnterView=new Enter();Layout replyLayout=new Layout();
+ Manager manager=new Manager();Controller controller=new Controller();
+ Manager getConnectionsManager(){return manager;}
+ Controller getMessagesController(){return controller;}
+ ACTUAL
+ static void check(boolean valid){if(!valid)throw new AssertionError();}
+ public static void main(String[] args){
+  Probe p=new Probe();MessageObject edit=p.chatActivityEnterView.editing;
+  edit.unlimited=true;p.timedEditMessage=edit;p.checkEditTimer();
+  check(AndroidUtilities.pending==null&&p.timedEditMessage==null);
+  edit.unlimited=false;p.timedEditMessage=edit;p.checkEditTimer();
+  check(AndroidUtilities.delay==1000000&&p.replyLayout.obj.text==null);
+  p.manager.now=1000;AndroidUtilities.fire();
+  check(AndroidUtilities.delay==1000&&"300".equals(p.replyLayout.obj.text));
+  p.paused=true;AndroidUtilities.fire();check(AndroidUtilities.pending==null);
+  p.paused=false;p.manager.now=1300;p.checkEditTimer();
+  check(p.chatActivityEnterView.expired==1&&"TimeToEditExpired".equals(p.replyLayout.obj.text));
+  p.timedEditMessage=edit;p.chatActivityEnterView.editing=new MessageObject();p.checkEditTimer();
+  check(p.timedEditMessage==null&&AndroidUtilities.pending==null);
+  p.manager.now=0;p.timedEditMessage=p.chatActivityEnterView.editing;p.checkEditTimer();
+  p.stopEditTimer();check(p.timedEditMessage==null&&AndroidUtilities.pending==null);
+ }
+}'''.replace('ACTUAL', actual)})
+
+
+def test_forwarding_hint_schedules_single_tick_and_stops_when_hidden(tmp_path):
+    source = (JAVA / 'org/telegram/ui/ChatActivity.java').read_text()
+    fields = source[source.index('    private boolean showTapForForwardingOptionsHit;'):
+                    source.index('    private final Runnable forwardingHintTick')].strip()
+    fields += '\n' + next(line for line in source.splitlines() if 'private final Runnable forwardingHintTick' in line)
+    actual = fields + '\n' + method(source, 'private void scheduleForwardingHint()') + method(source, 'private void animateForwardingHint()')
+    for signature in ('public void onPause()', 'public void onFragmentDestroy()'):
+        assert 'cancelRunOnUIThread(forwardingHintTick)' in method(source, signature)
+    probe(tmp_path, {'Probe.java': '''public class Probe {
+ static class AndroidUtilities {
+  static Runnable pending;
+  static void runOnUIThread(Runnable callback,long delay){check(delay==6000&&pending==null);pending=callback;}
+  static void cancelRunOnUIThread(Runnable callback){if(pending==callback)pending=null;}
+  static void fire(){Runnable callback=pending;pending=null;callback.run();}
+ }
+ static class SimpleTextView {
+  float alpha;int animations;
+  void setPivotX(int value){}
+  SimpleTextView animate(){return this;}
+  SimpleTextView alpha(float value){alpha=value;return this;}
+  SimpleTextView scaleX(float value){return this;}
+  SimpleTextView scaleY(float value){return this;}
+  SimpleTextView setDuration(int value){return this;}
+  void start(){animations++;}
+ }
+ static class Layout {SimpleTextView obj=new SimpleTextView(),objHint=new SimpleTextView();Layout current(){return this;}}
+ Layout replyLayout=new Layout();boolean paused,isFinished;
+ ACTUAL
+ static void check(boolean valid){if(!valid)throw new AssertionError();}
+ public static void main(String[] args){
+  Probe p=new Probe();p.forwardingHintEnabled=true;
+  for(int i=0;i<10000;i++)p.scheduleForwardingHint();
+  AndroidUtilities.fire();check(p.replyLayout.obj.alpha==0&&p.replyLayout.objHint.alpha==1);
+  p.paused=true;AndroidUtilities.fire();check(AndroidUtilities.pending==null&&p.replyLayout.obj.animations==1);
+  p.paused=false;p.scheduleForwardingHint();AndroidUtilities.fire();
+  check(p.replyLayout.obj.alpha==1&&p.replyLayout.objHint.alpha==0);
+  p.forwardingHintEnabled=false;AndroidUtilities.fire();check(AndroidUtilities.pending==null&&p.replyLayout.obj.animations==2);
+ }
+}'''.replace('ACTUAL', actual)})
+
+
 def test_native_network_resumes_before_list_rebuild_and_fragment_resume():
     source = (JAVA / 'org/telegram/ui/LaunchActivity.java').read_text()
     resume = method(source, 'protected void onResume()')
