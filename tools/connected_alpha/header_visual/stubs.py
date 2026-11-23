@@ -81,7 +81,7 @@ public class ChatAvatarContainer extends FrameLayout{
  public boolean ignoreTouches;
  protected boolean isSignatureCallAvailable(){return callable;}protected void onSignatureCallClick(){calls++;}
 
- public static class Simple extends TextView{Simple(Context c){super(c);setIncludeFontPadding(false);setSingleLine(true);setEllipsize(android.text.TextUtils.TruncateAt.END);}public void setTextSizePx(int v){setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,v);}}
+ public static class Simple extends TextView{public int getSideDrawablesSize(){return 0;} Simple(Context c){super(c);setIncludeFontPadding(false);setSingleLine(true);setEllipsize(android.text.TextUtils.TruncateAt.END);}public void setTextSizePx(int v){setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,v);}}
  public static class Photo extends ImageView{
   public int radius;
   public static class Receiver {

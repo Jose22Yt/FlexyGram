@@ -22,6 +22,7 @@ public final class SignatureChatHeader {
     private final ChatAvatarContainer avatar;
     private final Theme.ResourcesProvider provider;
     private final android.graphics.Paint textMetrics = new android.graphics.Paint();
+    private final android.text.TextPaint titleMeasure = new android.text.TextPaint();
     private final android.graphics.Paint.FontMetricsInt fontMetrics = new android.graphics.Paint.FontMetricsInt();
     private static final class Fusion {
         final app.flexygram.header.fusion.SignatureFusionGeometry.Layout layout = new app.flexygram.header.fusion.SignatureFusionGeometry.Layout();
@@ -118,7 +119,7 @@ public final class SignatureChatHeader {
         subtitleFits = true;
         titlePx = Math.min(titlePx, height - AndroidUtilities.dp(8));
         int content = Math.max(nativeHeight, Math.round(height) + AndroidUtilities.dp(12));
-        float titleWidth = avatar.signaturePreferredTitleWidth(titlePx, subtitlePx, textMetrics);
+        float titleWidth = HeaderConfig.adaptiveBubble() ? avatar.signaturePreferredTitleWidth(titlePx, titleMeasure) : 0;
         geometry.update(width, status + (content - height) / 2f, height, numberWidth,
                 AndroidUtilities.density, LocaleController.isRTL, mode, titleWidth);
         bar.prepareSignatureUnreadGlass(geometry.separateCount);

@@ -19,7 +19,7 @@
     <string name="FlexyHeaderPortrait">Signature Matte Portrait</string>
     <string name="FlexyHeaderCherrySection">Opciones de cabecera</string>
     <string name="FlexyHeaderCenterTitle">Centrar título en la barra de acción</string>
-    <string name="FlexyHeaderAdaptiveBubble">Adaptive bubble width</string>
+    <string name="FlexyHeaderAdaptiveBubble">Ajustar la píldora al nombre</string>
     <string name="FlexyHeaderShowUnread">Mostrar contador de chats no leídos</string>
     <string name="FlexyHeaderShowUnreadSub">Activar contador de chats no leídos en el botón atrás en el chat abierto</string>
     <string name="FlexyHeaderIosStyledCounter">iOS-styled counter</string>

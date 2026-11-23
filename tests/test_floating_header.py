@@ -34,9 +34,12 @@ public class Probe{
   check(Boolean.TRUE.equals(org.telegram.messenger.ApplicationLoader.applicationContext.prefs.data.get("back_counter_restored_v1")));
   for(int style=0;style<=4;style++){
    HeaderConfig.style(style);HeaderConfig.load();check(HeaderConfig.style()==style);
+   check(HeaderConfig.adaptiveBubble()==(style==0));
    check(HeaderConfig.floating()==(style==4));check(HeaderConfig.signature()==(style!=1));
    check(HeaderConfig.fusion()==(style>=2));check(HeaderConfig.portrait()==(style==3));
   }
+  HeaderConfig.style(0);HeaderConfig.adaptiveBubble(false);HeaderConfig.load();check(!HeaderConfig.adaptiveBubble());
+  HeaderConfig.adaptiveBubble(true);HeaderConfig.load();check(HeaderConfig.adaptiveBubble());
   org.telegram.messenger.ApplicationLoader.applicationContext.prefs.data.put("style",100);
   HeaderConfig.load();check(HeaderConfig.style()==1&&!HeaderConfig.floating());
  }
@@ -106,3 +109,33 @@ public class Probe {
         JAVA/'app/flexygram/header/fusion/FloatingStatusMotion.java',
         JAVA/'app/flexygram/animation/FastMotionTiming.java',
         JAVA/'app/flexygram/studio/core/StudioSchema.java'])
+
+
+def test_adaptive_contact_pill_tracks_name_in_both_directions(tmp_path):
+    from test_composer_layout import method
+    avatar = (JAVA/'org/telegram/ui/Components/ChatAvatarContainer.java').read_text()
+    preferred = method(avatar, 'public float signaturePreferredTitleWidth(')
+    assert 'getDesiredWidth(title, measure)' in preferred and 'subtitle' not in preferred
+    probe(tmp_path, {
+        'android/graphics/RectF.java': '''package android.graphics;
+        public class RectF {public float left,top,right,bottom;
+        public void set(float l,float t,float r,float b){left=l;top=t;right=r;bottom=b;}
+        public void offset(float x,float y){set(left+x,top+y,right+x,bottom+y);}
+        public float width(){return right-left;}}''',
+        'app/flexygram/header/HeaderConfig.java': '''package app.flexygram.header;
+        public class HeaderConfig {public static boolean centered;
+        public static boolean centerTitle(){return centered;} public static boolean adaptiveBubble(){return true;}}''',
+        'Probe.java': '''import app.flexygram.header.*;
+        public class Probe {public static void main(String[] args){
+          HeaderGeometry g=new HeaderGeometry();
+          for(boolean centered:new boolean[]{true,false})for(boolean rtl:new boolean[]{true,false}){
+            HeaderConfig.centered=centered;
+            for(int name:new int[]{28,143,800,10}){
+              g.update(360,24,44,18,1,rtl,1,name+24);
+              if(name<200 && g.title.width()!=Math.max(44,name+24))throw new AssertionError();
+              if(g.title.left<(rtl?g.avatar:g.back).right+6 || g.title.right>(rtl?g.back:g.avatar).left-6)
+                throw new AssertionError();
+            }
+          }
+        }}'''
+    }, [JAVA/'app/flexygram/header/HeaderGeometry.java'])

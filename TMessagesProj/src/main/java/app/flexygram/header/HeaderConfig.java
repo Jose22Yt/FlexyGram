@@ -9,7 +9,8 @@ import java.util.Map;
 /** UI-owned snapshot with a one-time repair of the integrated back counter. */
 public final class HeaderConfig {
     private static boolean loaded, signature = false, compact, counter = true;
-    private static boolean centerTitle = false, adaptiveBubble = false;
+    private static boolean centerTitle;
+    private static Boolean adaptiveBubble;
     private static int opacity = 85, counterMode = 1, currentStyle = 1;
     private HeaderConfig() { }
     private static SharedPreferences preferences;
@@ -37,7 +38,8 @@ public final class HeaderConfig {
         if (!restored) prefs().edit().putBoolean("counter",true).putInt("counter_mode",1)
                 .putBoolean("back_counter_restored_v1",true).apply();
         centerTitle = Boolean.TRUE.equals(p.get("center_title"));
-        adaptiveBubble = Boolean.TRUE.equals(p.get("adaptive_bubble"));
+        Object savedWidth = p.get("adaptive_bubble");
+        adaptiveBubble = savedWidth instanceof Boolean ? (Boolean) savedWidth : null;
         Object mode = p.get("counter_mode");
         counterMode = !restored ? 1 : mode instanceof Integer ? Math.max(1, Math.min(2, (Integer) mode)) : 1;
         Object value = p.get("opacity"); opacity = value instanceof Integer ? Math.max(0, Math.min(100, (Integer) value)) : 85;
@@ -55,7 +57,8 @@ public final class HeaderConfig {
     public static void counterMode(int value) { ensure(); counter = value != 0; if (counter) counterMode = Math.max(1, Math.min(2, value)); prefs().edit().putInt("counter_mode", counterMode).putBoolean("counter", counter).putBoolean("back_counter_restored_v1",true).apply(); }
     public static boolean centerTitle() { ensure(); return centerTitle; }
     public static void centerTitle(boolean value) { ensure(); centerTitle = value; prefs().edit().putBoolean("center_title", value).apply(); }
-    public static boolean adaptiveBubble() { ensure(); return adaptiveBubble; }
+    public static boolean adaptiveBubble() { ensure(); return adaptiveBubbleForStyle(currentStyle); }
+    static boolean adaptiveBubbleForStyle(int style) { ensure(); return adaptiveBubble != null ? adaptiveBubble : style == 0; }
     public static void adaptiveBubble(boolean value) { ensure(); adaptiveBubble = value; prefs().edit().putBoolean("adaptive_bubble", value).apply(); }
     public static int opacity() { ensure(); return opacity; }
     public static void style(boolean value) { style(value ? 0 : 1); }

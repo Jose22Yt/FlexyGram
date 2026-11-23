@@ -916,16 +916,18 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         requestLayout();
     }
     private boolean signatureActive() { return signatureHeader != null && signatureHeader.active(); }
-    public float signaturePreferredTitleWidth(float titlePx, float subtitlePx, android.graphics.Paint measure) {
+    public float signaturePreferredTitleWidth(float titlePx, android.text.TextPaint measure) {
         CharSequence title = titleTextView.getText();
-        measure.setTextSize(titlePx);
-        float titleWidth = title == null ? 0 : measure.measureText(title.toString());
-        CharSequence status = subtitleTextView != null ? subtitleTextView.getText()
-                : animatedSubtitleTextView != null ? animatedSubtitleTextView.getText() : null;
-        measure.setTextSize(subtitlePx);
-        float statusWidth = status == null ? 0 : measure.measureText(status.toString());
-        return Math.max(titleWidth, statusWidth) + dp(24);
+        measure.set(titleTextView.getPaint());
+        measure.setTextSize(Math.round(titlePx));
+        float width = title == null || title.length() == 0 ? 0 : android.text.Layout.getDesiredWidth(title, measure);
+        return (float) Math.ceil(width) + titleTextView.getSideDrawablesSize() + dp(24);
     }
+    public float signaturePreferredTitleWidth(float titlePx, float subtitlePx, android.graphics.Paint measure) {
+        return signaturePreferredTitleWidth(titlePx, measure instanceof android.text.TextPaint
+                ? (android.text.TextPaint) measure : new android.text.TextPaint());
+    }
+
     private void measureSignature(int widthMeasureSpec, int heightMeasureSpec) {
         int width = MeasureSpec.getSize(widthMeasureSpec);
         boolean fusion = signatureFusionActive();
@@ -1353,7 +1355,9 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             value = Emoji.replaceEmoji(value, titleTextView.getPaint().getFontMetricsInt(), false);
         }
 
-        titleTextView.setText(value);
+        boolean adaptiveTitle = signatureActive() && app.flexygram.header.HeaderConfig.adaptiveBubble();
+        int oldBadgeWidth = adaptiveTitle ? titleTextView.getSideDrawablesSize() : 0;
+        boolean titleChanged = titleTextView.setText(value);
         titleTextView.setScrollNonFitText(scrollable || isCentered());
         rightDrawableIsScam = false;
         if (scam || fake) {
@@ -1406,6 +1410,9 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             rightDrawableContentDescription = null;
         }
         checkActionBar(animated);
+        if (adaptiveTitle && (titleChanged || oldBadgeWidth != titleTextView.getSideDrawablesSize())) {
+            signatureHeader.changed();
+        }
     }
 
     private Drawable emojiStatusDefaultDrawable;

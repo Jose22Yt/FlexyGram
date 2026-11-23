@@ -19,6 +19,10 @@ public final class HeaderGeometry {
         update(width, top, height, numberWidth, density, rtl, counterMode, Float.MAX_VALUE);
     }
     public void update(int width, float top, float height, float numberWidth, float density, boolean rtl, int counterMode, float desiredTitleWidth) {
+        update(width, top, height, numberWidth, density, rtl, counterMode, desiredTitleWidth, HeaderConfig.adaptiveBubble());
+    }
+    void update(int width, float top, float height, float numberWidth, float density, boolean rtl,
+                int counterMode, float desiredTitleWidth, boolean adaptive) {
         float edge = 8 * density, gap = 6 * density;
         float maxSide = Math.max(height, Math.min(width * .28f, (width - 64 * density) / 2 - edge - gap));
         float extra = counterMode == 2 ? Math.max(height * .65f, numberWidth + 8 * density) + 3 * density : numberWidth + 8 * density;
@@ -29,9 +33,9 @@ public final class HeaderGeometry {
         avatar.set(width - edge - height, top, width - edge, top + height);
         float inset = edge + Math.max(side, height) + gap;
         boolean center = HeaderConfig.centerTitle();
-        boolean adaptive = HeaderConfig.adaptiveBubble();
-        float maxTitleW = Math.max(0, width - inset * 2);
-        float preferred = adaptive ? Math.min(maxTitleW, Math.max(80 * density, desiredTitleWidth)) : maxTitleW;
+        float trailingInset = adaptive && !center ? edge + height + gap : inset;
+        float maxTitleW = Math.max(0, width - inset - trailingInset);
+        float preferred = adaptive ? Math.min(maxTitleW, Math.max(height, desiredTitleWidth)) : maxTitleW;
         if (center) {
             title.set(width / 2f - preferred / 2f, top, width / 2f + preferred / 2f, top + height);
         } else {

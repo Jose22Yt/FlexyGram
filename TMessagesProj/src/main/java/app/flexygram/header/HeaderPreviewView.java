@@ -93,14 +93,13 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         titlePx=Math.min(titlePx,previewHeight-AndroidUtilities.dp(8));
         int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0&&!conversationStage?80:12);setMeasuredDimension(width,h);
         if(previewStyle()==1){prepareClassicText(width);return;}
-        text.setTextSize(titlePx); float preferred = text.measureText(name);
-        text.setTextSize(subtitlePx); preferred = Math.max(preferred, text.measureText(status)) + AndroidUtilities.dp(24);
+        text.setTextSize(titlePx); float preferred = (float) Math.ceil(text.measureText(name)) + AndroidUtilities.dp(24);
         float numberWidth = 0;
         int mode = HeaderConfig.counter() ? HeaderConfig.counterMode() : 0;
         if (mode != 0) {
             numberWidth = countText.measureText("10");
         }
-        geometry.update(width,(h-previewHeight)/2,previewHeight,numberWidth,AndroidUtilities.density,LocaleController.isRTL,mode,preferred);
+        geometry.update(width,(h-previewHeight)/2,previewHeight,numberWidth,AndroidUtilities.density,LocaleController.isRTL,mode,preferred,HeaderConfig.adaptiveBubbleForStyle(previewStyle()));
         text.setTextSize(titlePx); scratchPaint.set(text); displayName=android.text.TextUtils.ellipsize(name,scratchPaint,Math.max(0,geometry.title.width()-AndroidUtilities.dp(24)),android.text.TextUtils.TruncateAt.END).toString();
         text.setTextSize(subtitlePx); scratchPaint.set(text); displayStatus=android.text.TextUtils.ellipsize(status,scratchPaint,Math.max(0,geometry.title.width()-AndroidUtilities.dp(24)),android.text.TextUtils.TruncateAt.END).toString();
     }
