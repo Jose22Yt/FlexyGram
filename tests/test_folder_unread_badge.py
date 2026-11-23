@@ -16,6 +16,10 @@ def test_folder_unread_badge_count_and_theme():
     bar = (root / "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBar.java").read_text()
     count = method(chat, "private int getCurrentFolderUnreadMessageCount()")
     view = method(bar, "public class UnreadImageView extends AppCompatImageView")
+    for full, local in (("app.flexygram.header.HeaderConfig", "HeaderConfig"),
+                        ("app.flexygram.effects.ChatChromePalette", "ChatChromePalette"),
+                        ("ActionBar.this", "BadgeRegression.this")):
+        view = view.replace(full, local)
     header = (root / "TMessagesProj/src/main/java/app/flexygram/header/SignatureChatHeader.java").read_text()
     color_state = header[header.index("    private int lastBadgeAccent;"):header.index("    private void drawUnread(Canvas canvas)")]
     native_methods = color_state + method(header, "public void setCount(int value)") + method(header, "private void drawUnread(Canvas canvas)")
@@ -55,7 +59,7 @@ public class BadgeRegression {
         static double luminance(int c){return .2126*channel((c>>16)&255)+.7152*channel((c>>8)&255)+.0722*channel(c&255);}
         static double calculateContrast(int a,int b){double x=luminance(a)+.05,y=luminance(b)+.05;return Math.max(x,y)/Math.min(x,y);}
     }
-    static class Theme {static int accent;static int getColor(int key,Object provider){return accent;}static int key_telegram_color=1;static TextPaint dialogs_countTextPaint=new TextPaint(1);}
+    static class Theme {static int accent;static boolean isCurrentThemeDark(){return false;}static int getColor(int key,Object provider){return accent;}static int key_telegram_color=1;static TextPaint dialogs_countTextPaint=new TextPaint(1);}
     static class AndroidUtilities {
         static Object bold(){return null;}static float density=1;static int dp(float n){return Math.round(n);}
     }
@@ -63,7 +67,9 @@ public class BadgeRegression {
     static class Canvas {
         int background,foreground,draws;String text;
         void drawRoundRect(RectF r,float x,float y,Paint paint){background=paint.color;draws++;}
-        void save(){}void restore(){}void translate(float x,float y){}
+        void drawRoundRect(float l,float t,float r,float b,float x,float y,Paint p){surfaceWidth=r-l;}
+        float surfaceWidth;
+        int save(){return 1;}void restore(){}void restoreToCount(int n){}void translate(float x,float y){}
     }
     static class Layout {enum Alignment {ALIGN_CENTER}}
     static class StaticLayout {
@@ -78,9 +84,19 @@ public class BadgeRegression {
     }
     static class AppCompatImageView {
         AppCompatImageView(Context c){}void setImageResource(int id){}void setImageDrawable(Object d){}
-        Context getContext(){return new Context();}int getMeasuredWidth(){return 100;}
+        Context getContext(){return new Context();}int getWidth(){return 100;}int getHeight(){return 56;}
         public void onDraw(Canvas c){}void invalidate(){}
     }
+    static class HeaderConfig {static boolean iosStyledCounter(){return true;}}
+    static class ChatChromePalette {static int surface(boolean dark){return dark?0xff222222:0xffeeeeee;}}
+    static class ResourcesProvider {boolean isDark(){return false;}}
+    ResourcesProvider resourcesProvider;
+    Object glassDrawableBack;
+    int classicBackExtra,layoutRequests;
+    boolean classic;
+    boolean usesClassicChatBack(){return classic;}
+    void requestLayout(){layoutRequests++;}
+    static int dp(float n){return AndroidUtilities.dp(n);}
     int accent=0xff316bda;StaticLayout countLayout;
     int getThemedColor(int key){return accent;}
     VIEW
@@ -126,6 +142,17 @@ public class BadgeRegression {
             require("40".equals(canvas.text),"badge count unchanged by theme");
         }
         require(Theme.dialogs_countTextPaint.color==originalSharedTextColor,"do not mutate shared dialog text paint");
+        c.classic=true;
+        Canvas circle=new Canvas();badge.onDraw(circle);
+        require(circle.surfaceWidth==46 && "40".equals(circle.text),"circle keeps the unread badge");
+        c.classicBackExtra=30;
+        Canvas pill=new Canvas();badge.onDraw(pill);
+        require(pill.surfaceWidth==76 && "40".equals(pill.text),"pill expands without losing the count");
+        badge.setUnread(0);
+        Canvas cleared=new Canvas();badge.onDraw(cleared);
+        require(c.layoutRequests==1 && cleared.draws==0,"clearing the badge remeasures the back button");
+        badge.setUnread(40);
+
         nativeBadge.setCount(41);Canvas changedCount=new Canvas();nativeBadge.drawUnread(changedCount);
         require(ColorUtils.calculateContrast(changedCount.foreground,c.accent)>=4.5,"new count must restore cached contrast after copying shared paint");
         badge.setUnread(120);Canvas capped=new Canvas();badge.onDraw(capped);require("99+".equals(capped.text),"retain compact display");

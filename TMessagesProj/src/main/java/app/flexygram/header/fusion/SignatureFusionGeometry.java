@@ -188,6 +188,12 @@ public final class SignatureFusionGeometry {
         return g;
     }
 
+    public static float unreadWidthExtra(float numberWidth, int mode, float density) {
+        if (numberWidth <= 0 || mode == 0) return 0;
+        return mode == 2 ? Math.max(28 * density, numberWidth + 8 * density) + 3 * density
+                : numberWidth + 16 * density;
+    }
+
     /** Split only the painted back island; the reserved native touch rectangle stays unchanged. */
     public static void placeUnread(Layout g, float numberWidth, int mode, float density) {
         g.separateUnread = numberWidth > 0 && mode == 2;

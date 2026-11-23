@@ -24,15 +24,17 @@ public class UnreadGeometryProbe {
   int cases=0;
   for(float d:new float[]{1,1.5f,2,3})for(int w:new int[]{240,320,360,412,600})
    for(boolean rtl:new boolean[]{false,true})for(boolean call:new boolean[]{false,true})
-    for(boolean portrait:new boolean[]{false,true})for(int mode=0;mode<3;mode++)for(int digits=0;digits<4;digits++){
-     float number=digits*9*d, extra=number<=0||mode==0?0:mode==2?Math.max(28*d,number+8*d)+3*d:number+16*d;
-     if(portrait)SignatureFusionGeometry.updatePortrait(g,w*d,d,rtl,call,extra);
+    for(int style=2;style<=4;style++)for(int mode=0;mode<3;mode++)for(int digits=0;digits<4;digits++){
+     float number=digits*9*d, extra=SignatureFusionGeometry.unreadWidthExtra(number,mode,d);
+     if(style==4)SignatureFusionGeometry.updateFloating(g,w*d,d,rtl,call,extra);
+     else if(style==3)SignatureFusionGeometry.updatePortrait(g,w*d,d,rtl,call,extra);
      else SignatureFusionGeometry.update(g,w*d,d,rtl,call,extra);
      SignatureFusionGeometry.placeUnread(g,mode==0?0:number,mode,d);
      check(g.back==back&&g.unread==badge);check(g.back.height()==48*d);
      check(g.back.width()>=48*d);check(g.more.width()==48*d);if(call)check(g.call.width()==48*d);
      check(g.separateUnread==(mode==2&&number>0));
      if(g.separateUnread){check(g.unread.height()>=28*d);check(rtl?g.unread.right<g.backVisual.left:g.unread.left>g.backVisual.right);}
+     check((g.backVisual.width()-g.backVisual.height()>0.1f)==(mode==1&&number>0));
      if(g.fits){check(g.text.width()>=48*d);check(rtl?g.center.right<=g.back.left:g.center.left>=g.back.right);}
      cases++;
     }
@@ -44,7 +46,7 @@ public class UnreadGeometryProbe {
         folder=J/'app/flexygram/header/fusion'
         subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',tmp,str(folder/'SignatureFusionGeometry.java'),str(folder/'SignatureFusionFade.java'),str(p)],check=True,capture_output=True,text=True)
         result=subprocess.check_output(['java','-cp',tmp,'UnreadGeometryProbe'],text=True)
-        assert 'PASS 1920' in result
+        assert 'PASS 2880' in result
 
 def test_native_dock_retains_original_background_and_visibility_policy():
     host=src('org/telegram/ui/MainTabsActivity.java');dock=src('org/telegram/ui/MainTabsLayout.java')

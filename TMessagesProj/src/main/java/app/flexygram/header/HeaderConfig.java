@@ -11,7 +11,7 @@ public final class HeaderConfig {
     private static boolean loaded, signature = false, compact, counter = true;
     private static boolean centerTitle;
     private static Boolean adaptiveBubble;
-    private static int opacity = 85, counterMode = 1, currentStyle = 1;
+    private static int opacity = 85, counterMode = 2, currentStyle = 1;
     private HeaderConfig() { }
     private static SharedPreferences preferences;
     private static SharedPreferences prefs() {
@@ -35,13 +35,17 @@ public final class HeaderConfig {
         compact = Boolean.TRUE.equals(p.get("compact"));
         boolean restored = Boolean.TRUE.equals(p.get("back_counter_restored_v1"));
         counter = !restored || !Boolean.FALSE.equals(p.get("counter"));
-        if (!restored) prefs().edit().putBoolean("counter",true).putInt("counter_mode",1)
-                .putBoolean("back_counter_restored_v1",true).apply();
+        Object mode = p.get("counter_mode");
+        // Existing installs keep their selected shape. A fresh install uses the circular button.
+        counterMode = mode instanceof Integer ? Math.max(1, Math.min(2, (Integer) mode)) : 2;
+        if (!restored) {
+            if (p.containsKey("counter")) counterMode = 1;
+            prefs().edit().putBoolean("counter", true).putInt("counter_mode", counterMode)
+                    .putBoolean("back_counter_restored_v1", true).apply();
+        }
         centerTitle = Boolean.TRUE.equals(p.get("center_title"));
         Object savedWidth = p.get("adaptive_bubble");
         adaptiveBubble = savedWidth instanceof Boolean ? (Boolean) savedWidth : null;
-        Object mode = p.get("counter_mode");
-        counterMode = !restored ? 1 : mode instanceof Integer ? Math.max(1, Math.min(2, (Integer) mode)) : 1;
         Object value = p.get("opacity"); opacity = value instanceof Integer ? Math.max(0, Math.min(100, (Integer) value)) : 85;
         loaded = true;
     }
@@ -51,6 +55,12 @@ public final class HeaderConfig {
     public static boolean fusion() { ensure(); return currentStyle == 2 || currentStyle == 3 || currentStyle == 4; }
     public static boolean floating() { ensure(); return currentStyle == 4; }
     public static boolean portrait() { ensure(); return currentStyle == 3; }
+    public static boolean iosStyledCounter() { ensure(); return counterMode == 1; }
+    public static void setIosStyledCounter(boolean enabled) {
+        ensure();
+        counterMode = enabled ? 1 : 2;
+        prefs().edit().putInt("counter_mode", counterMode).apply();
+    }
     public static boolean compact() { ensure(); return compact; }
     public static boolean counter() { ensure(); return counter; }
     public static int counterMode() { ensure(); return counter ? counterMode : 0; }
@@ -64,6 +74,6 @@ public final class HeaderConfig {
     public static void style(boolean value) { style(value ? 0 : 1); }
     public static void style(int value) { ensure(); currentStyle = Math.max(0, Math.min(4, value)); signature = currentStyle != 1; prefs().edit().putInt("style", currentStyle).apply(); }
     public static void compact(boolean value) { ensure(); compact = value; prefs().edit().putBoolean("compact", value).apply(); }
-    public static void counter(boolean value) { counterMode(value ? 1 : 0); }
+    public static void counter(boolean value) { ensure(); counterMode(value ? counterMode : 0); }
     public static void opacity(int value) { ensure(); opacity = Math.max(0, Math.min(100, value)); prefs().edit().putInt("opacity", opacity).apply(); }
 }

@@ -22,7 +22,8 @@
     <string name="FlexyHeaderAdaptiveBubble">Ajustar la píldora al nombre</string>
     <string name="FlexyHeaderShowUnread">Mostrar contador de chats no leídos</string>
     <string name="FlexyHeaderShowUnreadSub">Activar contador de chats no leídos en el botón atrás en el chat abierto</string>
-    <string name="FlexyHeaderIosStyledCounter">iOS-styled counter</string>
+    <string name="FlexyHeaderIosStyledCounter">Contador de retroceso estilo iOS</string>
+    <string name="FlexyHeaderIosStyledCounterSub">Agrupa la flecha y el contador en una píldora. Desactívalo para usar un botón circular con una insignia aparte.</string>
     <string name="FlexyHeaderGeometrySection">Apariencia FlexyGram</string>
     <string name="FlexyHeaderFloating">Signature Floating</string>
     <string name="FlexyHeaderFloatingPreviewStatus">últ. vez hoy a las 09:41</string>

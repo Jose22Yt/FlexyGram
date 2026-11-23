@@ -1472,12 +1472,18 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         additionalTextLeft = x;
     }
 
+    private boolean usesClassicChatBack() {
+        return signatureHeader != null && !signatureHeader.enabled() && !isSearchFieldVisible && !isActionModeShowed();
+    }
+
+    private int classicBackExtra;
+
     private int centerTitleLeft() {
         final boolean back = backButtonImageView != null && backButtonImageView.getVisibility() != GONE;
         if (glassMode) {
-            return dp(back ? 76 : 24);
+            return dp(back ? 76 : 24) + classicBackExtra;
         }
-        return dp(back ? (AndroidUtilities.isTablet() ? 80 : 72) : (AndroidUtilities.isTablet() ? 26 : 18));
+        return dp(back ? (AndroidUtilities.isTablet() ? 80 : 72) : (AndroidUtilities.isTablet() ? 26 : 18)) + classicBackExtra;
     }
 
     private int centerTitleRightBound(int width) {
@@ -1748,10 +1754,15 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
         setMeasuredDimension(width, actionBarHeight + (occupyStatusBar ? AndroidUtilities.statusBarHeight : 0) + extraHeight);
 
+        classicBackExtra = 0;
         int textLeft;
         if (backButtonImageView != null && backButtonImageView.getVisibility() != GONE) {
-            backButtonImageView.measure(MeasureSpec.makeMeasureSpec(dp(54), MeasureSpec.EXACTLY), actionBarHeightSpec);
-            textLeft = dp(AndroidUtilities.isTablet() ? 80 : 72);
+            if (usesClassicChatBack() && app.flexygram.header.HeaderConfig.iosStyledCounter()
+                    && countLayout != null && width >= dp(240)) {
+                classicBackExtra = countLayout.getWidth() + dp(15);
+            }
+            backButtonImageView.measure(MeasureSpec.makeMeasureSpec(dp(54) + classicBackExtra, MeasureSpec.EXACTLY), actionBarHeightSpec);
+            textLeft = dp(AndroidUtilities.isTablet() ? 80 : 72) + classicBackExtra;
         } else {
             textLeft = dp(AndroidUtilities.isTablet() ? 26 : 18);
         }
@@ -1851,7 +1862,8 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             if (child.getVisibility() == GONE || child == titleTextView[0] || child == titleTextView[1] || child == additionalSubTitleOverlayContainer || child == subtitleTextView || child == menu || child == backButtonImageView || child == additionalSubtitleTextView || child == avatarSearchImageView) {
                 continue;
             }
-            measureChildWithMargins(child, widthMeasureSpec, 0, MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY), 0);
+            int backWidthUsed = child instanceof ChatAvatarContainer ? classicBackExtra : 0;
+            measureChildWithMargins(child, widthMeasureSpec, backWidthUsed, MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY), 0);
         }
         if (signatureHeader != null) signatureHeader.measureControls();
     }
@@ -1873,7 +1885,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         int textLeft;
         if (backButtonImageView != null && backButtonImageView.getVisibility() != GONE) {
             backButtonImageView.layout(0, additionalTop, backButtonImageView.getMeasuredWidth(), additionalTop + backButtonImageView.getMeasuredHeight());
-            textLeft = glassMode ? dp(76) : dp(AndroidUtilities.isTablet() ? 80 : 72);
+            textLeft = (glassMode ? dp(76) : dp(AndroidUtilities.isTablet() ? 80 : 72)) + classicBackExtra;
         } else {
             textLeft = glassMode ? dp(24) : dp(AndroidUtilities.isTablet() ? 26 : 18);
         }
@@ -1989,6 +2001,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                 default:
                     childTop = lp.topMargin;
             }
+            if (child instanceof ChatAvatarContainer) childLeft += classicBackExtra;
             child.layout(childLeft, childTop, childLeft + width, childTop + height);
         }
         if (signatureHeader != null) signatureHeader.layoutControls();
@@ -2679,7 +2692,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             final int menuWidthWithPadding = menuWidth + ((hasForcedMenuWidth || hasForcedMenuMinWidth) ? (menuWidth > 0 ? p : 0) : (int) (p * animatorHasMenuItems.getFloatValue()));
             final int rightOffset = lerp(menuWidthWithPadding, Math.max(menuWidthWithPadding, p + s), chatAvatarContainer == null ? 0f : 1f - animatorAvatarContainerHasAvatar.getFloatValue());
 
-            final int leftDefault = lerp(hasBackButton ? s + p : 0, s + p, chatAvatarContainer == null? 0f : 1f - animatorAvatarContainerHasAvatar.getFloatValue());
+            final int leftDefault = lerp(hasBackButton ? s + p : 0, s + p, chatAvatarContainer == null? 0f : 1f - animatorAvatarContainerHasAvatar.getFloatValue()) + classicBackExtra;
             final int rightDefault = getWidth() - rightOffset;
             final int widthDefault = rightDefault - leftDefault;
             final int left, right;
@@ -2696,7 +2709,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                 right = left + width;
 
                 final float translationX = left
-                    - ((MarginLayoutParams)(chatAvatarContainer.getLayoutParams())).leftMargin
+                    - ((MarginLayoutParams)(chatAvatarContainer.getLayoutParams())).leftMargin - classicBackExtra
                     - chatAvatarContainer.getLeftPadding()
                     + p + Math.round(glassAvatarGap);
                 chatAvatarContainer.setTranslationX(translationX);
@@ -2710,7 +2723,8 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             drawNativeChatEdge(canvas, glassDrawable);
         }
         if (!signature && glassDrawableBack != null && hasBackButton) {
-            glassDrawableBack.setBounds(0, t, s + p * 2, b);
+            int extra = usesClassicChatBack() ? classicBackExtra : 0;
+            glassDrawableBack.setBounds(0, t, s + p * 2 + extra, b);
             drawNativeChatEdge(canvas, glassDrawableBack);
         }
         if (!signature && glassDrawableMenu != null && menuWidth > 0 && !glassOnlyBack && !doNotDrawGlassMenu) {
@@ -2820,8 +2834,25 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
         @Override
         public void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
-            if (countLayout == null || unreadCount == 0 || pluginUnreadBadgeDepth > 0)
+            final boolean classic = usesClassicChatBack();
+            final int extraWidth = classic ? classicBackExtra : 0;
+            if (classic && glassDrawableBack == null) {
+                final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
+                badgePaint.setColor(app.flexygram.effects.ChatChromePalette.surface(dark));
+                final float radius = dp(23);
+                final float centerY = getHeight() * .5f;
+                canvas.drawRoundRect(dp(4), centerY - radius, dp(50) + extraWidth,
+                        centerY + radius, radius, radius, badgePaint);
+            }
+            if (extraWidth != 0) {
+                int save = canvas.save();
+                canvas.translate(-extraWidth * .5f, 0);
+                super.onDraw(canvas);
+                canvas.restoreToCount(save);
+            } else {
+                super.onDraw(canvas);
+            }
+            if (countLayout == null || pluginUnreadBadgeDepth > 0)
                 return;
 
             int accent = ColorUtils.setAlphaComponent(getThemedColor(Theme.key_telegram_color), 255);
@@ -2829,32 +2860,39 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             badgeTextPaint.setColor(ColorUtils.calculateContrast(Color.WHITE, accent)
                     >= ColorUtils.calculateContrast(Color.BLACK, accent) ? Color.WHITE : Color.BLACK);
             Paint paint = badgePaint;
-            String unreadCountString = unreadCount > 99 ? "99+" : Integer.toString(unreadCount);
-            int countWidth = Math.max(AndroidUtilities.dp(12), (int) Math.ceil(badgeTextPaint.measureText(unreadCountString)));
-            int countLeft = getMeasuredWidth() - countWidth - AndroidUtilities.dp(20);
-            int countTop = 0;
-
-            int x = countLeft - AndroidUtilities.dp(5.5f);
+            final int countWidth = countLayout.getWidth();
+            final int countLeft = extraWidth > 0 ? getWidth() - countWidth - dp(14) : getWidth() - countWidth - dp(20);
+            final int countTop = extraWidth > 0 ? (getHeight() - dp(23)) / 2 : 0;
+            final int x = countLeft - dp(5.5f);
             rect.set(x, countTop, x + countWidth + AndroidUtilities.dp(11), countTop + AndroidUtilities.dp(23));
             canvas.drawRoundRect(rect, 11.5f * AndroidUtilities.density, 11.5f * AndroidUtilities.density, paint);
             canvas.save();
-            canvas.translate(countLeft, countTop + AndroidUtilities.dp(4));
+            canvas.translate(countLeft, countTop + (dp(23) - countLayout.getHeight()) * .5f);
             countLayout.draw(canvas);
             canvas.restore();
         }
 
         public void setUnread(int count) {
             count = Math.max(0, count);
-            if (count != unreadCount) {
-                unreadCount = Math.max(0, count);
-                count = unreadCount;
-                badgeTextPaint.setTextSize(AndroidUtilities.dp(13));
+            if (count == unreadCount) return;
+            int oldDisplay = Math.min(unreadCount, 100);
+            unreadCount = count;
+            if (oldDisplay == Math.min(count, 100)) return;
+            int oldWidth = countLayout == null ? 0 : countLayout.getWidth();
+            if (count == 0) {
+                countLayout = null;
+            } else {
+                badgeTextPaint.setTextSize(dp(13));
                 badgeTextPaint.setTypeface(AndroidUtilities.bold());
                 String countString = count > 99 ? "99+" : Integer.toString(count);
-                int countWidth = count == 0 ? 0 : Math.max(AndroidUtilities.dp(12), (int) Math.ceil(badgeTextPaint.measureText(countString)));
+                int countWidth = Math.max(dp(12), (int) Math.ceil(badgeTextPaint.measureText(countString)));
                 countLayout = new StaticLayout(countString, badgeTextPaint, countWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
-                invalidate();
             }
+            if (usesClassicChatBack() && app.flexygram.header.HeaderConfig.iosStyledCounter()
+                    && oldWidth != (countLayout == null ? 0 : countLayout.getWidth())) {
+                ActionBar.this.requestLayout();
+            }
+            invalidate();
         }
     }
 
@@ -2862,8 +2900,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         if (signatureHeader != null && signatureHeader.enabled()) {
             signatureHeader.setCount(app.flexygram.header.HeaderConfig.counter() ? count : 0);
         } else if (backButtonImageView != null) {
-            backButtonImageView.setUnread(NekoConfig.unreadBadgeOnBackButton.Bool()
-                    || app.flexygram.header.HeaderConfig.counter() ? count : 0);
+            final boolean enabled = app.flexygram.header.HeaderConfig.counter()
+                    || signatureHeader == null && NekoConfig.unreadBadgeOnBackButton.Bool();
+            backButtonImageView.setUnread(enabled ? count : 0);
         }
     }
 

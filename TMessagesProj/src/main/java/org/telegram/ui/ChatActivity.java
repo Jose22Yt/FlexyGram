@@ -52146,7 +52146,7 @@ public class ChatActivity extends BaseFragment implements
     private boolean usesSignatureHeader() { return signatureChatHeader != null && signatureChatHeader.enabled(); }
     private void updateSignatureHeaderCounter() {
         if (signatureChatHeader == null) return;
-        signatureChatHeader.setCount(app.flexygram.header.HeaderConfig.counter()
+        actionBar.unreadBadgeSetCount(app.flexygram.header.HeaderConfig.counter()
                 ? getCurrentFolderUnreadMessageCount() : 0);
     }
 

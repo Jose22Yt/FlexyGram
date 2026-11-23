@@ -22,7 +22,12 @@ def test_counter_and_reference_icons_are_repaired_once_then_respect_choices(tmp_
  HeaderConfig.load();if(!HeaderConfig.counter()||HeaderConfig.counterMode()!=1||!FlexyComposerConfig.referenceIcons())throw new AssertionError("repair missing");
  int hw=h.writes,lw=lower.writes;for(int i=0;i<10000;i++){HeaderConfig.load();FlexyComposerConfig.referenceIcons();}if(h.writes!=hw||lower.writes!=lw)throw new AssertionError("repeated writes");
  HeaderConfig.counter(false);HeaderConfig.load();FlexyComposerConfig.setReferenceIcons(false);if(HeaderConfig.counter()||FlexyComposerConfig.referenceIcons())throw new AssertionError("explicit choice overwritten");
- HeaderConfig.counterMode(2);HeaderConfig.load();if(HeaderConfig.counterMode()!=2)throw new AssertionError();
+ HeaderConfig.counterMode(2);HeaderConfig.load();if(HeaderConfig.counterMode()!=2||HeaderConfig.iosStyledCounter())throw new AssertionError();
+ HeaderConfig.counter(false);HeaderConfig.counter(true);HeaderConfig.load();if(HeaderConfig.counterMode()!=2)throw new AssertionError("show toggle lost shape");
+ HeaderConfig.counter(false);HeaderConfig.setIosStyledCounter(true);HeaderConfig.load();
+ if(HeaderConfig.counter()||!HeaderConfig.iosStyledCounter())throw new AssertionError("shape changed counter visibility");
+ HeaderConfig.counter(true);HeaderConfig.load();
+ if(HeaderConfig.counterMode()!=1)throw new AssertionError("pill choice lost");
  FlexyComposerConfig.reset();if(!FlexyComposerConfig.referenceIcons())throw new AssertionError("reset uses obsolete icons");
  }}'''
     },[JAVA/'app/flexygram/header/HeaderConfig.java',JAVA/'app/flexygram/composer/FlexyComposerConfig.java',JAVA/'app/flexygram/composer/ComposerStyle.java',JAVA/'app/flexygram/composer/ComposerGeometry.java'])

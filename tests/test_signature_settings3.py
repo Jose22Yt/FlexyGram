@@ -63,6 +63,8 @@ def test_original_editor_click_logic_is_unchanged():
   # Floating is an additive fifth header choice; existing choices keep their IDs/callbacks.
   if path.endswith('/HeaderSettingsActivity.java'):
    current=current.replace('getString(R.string.FlexyHeaderFloating),\n                            ','').replace('new int[]{4, 3, 0, 2, 1}','new int[]{3, 0, 2, 1}')
+   current=current.replace('HeaderConfig.setIosStyledCounter(!HeaderConfig.iosStyledCounter());',
+                           'HeaderConfig.counterMode(HeaderConfig.counterMode() == 1 ? 2 : 1);')
   if path.endswith('/BubbleSettingsActivity.java'):
    # Native Test intentionally adds a shapes-only selector; legacy callbacks remain intact.
    current=current.replace(method(current,'if (org.telegram.messenger.BuildConfig.NATIVE_BASELINE_TEST)'),'',1)

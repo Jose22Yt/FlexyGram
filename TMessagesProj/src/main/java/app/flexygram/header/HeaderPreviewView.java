@@ -16,6 +16,9 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
     private final Paint text = new Paint(Paint.ANTI_ALIAS_FLAG), avatar = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final android.graphics.drawable.Drawable back, more;
     private final Paint countText=new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint countBadge = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private static final String PREVIEW_COUNT = "10";
+    private float previewCountWidth, classicPreviewExtra;
     private final String name, status;
     private int iconColor;
     private static final class FusionPreview {
@@ -65,12 +68,20 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         subtitlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,previewFloating()?app.flexygram.header.fusion.SignatureFusionGeometry.FLOATING_SUBTITLE_SP:12f,metrics);
         text.setTextSize(titlePx); text.getFontMetricsInt(fontMetrics); int titleLine=fontMetrics.descent-fontMetrics.ascent;
         text.setTextSize(subtitlePx); text.getFontMetricsInt(fontMetrics); int subtitleLine=fontMetrics.descent-fontMetrics.ascent;
+        int mode = HeaderConfig.counterMode();
+        float numberWidth = mode == 0 ? 0 : countText.measureText(PREVIEW_COUNT);
+        previewCountWidth = numberWidth;
+        classicPreviewExtra = mode == 1 && width >= AndroidUtilities.dp(240)
+                ? Math.max(AndroidUtilities.dp(12), numberWidth) + AndroidUtilities.dp(15) : 0;
+        float extra = app.flexygram.header.fusion.SignatureFusionGeometry.unreadWidthExtra(
+                numberWidth, mode, AndroidUtilities.density);
         fusionMode=false;
         previewScale=previewFloating()&&forcedStyle>=0&&width>0?Math.min(1f,width/(360f*AndroidUtilities.density)):1f;
         if(previewFusion()){
             if(fusion==null)fusion=new FusionPreview(getContext());
-            var g=previewFloating() ? app.flexygram.header.fusion.SignatureFusionGeometry.updateFloating(fusion.geometry,width/previewScale,AndroidUtilities.density,LocaleController.isRTL,true,0) : previewPortrait() ? app.flexygram.header.fusion.SignatureFusionGeometry.updatePortrait(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true) : app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true);
+            var g=previewFloating() ? app.flexygram.header.fusion.SignatureFusionGeometry.updateFloating(fusion.geometry,width/previewScale,AndroidUtilities.density,LocaleController.isRTL,true,extra) : previewPortrait() ? app.flexygram.header.fusion.SignatureFusionGeometry.updatePortrait(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true,extra) : app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true,extra);
             if(g.fits&&(titleLine+subtitleLine+AndroidUtilities.dp(2))<=g.height-AndroidUtilities.dp(8)){
+                app.flexygram.header.fusion.SignatureFusionGeometry.placeUnread(g, numberWidth, mode, AndroidUtilities.density);
                 fusionMode=true;previewHeight=g.height;
                 int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0&&!conversationStage?80:12);setMeasuredDimension(width,Math.round(h*previewScale));fusionTop=(h-previewHeight)/2;
                 text.setTextSize(titlePx); scratchPaint.set(text); displayName=android.text.TextUtils.ellipsize(name,scratchPaint,g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
@@ -88,11 +99,6 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0&&!conversationStage?80:12);setMeasuredDimension(width,h);
         if(previewStyle()==1){prepareClassicText(width);return;}
         text.setTextSize(titlePx); float preferred = (float) Math.ceil(text.measureText(name)) + AndroidUtilities.dp(24);
-        float numberWidth = 0;
-        int mode = HeaderConfig.counter() ? HeaderConfig.counterMode() : 0;
-        if (mode != 0) {
-            numberWidth = countText.measureText("10");
-        }
         geometry.update(width,(h-previewHeight)/2,previewHeight,numberWidth,AndroidUtilities.density,LocaleController.isRTL,mode,preferred,HeaderConfig.adaptiveBubbleForStyle(previewStyle()));
         text.setTextSize(titlePx); scratchPaint.set(text); displayName=android.text.TextUtils.ellipsize(name,scratchPaint,Math.max(0,geometry.title.width()-AndroidUtilities.dp(24)),android.text.TextUtils.TruncateAt.END).toString();
         text.setTextSize(subtitlePx); scratchPaint.set(text); displayStatus=android.text.TextUtils.ellipsize(status,scratchPaint,Math.max(0,geometry.title.width()-AndroidUtilities.dp(24)),android.text.TextUtils.TruncateAt.END).toString();
@@ -113,17 +119,9 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         int side=AndroidUtilities.dp(24), y=Math.round(geometry.back.centerY());
         back.setBounds(Math.round(arrow)-side/2,y-side/2,Math.round(arrow)+side/2,y+side/2); back.draw(canvas);
         if (geometry.countVisible) {
-            Paint countPaint = countText;
-            countPaint.setColor(color);
-            float countY = geometry.back.centerY() - (countPaint.descent() + countPaint.ascent()) / 2f;
-            float countX = LocaleController.isRTL
-                    ? geometry.back.left + AndroidUtilities.dp(8)
-                    : geometry.back.right - AndroidUtilities.dp(8) - countPaint.measureText("10");
-            if (geometry.separateCount) {
-                countX = geometry.badge.centerX() - countPaint.measureText("10") / 2f;
-                countY = geometry.badge.centerY() - (countPaint.descent() + countPaint.ascent()) / 2f;
-            }
-            canvas.drawText("10", countX, countY, countPaint);
+            float center = geometry.separateCount ? geometry.badge.centerX()
+                    : integratedCountCenter(geometry.back.left, geometry.back.right, LocaleController.isRTL);
+            drawCount(canvas, center, geometry.back.centerY());
         }
         text.setColor(color);
         text.setTextSize(titlePx); float titleHeight=text.descent()-text.ascent(), titleAscent=text.ascent();
@@ -134,8 +132,26 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));canvas.drawCircle(geometry.avatar.centerX(),geometry.avatar.centerY(),height/2-AndroidUtilities.dp(1),avatar);
         text.setColor(0xffffffff);text.setTextSize(AndroidUtilities.dp(20));canvas.drawText("A",geometry.avatar.centerX(),geometry.avatar.centerY()+AndroidUtilities.dp(7),text);
     }
+    private float integratedCountCenter(float left, float right, boolean rtl) {
+        float halfWidth = Math.max(AndroidUtilities.dp(23), previewCountWidth + AndroidUtilities.dp(12)) * .5f;
+        return rtl ? left + AndroidUtilities.dp(7) + halfWidth : right - AndroidUtilities.dp(7) - halfWidth;
+    }
+
+    private void drawCount(Canvas canvas, float centerX, float centerY) {
+        int accent = Theme.getColor(Theme.key_telegram_color);
+        countBadge.setColor(accent);
+        countText.setColor(androidx.core.graphics.ColorUtils.calculateContrast(0xffffffff, accent | 0xff000000)
+                >= androidx.core.graphics.ColorUtils.calculateContrast(0xff000000, accent | 0xff000000) ? 0xffffffff : 0xff000000);
+        float radius = AndroidUtilities.dp(23) * .5f;
+        float halfWidth = Math.max(radius, previewCountWidth * .5f + AndroidUtilities.dp(6));
+        canvas.drawRoundRect(centerX - halfWidth, centerY - radius, centerX + halfWidth,
+                centerY + radius, radius, radius, countBadge);
+        float baseline = centerY - (countText.ascent() + countText.descent()) * .5f;
+        canvas.drawText(PREVIEW_COUNT, centerX - previewCountWidth * .5f, baseline, countText);
+    }
+
     private void prepareClassicText(float width) {
-        float available = Math.max(0, width - 122 * AndroidUtilities.density);
+        float available = Math.max(0, width - 136 * AndroidUtilities.density - classicPreviewExtra);
         text.setTextSize(titlePx); scratchPaint.set(text);
         displayName = android.text.TextUtils.ellipsize(name, scratchPaint, available, android.text.TextUtils.TruncateAt.END).toString();
         text.setTextSize(subtitlePx); scratchPaint.set(text);
@@ -146,10 +162,20 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         avatar.setColor(Theme.getColor(Theme.key_actionBarDefault));canvas.drawRect(0,y-28*d,getWidth(),y+28*d,avatar);
         int color=Theme.getColor(Theme.key_actionBarDefaultTitle);
         back.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);more.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);
-        int size=AndroidUtilities.dp(24),backX=Math.round(rtl?getWidth()-20*d:20*d),menuX=Math.round(rtl?20*d:getWidth()-20*d);
+        float extra = classicPreviewExtra;
+        int size = AndroidUtilities.dp(24), backX = Math.round(rtl ? getWidth() - 27*d : 27*d);
+        int menuX = Math.round(rtl ? 20*d : getWidth() - 20*d);
+        float left = rtl ? getWidth() - 50*d - extra : 4*d;
+        float right = rtl ? getWidth() - 4*d : 50*d + extra;
+        avatar.setColor(app.flexygram.effects.ChatChromePalette.surface(Theme.isCurrentThemeDark()));
+        canvas.drawRoundRect(left, y - 23*d, right, y + 23*d, 23*d, 23*d, avatar);
+        if (HeaderConfig.counter()) {
+            float badgeX = extra > 0 ? integratedCountCenter(left, right, rtl) : backX + (rtl ? -8*d : 8*d);
+            drawCount(canvas, badgeX, extra > 0 ? y : y - 15*d);
+        }
         back.setBounds(backX-size/2,(int)y-size/2,backX+size/2,(int)y+size/2);int save=canvas.save();if(rtl)canvas.rotate(180,backX,y);back.draw(canvas);canvas.restoreToCount(save);
         more.setBounds(menuX-size/2,(int)y-size/2,menuX+size/2,(int)y+size/2);save=canvas.save();canvas.rotate(90,menuX,y);more.draw(canvas);canvas.restoreToCount(save);
-        float avatarX=rtl?getWidth()-58*d:58*d,textX=rtl?getWidth()-86*d:86*d;
+        float avatarX=rtl?getWidth()-72*d-extra:72*d+extra,textX=rtl?getWidth()-100*d-extra:100*d+extra;
         avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));canvas.drawCircle(avatarX,y,20*d,avatar);
         text.setColor(color);text.setTextAlign(rtl?Paint.Align.RIGHT:Paint.Align.LEFT);text.setTextSize(titlePx);
         canvas.drawText(displayName,textX,y-2*d,text);text.setTextSize(subtitlePx);text.setColor(Theme.getColor(Theme.key_actionBarDefaultSubtitle));
@@ -183,8 +209,13 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         text.setTextSize(titlePx);canvas.drawText(displayName,fusionTitleX,top-ta,text);
         text.setTextSize(subtitlePx);text.setColor(previewFloating()?Theme.getColor(Theme.key_actionBarDefaultSubtitle):color);
         canvas.drawText(displayStatus,fusionStatusX,top+th+AndroidUtilities.dp(2)-text.ascent(),text);
-        int icon=AndroidUtilities.dp(24),x=Math.round(g.back.centerX()),y=Math.round(g.back.centerY());back.setBounds(x-icon/2,y-icon/2,x+icon/2,y+icon/2);
-        int transform=canvas.save();if(g.rtl)canvas.scale(-1,1,g.back.centerX(),g.back.centerY());back.draw(canvas);canvas.restoreToCount(transform);
+        float arrowCenter = g.rtl ? g.back.right - g.back.height() * .5f : g.back.left + g.back.height() * .5f;
+        int icon=AndroidUtilities.dp(24),x=Math.round(arrowCenter),y=Math.round(g.back.centerY());back.setBounds(x-icon/2,y-icon/2,x+icon/2,y+icon/2);
+        int transform=canvas.save();if(g.rtl)canvas.scale(-1,1,arrowCenter,g.back.centerY());back.draw(canvas);canvas.restoreToCount(transform);
+        if (HeaderConfig.counter()) {
+            float badgeX = g.separateUnread ? g.unread.centerX() : integratedCountCenter(g.back.left, g.back.right, g.rtl);
+            drawCount(canvas, badgeX, g.back.centerY());
+        }
         x=Math.round(g.call.centerX());y=Math.round(g.call.centerY());fusion.phone.setBounds(x-icon/2,y-icon/2,x+icon/2,y+icon/2);fusion.phone.draw(canvas);
         x=Math.round(g.more.centerX());y=Math.round(g.more.centerY());fusion.more.setBounds(x-icon/2,y-icon/2,x+icon/2,y+icon/2);transform=canvas.save();if(!app.flexygram.icons.ExactIcons.isEnabled())canvas.rotate(90,x,y);fusion.more.draw(canvas);canvas.restoreToCount(transform);
         fusion.surface.drawCenterBorder(canvas,g,edge,d);canvas.restoreToCount(outer);

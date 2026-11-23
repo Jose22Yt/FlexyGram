@@ -20,6 +20,7 @@ import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.Cells.TextSettingsCell;
+import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import tw.nekomimi.nekogram.ui.cells.HeaderCell;
 import org.telegram.ui.Components.RecyclerListView;
@@ -28,7 +29,7 @@ import org.telegram.ui.Components.RecyclerListView;
 public final class ConversationStyleSettingsActivity extends SignatureMatteSettingsActivity {
     private static final int GALLERY = 310, POSITION = 311;
     private boolean header;
-    private int galleryRow, layoutHeaderRow, levelRow, positionRow, resetPositionRow, infoRow;
+    private int galleryRow, iosCounterRow, layoutHeaderRow, levelRow, positionRow, resetPositionRow, infoRow;
     private Gallery gallery;
     public ConversationStyleSettingsActivity() {}
     public ConversationStyleSettingsActivity(boolean header){this.header=header;}
@@ -37,6 +38,7 @@ public final class ConversationStyleSettingsActivity extends SignatureMatteSetti
     @Override protected void updateRows(){
         super.updateRows();HeaderConfig.load();galleryRow=addRow();
         layoutHeaderRow=levelRow=positionRow=resetPositionRow=infoRow=-1;
+        iosCounterRow = header ? addRow("signatureHeaderIosCounter") : -1;
         if(!header){
             layoutHeaderRow=addHeader("FlexyComposerLayoutSection");
             levelRow=addRow("flexyComposerLevel");
@@ -53,6 +55,12 @@ public final class ConversationStyleSettingsActivity extends SignatureMatteSetti
         if(!header&&listAdapter!=null)listAdapter.notifyItemRangeChanged(levelRow,rowCount-levelRow);
     }
     @Override protected void onItemClick(View view,int position,float x,float y){
+        if (header && position >= 0 && position == iosCounterRow) {
+            HeaderConfig.setIosStyledCounter(!HeaderConfig.iosStyledCounter());
+            listAdapter.notifyItemChanged(iosCounterRow);
+            if (gallery != null) gallery.invalidatePreviews();
+            return;
+        }
         if(header||position<0||!FlexyComposerConfig.compact())return;
         if(position==levelRow){
             showDialog(new AlertDialog.Builder(getParentActivity(),resourcesProvider)
@@ -140,7 +148,7 @@ public final class ConversationStyleSettingsActivity extends SignatureMatteSetti
         }
     }
     @Override protected BaseListAdapter createAdapter(Context context){return new MatteListAdapter(context){
-        @Override public int getItemViewType(int position){return position==galleryRow?GALLERY:position==layoutHeaderRow?TYPE_HEADER:position==positionRow?POSITION:position==infoRow?TYPE_INFO_PRIVACY:TYPE_SETTINGS;}
+        @Override public int getItemViewType(int position){return position==galleryRow?GALLERY:position==iosCounterRow?TYPE_CHECK:position==layoutHeaderRow?TYPE_HEADER:position==positionRow?POSITION:position==infoRow?TYPE_INFO_PRIVACY:TYPE_SETTINGS;}
         @Override protected boolean isSectionContent(int type){return type!=GALLERY&&type!=TYPE_HEADER&&super.isSectionContent(type);}
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,int type){
             if(type==GALLERY)return new RecyclerListView.Holder(gallery=new Gallery(parent.getContext()));
@@ -151,6 +159,13 @@ public final class ConversationStyleSettingsActivity extends SignatureMatteSetti
         }
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder,int position,boolean partial){
             if(position==galleryRow){gallery=(Gallery)holder.itemView;gallery.bind();return;}
+            if (position == iosCounterRow) {
+                ((TextCheckCell) holder.itemView).setTextAndValueAndCheck(
+                        LocaleController.getString(R.string.FlexyHeaderIosStyledCounter),
+                        LocaleController.getString(R.string.FlexyHeaderIosStyledCounterSub),
+                        HeaderConfig.iosStyledCounter(), true, false);
+                return;
+            }
             if(position==layoutHeaderRow){((HeaderCell)holder.itemView).setText(LocaleController.getString(R.string.FlexyComposerLayoutSection));return;}
             if(position==positionRow){((PositionCell)holder.itemView).bind();return;}
             if(position==infoRow){((TextInfoPrivacyCell)holder.itemView).setText(LocaleController.getString(R.string.FlexyComposerAdjustmentsInfo));return;}
@@ -159,6 +174,11 @@ public final class ConversationStyleSettingsActivity extends SignatureMatteSetti
             else cell.setText(LocaleController.getString(R.string.FlexyComposerPositionReset),false);
             cell.setEnabled(FlexyComposerConfig.compact(),null);
         }
-        @Override public boolean isEnabled(RecyclerView.ViewHolder holder){int position=settingsRowPosition(holder);return !header&&position>=0&&FlexyComposerConfig.compact()&&(position==levelRow||position==resetPositionRow);}
+        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) {
+            int position = settingsRowPosition(holder);
+            if (position < 0) return false;
+            if (header) return position == iosCounterRow;
+            return FlexyComposerConfig.compact() && (position == levelRow || position == resetPositionRow);
+        }
     };}
 }

@@ -34,7 +34,7 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
         centerTitleRow = addRow("signatureHeaderCenterTitle");
         adaptiveBubbleRow = addRow("signatureHeaderAdaptiveBubble");
         counterRow = addRow("signatureHeaderCounter");
-        iosStyledCounterRow = HeaderConfig.counter() ? addRow("signatureHeaderIosCounter") : -1;
+        iosStyledCounterRow = addRow("signatureHeaderIosCounter");
 
         geometryHeaderRow = addHeader("FlexyHeaderGeometrySection");
         styleRow = addRow("signatureHeaderStyle");
@@ -53,7 +53,7 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
     }
 
     private void changed(int row) {
-        if (row == styleRow || row == counterRow) {
+        if (row == styleRow) {
             updateRows();
             listAdapter.notifyDataSetChanged();
         } else {
@@ -76,7 +76,7 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
             HeaderConfig.counter(!HeaderConfig.counter());
             changed(counterRow);
         } else if (position == iosStyledCounterRow) {
-            HeaderConfig.counterMode(HeaderConfig.counterMode() == 1 ? 2 : 1);
+            HeaderConfig.setIosStyledCounter(!HeaderConfig.iosStyledCounter());
             changed(iosStyledCounterRow);
         } else if (position == styleRow || position == sizeRow) {
             boolean style = position == styleRow;
@@ -202,11 +202,13 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
                 return;
             }
             if (p == counterRow) {
-                ((TextCheckCell) h.itemView).setTextAndValueAndCheck(getString(R.string.FlexyHeaderShowUnread), getString(R.string.FlexyHeaderShowUnreadSub), HeaderConfig.counter(), false, iosStyledCounterRow != -1);
+                ((TextCheckCell) h.itemView).setTextAndValueAndCheck(getString(R.string.FlexyHeaderShowUnread), getString(R.string.FlexyHeaderShowUnreadSub), HeaderConfig.counter(), false, true);
                 return;
             }
             if (p == iosStyledCounterRow) {
-                ((TextCheckCell) h.itemView).setTextAndCheck(getString(R.string.FlexyHeaderIosStyledCounter), HeaderConfig.counterMode() == 1, false);
+                ((TextCheckCell) h.itemView).setTextAndValueAndCheck(
+                        getString(R.string.FlexyHeaderIosStyledCounter), getString(R.string.FlexyHeaderIosStyledCounterSub),
+                        HeaderConfig.iosStyledCounter(), true, false);
                 return;
             }
             ((TextSettingsCell) h.itemView).setTextAndValue(

@@ -7,25 +7,29 @@ def test_classic_header_prepares_text_once_not_every_draw(tmp_path):
     source=(JAVA/'app/flexygram/header/HeaderPreviewView.java').read_text()
     methods='\n'.join(method(source,s) for s in ['private void prepareClassicText(', 'private void drawClassic('])
     assert 'if(previewStyle()==1){prepareClassicText(width);return;}' in method(source,'protected void onMeasure(')
-    methods=methods.replace('android.text.TextUtils','TextUtils').replace('android.graphics.PorterDuff','PorterDuff')
+    methods=methods.replace('android.text.TextUtils','TextUtils').replace('android.graphics.PorterDuff','PorterDuff').replace('app.flexygram.effects.ChatChromePalette','ChatChromePalette')
     probe(tmp_path, {'Probe.java': '''public class Probe {
  static class AndroidUtilities {static float density=1;static int dp(float f){return Math.round(f*density);}}
  static class LocaleController {static boolean isRTL;}
- static class Theme {static int key_actionBarDefault,key_actionBarDefaultTitle,key_windowBackgroundWhiteBlueText,key_actionBarDefaultSubtitle;static int getColor(int key){return key;}}
+ static class Theme {static int key_actionBarDefault,key_actionBarDefaultTitle,key_windowBackgroundWhiteBlueText,key_actionBarDefaultSubtitle;static int getColor(int key){return key;}static boolean isCurrentThemeDark(){return true;}}
+ static class HeaderConfig {static boolean counter(){return false;}}
+ static class ChatChromePalette {static int surface(boolean dark){return 0xff444444;}}
  static class PorterDuff {static class Mode{static Object SRC_IN;}}
  static class Paint {float size;void setTextSize(float s){size=s;}void set(Paint p){size=p.size;}void setColor(int c){}void setTextAlign(Object a){}static class Align{static Object RIGHT,LEFT,CENTER;}}
  static class TextUtils {static int calls;static float[] widths=new float[2],sizes=new float[2];static class TruncateAt{static Object END;}
  static CharSequence ellipsize(String s,Paint p,float w,Object t){widths[calls%2]=w;sizes[calls%2]=p.size;calls++;return w<=0?"":s;}}
- static class Canvas {int texts;void drawRect(float a,float b,float c,float d,Paint p){}void drawCircle(float a,float b,float c,Paint p){}int save(){return 0;}void rotate(float a,float b,float c){}void restoreToCount(int i){}void drawText(String t,float a,float b,Paint p){if(!t.isEmpty())texts++;}}
+ static class Canvas {int texts;void drawRoundRect(float a,float b,float c,float d,float x,float y,Paint p){}void drawRect(float a,float b,float c,float d,Paint p){}void drawCircle(float a,float b,float c,Paint p){}int save(){return 0;}void rotate(float a,float b,float c){}void restoreToCount(int i){}void drawText(String t,float a,float b,Paint p){if(!t.isEmpty())texts++;}}
  static class Icon {void setColorFilter(int c,Object m){}void setBounds(int a,int b,int c,int d){}void draw(Canvas c){}}
  Paint text=new Paint(),scratchPaint=new Paint(),avatar=new Paint();Icon back=new Icon(),more=new Icon();
- float titlePx=16,subtitlePx=12;String name="Nombre muy largo",status="en línea",displayName="",displayStatus="";
+ float integratedCountCenter(float l,float r,boolean rtl){throw new AssertionError();}
+ void drawCount(Canvas c,float x,float y){throw new AssertionError();}
+ float titlePx=16,subtitlePx=12,classicPreviewExtra=32;String name="Nombre muy largo",status="en línea",displayName="",displayStatus="";
  int getHeight(){return 100;}int getWidth(){return 360;}
  METHODS
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[] args){Probe p=new Probe();p.prepareClassicText(360);Canvas c=new Canvas();
  for(int i=0;i<1000;i++){LocaleController.isRTL=i%2==0;p.drawClassic(c);}
- check(TextUtils.calls==2&&c.texts==2000&&TextUtils.widths[0]==238&&TextUtils.sizes[0]==16&&TextUtils.sizes[1]==12);
+ check(TextUtils.calls==2&&c.texts==2000&&TextUtils.widths[0]==192&&TextUtils.sizes[0]==16&&TextUtils.sizes[1]==12);
  AndroidUtilities.density=2;p.titlePx=32;p.subtitlePx=24;p.prepareClassicText(200);
  check(TextUtils.calls==4&&TextUtils.widths[0]==0&&TextUtils.sizes[1]==24);
  }

@@ -82,9 +82,8 @@ public final class SignatureChatHeader {
         int mode = HeaderConfig.counter() ? HeaderConfig.counterMode() : 0;
         float numberWidth = mode != 0 && unreadLayout != null
                 ? unreadLayout.getWidth() : 0;
-        float countExtra = numberWidth <= 0 ? 0 : mode == 2
-                ? Math.max(AndroidUtilities.dp(28), numberWidth + AndroidUtilities.dp(8)) + AndroidUtilities.dp(3)
-                : numberWidth + AndroidUtilities.dp(16);
+        float countExtra = app.flexygram.header.fusion.SignatureFusionGeometry.unreadWidthExtra(
+                numberWidth, mode, AndroidUtilities.density);
         if (HeaderConfig.fusion() && active()) {
             if (fusion == null) fusion = new Fusion();
             var g = HeaderConfig.floating()

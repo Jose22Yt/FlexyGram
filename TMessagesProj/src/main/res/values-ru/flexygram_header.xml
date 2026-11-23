@@ -17,4 +17,6 @@
     <string name="FlexyHeaderLastSeenTime">Был(а) %1$s</string>
     <string name="FlexyHeaderFusion">Signature Fusion</string>
     <string name="FlexyHeaderPortrait">Signature Matte Portrait</string>
+    <string name="FlexyHeaderIosStyledCounter">Счётчик на кнопке «Назад» в стиле iOS</string>
+    <string name="FlexyHeaderIosStyledCounterSub">Объединяет стрелку и счётчик в одной капсуле. При отключении кнопка круглая, а счётчик отображается отдельно.</string>
 </resources>

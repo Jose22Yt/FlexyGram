@@ -34,6 +34,10 @@ def test_gallery_has_one_live_preview_and_compact_native_style_choices():
     assert 'new CompactStylePicker(context,resourcesProvider,livePreview,2)' in gallery
     assert 'HeaderConfig.style(style)' in gallery and 'FlexyComposerConfig.setStyle(style)' in gallery
     assert 'new HeaderPreviewView(context,style,true)' in gallery and 'createStyleMiniature(context,style)' in gallery
+    assert 'iosCounterRow = header ? addRow(' in gallery
+    assert 'if (header) return position == iosCounterRow;' in gallery
+    assert 'HeaderConfig.setIosStyledCounter(!HeaderConfig.iosStyledCounter());' in gallery
+
     assert 'info.setChecked(isSelected())' in picker and 'label.setText(name)' in picker
     assert 'fontScale' in picker and 'LocaleController.isRTL' in picker
     for path in ['header/HeaderPreviewView.java','composer/FlexyComposerSettingsActivity.java']:

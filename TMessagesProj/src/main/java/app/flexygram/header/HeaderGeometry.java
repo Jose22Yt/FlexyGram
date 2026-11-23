@@ -25,7 +25,7 @@ public final class HeaderGeometry {
                 int counterMode, float desiredTitleWidth, boolean adaptive) {
         float edge = 8 * density, gap = 6 * density;
         float maxSide = Math.max(height, Math.min(width * .28f, (width - 64 * density) / 2 - edge - gap));
-        float extra = counterMode == 2 ? Math.max(height * .65f, numberWidth + 8 * density) + 3 * density : numberWidth + 8 * density;
+        float extra = counterMode == 2 ? Math.max(height * .65f, numberWidth + 8 * density) + 3 * density : numberWidth + 16 * density;
         countVisible = counterMode != 0 && numberWidth > 0 && height + extra <= maxSide;
         separateCount = countVisible && counterMode == 2;
         float side = height + (countVisible ? extra : 0);
