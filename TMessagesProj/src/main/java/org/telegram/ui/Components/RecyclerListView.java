@@ -4169,7 +4169,9 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         if (useSegmentedSections() && !forceRound) {
             final int neighbors = segmentedSectionNeighbors(child);
             float top = getSegmentedSectionTopRadius(child, rect, neighbors), bottom = getSegmentedSectionBottomRadius(child, rect, neighbors);
-            clipPath.addRoundRect(rect, new float[]{top,top,top,top,bottom,bottom,bottom,bottom}, Path.Direction.CW);
+            segmentRadii[0] = segmentRadii[1] = segmentRadii[2] = segmentRadii[3] = top;
+            segmentRadii[4] = segmentRadii[5] = segmentRadii[6] = segmentRadii[7] = bottom;
+            clipPath.addRoundRect(rect, segmentRadii, Path.Direction.CW);
         } else if (!prev && !next || forceRound) {
             clipPath.rewind();
             // Та же таблетка, что и в clipChild.

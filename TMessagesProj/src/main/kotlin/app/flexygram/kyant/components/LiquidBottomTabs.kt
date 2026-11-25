@@ -78,6 +78,7 @@ fun LiquidBottomTabs(
         else Color(0xFF121212).copy(0.4f)
 
     val tabsBackdrop = rememberLayerBackdrop()
+    val emptyHighlight = remember { Highlight.Default.copy(alpha = 0f) }
     val customEdge = subtleEdge || satinEdge
     val edge = if (customEdge) remember(subtleEdge, satinEdge) {
         ChatEdgeReflection().apply {
@@ -227,14 +228,16 @@ fun LiquidBottomTabs(
                             val progress = dampedDragAnimation.pressProgress
                             vibrancy()
                             blur(8f.dp.toPx())
-                            lens(
-                                24f.dp.toPx() * progress,
-                                24f.dp.toPx() * progress
-                            )
+                            if (progress > 0.001f) {
+                                lens(
+                                    24f.dp.toPx() * progress,
+                                    24f.dp.toPx() * progress
+                                )
+                            }
                         },
                         highlight = if (customEdge) null else ({
                             val progress = dampedDragAnimation.pressProgress
-                            Highlight.Default.copy(alpha = progress)
+                            if (progress > 0.001f) Highlight.Default.copy(alpha = progress) else emptyHighlight
                         }),
                         onDrawSurface = { drawRect(containerColor) }
                     )
@@ -264,15 +267,17 @@ fun LiquidBottomTabs(
                     shadow = null,
                     effects = {
                         val progress = dampedDragAnimation.pressProgress
-                        lens(
-                            10f.dp.toPx() * progress,
-                            14f.dp.toPx() * progress,
-                            chromaticAberration = true
-                        )
+                        if (progress > 0.001f) {
+                            lens(
+                                10f.dp.toPx() * progress,
+                                14f.dp.toPx() * progress,
+                                chromaticAberration = true
+                            )
+                        }
                     },
                     highlight = if (customEdge) null else ({
                         val progress = dampedDragAnimation.pressProgress
-                        Highlight.Default.copy(alpha = progress)
+                        if (progress > 0.001f) Highlight.Default.copy(alpha = progress) else emptyHighlight
                     }),
                     layerBlock = {
                         scaleX = dampedDragAnimation.scaleX
@@ -283,12 +288,16 @@ fun LiquidBottomTabs(
                     },
                     onDrawSurface = {
                         val progress = dampedDragAnimation.pressProgress
-                        drawRect(
-                            if (isLightTheme) Color.Black.copy(0.1f)
-                            else Color.White.copy(0.1f),
-                            alpha = 1f - progress
-                        )
-                        drawRect(Color.Black.copy(alpha = 0.03f * progress))
+                        if (progress < 0.999f) {
+                            drawRect(
+                                if (isLightTheme) Color.Black.copy(0.1f)
+                                else Color.White.copy(0.1f),
+                                alpha = 1f - progress
+                            )
+                        }
+                        if (progress > 0.001f) {
+                            drawRect(Color.Black.copy(alpha = 0.03f * progress))
+                        }
                         if (edge != null) drawIntoCanvas {
                             edge.draw(it.nativeCanvas, 0f, 0f, size.width, size.height,
                                 size.height / 2f, !isLightTheme, 255)

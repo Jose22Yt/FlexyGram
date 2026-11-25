@@ -163,6 +163,18 @@ def test_storage_matches_native_backup_outside_dialog_startup_changes():
             old_comparator = method(original, 'private final Comparator<TLRPC.Dialog> dialogDateComparator =')
             original = original.replace(old_comparator + ';', '', 1)
             original = original.replace('    private DialogFilter sortingDialogFilter;\n', '', 1)
+            for fast_gate, baseline_gate in [
+                (
+                    'app.exteraless.plugins.PluginsController.hasActiveUpdatesContainerHooks()',
+                    'app.exteraless.plugins.PluginsController.getInstance().hasAnyUpdatesContainerHooks()',
+                ),
+                (
+                    'app.exteraless.plugins.PluginsController.hasActiveUpdateHooks()',
+                    'app.exteraless.plugins.PluginsController.getInstance().hasAnyUpdateHooks()',
+                ),
+            ]:
+                assert current.count(fast_gate) == 1 and original.count(baseline_gate) == 1
+                current = current.replace(fast_gate, baseline_gate, 1)
         if name == 'MessagesStorage.java':
             current = current.replace('import java.util.Arrays;\n', '', 1)
             # Allow only the in-memory precheck before reading the SQLite revision.
@@ -173,6 +185,77 @@ def test_storage_matches_native_backup_outside_dialog_startup_changes():
                     }'''
             assert current.count(guarded_lookup) == 1 and original.count(old_lookup) == 1
             current = current.replace(guarded_lookup, old_lookup, 1)
+            # Allow Beta 87 WAL pragmas, ephemeralMessage NPE guard, and bounded unread-mention COUNT query.
+            wal_pragmas = (
+                'database.executeFast("PRAGMA synchronous = NORMAL").stepThis().dispose();\n'
+            )
+            cache_pragmas = (
+                'database.executeFast("PRAGMA cache_size = -8000").stepThis().dispose();\n'
+            )
+            assert current.count(wal_pragmas) == 2 and current.count(cache_pragmas) == 2
+            current = '\n'.join(
+                line for line in current.splitlines()
+                if line.strip() not in {wal_pragmas.strip(), cache_pragmas.strip()}
+            )
+            old_ephemeral = (
+                '                                ephemeralMessage.via_bot_id = message.via_bot_id;\n'
+                '                                if (ephemeralMessage != null) {'
+            )
+            new_ephemeral = (
+                '                                if (ephemeralMessage != null) {\n'
+                '                                    ephemeralMessage.via_bot_id = message.via_bot_id;'
+            )
+            assert current.count(new_ephemeral) == 1 and original.count(old_ephemeral) == 1
+            current = current.replace(new_ephemeral, old_ephemeral, 1)
+            old_mentions = '''                if (mentions_unread != 0) {
+                    if (threadMessageId == 0) {
+                        cursor = database.queryFinalized(String.format(Locale.US, "SELECT COUNT(mid) FROM messages_v2 WHERE uid = %d AND mention = 1 AND read_state IN(0, 1)", dialogId));
+                        if (cursor.next()) {
+                            if (mentions_unread != cursor.intValue(0)) {
+                                mentions_unread *= -1;
+                            }
+                        } else {
+                            mentions_unread *= -1;
+                        }
+                        cursor.dispose();
+                        cursor = null;
+                    } else {
+                        cursor = database.queryFinalized(String.format(Locale.US, "SELECT COUNT(mid) FROM messages_topics WHERE uid = %d AND topic_id = %d AND mention = 1 AND read_state IN(0, 1)", dialogId, threadMessageId));
+                        if (cursor.next()) {
+                            if (mentions_unread != cursor.intValue(0)) {
+                                mentions_unread *= -1;
+                            }
+                        } else {
+                            mentions_unread *= -1;
+                        }
+                        cursor.dispose();
+                        cursor = null;
+                    }
+                }'''
+            new_mentions = '''                if (mentions_unread != 0) {
+                    final String mentionsQuery;
+                    if (threadMessageId == 0) {
+                        mentionsQuery = mentions_unread > 0
+                                ? String.format(Locale.US, "SELECT COUNT(*) FROM (SELECT 1 FROM messages_v2 WHERE uid = %d AND mention = 1 AND read_state IN(0, 1) LIMIT %d)", dialogId, (long) mentions_unread + 1)
+                                : String.format(Locale.US, "SELECT COUNT(mid) FROM messages_v2 WHERE uid = %d AND mention = 1 AND read_state IN(0, 1)", dialogId);
+                    } else {
+                        mentionsQuery = mentions_unread > 0
+                                ? String.format(Locale.US, "SELECT COUNT(*) FROM (SELECT 1 FROM messages_topics WHERE uid = %d AND topic_id = %d AND mention = 1 AND read_state IN(0, 1) LIMIT %d)", dialogId, threadMessageId, (long) mentions_unread + 1)
+                                : String.format(Locale.US, "SELECT COUNT(mid) FROM messages_topics WHERE uid = %d AND topic_id = %d AND mention = 1 AND read_state IN(0, 1)", dialogId, threadMessageId);
+                    }
+                    cursor = database.queryFinalized(mentionsQuery);
+                    if (cursor.next()) {
+                        if (mentions_unread != cursor.intValue(0)) {
+                            mentions_unread *= -1;
+                        }
+                    } else {
+                        mentions_unread *= -1;
+                    }
+                    cursor.dispose();
+                    cursor = null;
+                }'''
+            assert current.count(new_mentions) == 1 and original.count(old_mentions) == 1
+            current = current.replace(new_mentions, old_mentions, 1)
         assert '\n'.join(line for line in current.splitlines() if line.strip()) == '\n'.join(
             line for line in original.splitlines() if line.strip()), path
 

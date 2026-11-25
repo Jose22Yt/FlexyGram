@@ -33,6 +33,7 @@ public final class VoskTranscriber {
 
     private static Model cachedModel;
     private static String cachedCode;
+    private static int cachedModelUses;
     private static boolean logLevelSet;
 
     private VoskTranscriber() {
@@ -42,38 +43,94 @@ public final class VoskTranscriber {
         return VoskManager.isInstalled(VoskManager.getLanguage());
     }
 
-    public static synchronized void releaseModel() {
-        if (cachedModel != null) {
+    public static void trimMemory(int level) {
+        if (level == android.content.ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN
+                || level < android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) {
+            return;
+        }
+        releaseModel();
+    }
+
+    public static void releaseModel() {
+        Model toClose = null;
+        synchronized (VoskTranscriber.class) {
+            if (cachedModel != null) {
+                if (cachedModelUses == 0) {
+                    toClose = cachedModel;
+                }
+                cachedModel = null;
+                cachedCode = null;
+            }
+        }
+        closeQuietly(toClose);
+    }
+
+    private static void closeQuietly(Model model) {
+        if (model != null) {
             try {
-                cachedModel.close();
+                model.close();
             } catch (Exception e) {
                 FileLog.e(e);
+            }
+        }
+    }
+
+    private static Model acquireModel(String code) throws IOException {
+        Model oldToClose = null;
+        synchronized (VoskTranscriber.class) {
+            if (cachedModel != null && code.equals(cachedCode)) {
+                cachedModelUses++;
+                return cachedModel;
+            }
+            if (cachedModel != null && cachedModelUses == 0) {
+                oldToClose = cachedModel;
             }
             cachedModel = null;
             cachedCode = null;
         }
-    }
+        closeQuietly(oldToClose);
 
-    private static synchronized Model obtainModel(String code) throws IOException {
-        if (cachedModel != null && code.equals(cachedCode)) {
-            return cachedModel;
-        }
-        releaseModel();
         File dir = VoskManager.getModelDir(code);
         if (dir == null || !dir.exists()) {
             throw new IOException("model not installed");
         }
-        if (!logLevelSet) {
-            logLevelSet = true;
-            try {
-                LibVosk.setLogLevel(LogLevel.WARNINGS);
-            } catch (Throwable e) {
-                FileLog.e(e);
+        synchronized (VoskTranscriber.class) {
+            if (cachedModel != null && code.equals(cachedCode)) {
+                cachedModelUses++;
+                return cachedModel;
+            }
+            if (!logLevelSet) {
+                logLevelSet = true;
+                try {
+                    LibVosk.setLogLevel(LogLevel.WARNINGS);
+                } catch (Throwable e) {
+                    FileLog.e(e);
+                }
+            }
+            Model loaded = new Model(dir.getAbsolutePath());
+            cachedModel = loaded;
+            cachedCode = code;
+            cachedModelUses = 1;
+            return loaded;
+        }
+    }
+
+    private static void releaseModelUse(Model model) {
+        if (model == null) {
+            return;
+        }
+        boolean shouldClose = false;
+        synchronized (VoskTranscriber.class) {
+            if (model == cachedModel) {
+                cachedModelUses = Math.max(0, cachedModelUses - 1);
+            } else {
+                // Model was detached by releaseModel() while transcription was in flight.
+                shouldClose = true;
             }
         }
-        cachedModel = new Model(dir.getAbsolutePath());
-        cachedCode = code;
-        return cachedModel;
+        if (shouldClose) {
+            closeQuietly(model);
+        }
     }
 
     public static void transcribe(String path, BiConsumer<String, Exception> callback) {
@@ -94,17 +151,21 @@ public final class VoskTranscriber {
             throw new IOException("no audio file");
         }
         String code = VoskManager.getLanguage();
-        Model model = obtainModel(code);
-        StringBuilder text = new StringBuilder();
-        try (Recognizer recognizer = new Recognizer(model, TARGET_RATE)) {
-            decode(path, samples -> {
-                if (recognizer.acceptWaveForm(samples, samples.length)) {
-                    appendResult(text, recognizer.getResult());
-                }
-            });
-            appendResult(text, recognizer.getFinalResult());
+        Model model = acquireModel(code);
+        try {
+            StringBuilder text = new StringBuilder();
+            try (Recognizer recognizer = new Recognizer(model, TARGET_RATE)) {
+                decode(path, samples -> {
+                    if (recognizer.acceptWaveForm(samples, samples.length)) {
+                        appendResult(text, recognizer.getResult());
+                    }
+                });
+                appendResult(text, recognizer.getFinalResult());
+            }
+            return text.toString().trim();
+        } finally {
+            releaseModelUse(model);
         }
-        return text.toString().trim();
     }
 
     private static void appendResult(StringBuilder builder, String json) {

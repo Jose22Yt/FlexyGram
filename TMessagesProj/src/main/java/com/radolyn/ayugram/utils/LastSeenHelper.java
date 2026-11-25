@@ -170,50 +170,6 @@ public class LastSeenHelper {
         return 0;
     }
 
-    private static int getLastMessageDate(long userId, ArrayList<MessageObject> messageObjects) {
-        int lastMessageDate = 0;
-        for (int i = 0, size = messageObjects.size(); i < size; i++) {
-            MessageObject messageObject = messageObjects.get(i);
-            if (messageObject == null || messageObject.messageOwner == null) {
-                continue;
-            }
-            if (messageObject.getFromChatId() != userId) {
-                continue;
-            }
-            int date = messageObject.messageOwner.date;
-            if (date > lastMessageDate) {
-                lastMessageDate = date;
-            }
-        }
-        return lastMessageDate;
-    }
-
-    private static int getLastReactionDate(long userId, ArrayList<MessageObject> messageObjects) {
-        int lastReactionDate = 0;
-        for (int i = 0, size = messageObjects.size(); i < size; i++) {
-            MessageObject messageObject = messageObjects.get(i);
-            if (messageObject == null || messageObject.messageOwner == null) {
-                continue;
-            }
-            if (messageObject.messageOwner.reactions == null || messageObject.messageOwner.reactions.recent_reactions == null) {
-                continue;
-            }
-            for (int j = 0, rSize = messageObject.messageOwner.reactions.recent_reactions.size(); j < rSize; j++) {
-                TLRPC.MessagePeerReaction reaction = messageObject.messageOwner.reactions.recent_reactions.get(j);
-                if (reaction == null || reaction.peer_id == null || reaction.date <= 0) {
-                    continue;
-                }
-                if (MessageObject.getPeerId(reaction.peer_id) != userId) {
-                    continue;
-                }
-                if (reaction.date > lastReactionDate) {
-                    lastReactionDate = reaction.date;
-                }
-            }
-        }
-        return lastReactionDate;
-    }
-
     public static void saveLastSeenFromLoadedMessages(long userId, long selfUserId, ArrayList<MessageObject> messages, ChatActivity.ChatActivityAdapter chatAdapter) {
         if (!NaConfig.INSTANCE.getSaveLocalLastSeen().Bool()) {
             return;
@@ -222,16 +178,35 @@ public class LastSeenHelper {
             return;
         }
         ArrayList<MessageObject> messageObjects = chatAdapter != null ? chatAdapter.getMessages() : messages;
-        if (messageObjects == null) {
+        if (messageObjects == null || messageObjects.isEmpty()) {
             return;
         }
-        int lastMessageDate = getLastMessageDate(userId, messageObjects);
-        if (lastMessageDate > 0) {
-            LastSeenHelper.saveLastSeen(userId, lastMessageDate);
+        int bestDate = getLastSeen(userId);
+        int initialDate = bestDate;
+        for (int i = 0, size = messageObjects.size(); i < size; i++) {
+            MessageObject messageObject = messageObjects.get(i);
+            if (messageObject == null || messageObject.messageOwner == null) {
+                continue;
+            }
+            TLRPC.Message owner = messageObject.messageOwner;
+            if (owner.date > bestDate && messageObject.getFromChatId() == userId) {
+                bestDate = owner.date;
+            }
+            if (owner.reactions != null && owner.reactions.recent_reactions != null) {
+                ArrayList<TLRPC.MessagePeerReaction> recent = owner.reactions.recent_reactions;
+                for (int j = 0, rSize = recent.size(); j < rSize; j++) {
+                    TLRPC.MessagePeerReaction reaction = recent.get(j);
+                    if (reaction == null || reaction.peer_id == null || reaction.date <= bestDate) {
+                        continue;
+                    }
+                    if (MessageObject.getPeerId(reaction.peer_id) == userId) {
+                        bestDate = reaction.date;
+                    }
+                }
+            }
         }
-        int lastReactionDate = getLastReactionDate(userId, messageObjects);
-        if (lastReactionDate > 0) {
-            LastSeenHelper.saveLastSeen(userId, lastReactionDate);
+        if (bestDate > initialDate) {
+            LastSeenHelper.saveLastSeen(userId, bestDate);
         }
     }
 

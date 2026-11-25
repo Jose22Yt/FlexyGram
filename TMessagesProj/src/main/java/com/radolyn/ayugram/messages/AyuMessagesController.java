@@ -41,12 +41,12 @@ public class AyuMessagesController {
     public static final File attachmentsPath = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
             ? new File(org.telegram.messenger.ApplicationLoader.getFilesDirFixed(), attachmentsSubfolder)
             : new File(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), AyuConstants.APP_NAME), attachmentsSubfolder);
-    private static AyuMessagesController instance;
+    private static volatile AyuMessagesController instance;
     private EditedMessageDao editedMessageDao;
     private DeletedMessageDao deletedMessageDao;
 
     private AyuMessagesController() {
-        initializeAttachmentsFolder();
+        Utilities.globalQueue.postRunnable(AyuMessagesController::initializeAttachmentsFolder);
         AyuSavePreferences.loadAllExclusions();
 
         refreshDaos();
@@ -100,10 +100,17 @@ public class AyuMessagesController {
     }
 
     public static AyuMessagesController getInstance() {
-        if (instance == null) {
-            instance = new AyuMessagesController();
+        AyuMessagesController local = instance;
+        if (local == null) {
+            synchronized (AyuMessagesController.class) {
+                local = instance;
+                if (local == null) {
+                    local = new AyuMessagesController();
+                    instance = local;
+                }
+            }
         }
-        return instance;
+        return local;
     }
 
     public void onMessageEdited(AyuSavePreferences prefs, TLRPC.Message newMessage) {
@@ -326,60 +333,11 @@ public class AyuMessagesController {
         return deletedMessageDao.getMessagesByIds(userId, dialogId, messageIds);
     }
 
-    public void delete(long userId, long dialogId, int messageId) {
-        var msg = getMessage(userId, dialogId, messageId);
-        if (msg == null) {
+    private static void deleteAttachmentAsync(String mediaPath) {
+        if (TextUtils.isEmpty(mediaPath)) {
             return;
         }
-
-        deletedMessageDao.delete(userId, dialogId, messageId);
-
-        if (!TextUtils.isEmpty(msg.message.mediaPath)) {
-            var p = new File(msg.message.mediaPath);
-            try {
-                if (p.exists() && !p.delete()) {
-                    p.deleteOnExit();
-                }
-            } catch (Exception e) {
-                FileLog.e(e);
-            }
-        }
-    }
-
-    public void deleteMessages(long userId, long dialogId, List<Integer> messageIds) {
-        if (messageIds == null || messageIds.isEmpty()) {
-            return;
-        }
-
-        deletedMessageDao.deleteMessages(userId, dialogId, messageIds);
-        editedMessageDao.deleteByDialogIdAndMessageIds(dialogId, messageIds);
-
-        for (int messageId : messageIds) {
-            var msg = getMessage(userId, dialogId, messageId);
-            if (msg == null) {
-                continue;
-            }
-
-            if (!TextUtils.isEmpty(msg.message.mediaPath)) {
-                var p = new File(msg.message.mediaPath);
-                try {
-                    if (p.exists() && !p.delete()) {
-                        p.deleteOnExit();
-                    }
-                } catch (Exception e) {
-                    FileLog.e(e);
-                }
-            }
-        }
-    }
-
-    public void deleteRevision(long fakeId) {
-        String mediaPath = editedMessageDao.getMediaPathByFakeId(fakeId);
-        int deleted = editedMessageDao.deleteByFakeId(fakeId);
-        if (deleted == 0) {
-            return;
-        }
-        if (!TextUtils.isEmpty(mediaPath)) {
+        Utilities.globalQueue.postRunnable(() -> {
             File p = new File(mediaPath);
             try {
                 if (p.exists() && !p.delete()) {
@@ -388,7 +346,70 @@ public class AyuMessagesController {
             } catch (Exception e) {
                 FileLog.e(e);
             }
+        });
+    }
+
+    private static void deleteAttachmentsAsync(List<String> paths) {
+        if (paths == null || paths.isEmpty()) {
+            return;
         }
+        Utilities.globalQueue.postRunnable(() -> {
+            for (int i = 0; i < paths.size(); i++) {
+                String mediaPath = paths.get(i);
+                if (TextUtils.isEmpty(mediaPath)) {
+                    continue;
+                }
+                File mediaFile = new File(mediaPath);
+                try {
+                    if (mediaFile.exists() && !mediaFile.delete()) {
+                        mediaFile.deleteOnExit();
+                    }
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
+            }
+        });
+    }
+
+    public void delete(long userId, long dialogId, int messageId) {
+        var msg = getMessage(userId, dialogId, messageId);
+        if (msg == null) {
+            return;
+        }
+
+        deletedMessageDao.delete(userId, dialogId, messageId);
+        deleteAttachmentAsync(msg.message.mediaPath);
+    }
+
+    public void deleteMessages(long userId, long dialogId, List<Integer> messageIds) {
+        if (messageIds == null || messageIds.isEmpty()) {
+            return;
+        }
+
+        List<DeletedMessageFull> existing = getMessagesByIds(userId, dialogId, messageIds);
+        ArrayList<String> mediaPaths = null;
+        if (existing != null && !existing.isEmpty()) {
+            mediaPaths = new ArrayList<>(existing.size());
+            for (int i = 0; i < existing.size(); i++) {
+                DeletedMessageFull msg = existing.get(i);
+                if (msg != null && msg.message != null && !TextUtils.isEmpty(msg.message.mediaPath)) {
+                    mediaPaths.add(msg.message.mediaPath);
+                }
+            }
+        }
+
+        deletedMessageDao.deleteMessages(userId, dialogId, messageIds);
+        editedMessageDao.deleteByDialogIdAndMessageIds(dialogId, messageIds);
+        deleteAttachmentsAsync(mediaPaths);
+    }
+
+    public void deleteRevision(long fakeId) {
+        String mediaPath = editedMessageDao.getMediaPathByFakeId(fakeId);
+        int deleted = editedMessageDao.deleteByFakeId(fakeId);
+        if (deleted == 0) {
+            return;
+        }
+        deleteAttachmentAsync(mediaPath);
     }
 
     public void deleteCurrent(long dialogId, long mergeDialogId, Runnable callback) {
@@ -408,18 +429,16 @@ public class AyuMessagesController {
             editedMessageDao.delete(mergeDialogId);
         }
 
-        // Clean up media files
-        for (DeletedMessageFull msg : messages) {
-            if (msg.message.mediaPath != null && !msg.message.mediaPath.isEmpty()) {
-                File mediaFile = new File(msg.message.mediaPath);
-                try {
-                    if (mediaFile.exists() && !mediaFile.delete()) {
-                        mediaFile.deleteOnExit();
-                    }
-                } catch (Exception e) {
-                    FileLog.e(e);
+        // Clean up media files off the caller/UI thread
+        if (messages != null && !messages.isEmpty()) {
+            ArrayList<String> mediaPaths = new ArrayList<>(messages.size());
+            for (int i = 0; i < messages.size(); i++) {
+                DeletedMessageFull msg = messages.get(i);
+                if (msg != null && msg.message != null && !TextUtils.isEmpty(msg.message.mediaPath)) {
+                    mediaPaths.add(msg.message.mediaPath);
                 }
             }
+            deleteAttachmentsAsync(mediaPaths);
         }
 
         if (callback != null) {

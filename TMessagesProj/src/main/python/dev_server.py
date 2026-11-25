@@ -48,12 +48,18 @@ def _publish_token(token: str) -> None:
     try:
         import file_utils
         path = os.path.join(file_utils.get_plugins_dir(), TOKEN_FILE)
-        with open(path, "w", encoding="utf-8") as handle:
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        try:
+            handle = os.fdopen(fd, "w", encoding="utf-8")
+        except Exception:
+            os.close(fd)
+            raise
+        with handle:
             handle.write(token)
+        os.chmod(path, 0o600)
         _log(f"token written to {path}")
     except Exception as e:
         _log(f"cannot write token file: {e}")
-    _log(f"token: {token}")
 
 
 def _log(message):
@@ -188,8 +194,15 @@ def _cmd_remove_plugin(request):
 
 
 def _cmd_start_debugger(request):
-    host = str(request.get("host") or "127.0.0.1")
-    port = int(request.get("port") or 5678)
+    host = str(request.get("host") or "127.0.0.1").strip()
+    if host not in ("127.0.0.1", "localhost", "::1"):
+        return {"ok": False, "error": "debugger can only listen on loopback (127.0.0.1)"}
+    try:
+        port = int(request.get("port") or 5678)
+    except (TypeError, ValueError):
+        return {"ok": False, "error": "port must be an integer between 1024 and 65535"}
+    if port < 1024 or port > 65535:
+        return {"ok": False, "error": "port must be between 1024 and 65535"}
     platform = str(request.get("platform") or "vscode")
     if _debugger["listening"]:
         return {"ok": True, "debugger": dict(_debugger),
@@ -286,15 +299,27 @@ def dispatch(request: dict) -> dict:
 
 # Server plumbing
 
+_MAX_LINE_BYTES = 4 * 1024 * 1024
+_SOCKET_TIMEOUT_SECONDS = 60.0
+
+
 class _Handler(socketserver.StreamRequestHandler):
     def handle(self):
+        try:
+            self.request.settimeout(_SOCKET_TIMEOUT_SECONDS)
+        except Exception:
+            pass
         while True:
             try:
-                line = self.rfile.readline()
+                line = self.rfile.readline(_MAX_LINE_BYTES + 1)
             except Exception:
                 return
             if not line:
                 return  # client went away
+            if len(line) > _MAX_LINE_BYTES:
+                self._respond({"#": None, "ok": False,
+                               "error": "request line exceeds maximum size"})
+                return
             line = line.strip()
             if not line:
                 continue

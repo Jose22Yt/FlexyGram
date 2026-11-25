@@ -178,11 +178,18 @@ public final class SignatureWallpaperBlur {
             if (dim != 0) paint.setColorFilter(new PorterDuffColorFilter(Color.argb(dim, 0, 0, 0), PorterDuff.Mode.DARKEN));
             canvas.drawBitmap(source, null, new RectF(0, 0, width, height), paint);
             if (entry.canceled) return null;
-            int[] pixels = new int[width * height], scratch = new int[pixels.length];
-            result.getPixels(pixels, 0, width, 0, 0, width, height);
-            if (!box(pixels, scratch, width, height, true, entry)
-                    || !box(scratch, pixels, width, height, false, entry)) return null;
-            result.setPixels(pixels, 0, width, 0, 0, width, height);
+            if (width > 1 || height > 1) {
+                try {
+                    Utilities.stackBlurBitmap(result, RADIUS);
+                } catch (UnsatisfiedLinkError fallback) {
+                    int[] pixels = new int[width * height], scratch = new int[pixels.length];
+                    result.getPixels(pixels, 0, width, 0, 0, width, height);
+                    if (!box(pixels, scratch, width, height, true, entry)
+                            || !box(scratch, pixels, width, height, false, entry)) return null;
+                    result.setPixels(pixels, 0, width, 0, 0, width, height);
+                }
+            }
+            if (entry.canceled) return null;
             handedOff = true; return result;
         } finally { if (!handedOff) result.recycle(); }
     }
@@ -246,6 +253,13 @@ public final class SignatureWallpaperBlur {
             if (mapping.isEmpty() || drawable.getAlpha() != 255) return null;
             if (snapshotSource != drawable || staticSnapshot == null
                     || snapshotBackground != backgroundColor || snapshotColor != color) {
+                if (drawable instanceof ColorDrawable && drawable.getColorFilter() == null) {
+                    Bitmap solid = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+                    solid.eraseColor(color);
+                    snapshotSource = drawable; staticSnapshot = solid;
+                    snapshotBackground = backgroundColor; snapshotColor = color;
+                    return staticSnapshot;
+                }
                 Drawable.ConstantState state = drawable.getConstantState();
                 if (state == null) return null;
                 Drawable copy = state.newDrawable().mutate();

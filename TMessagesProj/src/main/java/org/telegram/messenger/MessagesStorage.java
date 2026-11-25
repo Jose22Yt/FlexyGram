@@ -382,6 +382,8 @@ public class MessagesStorage extends BaseController {
             database.executeFast("PRAGMA secure_delete = ON").stepThis().dispose();
             database.executeFast("PRAGMA temp_store = MEMORY").stepThis().dispose();
             database.executeFast("PRAGMA journal_mode = WAL").stepThis().dispose();
+            database.executeFast("PRAGMA synchronous = NORMAL").stepThis().dispose();
+            database.executeFast("PRAGMA cache_size = -8000").stepThis().dispose();
             database.executeFast("PRAGMA journal_size_limit = 10485760").stepThis().dispose();
 
             if (createTable) {
@@ -497,6 +499,8 @@ public class MessagesStorage extends BaseController {
                 database.executeFast("PRAGMA secure_delete = ON").stepThis().dispose();
                 database.executeFast("PRAGMA temp_store = MEMORY").stepThis().dispose();
                 database.executeFast("PRAGMA journal_mode = WAL").stepThis().dispose();
+                database.executeFast("PRAGMA synchronous = NORMAL").stepThis().dispose();
+                database.executeFast("PRAGMA cache_size = -8000").stepThis().dispose();
                 database.executeFast("PRAGMA journal_size_limit = 10485760").stepThis().dispose();
             } catch (SQLiteException e) {
                 FileLog.e(new Exception(e));
@@ -10064,8 +10068,8 @@ public class MessagesStorage extends BaseController {
                             final int ephemeralMessageId = anchorBindings.get(message.id, -1);
                             if (ephemeralMessageId != -1) {
                                 TL_ephemeral.EphemeralMessage ephemeralMessage = getEphemeralMessageInternal(dialogId, ephemeralMessageId);
-                                ephemeralMessage.via_bot_id = message.via_bot_id;
                                 if (ephemeralMessage != null) {
+                                    ephemeralMessage.via_bot_id = message.via_bot_id;
                                     TLRPC.Message convetedEphemeralMessage = EphemeralMessagesHelper.convertEphemeralToFakeDefault(ephemeralMessage);
                                     addUsersAndChatsFromMessage(convetedEphemeralMessage, usersToLoad, chatsToLoad, animatedEmojiToLoad);
                                     res.messages.set(a, convetedEphemeralMessage);
@@ -10086,29 +10090,26 @@ public class MessagesStorage extends BaseController {
                     }
                 }
                 if (mentions_unread != 0) {
+                    final String mentionsQuery;
                     if (threadMessageId == 0) {
-                        cursor = database.queryFinalized(String.format(Locale.US, "SELECT COUNT(mid) FROM messages_v2 WHERE uid = %d AND mention = 1 AND read_state IN(0, 1)", dialogId));
-                        if (cursor.next()) {
-                            if (mentions_unread != cursor.intValue(0)) {
-                                mentions_unread *= -1;
-                            }
-                        } else {
-                            mentions_unread *= -1;
-                        }
-                        cursor.dispose();
-                        cursor = null;
+                        mentionsQuery = mentions_unread > 0
+                                ? String.format(Locale.US, "SELECT COUNT(*) FROM (SELECT 1 FROM messages_v2 WHERE uid = %d AND mention = 1 AND read_state IN(0, 1) LIMIT %d)", dialogId, (long) mentions_unread + 1)
+                                : String.format(Locale.US, "SELECT COUNT(mid) FROM messages_v2 WHERE uid = %d AND mention = 1 AND read_state IN(0, 1)", dialogId);
                     } else {
-                        cursor = database.queryFinalized(String.format(Locale.US, "SELECT COUNT(mid) FROM messages_topics WHERE uid = %d AND topic_id = %d AND mention = 1 AND read_state IN(0, 1)", dialogId, threadMessageId));
-                        if (cursor.next()) {
-                            if (mentions_unread != cursor.intValue(0)) {
-                                mentions_unread *= -1;
-                            }
-                        } else {
+                        mentionsQuery = mentions_unread > 0
+                                ? String.format(Locale.US, "SELECT COUNT(*) FROM (SELECT 1 FROM messages_topics WHERE uid = %d AND topic_id = %d AND mention = 1 AND read_state IN(0, 1) LIMIT %d)", dialogId, threadMessageId, (long) mentions_unread + 1)
+                                : String.format(Locale.US, "SELECT COUNT(mid) FROM messages_topics WHERE uid = %d AND topic_id = %d AND mention = 1 AND read_state IN(0, 1)", dialogId, threadMessageId);
+                    }
+                    cursor = database.queryFinalized(mentionsQuery);
+                    if (cursor.next()) {
+                        if (mentions_unread != cursor.intValue(0)) {
                             mentions_unread *= -1;
                         }
-                        cursor.dispose();
-                        cursor = null;
+                    } else {
+                        mentions_unread *= -1;
                     }
+                    cursor.dispose();
+                    cursor = null;
                 }
             }
             if (!replyMessageRandomOwners.isEmpty()) {

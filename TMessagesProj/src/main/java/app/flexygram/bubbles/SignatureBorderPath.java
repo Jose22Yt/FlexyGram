@@ -47,7 +47,7 @@ public final class SignatureBorderPath {
         do {
             float length = measure.getLength();
             if (length <= 0) continue;
-            float step = Math.max(.5f, AndroidUtilities.density * 2f);
+            float step = Math.max(1.5f, AndroidUtilities.density * 6f);
             boolean inside = belongs(0, position);
             float start = inside ? 0 : -1;
             for (float previous = 0; previous < length;) {
@@ -55,7 +55,7 @@ public final class SignatureBorderPath {
                 boolean nextInside = belongs(next, position);
                 if (inside != nextInside) {
                     float lo = previous, hi = next;
-                    for (int n = 0; n < 6; n++) {
+                    for (int n = 0; n < 7; n++) {
                         float mid = (lo + hi) * .5f;
                         if (belongs(mid, position) == inside) lo = mid; else hi = mid;
                     }

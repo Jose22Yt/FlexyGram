@@ -83,6 +83,27 @@ public class PluginsController extends com.exteragram.messenger.plugins.PluginsC
 
     private static final java.util.regex.Pattern PLUGIN_ID =
             java.util.regex.Pattern.compile("^[A-Za-z][A-Za-z0-9_-]{1,31}$");
+    private static volatile boolean anySendMessageHooks;
+    private static volatile boolean anyRequestHooks;
+    private static volatile boolean anyUpdateHooks;
+    private static volatile boolean anyUpdatesContainerHooks;
+
+    public static boolean hasActiveSendMessageHooks() {
+        return anySendMessageHooks;
+    }
+
+    public static boolean hasActiveRequestHooks() {
+        return anyRequestHooks;
+    }
+
+    public static boolean hasActiveUpdateHooks() {
+        return anyUpdateHooks;
+    }
+
+    public static boolean hasActiveUpdatesContainerHooks() {
+        return anyUpdatesContainerHooks;
+    }
+
     /** pluginId -> приоритет. */
     private final Map<String, Integer> sendMessageHooks = new ConcurrentHashMap<>();
     /** requestName -> список pluginId (точное совпадение). */
@@ -1633,6 +1654,7 @@ public class PluginsController extends com.exteragram.messenger.plugins.PluginsC
             return;
         }
         sendMessageHooks.put(pluginId, priority);
+        anySendMessageHooks = true;
         sendTargetsCache.invalidate();
     }
 
@@ -1722,6 +1744,7 @@ public class PluginsController extends com.exteragram.messenger.plugins.PluginsC
         }
         if (pluginId != null) {
             sendMessageHooks.remove(pluginId);
+            anySendMessageHooks = !sendMessageHooks.isEmpty();
             sendTargetsCache.invalidate();
         }
     }
@@ -2194,6 +2217,11 @@ public class PluginsController extends com.exteragram.messenger.plugins.PluginsC
     }
 
     private void invalidateHookTargets() {
+        anySendMessageHooks = !sendMessageHooks.isEmpty();
+        final boolean hasSub = !requestHooksSubstring.isEmpty();
+        anyRequestHooks = hasSub || !requestHooks.isEmpty();
+        anyUpdateHooks = hasSub || !updateHooks.isEmpty();
+        anyUpdatesContainerHooks = hasSub || !updatesContainerHooks.isEmpty();
         sendTargetsCache.invalidate();
         requestTargetsCache.invalidate();
         updateTargetsCache.invalidate();

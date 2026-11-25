@@ -139,12 +139,56 @@ public final class PluginSinkGate {
         ok += hookNativeLoad();
         ok += hookNetwork(URL.class, "openConnection", "open a network connection");
         ok += hookNetwork(Socket.class, "connect", "connect to the network");
+        ok += hookNetwork(java.net.DatagramSocket.class, "connect", "connect to the network");
+        ok += hookNetwork(java.net.DatagramSocket.class, "send", "send network data");
+        ok += hookNetwork(java.net.InetAddress.class, "getByName", "resolve a host name");
+        ok += hookNetwork(java.net.InetAddress.class, "getAllByName", "resolve a host name");
+        ok += hookNetworkByName("java.nio.channels.SocketChannel", "connect", "connect to the network");
+        ok += hookNetworkByName("java.nio.channels.SocketChannel", "open", "connect to the network");
+        ok += hookNetworkByName("okhttp3.OkHttpClient", "newCall", "open a network connection");
+        ok += hookDatabaseSinks();
         ok += hookOverlayWindows();
         ok += hookClassResolution();
         ok += hookMessengerSinks();
         ok += hookGrantStore();
         ok += hookPythonCallbacks();
         FileLog.d("PluginSinkGate: " + ok + " hooks installed");
+    }
+
+    private static int hookNetworkByName(String className, String methodName, String what) {
+        final Class<?> owner = classForName(className);
+        return owner == null ? 0 : hookNetwork(owner, methodName, what);
+    }
+
+    private static int hookDatabaseSinks() {
+        final Class<?> sqlite = classForName("android.database.sqlite.SQLiteDatabase");
+        if (sqlite == null) {
+            return 0;
+        }
+        XC_MethodHook hook = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                String pluginId = enterCheck();
+                if (pluginId == null) {
+                    return;
+                }
+                try {
+                    String detail = describe(param);
+                    if (PluginPermissions.check(pluginId, PluginPermissions.FILES)) {
+                        PluginAuditJournal.record(pluginId, "SQLiteDatabase." + param.method.getName(),
+                                "database", detail, true);
+                        return;
+                    }
+                    deny(pluginId, "SQLiteDatabase." + param.method.getName(), "database", detail,
+                            "missing the 'files' permission", param);
+                } finally {
+                    leaveCheck();
+                }
+            }
+        };
+        int count = hookAll(sqlite, "openDatabase", hook);
+        count += hookAll(sqlite, "openOrCreateDatabase", hook);
+        return count;
     }
 
     // ---------- стоки ----------

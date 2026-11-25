@@ -41,9 +41,9 @@ public final class TextLayoutPrecompute {
         private static long generation;
         private static final class Key {
             final String text; final PrecomputedText.Params params;
-            Key(String text,TextPaint paint) {
-                this.text=text;
-                params=new PrecomputedText.Params.Builder(new TextPaint(paint))
+            Key(String text, TextPaint paint, boolean copyPaint) {
+                this.text = text;
+                params = new PrecomputedText.Params.Builder(copyPaint ? new TextPaint(paint) : paint)
                         .setBreakStrategy(Layout.BREAK_STRATEGY_HIGH_QUALITY)
                         .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NONE)
                         .setTextDirection(TextDirectionHeuristics.FIRSTSTRONG_LTR).build();
@@ -52,28 +52,35 @@ public final class TextLayoutPrecompute {
             @Override public int hashCode(){return 31*text.hashCode()+params.hashCode();}
         }
         static CharSequence getOrSchedule(CharSequence original,TextPaint paint) {
-            Key key=new Key(original instanceof String ? (String) original : original.toString(),paint);
+            synchronized (ready) {
+                if (ready.isEmpty() && pending.size() >= 3) return original;
+            }
+            String text = original instanceof String ? (String) original : original.toString();
+            Key lookupKey = new Key(text, paint, false);
+            final Key workerKey;
             final long token;
             synchronized (ready) {
-                PrecomputedText hit=ready.get(key);
-                if(hit!=null)return hit;
-                if(pending.containsKey(key)||pending.size()>=3)return original;
-                token=generation;pending.put(key,token);
+                PrecomputedText hit = ready.get(lookupKey);
+                if (hit != null) return hit;
+                if (pending.containsKey(lookupKey) || pending.size() >= 3) return original;
+                workerKey = new Key(text, paint, true);
+                token = generation;
+                pending.put(workerKey, token);
             }
             try {worker.execute(()->{
                 PrecomputedText result=null;
-                try {result=PrecomputedText.create(key.text,key.params);}catch(RuntimeException|OutOfMemoryError unavailable){ /* Native layout remains the fallback. */ }
+                try {result=PrecomputedText.create(workerKey.text,workerKey.params);}catch(RuntimeException|OutOfMemoryError unavailable){ /* Native layout remains the fallback. */ }
                 synchronized (ready) {
-                    pending.remove(key,token);
+                    pending.remove(workerKey,token);
                     if(token!=generation||result==null)return;
-                    PrecomputedText old=ready.put(key,result);
-                    if(old==null)characters+=key.text.length();
+                    PrecomputedText old=ready.put(workerKey,result);
+                    if(old==null)characters+=workerKey.text.length();
                     Iterator<Map.Entry<Key,PrecomputedText>> iterator=ready.entrySet().iterator();
                     while((ready.size()>MAX_ENTRIES||characters>MAX_CHARACTERS)&&iterator.hasNext()){
                         characters-=iterator.next().getKey().text.length();iterator.remove();
                     }
                 }
-            });}catch(RejectedExecutionException full){synchronized(ready){pending.remove(key,token);}}
+            });}catch(RejectedExecutionException full){synchronized(ready){pending.remove(workerKey,token);}}
             return original;
         }
         static void clear(){synchronized(ready){generation++;ready.clear();pending.clear();worker.getQueue().clear();characters=0;}}
