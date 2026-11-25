@@ -7,6 +7,7 @@ def test_live_cell_keeps_down_move_cancel_static_and_preserves_confirmed_tap(tmp
     source = (JAVA/'org/telegram/ui/Cells/ChatMessageCell.java').read_text()
     assert 'signatureTapMotion.press(' not in source
     methods = '\n'.join(method(source, name) for name in [
+        'private float signatureTouchSlop()',
         'public boolean dispatchTouchEvent(MotionEvent event)',
         'public void signatureTapEvent(MotionEvent event)', 'public boolean isSignatureTap()',
         'public void finishSignatureCandidate()', 'public void cancelSignatureGesture()'])
@@ -29,6 +30,7 @@ public class Probe extends Native {
  final Motion signatureTapMotion=new Motion();Message currentMessageObject=new Message();Delegate delegate=new Delegate();Photo photoImage=new Photo();
  boolean signatureTapEligible,signatureMediaPress,drawPhotoImage;
  float signatureTapX,signatureTapY,signatureTapPivotX,signatureTapPivotY;long signatureTapReleased,signatureTapStarted;
+ int signatureTouchSlop=-1;
  Object getContext(){return this;}float getEventX(MotionEvent e){return e.x;}float getEventY(MotionEvent e){return e.y;}
  boolean isInsideBackground(float x,float y){return x>=0&&y>=0;}
  int getBackgroundDrawableLeft(){return 0;}int getBackgroundDrawableRight(){return 100;}
