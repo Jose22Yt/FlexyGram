@@ -72,10 +72,15 @@ public final class MemberLensActivity extends BaseFragment {
         results=new FilteredSearchView(this);
         results.configureMemberLens(scope,this::goToOriginal,this::updateState);
         root.addView(results,new LinearLayout.LayoutParams(-1,0,1));
-        queryField.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int start,int count,int after){}public void onTextChanged(CharSequence s,int start,int before,int count){query=s.toString();arguments.putString("lens_query",query);scrollState=null;runSearch();}public void afterTextChanged(Editable e){}});
+        queryField.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int start,int count,int after){}public void onTextChanged(CharSequence s,int start,int before,int count){query=s.toString();arguments.putString("lens_query",query);scrollState=null;scheduleSearch();}public void afterTextChanged(Editable e){}});
         search.setOnClickListener(v->{queryField.setVisibility(View.VISIBLE);queryField.requestFocus();AndroidUtilities.showKeyboard(queryField);});
         close.setOnClickListener(v->finishFragment());state.setOnClickListener(v->{if(results!=null)results.retryMemberLens();});
         applyColors();if(!results.restoreMemberLensState(saved,query))runSearch();return fragmentView;
+    }
+    private final Runnable debouncedSearch = this::runSearch;
+    private void scheduleSearch(){
+        AndroidUtilities.cancelRunOnUIThread(debouncedSearch);
+        AndroidUtilities.runOnUIThread(debouncedSearch, query.isEmpty() ? 0 : 300);
     }
     private void runSearch(){if(results!=null)results.search(scope.dialogId,0,0,0,null,false,query,true);}
     private void updateState(){
@@ -121,5 +126,5 @@ public final class MemberLensActivity extends BaseFragment {
     }
     @Override public void onResume(){super.onResume();if(scope!=null&&UserConfig.selectedAccount!=scope.account)finishFragment();}
     @Override public void onPause(){if(results!=null)scrollState=results.layoutManager.onSaveInstanceState();super.onPause();}
-    @Override public void onFragmentDestroy(){if(queryField!=null)AndroidUtilities.hideKeyboard(queryField);if(results!=null)results.disposeMemberLens();results=null;super.onFragmentDestroy();}
+    @Override public void onFragmentDestroy(){AndroidUtilities.cancelRunOnUIThread(debouncedSearch);if(queryField!=null)AndroidUtilities.hideKeyboard(queryField);if(results!=null)results.disposeMemberLens();results=null;super.onFragmentDestroy();}
 }

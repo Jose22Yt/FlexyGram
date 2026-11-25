@@ -79,7 +79,7 @@ final class StudioClientCatalog {
     Map<String,Map<String,Spec>> files(){return files;}
     private void item(ConfigItem item){item(item,"general");}
     private void item(ConfigItem item,String section){if(item.type==7||!portable(item.key))return;Spec spec=new Spec(item.type,item.defaultValue,item);spec.section=section;Spec previous=files.computeIfAbsent("neko",k->new TreeMap<>()).putIfAbsent(item.key,spec);if(previous!=null&&!section.equals("general"))previous.section=section;}
-    private static boolean portable(String key){String k=key.toLowerCase(Locale.ROOT).replace("_","");return !k.matches(".*(password|passcode|authkey|token|secret|apikey|apihash|apphash|encryptionkey|deviceid|installid).*" );}
+    private static boolean portable(String key){String k=key.toLowerCase(Locale.ROOT).replace("_","");return !k.endsWith("key")&&!k.matches(".*(password|passcode|authkey|token|secret|cookie|proxy|apikey|apihash|apphash|encryptionkey|deviceid|installid|accountid|weatherlat|weatherlon|weatheraddress|customdoh|lastfmnick).*");}
     private void add(String file,String key,int type,Object fallback){Spec spec=new Spec(type,fallback,null);spec.section=section(file,key);files.computeIfAbsent(file,k->new TreeMap<>()).put(key,spec);}
     private static String section(String file,String key){
         switch(file){

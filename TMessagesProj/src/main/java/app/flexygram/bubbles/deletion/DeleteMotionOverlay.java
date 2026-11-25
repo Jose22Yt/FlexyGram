@@ -30,7 +30,7 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
     private Completion completion;
     private long firstFrame = -1;
     private float progress;
-    private boolean stopped,counted,budgeted;
+    private boolean stopped,counted,budgeted,stopScheduled;
     private final int[] tmpAt = new int[2], tmpOrigin = new int[2];
     private final View.OnAttachStateChangeListener hostListener = new View.OnAttachStateChangeListener() {
         public void onViewAttachedToWindow(View view) {}
@@ -117,6 +117,11 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
         setWillNotDraw(false);setClickable(false);setFocusable(false);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
     }
     private void start(){host.addOnAttachStateChangeListener(hostListener);Choreographer.getInstance().postFrameCallback(this);invalidate();}
+    private void scheduleStop(){
+        if(stopped || stopScheduled)return;
+        stopScheduled=true;
+        org.telegram.messenger.AndroidUtilities.runOnUIThread(this::stop);
+    }
     @Override public void doFrame(long nanos){
         if(stopped)return;
         if (host.getWindowVisibility() != View.VISIBLE || !host.isShown()) {
@@ -134,11 +139,11 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
         float currentLeft=left,currentTop=top;
         View src=source.get();
         if(src!=null){
-            if(!src.isAttachedToWindow()){post(this::stop);return;}
+            if(!src.isAttachedToWindow()){scheduleStop();return;}
             if(host.isAttachedToWindow()){
                 src.getLocationInWindow(tmpAt);host.getLocationInWindow(tmpOrigin);
                 currentLeft=tmpAt[0]-tmpOrigin[0]+boundsLeft;currentTop=tmpAt[1]-tmpOrigin[1]+boundsTop;
-                if(currentTop+contentHeight<-150 || currentTop>host.getHeight()+150){post(this::stop);return;}
+                if(currentTop+contentHeight<-150 || currentTop>host.getHeight()+150){scheduleStop();return;}
             }
         }
         int save=canvas.save();canvas.clipRect(0,0,host.getWidth(),host.getHeight());canvas.translate(currentLeft,currentTop);

@@ -304,26 +304,48 @@ def _pick_pure_wheel(pypi_data: dict, requirement: Requirement):
     return best
 
 
+_MAX_UNCOMPRESSED_BYTES = 64 * 1024 * 1024  # 64 MB cap against zip bombs
+
+
 def _safe_extract(archive_bytes: bytes, target_dir: str) -> None:
     os.makedirs(target_dir, exist_ok=True)
+    real_target = os.path.realpath(target_dir)
+    total_uncompressed = 0
     with zipfile.ZipFile(io.BytesIO(archive_bytes)) as zf:
-        for member in zf.namelist():
+        for info in zf.infolist():
+            member = info.filename
+            # Reject symlinks (POSIX S_IFLNK = 0o120000 in upper 16 bits of external_attr)
+            if ((info.external_attr >> 16) & 0o170000) == 0o120000:
+                raise RuntimeError(f"symlink not allowed in wheel archive: {member!r}")
             normalized = os.path.normpath(member)
-            if normalized.startswith("..") or os.path.isabs(normalized):
+            if normalized.startswith("..") or os.path.isabs(normalized) or "\\" in member:
                 raise RuntimeError(f"unsafe path in wheel archive: {member!r}")
-        zf.extractall(target_dir)
+            dest = os.path.realpath(os.path.join(real_target, normalized))
+            if dest != real_target and not dest.startswith(real_target + os.sep):
+                raise RuntimeError(f"path escapes target dir in wheel archive: {member!r}")
+            if info.is_dir():
+                os.makedirs(dest, exist_ok=True)
+                continue
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            with zf.open(info, "r") as src, open(dest, "wb") as dst:
+                while True:
+                    chunk = src.read(64 * 1024)
+                    if not chunk:
+                        break
+                    total_uncompressed += len(chunk)
+                    if total_uncompressed > _MAX_UNCOMPRESSED_BYTES:
+                        raise RuntimeError(
+                            f"wheel archive exceeds uncompressed limit ({_MAX_UNCOMPRESSED_BYTES // (1024 * 1024)} MB)")
+                    dst.write(chunk)
 
 
 def _verify_digest(normalized_name: str, version: Version, file_info: dict,
                    payload: bytes) -> None:
-    """Сверить sha256 с тем, что отдал индекс PyPI.
-
-    Цифры нет — не повод отказывать (её нет у части старых релизов), но если
-    она есть и не сходится, файл не наш и разворачивать его нельзя.
-    """
+    """Verify sha256 against PyPI index metadata (fail closed if missing or mismatched)."""
     expected = (file_info.get("digests") or {}).get("sha256")
     if not expected:
-        return
+        raise RuntimeError(
+            f"missing sha256 digest in PyPI metadata for {normalized_name!r} {version}")
     actual = hashlib.sha256(payload).hexdigest()
     if actual != expected.lower():
         raise RuntimeError(

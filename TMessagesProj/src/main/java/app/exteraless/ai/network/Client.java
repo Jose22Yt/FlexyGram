@@ -394,8 +394,8 @@ public class Client {
                 .url(url)
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Authorization", "Bearer " + service.getKey())
-                .addHeader("HTTP-Referer", "https://github.com/exteraless/exteraless")
-                .addHeader("X-Title", "exteraless")
+                .addHeader("HTTP-Referer", "https://github.com/Jose22Yt/FlexyGram")
+                .addHeader("X-Title", "FlexyGram")
                 .post(RequestBody.create(body.toString(), JSON))
                 .build();
     }

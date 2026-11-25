@@ -84,8 +84,11 @@ public final class InlineConversionController {
             List<InlineConversionMatch> first=read(keyA,a,region),second=read(keyB,b,region);
             AndroidUtilities.runOnUIThread(()->{
                 InlineConversionController c=owner.get();
-                if(c==null||c.generation!=token||!c.anchor.isAttachedToWindow()||!InlineConversionConfig.get().enabled||InlineConversionConfig.get().revision!=config.revision)return;
-                c.task=null;c.body=first;c.caption=second;
+                if(c==null||c.generation!=token)return;
+                c.task=null;
+                if(!c.anchor.isAttachedToWindow()){c.preparedKey=null;return;}
+                if(!InlineConversionConfig.get().enabled||InlineConversionConfig.get().revision!=config.revision)return;
+                c.body=first;c.caption=second;
             });
         };
         Utilities.globalQueue.postRunnable(task);
