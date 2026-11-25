@@ -57,6 +57,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, private 
     private var available by mutableStateOf(false)
     private var subtleEdge by mutableStateOf(false)
     private var satinEdge by mutableStateOf(false)
+    private var colorOsGlassEdge by mutableStateOf(false)
     private var ready = false
     private var framePending = false
     private var sourceDirty = false
@@ -151,6 +152,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, private 
 
         subtleEdge = ChatEdgeStyle.isSubtle()
         satinEdge = ChatEdgeStyle.isSatin()
+        colorOsGlassEdge = ChatEdgeStyle.isColorOsGlass()
         visibleScratch.clear()
         for (i in 0 until dock.childCount) {
             val tab = dock.getChildAt(i) as? GlassTabView ?: continue
@@ -266,6 +268,7 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, private 
                         tabsCount = tabs.size,
                         subtleEdge = subtleEdge,
                         satinEdge = satinEdge,
+                        colorOsGlassEdge = colorOsGlassEdge,
                         modifier = Modifier.fillMaxSize()
                     ) {
                         tabs.forEachIndexed { index, tab ->

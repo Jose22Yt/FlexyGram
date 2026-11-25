@@ -215,12 +215,30 @@ public class FragmentFloatingButton extends FrameLayout implements FactorAnimato
         }
     }
 
+    private app.flexygram.effects.ChatEdgeReflection colorOsEdge;
+
     @Override
     public void draw(@NonNull Canvas canvas) {
+        final boolean colorOs = app.flexygram.effects.ChatEdgeStyle.isColorOsGlass();
+        final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
         if (iBlur3Background != null) {
-            iBlur3Background.draw(canvas);
+            if (colorOs) {
+                colorOsEdge = app.flexygram.effects.ChatEdgeStyle.updateReflection(colorOsEdge);
+                iBlur3Background.drawWithChatEdge(canvas, colorOsEdge, dark);
+            } else {
+                iBlur3Background.drawWithChatEdge(canvas, null, false);
+            }
         }
         super.draw(canvas);
+        if (colorOs && iBlur3Background == null) {
+            final int w = getWidth(), h = getHeight();
+            if (w > 0 && h > 0) {
+                colorOsEdge = app.flexygram.effects.ChatEdgeStyle.updateReflection(colorOsEdge);
+                final float r = Math.min(Math.min(w, h) * 0.5f,
+                        dp(app.exteraless.appearance.AppearanceConfig.fabCornerRadius(SIZE)));
+                colorOsEdge.draw(canvas, 0f, 0f, w, h, r, dark, 255);
+            }
+        }
     }
 
     @Override

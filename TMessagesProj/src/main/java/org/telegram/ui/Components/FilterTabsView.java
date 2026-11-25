@@ -462,7 +462,7 @@ public class FilterTabsView extends FrameLayout {
                 signaturePalette=themed?signatureAccentColors:signatureDefaultColors;
                 signatureSelected = app.flexygram.home.SignatureHomeStyle.selection(currentTab.id, id1, id2,
                         animatingIndicator || manualScrollingToId != -1, animatingIndicatorProgress);
-                final boolean satin = !signatureHomeOpaquePreview && app.flexygram.effects.ChatEdgeStyle.isSatin();
+                final boolean satin = !signatureHomeOpaquePreview && app.flexygram.effects.ChatEdgeStyle.isGlobalSurfaceEdge();
                 boolean nativePill = !signatureHomeOpaquePreview && signaturePillGlass != null && canvas.isHardwareAccelerated()
                         && org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.checkBlurEnabled(resourcesProvider);
                 if (nativePill) {

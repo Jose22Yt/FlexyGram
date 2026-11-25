@@ -79,6 +79,8 @@ public class LinearGradient extends Shader {
         'android/graphics/RectF.java': 'package android.graphics; public class RectF { public float left,top,right,bottom; }',
         'org/telegram/messenger/AndroidUtilities.java': '''package org.telegram.messenger;
 public class AndroidUtilities { public static float density=2f; public static float dpf2(float dp){return dp*density;} }''',
+        'org/telegram/messenger/LiteMode.java': '''package org.telegram.messenger;
+public class LiteMode { public static boolean thermalHigh; public static boolean isThermalPressureHigh(){return thermalHigh;} }''',
         'Probe.java': '''import android.graphics.*;
 import app.flexygram.effects.ChatEdgeReflection;
 public class Probe {
@@ -168,6 +170,31 @@ public class Probe {
   check(canvas.paths==paths+100 && BitmapFactory.count==2 && BitmapShader.count==2);
   reflection.draw(canvas,10,0,50,40,20,false,255);
   check(BitmapFactory.count==3 && BitmapShader.count==3 && RuntimeShader.creations==1);
+
+  reflection.setSatin(false);
+  reflection.setColorOsGlass(true);
+  android.os.Build.VERSION.SDK_INT=33;
+  canvas.hardware=true;
+  reflection.draw(canvas,10,20,410,100,40,true,220);
+  RuntimeShader colorOs=(RuntimeShader)canvas.paint.getShader();
+  check(colorOs!=curved && RuntimeShader.creations==2 && colorOs.width==400 && colorOs.height==80 && colorOs.radius==40 && canvas.paint.getAlpha()==220);
+  int colorOsUpdates=colorOs.updates;
+  reflection.draw(canvas,15,25,415,105,40,true,220);
+  check(colorOs==canvas.paint.getShader() && colorOs.updates==colorOsUpdates && RuntimeShader.creations==2);
+  reflection.draw(canvas,0,0,48,48,48,false,255);
+  check(colorOs.radius==24f && colorOs.width==48 && canvas.depth==0);
+  int beforeFallbackBands=canvas.bands;
+  android.os.Build.VERSION.SDK_INT=32;
+  reflection.draw(canvas,0,20,200,120,24,true,255);
+  check(canvas.paint.getShader() instanceof LinearGradient && canvas.bands==beforeFallbackBands+1);
+  int beforeClippedPaths=canvas.paths;
+  reflection.drawClipped(canvas,0,20,200,120,new Path(),false,200);
+  check(canvas.paths==beforeClippedPaths+1 && canvas.depth==0);
+  android.os.Build.VERSION.SDK_INT=33;
+  org.telegram.messenger.LiteMode.thermalHigh=true;
+  reflection.draw(canvas,0,20,200,120,24,true,255);
+  check(canvas.paint.getShader() instanceof LinearGradient);
+  org.telegram.messenger.LiteMode.thermalHigh=false;
  }
 }''',
     }, [JAVA/'app/flexygram/effects/ChatEdgeReflection.java', JAVA/'app/flexygram/effects/SatinEdgeMaterial.java'])
@@ -207,9 +234,10 @@ public class NekoConfig {
 }''',
         'app/flexygram/effects/ChatEdgeReflection.java': '''package app.flexygram.effects;
 public class ChatEdgeReflection {
- public boolean subtle,satin;
+ public boolean subtle,satin,colorOsGlass;
  public void setSubtle(boolean value){subtle=value;}
  public void setSatin(boolean value){satin=value;}
+ public void setColorOsGlass(boolean value){colorOsGlass=value;}
 }''',
         'Probe.java': '''public class Probe {
  public static void main(String[] args){app.flexygram.effects.StyleProbe.run();}
@@ -221,15 +249,18 @@ public class StyleProbe {
  public static void run(){
   check(ChatEdgeStyle.getSelected()==ChatEdgeStyle.REFLECTION);
   ChatEdgeReflection reflection=ChatEdgeStyle.updateReflection(null);
-  check(ChatEdgeStyle.hasCustomEdge() && !reflection.subtle);
+  check(ChatEdgeStyle.hasCustomEdge() && !reflection.subtle && !reflection.colorOsGlass);
   ChatEdgeStyle.setSelected(ChatEdgeStyle.SUBTLE);
-  check(NekoConfig.prefs.stored==2 && ChatEdgeStyle.isSubtle());
+  check(NekoConfig.prefs.stored==2 && ChatEdgeStyle.isSubtle() && !ChatEdgeStyle.isGlobalSurfaceEdge());
   check(ChatEdgeStyle.updateReflection(reflection)==reflection && reflection.subtle);
   ChatEdgeStyle.setSelected(ChatEdgeStyle.SATIN);
-  check(NekoConfig.prefs.stored==3 && ChatEdgeStyle.isSatin() && !ChatEdgeStyle.isSubtle());
-  check(ChatEdgeStyle.updateReflection(reflection)==reflection && reflection.satin && !reflection.subtle);
+  check(NekoConfig.prefs.stored==3 && ChatEdgeStyle.isSatin() && ChatEdgeStyle.isGlobalSurfaceEdge() && !ChatEdgeStyle.isSubtle());
+  check(ChatEdgeStyle.updateReflection(reflection)==reflection && reflection.satin && !reflection.subtle && !reflection.colorOsGlass);
+  ChatEdgeStyle.setSelected(ChatEdgeStyle.COLOROS_GLASS);
+  check(NekoConfig.prefs.stored==4 && ChatEdgeStyle.isColorOsGlass() && ChatEdgeStyle.isGlobalSurfaceEdge() && !ChatEdgeStyle.isSatin());
+  check(ChatEdgeStyle.updateReflection(reflection)==reflection && reflection.colorOsGlass && !reflection.satin && !reflection.subtle);
   ChatEdgeStyle.setSelected(ChatEdgeStyle.CURRENT);
-  check(NekoConfig.prefs.stored==0 && !ChatEdgeStyle.hasCustomEdge());
+  check(NekoConfig.prefs.stored==0 && !ChatEdgeStyle.hasCustomEdge() && !ChatEdgeStyle.isGlobalSurfaceEdge());
  }
 }''',
     }, [JAVA/'app/flexygram/effects/ChatEdgeStyle.java'])

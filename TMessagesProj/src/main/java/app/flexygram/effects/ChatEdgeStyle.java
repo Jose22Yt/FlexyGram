@@ -8,6 +8,7 @@ public final class ChatEdgeStyle {
     static final int REFLECTION = 1;
     static final int SUBTLE = 2;
     static final int SATIN = 3;
+    static final int COLOROS_GLASS = 4;
 
     private static final String LEGACY_KEY = "flexyChatEdgeReflection";
     private static final String KEY = "flexyChatEdgeStyle";
@@ -22,7 +23,7 @@ public final class ChatEdgeStyle {
     }
 
     private static int normalize(int style) {
-        return style >= CURRENT && style <= SATIN ? style : CURRENT;
+        return style >= CURRENT && style <= COLOROS_GLASS ? style : CURRENT;
     }
 
     static int getSelected() {
@@ -41,10 +42,19 @@ public final class ChatEdgeStyle {
         return selected == SATIN;
     }
 
+    public static boolean isColorOsGlass() {
+        return selected == COLOROS_GLASS;
+    }
+
+    public static boolean isGlobalSurfaceEdge() {
+        return selected == SATIN || selected == COLOROS_GLASS;
+    }
+
     public static ChatEdgeReflection updateReflection(ChatEdgeReflection reflection) {
         if (reflection == null) reflection = new ChatEdgeReflection();
         reflection.setSubtle(isSubtle());
         reflection.setSatin(isSatin());
+        reflection.setColorOsGlass(isColorOsGlass());
         return reflection;
     }
 

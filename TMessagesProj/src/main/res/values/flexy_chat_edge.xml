@@ -5,4 +5,5 @@
     <string name="FlexyChatEdgeReflection">Edge reflection</string>
     <string name="FlexyChatEdgeSubtle">Subtle edge</string>
     <string name="FlexyChatEdgeSatin">Satin reflection</string>
+    <string name="FlexyChatEdgeColorOsGlass">ColorOS 17 Glass</string>
 </resources>

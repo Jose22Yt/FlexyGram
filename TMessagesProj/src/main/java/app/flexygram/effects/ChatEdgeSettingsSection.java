@@ -47,7 +47,8 @@ public final class ChatEdgeSettingsSection extends SignatureMatteSettingsActivit
                 LocaleController.getString(R.string.FlexyChatEdgeCurrent),
                 LocaleController.getString(R.string.FlexyChatEdgeReflection),
                 LocaleController.getString(R.string.FlexyChatEdgeSubtle),
-                LocaleController.getString(R.string.FlexyChatEdgeSatin)
+                LocaleController.getString(R.string.FlexyChatEdgeSatin),
+                LocaleController.getString(R.string.FlexyChatEdgeColorOsGlass)
         };
         showDialog(AlertsCreator.createSingleChoiceDialog(getParentActivity(), choices, getActionBarTitle(),
                 ChatEdgeStyle.getSelected(), (dialog, which) -> {
@@ -70,6 +71,7 @@ public final class ChatEdgeSettingsSection extends SignatureMatteSettingsActivit
                     case ChatEdgeStyle.REFLECTION -> R.string.FlexyChatEdgeReflection;
                     case ChatEdgeStyle.SUBTLE -> R.string.FlexyChatEdgeSubtle;
                     case ChatEdgeStyle.SATIN -> R.string.FlexyChatEdgeSatin;
+                    case ChatEdgeStyle.COLOROS_GLASS -> R.string.FlexyChatEdgeColorOsGlass;
                     default -> R.string.FlexyChatEdgeCurrent;
                 };
                 ((TextSettingsCell) holder.itemView).setTextAndValue(getActionBarTitle(),

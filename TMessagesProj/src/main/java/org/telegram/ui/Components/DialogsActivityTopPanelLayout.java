@@ -107,7 +107,7 @@ public class DialogsActivityTopPanelLayout extends AnimatedLinearLayout {
         if (getMetadata().getTotalVisibility() == 0) return;
 
         if (backgroundDrawable != null) {
-            if (satinEdgeSupported && app.flexygram.effects.ChatEdgeStyle.isSatin()) {
+            if (satinEdgeSupported && app.flexygram.effects.ChatEdgeStyle.isGlobalSurfaceEdge()) {
                 satinEdge = app.flexygram.effects.ChatEdgeStyle.updateReflection(satinEdge);
                 backgroundDrawable.drawWithChatEdge(canvas, satinEdge, Theme.isCurrentThemeDark());
             } else if (satinEdgeSupported) {

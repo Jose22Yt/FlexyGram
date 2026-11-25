@@ -206,7 +206,7 @@ public class FragmentSearchField extends FrameLayout implements FactorAnimator.T
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
         canvas.save();
-        final boolean satin = satinEdgeSupported && app.flexygram.effects.ChatEdgeStyle.isSatin();
+        final boolean satin = satinEdgeSupported && app.flexygram.effects.ChatEdgeStyle.isGlobalSurfaceEdge();
         if (bg != null) {
             bg.setBounds(
                 getPaddingLeft(),

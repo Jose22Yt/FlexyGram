@@ -5,4 +5,5 @@
     <string name="FlexyChatEdgeReflection">Световой блик</string>
     <string name="FlexyChatEdgeSubtle">Мягкий контур</string>
     <string name="FlexyChatEdgeSatin">Сатиновый блик</string>
+    <string name="FlexyChatEdgeColorOsGlass">Стекло ColorOS 17</string>
 </resources>

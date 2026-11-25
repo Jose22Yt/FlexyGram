@@ -5,4 +5,5 @@
     <string name="FlexyChatEdgeReflection">Reflejo de borde</string>
     <string name="FlexyChatEdgeSubtle">Borde tenue</string>
     <string name="FlexyChatEdgeSatin">Reflejo satinado</string>
+    <string name="FlexyChatEdgeColorOsGlass">Cristal ColorOS 17</string>
 </resources>

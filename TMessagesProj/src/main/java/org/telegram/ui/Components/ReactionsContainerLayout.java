@@ -748,7 +748,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
                 float sc = transitionProgress;
                 canvas.scale(sc, sc, pivotX, getHeight() / 2f);
             }
-            final boolean satin = type == TYPE_DEFAULT && app.flexygram.effects.ChatEdgeStyle.isSatin();
+            final boolean satin = type == TYPE_DEFAULT && app.flexygram.effects.ChatEdgeStyle.isGlobalSurfaceEdge();
             if (type == TYPE_STORY || delegate.drawBackground()) {
                 delegate.drawRoundRect(canvas, rect, radius, getX(), getY(), 255, false);
             } else if (glassBackground != null) {

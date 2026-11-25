@@ -66,6 +66,7 @@ fun LiquidBottomTabs(
     tabsCount: Int,
     subtleEdge: Boolean,
     satinEdge: Boolean,
+    colorOsGlassEdge: Boolean = false,
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
@@ -79,11 +80,12 @@ fun LiquidBottomTabs(
 
     val tabsBackdrop = rememberLayerBackdrop()
     val emptyHighlight = remember { Highlight.Default.copy(alpha = 0f) }
-    val customEdge = subtleEdge || satinEdge
-    val edge = if (customEdge) remember(subtleEdge, satinEdge) {
+    val customEdge = subtleEdge || satinEdge || colorOsGlassEdge
+    val edge = if (customEdge) remember(subtleEdge, satinEdge, colorOsGlassEdge) {
         ChatEdgeReflection().apply {
             setSubtle(subtleEdge)
             setSatin(satinEdge)
+            setColorOsGlass(colorOsGlassEdge)
         }
     } else null
 

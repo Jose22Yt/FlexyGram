@@ -586,7 +586,25 @@ public class ActionBarPopupWindow extends PopupWindow {
             } else {
                 super.dispatchDraw(canvas);
             }
+            if (backgroundDrawable != null && app.flexygram.effects.ChatEdgeStyle.isColorOsGlass()) {
+                final Rect bgBounds = backgroundDrawable.getBounds();
+                final float left = bgBounds.left + bgPaddings.left;
+                final float top = bgBounds.top + bgPaddings.top;
+                final float right = bgBounds.right - bgPaddings.right;
+                final float bottom = bgBounds.bottom - bgPaddings.bottom;
+                if (right > left && bottom > top) {
+                    colorOsPopupEdge = app.flexygram.effects.ChatEdgeStyle.updateReflection(colorOsPopupEdge);
+                    final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
+                    final int baseAlpha = Math.max(0, Math.min(255, backAlpha));
+                    final int edgeAlpha = reactionsEnterProgress != 1f
+                            ? Math.round(baseAlpha * reactionsEnterProgress)
+                            : baseAlpha;
+                    colorOsPopupEdge.draw(canvas, left, top, right, bottom, dp(12), dark, edgeAlpha);
+                }
+            }
         }
+
+        private app.flexygram.effects.ChatEdgeReflection colorOsPopupEdge;
 
         public Drawable getBackgroundDrawable() {
             return backgroundDrawable;

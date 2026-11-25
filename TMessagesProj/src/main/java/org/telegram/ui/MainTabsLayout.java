@@ -64,7 +64,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         // View.draw paints backgrounds before onDraw: skip that old layer as well as its controls.
         if (kyantHost != null && kyantHost.isRendering()) return;
         if (getBackground() instanceof BlurredBackgroundDrawable background) {
-            background.setStrokeVisible(!(ChatEdgeStyle.isSubtle() || ChatEdgeStyle.isSatin()));
+            background.setStrokeVisible(!(ChatEdgeStyle.isSubtle() || ChatEdgeStyle.isGlobalSurfaceEdge()));
         }
         super.draw(canvas);
     }
@@ -416,7 +416,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
         if (kyantHost != null && kyantHost.isRendering()) return;
-        if (ChatEdgeStyle.isSatin() && getBackground() instanceof BlurredBackgroundDrawable background) {
+        if (ChatEdgeStyle.isGlobalSurfaceEdge() && getBackground() instanceof BlurredBackgroundDrawable background) {
             subtleEdge = ChatEdgeStyle.updateReflection(subtleEdge);
             background.drawChatEdge(canvas, subtleEdge,
                     resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark());
