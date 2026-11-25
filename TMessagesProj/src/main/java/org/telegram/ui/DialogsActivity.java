@@ -4497,11 +4497,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         int pagesCount = folderId == 0 && communityId == 0 && (initialDialogsType == DIALOGS_TYPE_DEFAULT && !onlySelect || initialDialogsType == DIALOGS_TYPE_FORWARD) ? 2 : 1;
         viewPages = new ViewPage[pagesCount];
-        final int cacheSize = SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_HIGH ? 12 : 8;
-        final int maxPool = SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_HIGH ? 32 : 20;
+        final int viewCacheSize = SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_HIGH ? 12 : 8;
+        final int maxViewPool = SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_HIGH ? 32 : 20;
         final RecyclerView.RecycledViewPool sharedDialogsPool = pagesCount > 1 ? new RecyclerView.RecycledViewPool() : null;
         if (sharedDialogsPool != null) {
-            sharedDialogsPool.setMaxRecycledViews(0, maxPool);
+            sharedDialogsPool.setMaxRecycledViews(0, maxViewPool);
         }
         for (int a = 0; a < pagesCount; a++) {
             final ViewPage viewPage = new ViewPage(context);
@@ -4515,14 +4515,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             viewPage.addView(viewPage.progressView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER));
 
             viewPage.listView = new DialogsRecyclerView(context, viewPage);
-            viewPage.listView.setItemViewCacheSize(cacheSize);
+            viewPage.listView.setItemViewCacheSize(viewCacheSize);
             viewPage.listView.setHasFixedSize(true);
             if (sharedDialogsPool != null) {
                 viewPage.listView.setRecycledViewPool(sharedDialogsPool);
             } else {
                 RecyclerView.RecycledViewPool pool = viewPage.listView.getRecycledViewPool();
                 if (pool != null) {
-                    pool.setMaxRecycledViews(0, maxPool);
+                    pool.setMaxRecycledViews(0, maxViewPool);
                 }
             }
             viewPage.listView.addEdgeEffectListener(() -> viewPage.listView.postOnAnimation(this::blur3_InvalidateBlur));
