@@ -18246,7 +18246,7 @@ public class MessagesController extends BaseController implements NotificationCe
     // must be run from Utilities.stageQueue
     public void processUpdates(final TLRPC.Updates originalUpdates, boolean fromQueue) {
         // exteraless plugins: on_updates_hook (CANCEL = контейнер не обрабатывается)
-        app.exteraless.plugins.HookResult hookResult = app.exteraless.plugins.PluginsController.getInstance().hasAnyUpdatesContainerHooks()
+        app.exteraless.plugins.HookResult hookResult = app.exteraless.plugins.PluginsController.hasActiveUpdatesContainerHooks()
                 ? app.exteraless.plugins.PluginsController.getInstance()
                         .executeOnUpdatesHook(currentAccount, app.exteraless.plugins.PluginsController.hookName(originalUpdates), originalUpdates)
                 : app.exteraless.plugins.HookResult.DEFAULT;
@@ -18830,7 +18830,7 @@ public class MessagesController extends BaseController implements NotificationCe
         // Список принадлежит вызывающему (res.other_updates, updates.updates) и в
         // некоторых ветках обрабатывается повторно, поэтому фильтруем в копию,
         // а не мутируем чужое.
-        if (app.exteraless.plugins.PluginsController.getInstance().hasAnyUpdateHooks()) {
+        if (app.exteraless.plugins.PluginsController.hasActiveUpdateHooks()) {
             ArrayList<TLRPC.Update> allowed = null;
             int updateIndex = 0;
             for (TLRPC.Update u : updates) {

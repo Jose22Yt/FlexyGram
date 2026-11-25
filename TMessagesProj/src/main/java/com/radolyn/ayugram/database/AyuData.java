@@ -51,12 +51,12 @@ public class AyuData {
     private static final String IMPORT_DATABASE = AyuConstants.AYU_DATABASE + "-import";
 
     public static long dbSize, attachmentsSize, totalSize;
-    private static AyuDatabase database;
-    private static EditedMessageDao editedMessageDao;
-    private static DeletedMessageDao deletedMessageDao;
-    private static LastSeenDao lastSeenDao;
-    private static SpyDao spyDao;
-    private static DeletedDialogDao deletedDialogDao;
+    private static volatile AyuDatabase database;
+    private static volatile EditedMessageDao editedMessageDao;
+    private static volatile DeletedMessageDao deletedMessageDao;
+    private static volatile LastSeenDao lastSeenDao;
+    private static volatile SpyDao spyDao;
+    private static volatile DeletedDialogDao deletedDialogDao;
 
     private static final Migration MIGRATION_21_22 = new Migration(21, 22) {
         @Override
@@ -122,18 +122,24 @@ public class AyuData {
         }
     };
 
-    static {
-        create();
+    private static void ensureCreated() {
+        if (database == null) {
+            synchronized (AyuData.class) {
+                if (database == null) {
+                    create();
+                }
+            }
+        }
     }
 
     public static synchronized void create() {
-        database = createDatabase(AyuConstants.AYU_DATABASE);
-
-        editedMessageDao = database.editedMessageDao();
-        deletedMessageDao = database.deletedMessageDao();
-        lastSeenDao = database.lastSeenDao();
-        spyDao = database.spyDao();
-        deletedDialogDao = database.deletedDialogDao();
+        AyuDatabase db = createDatabase(AyuConstants.AYU_DATABASE);
+        editedMessageDao = db.editedMessageDao();
+        deletedMessageDao = db.deletedMessageDao();
+        lastSeenDao = db.lastSeenDao();
+        spyDao = db.spyDao();
+        deletedDialogDao = db.deletedDialogDao();
+        database = db;
     }
 
     private static AyuDatabase createDatabase(String name) {
@@ -145,26 +151,32 @@ public class AyuData {
     }
 
     public static AyuDatabase getDatabase() {
+        ensureCreated();
         return database;
     }
 
     public static EditedMessageDao getEditedMessageDao() {
+        ensureCreated();
         return editedMessageDao;
     }
 
     public static DeletedMessageDao getDeletedMessageDao() {
+        ensureCreated();
         return deletedMessageDao;
     }
 
     public static LastSeenDao getLastSeenDao() {
+        ensureCreated();
         return lastSeenDao;
     }
 
     public static SpyDao getSpyDao() {
+        ensureCreated();
         return spyDao;
     }
 
     public static DeletedDialogDao getDeletedDialogDao() {
+        ensureCreated();
         return deletedDialogDao;
     }
 
@@ -281,11 +293,13 @@ public class AyuData {
                 importDatabase.close();
             }
 
-            checkpointDatabase();
-            try {
-                database.close();
-            } finally {
-                clearReferences();
+            if (database != null) {
+                checkpointDatabase();
+                try {
+                    database.close();
+                } finally {
+                    clearReferences();
+                }
             }
             deleteSidecars(databaseFile);
             Os.rename(importFile.getAbsolutePath(), databaseFile.getAbsolutePath());
@@ -328,6 +342,7 @@ public class AyuData {
     }
 
     public static synchronized void checkpointDatabase() throws IOException {
+        ensureCreated();
         try (Cursor cursor = database.getOpenHelper().getWritableDatabase().query("PRAGMA wal_checkpoint(FULL)")) {
             if (!cursor.moveToFirst() || cursor.getInt(0) != 0) {
                 throw new IOException("Ayu database checkpoint is busy");

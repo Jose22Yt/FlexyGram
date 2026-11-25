@@ -246,6 +246,8 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         postInitApplication();
     }
 
+    private static final Object applicationInitLock = new Object();
+
     /** Launch requests local dialogs early; background push initialization does not prefetch UI data. */
     public static void postInitApplication(boolean prepareDialogs) {
         if (applicationContext == null) return;
@@ -255,9 +257,17 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                 PendingStartupAccounts.DRAIN.request();
             return;
         }
+        synchronized (applicationInitLock) {
+            if (applicationInited) {
+                if (prepareDialogs) prepareSelectedDialogs();
+                else if (deferredStartupAccountCount != 0)
+                    PendingStartupAccounts.DRAIN.request();
+                return;
+            }
+            applicationInited = true;
+        }
         android.os.Trace.beginSection("Flexy.startup.post_init");
         try {
-        applicationInited = true;
         NativeLoader.initNativeLibs(ApplicationLoader.applicationContext);
 
         android.os.Trace.beginSection("Flexy.startup.locale");
@@ -535,15 +545,23 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         return Camera2Config.defaultConfig();
     }
 
-    private android.content.res.Resources cupertinoResources;
-    private android.content.res.AssetManager cupertinoAssets;
+    private volatile android.content.res.Resources cupertinoResources;
+    private volatile android.content.res.AssetManager cupertinoAssets;
+    private final Object cupertinoResourcesLock = new Object();
     @Override public android.content.res.Resources getResources() {
-        android.content.res.Resources original=super.getResources();
-        if(cupertinoResources==null || cupertinoAssets!=original.getAssets()){
-            cupertinoAssets=original.getAssets();
-            cupertinoResources=new app.flexygram.icons.CupertinoResources(original);
+        android.content.res.Resources original = super.getResources();
+        android.content.res.AssetManager assets = original.getAssets();
+        android.content.res.Resources cached = cupertinoResources;
+        if (cached != null && cupertinoAssets == assets) {
+            return cached;
         }
-        return cupertinoResources;
+        synchronized (cupertinoResourcesLock) {
+            if (cupertinoResources == null || cupertinoAssets != assets) {
+                cupertinoAssets = assets;
+                cupertinoResources = new app.flexygram.icons.CupertinoResources(original);
+            }
+            return cupertinoResources;
+        }
     }
 
     @Override
@@ -631,6 +649,9 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         if (!BuildConfig.NATIVE_BASELINE_TEST) {
             app.exteraless.links.LinkCleaner.preloadIfEnabled();
             app.exteraless.appearance.M3CircularProgress.prewarm();
+            if (app.flexygram.effects.ChatEdgeStyle.isSatin()) {
+                Utilities.globalQueue.postRunnable(app.flexygram.effects.SatinEdgeMaterial::prewarm);
+            }
         }
 
         //if (BuildConfig.DEBUG_PRIVATE_VERSION) {
@@ -738,7 +759,9 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
         app.flexygram.bubbles.SignatureWallpaperBlur.trimMemory(level);
+        app.flexygram.effects.SatinEdgeMaterial.trimMemory(level);
         app.flexygram.performance.TextLayoutPrecompute.trimMemory(level);
+        app.exteraless.speech.VoskTranscriber.trimMemory(level);
         if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) MessagesStorage.trimWarmHistories();
         if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
             ImageLoader.clearMemoryIfInitialized();
@@ -749,7 +772,9 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     public void onLowMemory() {
         super.onLowMemory();
         app.flexygram.bubbles.SignatureWallpaperBlur.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
+        app.flexygram.effects.SatinEdgeMaterial.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
         app.flexygram.performance.TextLayoutPrecompute.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
+        app.exteraless.speech.VoskTranscriber.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
         MessagesStorage.trimWarmHistories();
         ImageLoader.clearMemoryIfInitialized();
     }

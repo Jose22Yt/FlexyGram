@@ -441,7 +441,7 @@ public class ConnectionsManager extends BaseController {
 
         // --- exteraless plugins: pre_request_hook (CANCEL = запрос не уходит) ---
         TLObject pluginRequest = object;
-        if (app.exteraless.plugins.PluginsController.getInstance().hasAnyRequestHooks()) {
+        if (app.exteraless.plugins.PluginsController.hasActiveRequestHooks()) {
             app.exteraless.plugins.HookResult preHook = app.exteraless.plugins.PluginsController.getInstance()
                     .executePreRequestHook(currentAccount, app.exteraless.plugins.PluginsController.hookName(object), object);
             if (preHook.isCancel()) {
@@ -523,7 +523,7 @@ public class ConnectionsManager extends BaseController {
                     Utilities.stageQueue.postRunnable(() -> {
                         TLObject pluginResponse = finalResponse;
                         // exteraless plugins: post_request_hook
-                        if (app.exteraless.plugins.PluginsController.getInstance().hasAnyRequestHooks()) {
+                        if (app.exteraless.plugins.PluginsController.hasActiveRequestHooks()) {
                             app.exteraless.plugins.HookResult postHook = app.exteraless.plugins.PluginsController.getInstance()
                                     .executePostRequestHook(currentAccount, app.exteraless.plugins.PluginsController.hookName(normalizedObject), finalResponse, finalError);
                             if (postHook.isCancel()) {

@@ -90,7 +90,14 @@ public final class ClassProxyFactory {
     private static final ConcurrentHashMap<String, ClassRecord> CLASSES = new ConcurrentHashMap<>();
     /** pluginId -> classKey'и (для releaseAllForPlugin). */
     private static final ConcurrentHashMap<String, Set<String>> PLUGIN_CLASSES = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<String, Serializable> MVEL_CACHE = new ConcurrentHashMap<>();
+    private static final int MAX_MVEL_CACHE_ENTRIES = 256;
+    private static final Map<String, Serializable> MVEL_CACHE = Collections.synchronizedMap(
+            new LinkedHashMap<String, Serializable>(32, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, Serializable> eldest) {
+                    return size() > MAX_MVEL_CACHE_ENTRIES;
+                }
+            });
     private static final Object GENERATE_LOCK = new Object();
     private static final Random RANDOM = new Random();
 

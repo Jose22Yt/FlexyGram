@@ -72,7 +72,7 @@ def test_scope_preserves_telegram_engine_and_disables_it_only_for_home_bar():
     assert (ROOT/'TMessagesProj/src/main/res/raw/liquid_glass_shader.agsl').exists()
     original=json.loads((ROOT/'third_party/kyant-backdrop/provenance.json').read_text())
     # The upstream provenance stays intact. Pin the locally adapted component separately.
-    original['components/LiquidBottomTabs.kt'] = '3405718862d3744efce3f308e502143218a937f33bb67bf7bbf3848264d9208d'
+    original['components/LiquidBottomTabs.kt'] = '2def7d7776902f60e139cd1ae07553ba8188f5526f6eb20c40b2dea5c2ccf41b'
     for path,sha in original.items():
         source=(ROOT/'TMessagesProj/src/main/kotlin/app/flexygram/kyant'/path).read_text()
         normalized=source.split('\n',1)[1].replace('app.flexygram.kyant','com.kyant.backdrop.catalog')

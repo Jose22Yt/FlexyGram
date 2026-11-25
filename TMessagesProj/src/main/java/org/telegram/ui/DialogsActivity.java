@@ -4807,6 +4807,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
             };
             viewPage.layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+            viewPage.layoutManager.setItemPrefetchEnabled(true);
+            viewPage.layoutManager.setInitialPrefetchItemCount(8);
             viewPage.listView.setLayoutManager(viewPage.layoutManager);
             viewPage.listView.setVerticalScrollbarPosition(LocaleController.isRTL ? RecyclerListView.SCROLLBAR_POSITION_LEFT : RecyclerListView.SCROLLBAR_POSITION_RIGHT);
             viewPage.addView(viewPage.listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));

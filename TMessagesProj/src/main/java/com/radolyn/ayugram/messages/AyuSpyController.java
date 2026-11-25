@@ -31,6 +31,26 @@ import xyz.nextalone.nagram.NaConfig;
 
 public final class AyuSpyController {
 
+    private static final int MAX_CACHE_ENTRIES = 256;
+    private static final java.util.Map<String, Integer> READ_DATE_CACHE = java.util.Collections.synchronizedMap(
+            new java.util.LinkedHashMap<String, Integer>(32, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(java.util.Map.Entry<String, Integer> eldest) {
+                    return size() > MAX_CACHE_ENTRIES;
+                }
+            });
+    private static final java.util.Map<String, Integer> CONTENTS_DATE_CACHE = java.util.Collections.synchronizedMap(
+            new java.util.LinkedHashMap<String, Integer>(32, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(java.util.Map.Entry<String, Integer> eldest) {
+                    return size() > MAX_CACHE_ENTRIES;
+                }
+            });
+
+    private static String cacheKey(long userId, long dialogId, int messageId) {
+        return userId + ":" + dialogId + ":" + messageId;
+    }
+
     private AyuSpyController() {
     }
 
@@ -98,9 +118,17 @@ public final class AyuSpyController {
                 try {
                     if (!reads.isEmpty()) {
                         dao.insertRead(reads);
+                        for (int i = 0; i < reads.size(); i++) {
+                            SpyMessageRead r = reads.get(i);
+                            READ_DATE_CACHE.put(cacheKey(r.userId, r.dialogId, r.messageId), r.date);
+                        }
                     }
                     if (!contentsReads.isEmpty()) {
                         dao.insertContentsRead(contentsReads);
+                        for (int i = 0; i < contentsReads.size(); i++) {
+                            SpyMessageContentsRead r = contentsReads.get(i);
+                            CONTENTS_DATE_CACHE.put(cacheKey(r.userId, r.dialogId, r.messageId), r.date);
+                        }
                     }
                 } catch (Exception e) {
                     FileLog.e(e);
@@ -155,13 +183,23 @@ public final class AyuSpyController {
         if (messageObject == null || !isEnabled()) {
             return 0;
         }
+        final long userId = UserConfig.getInstance(messageObject.currentAccount).getClientUserId();
+        final long dialogId = messageObject.getDialogId();
+        final int messageId = messageObject.getId();
+        final String key = cacheKey(userId, dialogId, messageId);
+        final Integer cached = READ_DATE_CACHE.get(key);
+        if (cached != null) {
+            return cached;
+        }
         final SpyDao dao = AyuData.getSpyDao();
         if (dao == null) {
             return 0;
         }
         try {
-            final Integer date = dao.getReadDate(UserConfig.getInstance(messageObject.currentAccount).getClientUserId(), messageObject.getDialogId(), messageObject.getId());
-            return date == null ? 0 : date;
+            final Integer date = dao.getReadDate(userId, dialogId, messageId);
+            final int value = date == null ? 0 : date;
+            READ_DATE_CACHE.put(key, value);
+            return value;
         } catch (Exception e) {
             FileLog.e(e);
             return 0;
@@ -172,13 +210,23 @@ public final class AyuSpyController {
         if (messageObject == null || !isEnabled()) {
             return 0;
         }
+        final long userId = UserConfig.getInstance(messageObject.currentAccount).getClientUserId();
+        final long dialogId = messageObject.getDialogId();
+        final int messageId = messageObject.getId();
+        final String key = cacheKey(userId, dialogId, messageId);
+        final Integer cached = CONTENTS_DATE_CACHE.get(key);
+        if (cached != null) {
+            return cached;
+        }
         final SpyDao dao = AyuData.getSpyDao();
         if (dao == null) {
             return 0;
         }
         try {
-            final Integer date = dao.getContentsReadDate(UserConfig.getInstance(messageObject.currentAccount).getClientUserId(), messageObject.getDialogId(), messageObject.getId());
-            return date == null ? 0 : date;
+            final Integer date = dao.getContentsReadDate(userId, dialogId, messageId);
+            final int value = date == null ? 0 : date;
+            CONTENTS_DATE_CACHE.put(key, value);
+            return value;
         } catch (Exception e) {
             FileLog.e(e);
             return 0;

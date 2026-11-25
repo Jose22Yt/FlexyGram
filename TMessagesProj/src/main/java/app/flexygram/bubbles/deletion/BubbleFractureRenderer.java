@@ -32,7 +32,7 @@ final class BubbleFractureRenderer {
     private final List<FractureMesh.Piece> pieces;
     private final float firstPieceDelay;
     private final ArrayList<Path> paths = new ArrayList<>();
-    private final Paint paint = new Paint(3), edge = new Paint(3), flashPaint = new Paint(3), blastPaint = new Paint(3), smokePaint = new Paint(3);
+    private final Paint paint = new Paint(3), piecePaint = new Paint(3), edge = new Paint(3), flashPaint = new Paint(3), blastPaint = new Paint(3), smokePaint = new Paint(3);
     private final int[] pos = {0,0};
     private final Rect src;
     private final RectF dst;
@@ -51,6 +51,13 @@ final class BubbleFractureRenderer {
         }
         firstPieceDelay = earliest;
         src=new Rect(0,0,image.getWidth(),image.getHeight());dst=new RectF(0,0,width,height);
+        if (!pieces.isEmpty() && image.getWidth() > 0 && image.getHeight() > 0) {
+            BitmapShader shader = new BitmapShader(image, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+            Matrix shaderMatrix = new Matrix();
+            shaderMatrix.setScale(width / image.getWidth(), height / image.getHeight());
+            shader.setLocalMatrix(shaderMatrix);
+            piecePaint.setShader(shader);
+        }
         edge.setStyle(Paint.Style.STROKE);edge.setStrokeWidth(.55f*density);edge.setColor(0x44ffffff);
         flashPaint.setColorFilter(new PorterDuffColorFilter(0xffffffff,PorterDuff.Mode.SRC_ATOP));
         blastPaint.setStyle(Paint.Style.STROKE);
@@ -90,10 +97,12 @@ final class BubbleFractureRenderer {
                 c.restoreToCount(viewportSave);
                 return;
             }
-            paint.setAlpha((int)(255*FractureMesh.fade(progress)));
+            int alpha = (int)(255*FractureMesh.fade(progress));
             if (progress <= firstPieceDelay) {
+                paint.setAlpha(alpha);
                 c.drawBitmap(image,src,dst,paint);
             } else {
+                piecePaint.setAlpha(alpha);
                 for(int i=0;i<pieces.size();i++) {
                     FractureMesh.Piece p=pieces.get(i);
                     float phase=FractureMesh.phase(progress,p.delay);
@@ -102,8 +111,7 @@ final class BubbleFractureRenderer {
                     int save=c.save();
                     c.translate(pos[0]+x,pos[1]+y);
                     c.rotate(rotation,p.cx,p.cy);
-                    c.clipPath(paths.get(i));
-                    c.drawBitmap(image,src,dst,paint);
+                    c.drawPath(paths.get(i),piecePaint);
                     c.restoreToCount(save);
                 }
             }
@@ -136,7 +144,7 @@ final class BubbleFractureRenderer {
             float burst=FractureMotionMath.unit((progress-fuse)/(1f-fuse));
             float travel=TntMotion.travel(burst);
             float radius=Math.max(width,height)*.62f*settings.power*.01f;
-            paint.setAlpha((int)(255*TntMotion.fade(burst)));
+            piecePaint.setAlpha((int)(255*TntMotion.fade(burst)));
             for(int i=0;i<pieces.size();i++) {
                 FractureMesh.Piece tile=pieces.get(i);
                 float x=tile.vx*radius*travel;
@@ -146,8 +154,7 @@ final class BubbleFractureRenderer {
                 canvas.rotate(tile.spin*travel*settings.spin*.01f,tile.cx,tile.cy);
                 float shrink=1f-.55f*FractureMotionMath.smooth(burst);
                 canvas.scale(shrink,shrink,tile.cx,tile.cy);
-                canvas.clipPath(paths.get(i));
-                canvas.drawBitmap(image,src,dst,paint);
+                canvas.drawPath(paths.get(i),piecePaint);
                 canvas.restoreToCount(saved);
             }
             int saved=canvas.save();

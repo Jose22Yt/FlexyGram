@@ -13,15 +13,50 @@ import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.R;
 
 /** A sampled lighting layer. Only the local shape, never the chat backdrop, is textured. */
-final class SatinEdgeMaterial {
+public final class SatinEdgeMaterial {
     private static final int[] RESOURCES = {
             R.drawable.flexy_satin_pill_dark, R.drawable.flexy_satin_circle_dark,
             R.drawable.flexy_satin_pill_light, R.drawable.flexy_satin_circle_light
     };
+    private static final Object TEXTURE_LOCK = new Object();
     private static final Bitmap[] textures = new Bitmap[RESOURCES.length];
     private final MaterialShader[] shaders = new MaterialShader[RESOURCES.length];
     private final Matrix matrix = new Matrix();
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+
+    /** Pre-decodes satin lighting bitmaps on a background queue so first chat frame never stalls. */
+    public static void prewarm() {
+        for (int i = 0; i < RESOURCES.length; i++) {
+            ensureTexture(i);
+        }
+    }
+
+    /** Releases static texture references under low-memory pressure (TRIM_MEMORY_RUNNING_LOW=10, UI_HIDDEN=20). */
+    public static void trimMemory(int level) {
+        if (level == 20 || level < 10) return;
+        synchronized (TEXTURE_LOCK) {
+            for (int i = 0; i < textures.length; i++) {
+                textures[i] = null;
+            }
+        }
+    }
+
+    private static Bitmap ensureTexture(int index) {
+        Bitmap texture;
+        synchronized (TEXTURE_LOCK) {
+            texture = textures[index];
+        }
+        if (texture != null) return texture;
+        if (ApplicationLoader.applicationContext == null) return null;
+        Bitmap decoded = BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), RESOURCES[index]);
+        if (decoded == null) return null;
+        synchronized (TEXTURE_LOCK) {
+            if (textures[index] == null) {
+                textures[index] = decoded;
+            }
+            return textures[index];
+        }
+    }
 
     void draw(Canvas canvas, float left, float top, float right, float bottom, float radius,
               Path path, boolean dark, int alpha) {
@@ -31,12 +66,8 @@ final class SatinEdgeMaterial {
         final int index = (dark ? 0 : 2) + (circle ? 1 : 0);
         MaterialShader material = shaders[index];
         if (material == null) {
-            Bitmap texture = textures[index];
-            if (texture == null) {
-                texture = BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), RESOURCES[index]);
-                if (texture == null) return;
-                textures[index] = texture;
-            }
+            Bitmap texture = ensureTexture(index);
+            if (texture == null) return;
             material = new MaterialShader(texture);
             shaders[index] = material;
         }

@@ -5148,10 +5148,17 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private boolean signatureMediaPress;
     private float signatureTapPivotX, signatureTapPivotY;
     private long signatureTapReleased, signatureTapStarted;
+    private int signatureTouchSlop = -1;
+    private float signatureTouchSlop() {
+        if (signatureTouchSlop < 0) {
+            signatureTouchSlop = android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop();
+        }
+        return signatureTouchSlop;
+    }
     public void signatureTapEvent(MotionEvent event) {
         int action=event.getActionMasked();
         if(action==MotionEvent.ACTION_MOVE && signatureTapEligible){
-            float slop=android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop();
+            float slop=signatureTouchSlop();
             if(Math.abs(event.getX()-signatureTapX)>slop || Math.abs(event.getY()-signatureTapY)>slop)cancelSignatureGesture();
             else signatureTapMotion.drag(event.getX()-signatureTapX,event.getY()-signatureTapY,slop);
         } else if(action==MotionEvent.ACTION_UP && signatureTapEligible){
@@ -5210,7 +5217,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     || action==MotionEvent.ACTION_POINTER_UP) {
                 cancelSignatureGesture();
             } else if (action==MotionEvent.ACTION_MOVE) {
-                float slop=android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop();
+                float slop=signatureTouchSlop();
                 if (Math.abs(getEventX(event)-signatureTapX)>slop
                         || Math.abs(getEventY(event)-signatureTapY)>slop) cancelSignatureGesture();
                 else signatureTapMotion.drag(getEventX(event)-signatureTapX,getEventY(event)-signatureTapY,slop);

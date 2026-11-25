@@ -39,12 +39,14 @@ import org.telegram.ui.Components.glass.GlassTabView
 
 /** Original Kyant Compose material, mounted over a native dock with native actions and icons. */
 @RequiresApi(33)
-class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: View) : AbstractComposeView(context) {
+class KyantDockView(context: Context, private val dock: MainTabsLayout, private val scene: View) : AbstractComposeView(context) {
     private val powerListener = Utilities.Callback<Boolean> { syncFromNative(); backdropChanged(); dock.invalidate() }
     private val configListener = Runnable { syncFromNative(); backdropChanged(); dock.invalidate() }
     private val iconSnapshots = java.util.IdentityHashMap<GlassTabView, KyantIconSnapshot>()
     private val visibleScratch = ArrayList<GlassTabView>(8)
     private val tabOrder = Comparator<GlassTabView> { a, b -> a.x.compareTo(b.x) }
+    private val targetMatrix = android.graphics.Matrix()
+    private val targetBounds = android.graphics.RectF()
     private val source = KyantBackdropSource(scene, dock)
     private var tabs by mutableStateOf<List<GlassTabView>>(emptyList())
     private var selectedIndex by mutableIntStateOf(0)
@@ -91,8 +93,31 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
 
     fun isRendering(): Boolean = ready && available && isAttachedToWindow && tabs.size >= 2
 
+    private fun mayIntersectDock(target: View): Boolean {
+        if (target === scene || dock.width <= 0 || dock.height <= 0
+                || target.width <= 0 || target.height <= 0
+                || !target.isAttachedToWindow || !dock.isAttachedToWindow) {
+            return true
+        }
+        targetMatrix.reset()
+        target.transformMatrixToGlobal(targetMatrix)
+        dock.transformMatrixToLocal(targetMatrix)
+        targetBounds.set(0f, 0f, target.width.toFloat(), target.height.toFloat())
+        targetMatrix.mapRect(targetBounds)
+        val density = resources.displayMetrics.density
+        val bandHeight = 64f * density
+        val verticalInset = KyantDockGeometry.panelInset(dock.height, dock.paddingTop, dock.paddingBottom, bandHeight)
+        val margin = 32f * density
+        return targetBounds.right > -margin
+            && targetBounds.left < dock.width + margin
+            && targetBounds.bottom > verticalInset - margin
+            && targetBounds.top < verticalInset + bandHeight + margin
+    }
+
     fun sourceInvalidated(target: View) {
-        if (available && !sourceDirty && !source.isRecording && source.contains(target)) { sourceDirty = true; scheduleFrame() }
+        if (available && !sourceDirty && !source.isRecording && source.contains(target) && mayIntersectDock(target)) {
+            sourceDirty = true; scheduleFrame()
+        }
     }
 
     fun nativeIconsInvalidated() { if (available && !drawingIcon) { iconsDirty = true; scheduleFrame() } }
@@ -211,9 +236,13 @@ class KyantDockView(context: Context, private val dock: MainTabsLayout, scene: V
         val width = dock.width / density
         if (width <= 0) return
         val verticalInset = KyantDockGeometry.panelInset(dock.height, dock.paddingTop, dock.paddingBottom, 64 * density)
-        val configuration = Configuration(LocalConfiguration.current).apply {
-            uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or
-                if (Theme.isCurrentThemeDark()) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO
+        val baseConfiguration = LocalConfiguration.current
+        val darkTheme = Theme.isCurrentThemeDark()
+        val configuration = remember(baseConfiguration, darkTheme) {
+            Configuration(baseConfiguration).apply {
+                uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or
+                    if (darkTheme) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO
+            }
         }
         val background = rememberLayerBackdrop()
         CompositionLocalProvider(

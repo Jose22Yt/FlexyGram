@@ -18,6 +18,14 @@ public final class InlineConversionScanner {
     // boundary, find() rescans every suffix of long words that contain no '@'.
     private static final Pattern RESERVED=Pattern.compile("(?i)(?:https?://|www\\.)\\S+|(?<![\\p{L}\\p{N}._%+-])[\\p{L}\\p{N}._%+-]++@[\\p{L}\\p{N}.-]+\\.[\\p{L}]{2,}|(?:@|#)[\\p{L}\\p{N}_]+|`[^`]*`");
     private InlineConversionScanner(){}
+    private static boolean isAsciiDigits(String value, int start, int end) {
+        if (end <= start) return false;
+        for (int i = start; i < end; i++) {
+            char c = value.charAt(i);
+            if (c < '0' || c > '9') return false;
+        }
+        return true;
+    }
     public static BigDecimal number(String raw,Locale locale){
         if(raw==null||raw.length()>40||locale==null)throw new IllegalArgumentException("Number/locale required");
         DecimalFormatSymbols symbols=DecimalFormatSymbols.getInstance(locale);
@@ -25,24 +33,41 @@ public final class InlineConversionScanner {
         String s=raw.replace('−','-').replace('\u202f','\u00a0');
         if(group=='\u202f')group='\u00a0';
         String sign=s.startsWith("-")?"-":"";if(!sign.isEmpty())s=s.substring(1);
-        String[] parts=s.split(Pattern.quote(String.valueOf(decimal)),-1);
-        if(parts.length>2)throw new IllegalArgumentException("Ambiguous decimal");
-        String integer=parts[0];
+        int decPos=s.indexOf(decimal);
+        if(decPos>=0&&s.indexOf(decimal,decPos+1)>=0)throw new IllegalArgumentException("Ambiguous decimal");
+        String integer=decPos>=0?s.substring(0,decPos):s;
+        String fraction=decPos>=0?s.substring(decPos+1):"";
         if(integer.indexOf(group)>=0){
-            String[] groups=integer.split(Pattern.quote(String.valueOf(group)),-1);
-            if(groups[0].length()<1||groups[0].length()>3)throw new IllegalArgumentException("Grouping");
-            for(int i=1;i<groups.length;i++)if(groups[i].length()!=3)throw new IllegalArgumentException("Grouping");
-            integer=String.join("",groups);
+            StringBuilder stripped=new StringBuilder(integer.length());
+            int segStart=0,segIndex=0,len=integer.length();
+            while(true){
+                int sep=integer.indexOf(group,segStart);
+                int segEnd=sep<0?len:sep;
+                int segLen=segEnd-segStart;
+                if(segIndex==0?(segLen<1||segLen>3):segLen!=3)throw new IllegalArgumentException("Grouping");
+                if(!isAsciiDigits(integer,segStart,segEnd))throw new IllegalArgumentException("Regional number");
+                stripped.append(integer,segStart,segEnd);
+                if(sep<0)break;
+                segStart=sep+1;segIndex++;
+            }
+            integer=stripped.toString();
+        } else if(!isAsciiDigits(integer,0,integer.length())){
+            throw new IllegalArgumentException("Regional number");
         }
-        String fraction=parts.length==2?parts[1]:"";
-        if(!integer.matches("[0-9]+")||parts.length==2&&!fraction.matches("[0-9]+"))throw new IllegalArgumentException("Regional number");
+        if(decPos>=0&&!isAsciiDigits(fraction,0,fraction.length()))throw new IllegalArgumentException("Regional number");
         if(integer.length()+fraction.length()>24)throw new IllegalArgumentException("Number too long");
-        return new BigDecimal(sign+integer+(parts.length==2?"."+fraction:""));
+        return new BigDecimal(sign+integer+(decPos>=0?"."+fraction:""));
     }
     private static boolean symbolMatches(String symbol,String code) {
         if (symbol==null||symbol.isEmpty()) return true;
         switch(symbol) {
-            case "$": return Arrays.asList("USD","CAD","AUD","COP","MXN","ARS","CLP","NZD","SGD","HKD").contains(code);
+            case "$":
+                switch(code) {
+                    case "USD": case "CAD": case "AUD": case "COP": case "MXN":
+                    case "ARS": case "CLP": case "NZD": case "SGD": case "HKD":
+                        return true;
+                    default: return false;
+                }
             case "€": return code.equals("EUR");
             case "£": return code.equals("GBP");
             case "¥": return code.equals("JPY")||code.equals("CNY");
