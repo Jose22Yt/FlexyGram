@@ -67,6 +67,11 @@ public class Probe implements ChatHistoryWarmup.Host{
   w.request();AndroidUtilities.fire();p.account=1;before=MessagesStorage.dialogs.size();MessagesStorage.complete();check(MessagesStorage.dialogs.size()==before);
   w.cancel();p.ready=false;w.request();check(AndroidUtilities.queue.isEmpty());
   p.ready=true;UserConfig.config.active=false;w.request();AndroidUtilities.fire();check(MessagesStorage.completions.isEmpty());
+  UserConfig.config.active=true;int beforeTouch=MessagesStorage.dialogs.size();
+  w.warmTouched(777);check(MessagesStorage.dialogs.size()==beforeTouch+1&&MessagesStorage.dialogs.get(beforeTouch)==777);
+  w.warmTouched(777);check(MessagesStorage.dialogs.size()==beforeTouch+1);
+  android.os.SystemClock.now+=1600;w.warmTouched(777);check(MessagesStorage.dialogs.size()==beforeTouch+2);
+  MessagesStorage.complete();
  }
 }'''
     probe(tmp_path,files,[JAVA/'app/flexygram/performance/ChatHistoryWarmup.java'])

@@ -2452,6 +2452,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
             if (e.getAction() == MotionEvent.ACTION_DOWN) {
                 allowSwipeDuringCurrentTouch = !actionBar.isActionModeShowed();
+                if (allowSwipeDuringCurrentTouch && historyWarmup != null && getScrollState() == SCROLL_STATE_IDLE) {
+                    View touched = findChildViewUnder(e.getX(), e.getY());
+                    if (touched instanceof DialogCell) {
+                        long dialogId = ((DialogCell) touched).getDialogId();
+                        if (dialogId != 0 && !getMessagesController().isForum(dialogId)) {
+                            historyWarmup.warmTouched(dialogId);
+                        }
+                    }
+                }
             }
             return super.onInterceptTouchEvent(e);
         }
@@ -3414,7 +3423,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 if (inPreviewMode && avatarContainer != null && child != avatarContainer) {
                     return false;
                 }
-                final boolean satin = ChatEdgeStyle.isSatin();
+                final boolean satin = ChatEdgeStyle.isGlobalSurfaceEdge();
                 if ((!BuildConfig.NATIVE_BASELINE_TEST || satin) && isSignatureHome() && child == menu && progressToActionMode == 0
                         && !isActionModeShowed() && getRightSlidingProgress() == 0 && (!satin || searchAnimationProgress == 0)) {
                     drawSignatureHomeControl(canvas, searchItem, satin);
@@ -4488,6 +4497,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         int pagesCount = folderId == 0 && communityId == 0 && (initialDialogsType == DIALOGS_TYPE_DEFAULT && !onlySelect || initialDialogsType == DIALOGS_TYPE_FORWARD) ? 2 : 1;
         viewPages = new ViewPage[pagesCount];
+        final int cacheSize = SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_HIGH ? 12 : 8;
+        final int maxPool = SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_HIGH ? 32 : 20;
+        final RecyclerView.RecycledViewPool sharedDialogsPool = pagesCount > 1 ? new RecyclerView.RecycledViewPool() : null;
+        if (sharedDialogsPool != null) {
+            sharedDialogsPool.setMaxRecycledViews(0, maxPool);
+        }
         for (int a = 0; a < pagesCount; a++) {
             final ViewPage viewPage = new ViewPage(context);
             contentView.addView(viewPage, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
@@ -4500,13 +4515,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             viewPage.addView(viewPage.progressView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER));
 
             viewPage.listView = new DialogsRecyclerView(context, viewPage);
-            final int cacheSize = SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_HIGH ? 12 : 8;
-            final int maxPool = SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_HIGH ? 25 : 15;
             viewPage.listView.setItemViewCacheSize(cacheSize);
             viewPage.listView.setHasFixedSize(true);
-            RecyclerView.RecycledViewPool pool = viewPage.listView.getRecycledViewPool();
-            if (pool != null) {
-                pool.setMaxRecycledViews(0, maxPool);
+            if (sharedDialogsPool != null) {
+                viewPage.listView.setRecycledViewPool(sharedDialogsPool);
+            } else {
+                RecyclerView.RecycledViewPool pool = viewPage.listView.getRecycledViewPool();
+                if (pool != null) {
+                    pool.setMaxRecycledViews(0, maxPool);
+                }
             }
             viewPage.listView.addEdgeEffectListener(() -> viewPage.listView.postOnAnimation(this::blur3_InvalidateBlur));
             viewPage.scroller = new RecyclerListViewScroller(viewPage.listView);
@@ -7506,17 +7523,22 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
-    private boolean homeSatinApplied;
+    private int homeEdgeStyleApplied = -1;
 
     @Override
     public void onResume() {
         super.onResume();
-        if (isSignatureHome() && homeSatinApplied != ChatEdgeStyle.isSatin()) {
-            homeSatinApplied = ChatEdgeStyle.isSatin();
-            if (actionBar != null) actionBar.invalidate();
-            if (filterTabsView != null) filterTabsView.invalidateFolderEdges();
-            if (fragmentSearchField != null) fragmentSearchField.invalidate();
-            if (topPanelLayout != null) topPanelLayout.invalidate();
+        final int currentEdgeStyle = (ChatEdgeStyle.isSatin() ? 1 : 0) | (ChatEdgeStyle.isColorOsGlass() ? 2 : 0);
+        if (homeEdgeStyleApplied != currentEdgeStyle) {
+            homeEdgeStyleApplied = currentEdgeStyle;
+            if (isSignatureHome()) {
+                if (actionBar != null) actionBar.invalidate();
+                if (filterTabsView != null) filterTabsView.invalidateFolderEdges();
+                if (fragmentSearchField != null) fragmentSearchField.invalidate();
+                if (topPanelLayout != null) topPanelLayout.invalidate();
+            }
+            if (floatingButton3 != null) floatingButton3.invalidate();
+            if (floatingButtonStories != null) floatingButtonStories.invalidate();
         }
         historyWarmup.request();
         refreshNativeGlassPolicy();

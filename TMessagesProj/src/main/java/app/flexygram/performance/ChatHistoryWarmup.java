@@ -17,6 +17,7 @@ public final class ChatHistoryWarmup implements Runnable {
     private final Host host;
     private boolean scheduled, busy;
     private long generation, lastBatch = -1;
+    private long lastTouchedDialog, lastTouchedAt = -1;
     private Runnable cancelRead;
     public ChatHistoryWarmup(Host host) { this.host = host; }
     public void request() {
@@ -25,6 +26,27 @@ public final class ChatHistoryWarmup implements Runnable {
         long now = SystemClock.uptimeMillis();
         long delay = lastBatch < 0 || now < lastBatch ? 350 : Math.max(350, 3000 - (now - lastBatch));
         AndroidUtilities.runOnUIThread(this, delay);
+    }
+    /** Speculatively warms a tapped dialog during ACTION_DOWN before ACTION_UP opens ChatActivity. */
+    public void warmTouched(long dialogId) {
+        if (dialogId == 0 || !host.canWarm()) return;
+        final long now = SystemClock.uptimeMillis();
+        if (dialogId == lastTouchedDialog && lastTouchedAt >= 0 && now >= lastTouchedAt && now - lastTouchedAt < 1500) {
+            return;
+        }
+        final int account = host.account();
+        final UserConfig config = UserConfig.getInstance(account);
+        if (config.getClientUserId() == 0 || !config.isClientActivated()) return;
+        cancel();
+        lastTouchedDialog = dialogId;
+        lastTouchedAt = now;
+        busy = true;
+        final long token = generation;
+        cancelRead = MessagesStorage.getInstance(account).warmChatHistory(dialogId, SharedConfig.deviceIsHigh() ? 25 : 15, () -> {
+            if (token != generation) return;
+            cancelRead = null;
+            busy = false;
+        });
     }
     public void cancel() {
         generation++; scheduled = busy = false;
