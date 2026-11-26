@@ -144,9 +144,22 @@ public class AyuData {
 
     private static AyuDatabase createDatabase(String name) {
         return Room.databaseBuilder(ApplicationLoader.applicationContext, AyuDatabase.class, name)
+                .setJournalMode(androidx.room.RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigrationOnDowngrade()
                 .addMigrations(MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24, MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27)
+                .addCallback(new androidx.room.RoomDatabase.Callback() {
+                    @Override
+                    public void onOpen(@androidx.annotation.NonNull SupportSQLiteDatabase db) {
+                        super.onOpen(db);
+                        try {
+                            db.execSQL("PRAGMA synchronous = NORMAL");
+                            db.execSQL("PRAGMA temp_store = MEMORY");
+                            db.execSQL("PRAGMA cache_size = -4000");
+                        } catch (Throwable ignore) {
+                        }
+                    }
+                })
                 .build();
     }
 

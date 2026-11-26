@@ -388,5 +388,28 @@ def test_120hz_and_ghost_and_player_wiring():
     player = (JAVA / 'app/exteraless/player/baseline/PlayerSheet.java').read_text()
     assert 'Utilities.globalQueue.postRunnable' in player
     assert 'AndroidUtilities.setPreferredMaxRefreshRate(getWindow())' in player
+    assert 'tempCopy.recycle()' in player
+
+
+def test_hidden_bottlenecks_and_canvas_or_db_leaks_fixed():
+    cell = (JAVA / 'org/telegram/ui/Cells/ChatMessageCell.java').read_text()
+    assert 'canvas.saveLayerAlpha(null, (int) (255 * 0.75f)' not in cell
+    assert 'final int translucentRestore = (shouldTranslucentDeleted() && ayuDeleted' in cell
+    assert 'Theme.chat_msgTextPaint.setAlpha(prevDeletedCaptionAlpha);' in cell
+
+    ayu_data = (JAVA / 'com/radolyn/ayugram/database/AyuData.java').read_text()
+    assert 'JournalMode.WRITE_AHEAD_LOGGING' in ayu_data
+    assert 'PRAGMA synchronous = NORMAL' in ayu_data
+
+    ayu_ctrl = (JAVA / 'com/radolyn/ayugram/messages/AyuMessagesController.java').read_text()
+    assert 'deletedMessageDao.getExistingMessageIds(userId, dialogId, java.util.Collections.singletonList(messageId))' in ayu_ctrl
+    assert 'Utilities.globalQueue.postRunnable(() -> {' in method(ayu_ctrl, 'public void deleteCurrent(')
+
+    drawer_picker = (JAVA / 'app/exteraless/drawer/DrawerAccountPickerView.java').read_text()
+    assert 'if (topAlpha <= 0.0f && bottomAlpha <= 0.0f)' in drawer_picker
+
+    member_lens = (JAVA / 'app/flexygram/memberlens/MemberLensConfig.java').read_text()
+    assert 'private static volatile Boolean cached;' in member_lens
+
 
 

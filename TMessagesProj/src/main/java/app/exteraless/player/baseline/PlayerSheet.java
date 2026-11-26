@@ -2293,6 +2293,9 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         private Bitmap extension;
         private Bitmap extensionSource;
         private int extensionKey;
+        private int extensionPendingKey;
+        private Bitmap extensionPendingSource;
+        private int extensionGeneration;
         private int extensionFadeRows;
         private LinearGradient shade;
         private int shadeKey;
@@ -2358,31 +2361,73 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             if (below <= 0 || source == null || source.isRecycled() || source.getWidth() <= 0 || source.getHeight() <= 0) {
                 return false;
             }
-            int key = (w * 31 + h) * 31 + below;
-            if (extension != null && source == extensionSource && key == extensionKey) {
+            final int key = (w * 31 + h) * 31 + below;
+            if (extension != null && !extension.isRecycled() && source == extensionSource && key == extensionKey) {
                 return true;
             }
-            Bitmap built = buildExtension(source, w, h, below);
-            if (built == null) {
-                return false;
+            if (extensionPendingSource != source || extensionPendingKey != key) {
+                extensionPendingSource = source;
+                extensionPendingKey = key;
+                final int generation = ++extensionGeneration;
+                // Copy hardware bitmaps on the UI thread (required by Skia) and run the double blur off-thread.
+                Bitmap copy = null;
+                final Bitmap workSrc;
+                if (Build.VERSION.SDK_INT >= 26 && source.getConfig() == Bitmap.Config.HARDWARE) {
+                    try {
+                        copy = source.copy(Bitmap.Config.ARGB_8888, false);
+                    } catch (Throwable ignore) {
+                    }
+                    if (copy == null) {
+                        return extension != null && !extension.isRecycled();
+                    }
+                    workSrc = copy;
+                } else {
+                    workSrc = source;
+                }
+                final Bitmap tempCopy = copy;
+                Utilities.globalQueue.postRunnable(() -> {
+                    final int[] fadeRowsOut = new int[1];
+                    Bitmap built = null;
+                    try {
+                        built = buildExtension(workSrc, w, h, below, fadeRowsOut);
+                    } finally {
+                        if (tempCopy != null && !tempCopy.isRecycled()) {
+                            tempCopy.recycle();
+                        }
+                    }
+                    final Bitmap result = built;
+                    final int rows = fadeRowsOut[0];
+                    AndroidUtilities.runOnUIThread(() -> {
+                        if (detached || generation != extensionGeneration) {
+                            if (result != null && !result.isRecycled()) {
+                                result.recycle();
+                            }
+                            return;
+                        }
+                        extensionPendingSource = null;
+                        if (result != null) {
+                            extension = result;
+                            extensionSource = source;
+                            extensionKey = key;
+                            extensionFadeRows = rows;
+                            invalidate();
+                        }
+                    });
+                });
             }
-            extension = built;
-            extensionSource = source;
-            extensionKey = key;
-            return true;
+            return extension != null && !extension.isRecycled();
         }
 
-        private Bitmap buildExtension(Bitmap source, int w, int h, int below) {
+        private Bitmap buildExtension(Bitmap src, int w, int h, int below, int[] fadeRowsOut) {
             try {
-                Bitmap src = source;
-                if (Build.VERSION.SDK_INT >= 26 && src.getConfig() == Bitmap.Config.HARDWARE) {
-                    src = src.copy(Bitmap.Config.ARGB_8888, false);
-                    if (src == null) {
-                        return null;
-                    }
+                if (src == null || src.isRecycled()) {
+                    return null;
                 }
                 int sw = src.getWidth();
                 int sh = src.getHeight();
+                if (sw <= 0 || sh <= 0) {
+                    return null;
+                }
                 float scale = Math.max(w / (float) sw, h / (float) sh);
                 float visibleW = w / scale;
                 float left = (sw - visibleW) / 2f;
@@ -2410,7 +2455,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
                 mask.setShader(new LinearGradient(0, 0, 0, fadeRows, 0, 0xff000000, Shader.TileMode.CLAMP));
                 mask.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
                 c.drawRect(0, 0, width, fadeRows, mask);
-                extensionFadeRows = fadeRows;
+                fadeRowsOut[0] = fadeRows;
                 return out;
             } catch (Throwable e) {
                 return null;

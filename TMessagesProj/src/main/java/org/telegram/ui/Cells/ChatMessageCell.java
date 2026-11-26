@@ -17429,7 +17429,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if (textLayoutBlocks == null || textLayoutBlocks.isEmpty() || alpha == 0 || currentMessageObject == null) {
             return;
         }
-        if (shouldTranslucentDeleted() && ayuDeleted && caption) {
+        final boolean appliedDeletedCaptionAlpha = shouldTranslucentDeleted() && ayuDeleted && caption;
+        final int prevDeletedCaptionAlpha = appliedDeletedCaptionAlpha ? Theme.chat_msgTextPaint.getAlpha() : 255;
+        if (appliedDeletedCaptionAlpha) {
             Theme.chat_msgTextPaint.setAlpha((int) (255 * 0.75f));
         }
         int firstVisibleBlockNum;
@@ -17781,6 +17783,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             if (restore != Integer.MIN_VALUE) {
                 canvas.restoreToCount(restore);
             }
+        }
+        if (appliedDeletedCaptionAlpha) {
+            Theme.chat_msgTextPaint.setAlpha(prevDeletedCaptionAlpha);
         }
     }
 
@@ -20951,9 +20956,6 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if (currentMessageObject == null) {
             return;
         }
-        if (shouldTranslucentDeleted() && ayuDeleted) {
-            canvas.saveLayerAlpha(null, (int) (255 * 0.75f), Canvas.ALL_SAVE_FLAG);
-        }
         if (!wasLayout) {
             onLayout(false, getLeft(), getTop(), getRight(), getBottom());
         }
@@ -20974,6 +20976,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             return;
         }
 
+        final int translucentRestore = (shouldTranslucentDeleted() && ayuDeleted && getMeasuredWidth() > 0 && getMeasuredHeight() > 0)
+                ? canvas.saveLayerAlpha(0, 0, getMeasuredWidth(), getMeasuredHeight(), (int) (255 * 0.75f), Canvas.ALL_SAVE_FLAG)
+                : -1;
         final int restore = canvas.getSaveCount();
         int restoreToSponosoredAlpha = -1;
         if (sponosoredAlpha != 255) {
@@ -21194,8 +21199,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
         canvas.restoreToCount(restore);
 
-        if (shouldTranslucentDeleted() && ayuDeleted) {
-            canvas.restore();
+        if (translucentRestore != -1) {
+            canvas.restoreToCount(translucentRestore);
         }
     }
 

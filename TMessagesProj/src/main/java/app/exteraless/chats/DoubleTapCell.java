@@ -82,6 +82,10 @@ public class DoubleTapCell extends LinearLayout {
 
     private static final int[] ICON_WIDTH = new int[]{AndroidUtilities.dp(12), AndroidUtilities.dp(12)};
 
+    private final Drawable[] cachedActionDrawables = new Drawable[2];
+    private final int[] cachedActionIconIds = new int[2];
+    private final PorterDuffColorFilter[] cachedIconFilters = new PorterDuffColorFilter[2];
+    private final int[] cachedIconFilterColors = new int[2];
     private final ValueAnimator[] animator = new ValueAnimator[2];
     private final ValueAnimator[] circleAnimator = new ValueAnimator[2];
     private final ValueAnimator[] circleSizeAnimator = new ValueAnimator[2];
@@ -145,20 +149,26 @@ public class DoubleTapCell extends LinearLayout {
                         canvas.drawCircle((i == 0 ? 1 : 3) * getMeasuredWidth() / 4f, getMeasuredHeight() / 4f + AndroidUtilities.dpf2(i == 0 ? 3f : -2f), AndroidUtilities.dp(25 - 6 * j) * circleSizeProgress[i + 2 * j], circleOutlinePaint[j]);
                     }
 
-                    Drawable icon = ContextCompat.getDrawable(context, actionIcon[i]);
+                    Drawable icon = cachedActionDrawables[i];
+                    if (icon == null || cachedActionIconIds[i] != actionIcon[i]) {
+                        Drawable loaded = ContextCompat.getDrawable(context, actionIcon[i]);
+                        icon = loaded != null ? loaded.mutate() : null;
+                        cachedActionDrawables[i] = icon;
+                        cachedActionIconIds[i] = actionIcon[i];
+                        cachedIconFilterColors[i] = 0;
+                    }
                     if (icon == null) continue;
-                    if (i == 0)
-                        icon.setBounds(getMeasuredWidth() / 4 - ICON_WIDTH[i], (int) (getMeasuredHeight() / 4 - ICON_WIDTH[i] + AndroidUtilities.dpf2(3f)), getMeasuredWidth() / 4 + ICON_WIDTH[i], (int) (getMeasuredHeight() / 4 + ICON_WIDTH[i] + AndroidUtilities.dpf2(3f)));
-                    else
-                        icon.setBounds(3 * getMeasuredWidth() / 4 - ICON_WIDTH[i], (int) (getMeasuredHeight() / 4 - ICON_WIDTH[i] - AndroidUtilities.dpf2(2f)), 3 * getMeasuredWidth() / 4 + ICON_WIDTH[i], (int) (getMeasuredHeight() / 4 + ICON_WIDTH[i] - AndroidUtilities.dpf2(2f)));
-
-                    icon.setBounds(
-                            icon.getBounds().left - AndroidUtilities.dp(4 - 4 * iconChangingProgress[i]),
-                            icon.getBounds().top - AndroidUtilities.dp(4 - 4 * iconChangingProgress[i]),
-                            icon.getBounds().right + AndroidUtilities.dp(4 - 4 * iconChangingProgress[i]),
-                            icon.getBounds().bottom + AndroidUtilities.dp(4 - 4 * iconChangingProgress[i])
-                    );
-                    icon.setColorFilter(new PorterDuffColorFilter(ColorUtils.blendARGB(0x00, Theme.getColor(Theme.key_chats_menuItemIcon), iconChangingProgress[i]), PorterDuff.Mode.MULTIPLY));
+                    final int cx = (i == 0 ? 1 : 3) * getMeasuredWidth() / 4;
+                    final int cy = Math.round(getMeasuredHeight() / 4f + AndroidUtilities.dpf2(i == 0 ? 3f : -2f));
+                    final int expand = AndroidUtilities.dp(4 - 4 * iconChangingProgress[i]);
+                    final int half = ICON_WIDTH[i] + expand;
+                    icon.setBounds(cx - half, cy - half, cx + half, cy + half);
+                    final int tintColor = ColorUtils.blendARGB(0x00, Theme.getColor(Theme.key_chats_menuItemIcon), iconChangingProgress[i]);
+                    if (cachedIconFilters[i] == null || cachedIconFilterColors[i] != tintColor) {
+                        cachedIconFilterColors[i] = tintColor;
+                        cachedIconFilters[i] = new PorterDuffColorFilter(tintColor, PorterDuff.Mode.MULTIPLY);
+                    }
+                    icon.setColorFilter(cachedIconFilters[i]);
                     icon.draw(canvas);
                 }
             }

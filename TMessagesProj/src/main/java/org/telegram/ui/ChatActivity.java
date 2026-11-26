@@ -49083,12 +49083,16 @@ public class ChatActivity extends BaseFragment implements
             builder.setMessage(LocaleController.getString(R.string.ClearDeletedAlertMessage));
             builder.setPositiveButton(LocaleController.getString(R.string.Clear), (dialogInterface, i) -> {
                 AyuMessagesController.getInstance().deleteCurrent(dialog_id, mergeDialogId, () -> {
-                    AndroidUtilities.runOnUIThread(() -> {
-                        getNotificationCenter().removeObserver(ChatActivity.this, NotificationCenter.closeChats);
-                        getNotificationCenter().postNotificationName(NotificationCenter.closeChats);
-                        finishFragment();
-                    });
-                    if (!NekoConfig.disableVibration.Bool()) LaunchActivity.getLastFragment().getFragmentView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+                    getNotificationCenter().removeObserver(ChatActivity.this, NotificationCenter.closeChats);
+                    getNotificationCenter().postNotificationName(NotificationCenter.closeChats);
+                    finishFragment();
+                    if (!NekoConfig.disableVibration.Bool()) {
+                        BaseFragment last = LaunchActivity.getLastFragment();
+                        View v = last != null ? last.getFragmentView() : null;
+                        if (v != null) {
+                            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+                        }
+                    }
                 });
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);

@@ -38,6 +38,8 @@ public class StickerShapeCell extends LinearLayout {
         private final TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         private final RectF rect = new RectF();
         private final Paint outlinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Path bubblePath = new android.graphics.Path();
+        private final float[] bubbleRadii = new float[8];
         private float progress;
 
         public StickerShape(Context context, boolean rounded, boolean roundedAsMsg) {
@@ -89,14 +91,14 @@ public class StickerShapeCell extends LinearLayout {
             } else if (isRounded) {
                 canvas.drawRoundRect(rect, AndroidUtilities.dp(6), AndroidUtilities.dp(6), Theme.dialogs_onlineCirclePaint);
             } else {
-                @SuppressLint("DrawAllocation") Rect bounds = new Rect();
-                rect.round(bounds);
-                int rad = AndroidUtilities.dp(SharedConfig.bubbleRadius);
-                @SuppressLint("DrawAllocation") ShapeDrawable drawable = new ShapeDrawable(new RoundRectShape(
-                        new float[]{rad, rad, rad, rad, rad, rad, rad / 3f, rad / 3f}, null, null));
-                drawable.getPaint().setColor(Theme.dialogs_onlineCirclePaint.getColor());
-                drawable.setBounds(bounds);
-                drawable.draw(canvas);
+                float rad = AndroidUtilities.dp(SharedConfig.bubbleRadius);
+                float small = rad / 3f;
+                bubbleRadii[0] = bubbleRadii[1] = bubbleRadii[2] = bubbleRadii[3] = rad;
+                bubbleRadii[4] = bubbleRadii[5] = rad;
+                bubbleRadii[6] = bubbleRadii[7] = small;
+                bubblePath.rewind();
+                bubblePath.addRoundRect(rect, bubbleRadii, android.graphics.Path.Direction.CW);
+                canvas.drawPath(bubblePath, Theme.dialogs_onlineCirclePaint);
             }
         }
 

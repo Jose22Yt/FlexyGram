@@ -413,44 +413,51 @@ public class AyuMessagesController {
     }
 
     public void deleteCurrent(long dialogId, long mergeDialogId, Runnable callback) {
-        List<DeletedMessageFull> messages = deletedMessageDao.getMessagesByDialog(dialogId);
+        Utilities.globalQueue.postRunnable(() -> {
+            List<DeletedMessageFull> messages = deletedMessageDao.getMessagesByDialog(dialogId);
 
-        if (mergeDialogId != 0) {
-            List<DeletedMessageFull> mergeMessages = deletedMessageDao.getMessagesByDialog(mergeDialogId);
-            messages.addAll(mergeMessages);
-        }
-
-        // Delete messages and their edit history from database
-        deletedMessageDao.delete(dialogId);
-        editedMessageDao.delete(dialogId);
-
-        if (mergeDialogId != 0) {
-            deletedMessageDao.delete(mergeDialogId);
-            editedMessageDao.delete(mergeDialogId);
-        }
-
-        // Clean up media files off the caller/UI thread
-        if (messages != null && !messages.isEmpty()) {
-            ArrayList<String> mediaPaths = new ArrayList<>(messages.size());
-            for (int i = 0; i < messages.size(); i++) {
-                DeletedMessageFull msg = messages.get(i);
-                if (msg != null && msg.message != null && !TextUtils.isEmpty(msg.message.mediaPath)) {
-                    mediaPaths.add(msg.message.mediaPath);
+            if (mergeDialogId != 0) {
+                List<DeletedMessageFull> mergeMessages = deletedMessageDao.getMessagesByDialog(mergeDialogId);
+                if (messages == null) {
+                    messages = mergeMessages;
+                } else if (mergeMessages != null) {
+                    messages.addAll(mergeMessages);
                 }
             }
-            deleteAttachmentsAsync(mediaPaths);
-        }
 
-        if (callback != null) {
-            callback.run();
-        }
+            // Delete messages and their edit history from database
+            deletedMessageDao.delete(dialogId);
+            editedMessageDao.delete(dialogId);
+
+            if (mergeDialogId != 0) {
+                deletedMessageDao.delete(mergeDialogId);
+                editedMessageDao.delete(mergeDialogId);
+            }
+
+            // Clean up media files off the caller/UI thread
+            if (messages != null && !messages.isEmpty()) {
+                ArrayList<String> mediaPaths = new ArrayList<>(messages.size());
+                for (int i = 0; i < messages.size(); i++) {
+                    DeletedMessageFull msg = messages.get(i);
+                    if (msg != null && msg.message != null && !TextUtils.isEmpty(msg.message.mediaPath)) {
+                        mediaPaths.add(msg.message.mediaPath);
+                    }
+                }
+                deleteAttachmentsAsync(mediaPaths);
+            }
+
+            if (callback != null) {
+                AndroidUtilities.runOnUIThread(callback);
+            }
+        });
     }
 
     public boolean isAyuDeletedMessageId(long userId, long dialogId, int messageId) {
         if (userId == 0 || dialogId == 0 || messageId == 0) {
             return false;
         }
-        return AyuMessagesController.getInstance().getMessage(userId, dialogId, messageId) != null;
+        List<Integer> existing = deletedMessageDao.getExistingMessageIds(userId, dialogId, java.util.Collections.singletonList(messageId));
+        return existing != null && !existing.isEmpty();
     }
 
     public int getDeletedCount(long userId, long dialogId) {

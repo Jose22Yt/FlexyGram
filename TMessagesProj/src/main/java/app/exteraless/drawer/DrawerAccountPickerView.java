@@ -120,22 +120,12 @@ public class DrawerAccountPickerView extends FrameLayout {
         clipWrapper = new FrameLayout(context) {
             @Override
             protected void dispatchDraw(Canvas canvas) {
+                final int w = getWidth();
+                final int h = getHeight();
+                if (w <= 0 || h <= 0) return;
                 bgPaint.setColor(Theme.getColor(COLOR_KEY_BACKGROUND));
-                bgRect.set(0.0f, 0.0f, getWidth(), getHeight());
+                bgRect.set(0.0f, 0.0f, w, h);
                 canvas.drawRoundRect(bgRect, cornerRadius, cornerRadius, bgPaint);
-
-                final int save = canvas.saveLayer(0.0f, 0.0f, getWidth(), getHeight(), null);
-                super.dispatchDraw(canvas);
-
-                if (topGradient == null || getHeight() != lastHeight) {
-                    lastHeight = getHeight();
-                    topGradient = new LinearGradient(0.0f, 0.0f, 0.0f, AndroidUtilities.dp(16.0f),
-                            new int[]{0xff000000, 0}, null, Shader.TileMode.CLAMP);
-                    topGradientPaint.setShader(topGradient);
-                    bottomGradient = new LinearGradient(0.0f, getHeight(), 0.0f, getHeight() - AndroidUtilities.dp(16.0f),
-                            new int[]{0xff000000, 0}, null, Shader.TileMode.CLAMP);
-                    bottomGradientPaint.setShader(bottomGradient);
-                }
 
                 final int fade = AndroidUtilities.dp(16.0f);
                 final int scrollOffset = recyclerView.computeVerticalScrollOffset();
@@ -143,13 +133,32 @@ public class DrawerAccountPickerView extends FrameLayout {
                         recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - scrollOffset);
                 final float topAlpha = Math.min(1.0f, Math.max(0.0f, scrollOffset / (float) fade));
                 final float bottomAlpha = Math.min(1.0f, scrollLeft / (float) fade);
+                if (topAlpha <= 0.0f && bottomAlpha <= 0.0f) {
+                    super.dispatchDraw(canvas);
+                    return;
+                }
+
+                if (topGradient == null) {
+                    topGradient = new LinearGradient(0.0f, 0.0f, 0.0f, fade,
+                            new int[]{0xff000000, 0}, null, Shader.TileMode.CLAMP);
+                    topGradientPaint.setShader(topGradient);
+                    bottomGradient = new LinearGradient(0.0f, fade, 0.0f, 0.0f,
+                            new int[]{0xff000000, 0}, null, Shader.TileMode.CLAMP);
+                    bottomGradientPaint.setShader(bottomGradient);
+                }
+
+                final int save = canvas.saveLayer(0.0f, 0.0f, w, h, null);
+                super.dispatchDraw(canvas);
                 if (topAlpha > 0.0f) {
                     topGradientPaint.setAlpha((int) (topAlpha * 255.0f));
-                    canvas.drawRect(0.0f, 0.0f, getWidth(), fade, topGradientPaint);
+                    canvas.drawRect(0.0f, 0.0f, w, fade, topGradientPaint);
                 }
                 if (bottomAlpha > 0.0f) {
                     bottomGradientPaint.setAlpha((int) (bottomAlpha * 255.0f));
-                    canvas.drawRect(0.0f, getHeight() - fade, getWidth(), getHeight(), bottomGradientPaint);
+                    canvas.save();
+                    canvas.translate(0.0f, h - fade);
+                    canvas.drawRect(0.0f, 0.0f, w, fade, bottomGradientPaint);
+                    canvas.restore();
                 }
                 canvas.drawRoundRect(bgRect, cornerRadius, cornerRadius, clipMaskPaint);
                 canvas.restoreToCount(save);
