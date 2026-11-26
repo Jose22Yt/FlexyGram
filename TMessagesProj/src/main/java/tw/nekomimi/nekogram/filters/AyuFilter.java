@@ -31,6 +31,7 @@ import tw.nekomimi.nekogram.helpers.MessageHelper;
 import xyz.nextalone.nagram.NaConfig;
 
 public class AyuFilter {
+    private static final Gson GSON = new Gson();
     private static final Object cacheLock = new Object();
     private static final int PER_DIALOG_CACHE_LIMIT = 1000;
     private static final ConcurrentHashMap<Long, LruCache<Integer, Boolean>> filteredCache = new ConcurrentHashMap<>();
@@ -46,7 +47,7 @@ public class AyuFilter {
             synchronized (cacheLock) {
                 if (filterModels == null) {
                     var str = NaConfig.INSTANCE.getRegexFiltersData().String();
-                    FilterModel[] arr = new Gson().fromJson(str, FilterModel[].class);
+                    FilterModel[] arr = GSON.fromJson(str, FilterModel[].class);
                     if (arr != null) {
                         filterModels = new ArrayList<>(Arrays.asList(arr));
                         boolean migrated = false;
@@ -57,7 +58,7 @@ public class AyuFilter {
                             filter.buildPattern();
                         }
                         if (migrated) {
-                            NaConfig.INSTANCE.getRegexFiltersData().setConfigString(new Gson().toJson(filterModels));
+                            NaConfig.INSTANCE.getRegexFiltersData().setConfigString(GSON.toJson(filterModels));
                         }
                     } else {
                         filterModels = new ArrayList<>();
@@ -92,7 +93,7 @@ public class AyuFilter {
     }
 
     public static void saveFilter(ArrayList<FilterModel> filterModels1) {
-        var str = new Gson().toJson(filterModels1);
+        var str = GSON.toJson(filterModels1);
         NaConfig.INSTANCE.getRegexFiltersData().setConfigString(str);
         AyuFilter.rebuildCache();
     }
@@ -313,7 +314,7 @@ public class AyuFilter {
                 if (chatFilterEntries == null) {
                     var str = NaConfig.INSTANCE.getRegexChatFiltersData().String();
                     try {
-                        ChatFilterEntry[] arr = new Gson().fromJson(str, ChatFilterEntry[].class);
+                        ChatFilterEntry[] arr = GSON.fromJson(str, ChatFilterEntry[].class);
                         if (arr != null) {
                             chatFilterEntries = new ArrayList<>(Arrays.asList(arr));
                             boolean migrated = false;
@@ -327,7 +328,7 @@ public class AyuFilter {
                                 }
                             }
                             if (migrated) {
-                                var json = new Gson().toJson(chatFilterEntries);
+                                var json = GSON.toJson(chatFilterEntries);
                                 NaConfig.INSTANCE.getRegexChatFiltersData().setConfigString(json);
                             }
                         } else {
@@ -343,7 +344,7 @@ public class AyuFilter {
     }
 
     public static void saveChatFilterEntries(ArrayList<ChatFilterEntry> entries) {
-        var str = new Gson().toJson(entries);
+        var str = GSON.toJson(entries);
         NaConfig.INSTANCE.getRegexChatFiltersData().setConfigString(str);
         AyuFilter.rebuildCache();
     }
@@ -425,7 +426,7 @@ public class AyuFilter {
                 if (excludedDialogs == null) {
                     try {
                         String str = NaConfig.INSTANCE.getRegexFiltersExcludedDialogs().String();
-                        Long[] arr = new Gson().fromJson(str, Long[].class);
+                        Long[] arr = GSON.fromJson(str, Long[].class);
                         excludedDialogs = new HashSet<>();
                         if (arr != null) {
                             excludedDialogs.addAll(Arrays.asList(arr));
@@ -453,7 +454,7 @@ public class AyuFilter {
         }
         if (changed) {
             Long[] arr = set.toArray(new Long[0]);
-            String str = new Gson().toJson(arr);
+            String str = GSON.toJson(arr);
             NaConfig.INSTANCE.getRegexFiltersExcludedDialogs().setConfigString(str);
             synchronized (cacheLock) {
                 excludedDialogs = set;
@@ -480,7 +481,7 @@ public class AyuFilter {
                 if (blockedChannels == null) {
                     try {
                         String str = NaConfig.INSTANCE.getBlockedChannelsData().String();
-                        Long[] arr = new Gson().fromJson(str, Long[].class);
+                        Long[] arr = GSON.fromJson(str, Long[].class);
                         blockedChannels = new HashSet<>();
                         if (arr != null) {
                             blockedChannels.addAll(Arrays.asList(arr));
@@ -504,7 +505,7 @@ public class AyuFilter {
             }
         }
         Collections.sort(sorted);
-        String str = new Gson().toJson(sorted.toArray(new Long[0]));
+        String str = GSON.toJson(sorted.toArray(new Long[0]));
         NaConfig.INSTANCE.getBlockedChannelsData().setConfigString(str);
         synchronized (cacheLock) {
             blockedChannels = new HashSet<>(sorted);
@@ -609,7 +610,7 @@ public class AyuFilter {
             HashMap<Long, CustomFilteredUser> data = new HashMap<>();
             try {
                 String str = NaConfig.INSTANCE.getCustomFilteredUsersData().String();
-                CustomFilteredUser[] arr = new Gson().fromJson(str, CustomFilteredUser[].class);
+                CustomFilteredUser[] arr = GSON.fromJson(str, CustomFilteredUser[].class);
                 if (arr != null) {
                     for (CustomFilteredUser item : arr) {
                         if (item != null && item.id > 0L) {
@@ -652,7 +653,7 @@ public class AyuFilter {
             out.add(user);
             resultMap.put(user.id, user);
         }
-        String str = new Gson().toJson(out.toArray(new CustomFilteredUser[0]));
+        String str = GSON.toJson(out.toArray(new CustomFilteredUser[0]));
         NaConfig.INSTANCE.getCustomFilteredUsersData().setConfigString(str);
         synchronized (cacheLock) {
             customFilteredUsers = new HashSet<>(resultMap.keySet());

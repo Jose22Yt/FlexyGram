@@ -19,6 +19,8 @@ import java.util.List;
 
 public class VerticalImageSpan extends ImageSpan {
 
+    private final Paint.FontMetricsInt tmpFontMetrics = new Paint.FontMetricsInt();
+
     public VerticalImageSpan(Drawable drawable) {
         super(drawable);
     }
@@ -34,10 +36,11 @@ public class VerticalImageSpan extends ImageSpan {
         if (positions.isEmpty()) {
             return builder;
         }
-        Drawable drawable = context.getDrawable(resId);
-        if (drawable == null) {
+        Drawable loaded = context.getDrawable(resId);
+        if (loaded == null) {
             return builder;
         }
+        Drawable drawable = loaded.mutate();
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         drawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(colorKey, resourcesProvider), PorterDuff.Mode.MULTIPLY));
         for (int position : positions) {
@@ -50,8 +53,8 @@ public class VerticalImageSpan extends ImageSpan {
     public void draw(Canvas canvas, CharSequence text, int start, int end, float x, int top, int y, int bottom, Paint paint) {
         Drawable drawable = getDrawable();
         canvas.save();
-        Paint.FontMetricsInt fontMetrics = paint.getFontMetricsInt();
-        int center = fontMetrics.descent - (fontMetrics.descent - fontMetrics.ascent) / 2;
+        paint.getFontMetricsInt(tmpFontMetrics);
+        int center = tmpFontMetrics.descent - (tmpFontMetrics.descent - tmpFontMetrics.ascent) / 2;
         int half = (drawable.getBounds().bottom - drawable.getBounds().top) / 2;
         canvas.translate(x, y + center - half);
         if (LocaleController.isRTL) {
@@ -65,8 +68,8 @@ public class VerticalImageSpan extends ImageSpan {
     public int getSize(Paint paint, CharSequence text, int start, int end, Paint.FontMetricsInt fontMetricsInt) {
         Rect bounds = getDrawable().getBounds();
         if (fontMetricsInt != null) {
-            Paint.FontMetricsInt fontMetrics = paint.getFontMetricsInt();
-            int center = fontMetrics.ascent + (fontMetrics.descent - fontMetrics.ascent) / 2;
+            paint.getFontMetricsInt(tmpFontMetrics);
+            int center = tmpFontMetrics.ascent + (tmpFontMetrics.descent - tmpFontMetrics.ascent) / 2;
             int half = (bounds.bottom - bounds.top) / 2;
             fontMetricsInt.ascent = center - half;
             fontMetricsInt.top = center - half;

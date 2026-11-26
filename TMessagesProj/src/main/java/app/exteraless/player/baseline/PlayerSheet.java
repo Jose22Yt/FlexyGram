@@ -1377,17 +1377,28 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         }
     }
 
+    private int lastTimeNow = Integer.MIN_VALUE;
+    private int lastTimeDuration = Integer.MIN_VALUE;
+    private boolean lastTimeRemaining;
+
     private void updateTimes() {
         MessageObject mo = current;
         if (mo == null) {
             return;
         }
-        int duration = (int) Math.round(mo.getDuration());
-        int now = seeking ? (int) (duration * seekProgress) : Math.min(duration, mo.audioProgressSec);
+        int duration = Math.max(0, (int) Math.round(mo.getDuration()));
+        int now = seeking ? Math.max(0, (int) (duration * seekProgress)) : Math.max(0, Math.min(duration, mo.audioProgressSec));
+        boolean showRemaining = PlayerStyle.showRemaining();
+        if (now == lastTimeNow && duration == lastTimeDuration && showRemaining == lastTimeRemaining) {
+            return;
+        }
+        lastTimeNow = now;
+        lastTimeDuration = duration;
+        lastTimeRemaining = showRemaining;
         String a = formatTime(now);
-        String b = PlayerStyle.showRemaining()
+        String b = showRemaining
                 ? "−" + formatTime(Math.max(0, duration - now))
-                : formatTime(Math.max(0, duration));
+                : formatTime(duration);
         if (!TextUtils.equals(timeNow.getText(), a)) {
             timeNow.setText(a);
             bubble.setText(a);
@@ -1398,10 +1409,19 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     }
 
     private static String formatTime(int seconds) {
-        if (seconds >= 3600) {
-            return String.format(Locale.US, "%d:%02d:%02d", seconds / 3600, seconds / 60 % 60, seconds % 60);
+        if (seconds < 0) seconds = 0;
+        StringBuilder sb = new StringBuilder(8);
+        int hours = seconds / 3600;
+        int minutes = (seconds / 60) % 60;
+        int secs = seconds % 60;
+        if (hours > 0) {
+            sb.append(hours).append(':');
+            if (minutes < 10) sb.append('0');
         }
-        return String.format(Locale.US, "%d:%02d", seconds / 60, seconds % 60);
+        sb.append(minutes).append(':');
+        if (secs < 10) sb.append('0');
+        sb.append(secs);
+        return sb.toString();
     }
 
     private void layoutBubble() {

@@ -766,10 +766,11 @@ public class FilterTabsView extends FrameLayout {
                 if (lockDrawable == null) {
                     lockDrawable = ContextCompat.getDrawable(getContext(), R.drawable.other_lockedfolders);
                 }
+                final float step = Math.min(32f, AndroidUtilities.screenRefreshTime) / 150f;
                 if (currentTab.isLocked && progressToLocked != 1f) {
-                    progressToLocked += 16 / 150f;
+                    progressToLocked += step;
                 } else if (!currentTab.isLocked){
-                    progressToLocked -= 16 / 150f;
+                    progressToLocked -= step;
                 }
                 progressToLocked = Utilities.clamp(progressToLocked, 1f, 0);
                 int unactiveColor = Theme.getColor(unactiveTextColorKey, resourcesProvider);

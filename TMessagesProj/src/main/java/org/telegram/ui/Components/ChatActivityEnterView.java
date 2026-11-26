@@ -534,6 +534,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         private final Paint gradientPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Drawable closeDrawable;
         private boolean isPremiumMode = false;
+        private int lastGradientWidth = -1;
 
         public SlowModeBtn(@NonNull Context context) {
             super(context);
@@ -550,7 +551,11 @@ public class ChatActivityEnterView extends FrameLayout implements
         @Override
         protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
             super.onLayout(changed, left, top, right, bottom);
-            gradientPaint.setShader(new LinearGradient(0, 0, getMeasuredWidth(), 0, new int[]{0xff7593ff, 0xffa472ff}, new float[]{0f, 1f}, Shader.TileMode.CLAMP));
+            final int w = getMeasuredWidth();
+            if (w > 0 && w != lastGradientWidth) {
+                lastGradientWidth = w;
+                gradientPaint.setShader(new LinearGradient(0, 0, w, 0, new int[]{0xff7593ff, 0xffa472ff}, new float[]{0f, 1f}, Shader.TileMode.CLAMP));
+            }
         }
 
         public void setTextSize(int size) {
