@@ -411,5 +411,20 @@ def test_hidden_bottlenecks_and_canvas_or_db_leaks_fixed():
     member_lens = (JAVA / 'app/flexygram/memberlens/MemberLensConfig.java').read_text()
     assert 'private static volatile Boolean cached;' in member_lens
 
+    fade = (JAVA / 'org/telegram/ui/Components/blur3/BlurredBackgroundWithFadeDrawable.java').read_text()
+    assert 'matrixTmp.setScale(1f, height);' in method(fade, 'private void drawOverrideFade(')
+
+    cam = (JAVA / 'app/exteraless/camera/CameraZoomSliderView.java').read_text()
+    assert 'if (edgeFadeShader == null' in cam
+    assert 'paint.getFontMetricsInt(tmpFontMetrics);' in cam
+
+    persian = (JAVA / 'tw/nekomimi/nekogram/shamsicalendar/PersianDate.java').read_text()
+    assert 'Calendar.getInstance()' in method(persian, 'private void changeTime()')
+    assert 'new SimpleDateFormat' not in method(persian, 'private void changeTime()')
+
+    typeface = (JAVA / 'tw/nekomimi/nekogram/helpers/TypefaceHelper.java').read_text()
+    assert 'synchronized (PAINT)' in method(typeface, 'private static boolean testTypeface(')
+
+
 
 

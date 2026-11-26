@@ -137,17 +137,16 @@ public class BlurredBackgroundWithFadeDrawable extends Drawable {
     private void drawOverrideFade(Canvas canvas, Rect bounds) {
         final int height = Math.max(1, bounds.height());
         final boolean dark = Theme.isCurrentThemeDark();
-        if (lastOverrideDark != dark || lastOverrideFadeColor != overrideFadeColor || lastOverrideFadeHeight != height || overrideFadeShader == null) {
+        if (lastOverrideDark != dark || lastOverrideFadeColor != overrideFadeColor || overrideFadeShader == null) {
             lastOverrideDark = dark;
             lastOverrideFadeColor = overrideFadeColor;
-            lastOverrideFadeHeight = height;
-            overrideFadeShader = createOverrideFadeGradient(overrideFadeColor, height, 1.0f, dark);
-            overrideMaskShader = createOverrideFadeGradient(Color.BLACK, height, 0.75f, dark);
+            overrideFadeShader = createOverrideFadeGradient(overrideFadeColor, 1, 1.0f, dark);
+            overrideMaskShader = createOverrideFadeGradient(Color.BLACK, 1, 0.75f, dark);
             overrideComposeShader = null;
             overrideFadePaint.setShader(overrideFadeShader);
         }
 
-        matrixTmp.reset();
+        matrixTmp.setScale(1f, height);
         matrixTmp.postTranslate(bounds.left, bounds.top);
 
         final BlurredBackgroundSource source = drawable.getUnwrappedSource();

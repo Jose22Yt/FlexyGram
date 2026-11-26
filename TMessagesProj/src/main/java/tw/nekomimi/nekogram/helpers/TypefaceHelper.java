@@ -277,21 +277,24 @@ public class TypefaceHelper {
     }
 
     private static boolean testTypeface(Typeface typeface) {
-        Canvas canvas = new Canvas();
+        final Canvas canvas = new Canvas();
+        final Bitmap bitmap1 = Bitmap.createBitmap(CANVAS_SIZE * 2, CANVAS_SIZE, Bitmap.Config.ARGB_8888);
+        final Bitmap bitmap2 = Bitmap.createBitmap(CANVAS_SIZE * 2, CANVAS_SIZE, Bitmap.Config.ARGB_8888);
+        try {
+            synchronized (PAINT) {
+                canvas.setBitmap(bitmap1);
+                PAINT.setTypeface(null);
+                canvas.drawText(TEST_TEXT, 0, CANVAS_SIZE, PAINT);
 
-        Bitmap bitmap1 = Bitmap.createBitmap(CANVAS_SIZE * 2, CANVAS_SIZE, Bitmap.Config.ARGB_8888);
-        canvas.setBitmap(bitmap1);
-        PAINT.setTypeface(null);
-        canvas.drawText(TEST_TEXT, 0, CANVAS_SIZE, PAINT);
-
-        Bitmap bitmap2 = Bitmap.createBitmap(CANVAS_SIZE * 2, CANVAS_SIZE, Bitmap.Config.ARGB_8888);
-        canvas.setBitmap(bitmap2);
-        PAINT.setTypeface(typeface);
-        canvas.drawText(TEST_TEXT, 0, CANVAS_SIZE, PAINT);
-
-        boolean supported = !bitmap1.sameAs(bitmap2);
-        AndroidUtilities.recycleBitmaps(List.of(bitmap1, bitmap2));
-        return supported;
+                canvas.setBitmap(bitmap2);
+                PAINT.setTypeface(typeface);
+                canvas.drawText(TEST_TEXT, 0, CANVAS_SIZE, PAINT);
+                PAINT.setTypeface(null);
+            }
+            return !bitmap1.sameAs(bitmap2);
+        } finally {
+            AndroidUtilities.recycleBitmaps(List.of(bitmap1, bitmap2));
+        }
     }
 
     public static Typeface createTypeface(int weight, boolean italic) {

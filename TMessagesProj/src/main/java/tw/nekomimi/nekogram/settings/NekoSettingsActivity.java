@@ -480,22 +480,33 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
                 File cacheDir = AndroidUtilities.getCacheDir();
                 String tempFile = UUID.randomUUID().toString().replace("-", "") + ".nekox-settings.json";
                 File file = new File(cacheDir.getPath(), tempFile);
-                try {
-                    final InputStream inputStream = ApplicationLoader.applicationContext.getContentResolver().openInputStream(uri);
-                    if (inputStream != null) {
-                        OutputStream outputStream = new FileOutputStream(file);
-                        final byte[] buffer = new byte[4 * 1024];
-                        int read;
-                        while ((read = inputStream.read(buffer)) != -1) {
-                            outputStream.write(buffer, 0, read);
+                final File targetFile = file;
+                org.telegram.messenger.Utilities.globalQueue.postRunnable(() -> {
+                    boolean copied = false;
+                    try (InputStream inputStream = ApplicationLoader.applicationContext.getContentResolver().openInputStream(uri)) {
+                        if (inputStream != null) {
+                            try (OutputStream outputStream = new FileOutputStream(targetFile)) {
+                                final byte[] buffer = new byte[8 * 1024];
+                                int read;
+                                while ((read = inputStream.read(buffer)) != -1) {
+                                    outputStream.write(buffer, 0, read);
+                                }
+                                outputStream.flush();
+                                copied = true;
+                            }
                         }
-                        inputStream.close();
-                        outputStream.flush();
-                        outputStream.close();
-                        SettingsBackupHelper.importSettings(getParentActivity(), file);
+                    } catch (Exception ignore) {
                     }
-                } catch (Exception ignore) {
-                }
+                    if (!copied) {
+                        targetFile.delete();
+                        return;
+                    }
+                    AndroidUtilities.runOnUIThread(() -> {
+                        if (getParentActivity() != null) {
+                            SettingsBackupHelper.importSettings(getParentActivity(), targetFile);
+                        }
+                    });
+                });
             }
             super.onActivityResultFragment(requestCode, resultCode, data);
         }

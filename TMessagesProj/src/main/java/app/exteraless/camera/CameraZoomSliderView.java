@@ -159,6 +159,10 @@ public abstract class CameraZoomSliderView extends View {
     private final RectF rulerTouchBounds = new RectF();
     private final RectF selectorBounds = new RectF();
     private final RectF bubbleBounds = new RectF();
+    private final Paint.FontMetricsInt tmpFontMetrics = new Paint.FontMetricsInt();
+    private LinearGradient edgeFadeShader;
+    private float edgeFadeLeft = Float.NaN;
+    private float edgeFadeRight = Float.NaN;
 
     private final SparseArray<String> primaryLabels = new SparseArray<>();
     private final int touchSlop;
@@ -573,22 +577,28 @@ public abstract class CameraZoomSliderView extends View {
             && drawPillBackground(canvas, controlBounds, AndroidUtilities.dp(24f));
         final float compactAlpha = clamp(1f - expandedProgress, 0f, 1f);
         final float expandedAlpha = clamp(expandedProgress, 0f, 1f);
-        final int layer = canvas.saveLayer(0f, 0f, getWidth(), getHeight(), null);
-        if (compactAlpha > 0.001f) {
-            final int save = canvas.saveLayerAlpha(0f, 0f, getWidth(), getHeight(), Math.round(compactAlpha * 255f));
+        final int layer = !pillDrawn ? canvas.saveLayer(controlBounds, null) : -1;
+        if (compactAlpha > 0.001f && !compactBounds.isEmpty()) {
+            // drawToggleRow relies on XOR/DST_OVER compositing inside compactBounds.
+            final int save = canvas.saveLayerAlpha(compactBounds, Math.round(compactAlpha * 255f));
             drawToggleRow(canvas, 1f);
             canvas.restoreToCount(save);
         }
         if (expandedAlpha > 0.001f) {
-            final int save = canvas.saveLayerAlpha(0f, 0f, getWidth(), getHeight(), Math.round(expandedAlpha * 255f));
-            drawBubble(canvas, 1f);
-            drawRuler(canvas, 1f);
-            canvas.restoreToCount(save);
+            if (expandedAlpha < 0.999f) {
+                final int save = canvas.saveLayerAlpha(0f, 0f, getWidth(), getHeight(), Math.round(expandedAlpha * 255f));
+                drawBubble(canvas, 1f);
+                drawRuler(canvas, 1f);
+                canvas.restoreToCount(save);
+            } else {
+                drawBubble(canvas, 1f);
+                drawRuler(canvas, 1f);
+            }
         }
         if (!pillDrawn) {
             drawProtectionBackground(canvas);
+            canvas.restoreToCount(layer);
         }
-        canvas.restoreToCount(layer);
     }
 
     private void drawProtectionBackground(Canvas canvas) {
@@ -627,9 +637,9 @@ public abstract class CameraZoomSliderView extends View {
             final Paint paint = i == selectedToggleIndex ? selectedToggleTextPaint : toggleTextPaint;
             paint.setColor(Theme.multAlpha(color, alpha));
             final float cx = compactBounds.left + (i + 0.5f) * AndroidUtilities.dp(TOGGLE_SIZE_DP);
-            final Paint.FontMetricsInt metrics = paint.getFontMetricsInt();
-            final int textHeight = metrics.descent - metrics.ascent;
-            final float baseline = compactBounds.top + (int) ((compactBounds.height() - textHeight) / 2f) - metrics.ascent;
+            paint.getFontMetricsInt(tmpFontMetrics);
+            final int textHeight = tmpFontMetrics.descent - tmpFontMetrics.ascent;
+            final float baseline = compactBounds.top + (int) ((compactBounds.height() - textHeight) / 2f) - tmpFontMetrics.ascent;
             canvas.drawText(getToggleLabel(i), cx, baseline, paint);
         }
     }
@@ -648,9 +658,9 @@ public abstract class CameraZoomSliderView extends View {
         final float halfTicks = (rulerBounds.width() / 2f) / tickSpacing;
         int from = Math.max(0, (int) Math.floor(currentTick - halfTicks) - 1);
         final int to = Math.min(intervalCount, (int) Math.ceil(currentTick + halfTicks) + 1);
-        final Paint.FontMetricsInt metrics = rulerLabelPaint.getFontMetricsInt();
+        rulerLabelPaint.getFontMetricsInt(tmpFontMetrics);
         final float labelBaseline = controlBounds.bottom - AndroidUtilities.dp(4f)
-            - (metrics.descent - metrics.ascent) - metrics.ascent;
+            - (tmpFontMetrics.descent - tmpFontMetrics.ascent) - tmpFontMetrics.ascent;
 
         for (; from <= to; from++) {
             final float x = centerX + (from - currentTick) * tickSpacing;
@@ -669,9 +679,14 @@ public abstract class CameraZoomSliderView extends View {
         markerPaint.setStrokeWidth(AndroidUtilities.dp(4f));
         canvas.drawLine(centerX, markerBottom - AndroidUtilities.dp(12f), centerX, markerBottom, markerPaint);
 
-        edgeFadePaint.setShader(new LinearGradient(rulerBounds.left, 0f, rulerBounds.right, 0f,
-            new int[]{0x33000000, 0xff000000, 0xff000000, 0x33000000},
-            new float[]{0f, 1f / 3f, 2f / 3f, 1f}, Shader.TileMode.CLAMP));
+        if (edgeFadeShader == null || edgeFadeLeft != rulerBounds.left || edgeFadeRight != rulerBounds.right) {
+            edgeFadeLeft = rulerBounds.left;
+            edgeFadeRight = rulerBounds.right;
+            edgeFadeShader = new LinearGradient(edgeFadeLeft, 0f, edgeFadeRight, 0f,
+                new int[]{0x33000000, 0xff000000, 0xff000000, 0x33000000},
+                new float[]{0f, 1f / 3f, 2f / 3f, 1f}, Shader.TileMode.CLAMP);
+        }
+        edgeFadePaint.setShader(edgeFadeShader);
         edgeFadePaint.setXfermode(DST_IN_XFERMODE);
         canvas.drawRect(rulerBounds.left, controlBounds.top, rulerBounds.right, controlBounds.bottom, edgeFadePaint);
         edgeFadePaint.setShader(null);
@@ -684,7 +699,7 @@ public abstract class CameraZoomSliderView extends View {
         if (text.isEmpty()) {
             return;
         }
-        final Paint.FontMetricsInt metrics = bubbleTextPaint.getFontMetricsInt();
+        bubbleTextPaint.getFontMetricsInt(tmpFontMetrics);
         final float width = Math.max(AndroidUtilities.dp(40f), (float) Math.ceil(bubbleTextPaint.measureText(text)))
             + AndroidUtilities.dp(4f) * 2f;
         final float height = getBubbleHeight();
@@ -699,11 +714,16 @@ public abstract class CameraZoomSliderView extends View {
         }
         bubblePaint.setColor(secondaryFixedColor);
         bubbleTextPaint.setColor(onSecondaryFixedColor);
-        final float baseline = bubbleBounds.top + AndroidUtilities.dp(6f) - metrics.ascent;
-        final int save = canvas.saveLayerAlpha(0f, 0f, getWidth(), getHeight(), Math.round(bubbleAlpha * 255f));
-        canvas.drawRoundRect(bubbleBounds, halfHeight, halfHeight, bubblePaint);
-        canvas.drawText(text, bubbleBounds.centerX(), baseline, bubbleTextPaint);
-        canvas.restoreToCount(save);
+        final float baseline = bubbleBounds.top + AndroidUtilities.dp(6f) - tmpFontMetrics.ascent;
+        if (bubbleAlpha < 0.999f) {
+            final int save = canvas.saveLayerAlpha(bubbleBounds, Math.round(bubbleAlpha * 255f));
+            canvas.drawRoundRect(bubbleBounds, halfHeight, halfHeight, bubblePaint);
+            canvas.drawText(text, bubbleBounds.centerX(), baseline, bubbleTextPaint);
+            canvas.restoreToCount(save);
+        } else {
+            canvas.drawRoundRect(bubbleBounds, halfHeight, halfHeight, bubblePaint);
+            canvas.drawText(text, bubbleBounds.centerX(), baseline, bubbleTextPaint);
+        }
     }
 
     @Override

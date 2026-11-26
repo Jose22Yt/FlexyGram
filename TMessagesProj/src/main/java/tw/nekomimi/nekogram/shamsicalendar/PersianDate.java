@@ -693,12 +693,16 @@ public class PersianDate {
      * initialize with time in millisecond
      */
     private void changeTime() {
-        this.initGrgDate(Integer.parseInt(new SimpleDateFormat("yyyy").format(this.timeInMilliSecond)),
-                Integer.parseInt(new SimpleDateFormat("MM").format(this.timeInMilliSecond)),
-                Integer.parseInt(new SimpleDateFormat("dd").format(this.timeInMilliSecond)),
-                Integer.parseInt(new SimpleDateFormat("HH").format(this.timeInMilliSecond)),
-                Integer.parseInt(new SimpleDateFormat("mm").format(this.timeInMilliSecond)),
-                Integer.parseInt(new SimpleDateFormat("ss").format(this.timeInMilliSecond)));
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(this.timeInMilliSecond);
+        this.initGrgDate(
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH) + 1,
+                cal.get(Calendar.DAY_OF_MONTH),
+                cal.get(Calendar.HOUR_OF_DAY),
+                cal.get(Calendar.MINUTE),
+                cal.get(Calendar.SECOND)
+        );
     }
 
     /**
