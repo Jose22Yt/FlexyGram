@@ -888,6 +888,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         private VelocityTracker velocityTracker;
         private boolean globalIgnoreLayout;
         private int[] pos = new int[2];
+        private final app.flexygram.performance.ScrollFrameRateHint tabSwipeFrameRateHint =
+                new app.flexygram.performance.ScrollFrameRateHint(this);
 
         private boolean prepareForMoving(MotionEvent ev, boolean forward) {
             int id = filterTabsView.getNextPageId(forward);
@@ -897,6 +899,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             getParent().requestDisallowInterceptTouchEvent(true);
             maybeStartTracking = false;
             startedTracking = true;
+            tabSwipeFrameRateHint.setScrolling(true);
             startedTrackingX = (int) (ev.getX() + additionalOffset);
             actionBar.setEnabled(false);
             filterTabsView.setEnabled(false);
@@ -940,6 +943,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         tabsAnimation = null;
                     }
                     tabsAnimationInProgress = false;
+                    tabSwipeFrameRateHint.setScrolling(false);
                 }
                 return tabsAnimationInProgress;
             }
@@ -1652,6 +1656,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 viewPages[1].setVisibility(View.GONE);
                                 showScrollbars(true);
                                 tabsAnimationInProgress = false;
+                                tabSwipeFrameRateHint.setScrolling(false);
                                 maybeStartTracking = false;
                                 actionBar.setEnabled(true);
                                 filterTabsView.setEnabled(true);
@@ -1663,6 +1668,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         startedTracking = false;
                     } else {
                         maybeStartTracking = false;
+                        tabSwipeFrameRateHint.setScrolling(false);
                         actionBar.setEnabled(true);
                         filterTabsView.setEnabled(true);
                     }
@@ -1717,6 +1723,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         @Override
         protected void onDetachedFromWindow() {
+            tabSwipeFrameRateHint.setScrolling(false);
             super.onDetachedFromWindow();
             if (statusDrawable != null) {
                 statusDrawable.detach();

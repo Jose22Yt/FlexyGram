@@ -506,6 +506,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         app.flexygram.performance.StartupSplash.install(this);
         ApplicationLoader.postInitApplication(true);
         AndroidUtilities.checkDisplaySize(this, getResources().getConfiguration());
+        AndroidUtilities.setPreferredMaxRefreshRate(getWindow());
         currentAccount = UserConfig.selectedAccount;
         final IntentFilter powerFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         powerFilter.addAction(android.os.PowerManager.ACTION_POWER_SAVE_MODE_CHANGED);
@@ -1497,7 +1498,11 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (!hasFocus) hideFlexyInAppAlert();
+        if (hasFocus) {
+            AndroidUtilities.setPreferredMaxRefreshRate(getWindow());
+        } else {
+            hideFlexyInAppAlert();
+        }
     }
 
     private void checkCurrentAccount() {
@@ -7395,6 +7400,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         ConnectionsManager cm = ConnectionsManager.getInstance(currentAccount);
         cm.setAppPaused(false, false);
         MediaController.onPlaybackUiVisibilityChanged();
+        AndroidUtilities.setPreferredMaxRefreshRate(getWindow());
         refreshRateMonitor.start();
         if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) {
             frameDiagnostics = app.flexygram.performance.FrameDiagnostics.resume(this, frameDiagnostics);

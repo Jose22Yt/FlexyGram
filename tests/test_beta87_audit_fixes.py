@@ -240,3 +240,153 @@ def test_network_and_update_hot_paths_use_static_plugin_hook_gates():
     assert 'PluginsController.hasActiveUpdateHooks()' in mc
     assert 'PluginsController.hasActiveSendMessageHooks()' in smh
 
+
+def test_ghost_mode_toggle_sends_correct_status_and_applies_presets(tmp_path):
+    src = (JAVA / 'tw/nekomimi/nekogram/NekoConfig.java').read_text()
+    methods = '\n'.join(method(src, sig) for sig in [
+        'public static boolean isGhostModeActive()',
+        'public static void setGhostMode(boolean enabled)',
+        'public static void toggleGhostMode()',
+        'public static void applyGhostPreset(int preset)',
+    ])
+    probe(tmp_path, {
+        'Probe.java': '''import java.util.*;
+public class Probe {
+    static class Pair<A, B> { final A first; final B second; Pair(A a, B b) { first = a; second = b; } }
+    static class ConfigItem {
+        boolean b; int i;
+        ConfigItem(boolean v) { b = v; }
+        ConfigItem(int v) { i = v; }
+        boolean Bool() { return b; }
+        int Int() { return i; }
+        void setConfigBool(boolean v) { b = v; }
+        void setConfigInt(int v) { i = v; }
+    }
+    static final List<Boolean> statusCalls = new ArrayList<>();
+    static class AyuGhostUtils {
+        static void performStatusRequest(Boolean offline) { statusCalls.add(offline); }
+    }
+    public static ConfigItem sendReadMessagePackets = new ConfigItem(true);
+    public static ConfigItem sendReadStoriesPackets = new ConfigItem(true);
+    public static ConfigItem sendOnlinePackets = new ConfigItem(true);
+    public static ConfigItem sendUploadProgress = new ConfigItem(true);
+    public static ConfigItem sendOfflinePacketAfterOnline = new ConfigItem(false);
+    public static ConfigItem ghostBlockReactionOnline = new ConfigItem(false);
+    public static ConfigItem ghostBlockMentionsRead = new ConfigItem(false);
+    public static ConfigItem markReadAfterSend = new ConfigItem(false);
+    static ConfigItem unlocked = new ConfigItem(false);
+    private static final List<Pair<ConfigItem, ConfigItem>> ghostToggleItems = Arrays.asList(
+        new Pair<>(sendReadMessagePackets, unlocked),
+        new Pair<>(sendReadStoriesPackets, unlocked),
+        new Pair<>(sendOnlinePackets, unlocked),
+        new Pair<>(sendUploadProgress, unlocked),
+        new Pair<>(sendOfflinePacketAfterOnline, unlocked)
+    );
+    METHODS
+    static void check(boolean ok, String msg) { if (!ok) throw new AssertionError(msg); }
+    public static void main(String[] args) {
+        check(!isGhostModeActive(), "starts inactive");
+        toggleGhostMode();
+        check(isGhostModeActive(), "now active");
+        check(statusCalls.size() == 1 && Boolean.TRUE.equals(statusCalls.get(0)),
+              "enabling ghost mode must send offline=true, got " + statusCalls);
+        toggleGhostMode();
+        check(!isGhostModeActive(), "now inactive again");
+        check(statusCalls.size() == 2 && Boolean.FALSE.equals(statusCalls.get(1)),
+              "disabling ghost mode must send offline=false, got " + statusCalls);
+        applyGhostPreset(0);
+        check(isGhostModeActive() && ghostBlockReactionOnline.Bool() && ghostBlockMentionsRead.Bool() && !markReadAfterSend.Bool(), "preset 0");
+        applyGhostPreset(1);
+        check(isGhostModeActive() && markReadAfterSend.Bool() && ghostBlockReactionOnline.Bool(), "preset 1");
+        applyGhostPreset(2);
+        check(!sendReadStoriesPackets.Bool() && sendReadMessagePackets.Bool() && sendOnlinePackets.Bool(), "preset 2");
+    }
+}'''.replace('METHODS', methods)
+    })
+
+
+def test_preferred_refresh_rate_selects_matching_mode_and_skips_redundant_updates(tmp_path):
+    src = (JAVA / 'org/telegram/messenger/AndroidUtilities.java').read_text()
+    methods = '\n'.join(method(src, sig) for sig in [
+        'private static int findPreferredDisplayModeId(Window window, float targetRate)',
+        'public static void setPreferredMaxRefreshRate(Window window, float rate)',
+    ])
+    probe(tmp_path, {
+        'Probe.java': '''public class Probe {
+    static class Build { static class VERSION { static int SDK_INT = 35; } static class VERSION_CODES { static final int M = 23, R = 30; } }
+    static class FileLog { static void e(Throwable t) { throw new RuntimeException(t); } }
+    static class Display {
+        static class Mode {
+            final int id, w, h; final float rr;
+            Mode(int id, int w, int h, float rr) { this.id = id; this.w = w; this.h = h; this.rr = rr; }
+            int getModeId() { return id; }
+            int getPhysicalWidth() { return w; }
+            int getPhysicalHeight() { return h; }
+            float getRefreshRate() { return rr; }
+        }
+        Mode current; Mode[] modes;
+        Mode getMode() { return current; }
+        Mode[] getSupportedModes() { return modes; }
+    }
+    static class WindowManager {
+        static class LayoutParams { float preferredRefreshRate; int preferredDisplayModeId; }
+        Display d;
+        Display getDefaultDisplay() { return d; }
+    }
+    static class Context {
+        Display d;
+        Display getDisplay() { return d; }
+    }
+    static class Window {
+        Context ctx = new Context();
+        WindowManager wm = new WindowManager();
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        int setCalls;
+        Context getContext() { return ctx; }
+        WindowManager getWindowManager() { return wm; }
+        WindowManager.LayoutParams getAttributes() { return lp; }
+        void setAttributes(WindowManager.LayoutParams p) { lp = p; setCalls++; }
+    }
+    METHODS
+    static void check(boolean ok, String msg) { if (!ok) throw new AssertionError(msg); }
+    public static void main(String[] args) {
+        Window w = new Window();
+        Display d = new Display();
+        Display.Mode m60 = new Display.Mode(1, 1080, 2400, 60f);
+        Display.Mode m120 = new Display.Mode(2, 1080, 2400, 120f);
+        Display.Mode m120LowRes = new Display.Mode(3, 720, 1600, 120f);
+        d.current = m60;
+        d.modes = new Display.Mode[]{m60, m120LowRes, m120};
+        w.ctx.d = d;
+        w.wm.d = d;
+
+        setPreferredMaxRefreshRate(w, 120f);
+        check(w.setCalls == 1 && w.lp.preferredRefreshRate == 120f && w.lp.preferredDisplayModeId == 2,
+              "should select 1080x2400@120Hz mode id=2");
+        setPreferredMaxRefreshRate(w, 120f);
+        check(w.setCalls == 1, "repeated call must be a no-op");
+        setPreferredMaxRefreshRate(w, Float.NaN);
+        setPreferredMaxRefreshRate(w, 0f);
+        check(w.setCalls == 1 && w.lp.preferredDisplayModeId == 2, "invalid rates ignored");
+    }
+}'''.replace('METHODS', methods)
+    })
+
+
+def test_120hz_and_ghost_and_player_wiring():
+    launch = (JAVA / 'org/telegram/ui/LaunchActivity.java').read_text()
+    assert 'AndroidUtilities.setPreferredMaxRefreshRate(getWindow());' in method(launch, 'protected void onCreate(Bundle savedInstanceState)')
+    assert 'AndroidUtilities.setPreferredMaxRefreshRate(getWindow());' in method(launch, 'protected void onResume()')
+    assert 'AndroidUtilities.setPreferredMaxRefreshRate(getWindow());' in method(launch, 'public void onWindowFocusChanged(boolean hasFocus)')
+
+    ghost_ui = (JAVA / 'tw/nekomimi/nekogram/settings/GhostModeActivity.java').read_text()
+    assert '((CheckBoxCell) view).setChecked(!NekoConfig.sendReadMessagePackets.Bool(), true);' in ghost_ui
+    assert '((CheckBoxCell) view).setChecked(!NekoConfig.sendOnlinePackets.Bool(), true);' in ghost_ui
+    assert '((CheckBoxCell) view).setChecked(!NekoConfig.sendReadStoriesPackets.Bool(), true);' in ghost_ui
+    assert '((CheckBoxCell) view).setChecked(!NekoConfig.sendUploadProgress.Bool(), true);' in ghost_ui
+
+    player = (JAVA / 'app/exteraless/player/baseline/PlayerSheet.java').read_text()
+    assert 'Utilities.globalQueue.postRunnable' in player
+    assert 'AndroidUtilities.setPreferredMaxRefreshRate(getWindow())' in player
+
+

@@ -639,6 +639,8 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     private boolean beginTrackingSent;
     private boolean transitionAnimationInProgress;
     private boolean transitionAnimationPreviewMode;
+    private final app.flexygram.performance.ScrollFrameRateHint transitionFrameRateHint =
+            new app.flexygram.performance.ScrollFrameRateHint(this);
     private ArrayList<int[]> animateStartColors = new ArrayList<>();
     private ArrayList<int[]> animateEndColors = new ArrayList<>();
 
@@ -1053,6 +1055,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public void onPause() {
+        transitionFrameRateHint.setScrolling(false);
         chatNavigation.cancel();
         if (!fragmentsStack.isEmpty()) {
             BaseFragment lastFragment = fragmentsStack.get(fragmentsStack.size() - 1);
@@ -1382,6 +1385,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 containerViewBack.setTranslationX(0);
                 containerView.setLayerType(LAYER_TYPE_NONE, null);
                 setInnerTranslationX(0);
+                transitionFrameRateHint.setScrolling(false);
                 return;
             }
             BaseFragment lastFragment = fragmentsStack.get(fragmentsStack.size() - 1);
@@ -1439,6 +1443,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         containerViewBack.setVisibility(View.INVISIBLE);
         startedTracking = false;
         animationInProgress = false;
+        transitionFrameRateHint.setScrolling(false);
         containerView.setTranslationX(0);
         containerViewBack.setTranslationX(0);
         containerView.setLayerType(LAYER_TYPE_NONE, null);
@@ -1473,6 +1478,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             containerViewBack.setVisibility(View.INVISIBLE);
             return;
         }
+        transitionFrameRateHint.setScrolling(true);
         ViewGroup parent = (ViewGroup) fragmentView.getParent();
         if (parent != null) {
             lastFragment.onRemoveFromParent();
@@ -2110,6 +2116,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             if (USE_ACTIONBAR_CROSSFADE) invalidateActionBars();
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 512);
         } finally {
+            transitionFrameRateHint.setScrolling(false);
             completingTransition = false;
         }
     }
@@ -2243,6 +2250,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     private void startLayoutAnimation(final boolean open, final boolean preview) {
         animationProgress = 0.0f;
+        transitionFrameRateHint.setScrolling(true);
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.stopAllHeavyOperations, 512);
         if (USE_SPRING_ANIMATION) {
             if (USE_ACTIONBAR_CROSSFADE) {
@@ -4038,6 +4046,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     protected void onDetachedFromWindow() {
+        transitionFrameRateHint.setScrolling(false);
         chatNavigation.cancel();
         super.onDetachedFromWindow();
         attached = false;

@@ -2810,17 +2810,36 @@ public class AndroidUtilities {
                 if (display != null) {
                     display.getMetrics(displayMetrics);
                     display.getSize(displaySize);
-                    screenRefreshRate = display.getRefreshRate();
+                    float currentRate = display.getRefreshRate();
+                    screenRefreshRate = (Float.isFinite(currentRate) && currentRate >= 30f && currentRate <= 1000f) ? currentRate : 60f;
                     screenMaxRefreshRate = screenRefreshRate;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        Display.Mode currentMode = display.getMode();
+                        Display.Mode[] modes = display.getSupportedModes();
+                        if (modes != null && currentMode != null) {
+                            int physW = currentMode.getPhysicalWidth();
+                            int physH = currentMode.getPhysicalHeight();
+                            for (Display.Mode mode : modes) {
+                                if (mode == null) continue;
+                                if (mode.getPhysicalWidth() == physW && mode.getPhysicalHeight() == physH) {
+                                    float modeRate = mode.getRefreshRate();
+                                    if (Float.isFinite(modeRate) && modeRate <= 1000f && modeRate > screenMaxRefreshRate) {
+                                        screenMaxRefreshRate = modeRate;
+                                    }
+                                }
+                            }
+                        }
+                    }
                     float[] rates = display.getSupportedRefreshRates();
                     if (rates != null) {
                         for (int i = 0; i < rates.length; ++i) {
-                            if (rates[i] > screenMaxRefreshRate) {
+                            if (Float.isFinite(rates[i]) && rates[i] <= 1000f && rates[i] > screenMaxRefreshRate) {
                                 screenMaxRefreshRate = rates[i];
                             }
                         }
                     }
-                    screenRefreshTime = 1000 / screenRefreshRate;
+                    screenRefreshTime = 1000f / screenRefreshRate;
+                    RecyclerView.updatePrefetchFrameInterval(screenRefreshRate);
                 }
             }
             if (configuration.screenWidthDp != Configuration.SCREEN_WIDTH_DP_UNDEFINED) {
@@ -2863,21 +2882,74 @@ public class AndroidUtilities {
         setPreferredMaxRefreshRate(window, screenMaxRefreshRate);
     }
 
-    public static void setPreferredMaxRefreshRate(Window window, float rate) {
-        if (window == null) return;
-        final WindowManager wm = window.getWindowManager();
-        if (wm == null) return;
-        WindowManager.LayoutParams params = window.getAttributes();
-        params.preferredRefreshRate = rate;
+    private static int findPreferredDisplayModeId(Window window, float targetRate) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || window == null) return 0;
         try {
-            wm.updateViewLayout(window.getDecorView(), params);
+            Display display = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                try {
+                    display = window.getContext().getDisplay();
+                } catch (Throwable ignore) {
+                }
+            }
+            if (display == null) {
+                WindowManager wm = window.getWindowManager();
+                if (wm != null) {
+                    display = wm.getDefaultDisplay();
+                }
+            }
+            if (display == null) return 0;
+            Display.Mode current = display.getMode();
+            Display.Mode[] modes = display.getSupportedModes();
+            if (current == null || modes == null || modes.length <= 1) return 0;
+            int physW = current.getPhysicalWidth();
+            int physH = current.getPhysicalHeight();
+            Display.Mode best = null;
+            float bestDiff = Float.MAX_VALUE;
+            for (Display.Mode mode : modes) {
+                if (mode == null) continue;
+                if (mode.getPhysicalWidth() != physW || mode.getPhysicalHeight() != physH) continue;
+                float rr = mode.getRefreshRate();
+                if (!Float.isFinite(rr) || rr < 30f || rr > 1000f) continue;
+                float diff = Math.abs(rr - targetRate);
+                if (best == null || diff < bestDiff - 0.1f || (Math.abs(diff - bestDiff) <= 0.1f && rr > best.getRefreshRate())) {
+                    best = mode;
+                    bestDiff = diff;
+                }
+            }
+            return best != null ? best.getModeId() : 0;
+        } catch (Throwable ignore) {
+            return 0;
+        }
+    }
+
+    public static void setPreferredMaxRefreshRate(Window window, float rate) {
+        if (window == null || !Float.isFinite(rate) || rate < 30f || rate > 1000f) return;
+        WindowManager.LayoutParams params = window.getAttributes();
+        if (params == null) return;
+        boolean changed = false;
+        if (Math.abs(params.preferredRefreshRate - rate) > 0.2f) {
+            params.preferredRefreshRate = rate;
+            changed = true;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int modeId = findPreferredDisplayModeId(window, rate);
+            if (modeId != 0 && params.preferredDisplayModeId != modeId) {
+                params.preferredDisplayModeId = modeId;
+                changed = true;
+            }
+        }
+        if (!changed) return;
+        try {
+            window.setAttributes(params);
         } catch (Exception e) {
             FileLog.e(e);
         }
     }
 
     public static void setPreferredMaxRefreshRate(WindowManager wm, View windowView, WindowManager.LayoutParams params) {
-        if (wm == null) return;
+        if (wm == null || windowView == null || params == null) return;
+        if (!Float.isFinite(screenMaxRefreshRate) || screenMaxRefreshRate < 30f) return;
         if (Math.abs(params.preferredRefreshRate - screenMaxRefreshRate) > 0.2) {
             params.preferredRefreshRate = screenMaxRefreshRate;
             if (windowView.isAttachedToWindow()) {
