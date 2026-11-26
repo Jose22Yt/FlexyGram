@@ -469,10 +469,10 @@ public class ActionBarPopupWindow extends PopupWindow {
             if (swipeBackGravityBottom) {
                 setTranslationY(getMeasuredHeight() * (1f - backScaleY));
             }
+            boolean hasGap = false;
             if (backgroundDrawable != null) {
                 int start = gapStartY - (scrollView == null ? 0 : scrollView.getScrollY());
                 int end = gapEndY - (scrollView == null ? 0 : scrollView.getScrollY());
-                boolean hasGap = false;
                 for (int i = 0; i < linearLayout.getChildCount(); i++) {
                     if (linearLayout.getChildAt(i) instanceof GapView && linearLayout.getChildAt(i).getVisibility() == View.VISIBLE) {
                         hasGap = true;
@@ -582,15 +582,14 @@ public class ActionBarPopupWindow extends PopupWindow {
                 float scale = 0.5f + reactionsEnterProgress * 0.5f;
                 canvas.scale(scale, scale, AndroidUtilities.rectTmp2.right, AndroidUtilities.rectTmp2.top);
                 super.dispatchDraw(canvas);
-                drawColorOsPopupEdge(canvas);
                 canvas.restore();
             } else {
                 super.dispatchDraw(canvas);
-                drawColorOsPopupEdge(canvas);
             }
+            drawColorOsPopupEdge(canvas, hasGap);
         }
 
-        private void drawColorOsPopupEdge(Canvas canvas) {
+        private void drawColorOsPopupEdge(Canvas canvas, boolean hasGap) {
             if (backgroundDrawable == null || hasGap || !app.flexygram.effects.ChatEdgeStyle.isColorOsGlass()) {
                 return;
             }
@@ -604,7 +603,7 @@ public class ActionBarPopupWindow extends PopupWindow {
             if (width <= 0f || height <= 0f) {
                 return;
             }
-            final int edgeAlpha = Math.max(0, Math.min(255, backAlpha));
+            final int edgeAlpha = Math.max(0, Math.min(255, Math.round(backAlpha * reactionsEnterProgress)));
             if (edgeAlpha == 0) {
                 return;
             }
