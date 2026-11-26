@@ -23120,7 +23120,7 @@ public class ChatActivity extends BaseFragment implements
                                 final int topMessage = dialog.top_message;
                                 getMessagesStorage().getStorageQueue().postRunnable(() -> {
                                     Pair<Integer, Integer> minMaxRes = getMessagesStorage().getMinAndMaxForDialog(dialogId);
-                                    if (minMaxRes.second == batchEndId && topMessage <= minMaxRes.second) {
+                                    if (minMaxRes.second == batchEndId && (topMessage <= minMaxRes.second || loadType != 1)) {
                                         hookDeletedHistory(currentAccount, batchStartId, maxVal, minVal, dialogId, topicId, loadType, threadId, topicChat);
                                     } else {
                                         hookDeletedHistory(currentAccount, otherStartId, otherEndId, minVal, dialogId, topicId, loadType, threadId, topicChat);
@@ -28662,7 +28662,7 @@ public class ChatActivity extends BaseFragment implements
                 BaseFragment fragment = parentLayout.getFragmentStack().get(a);
                 if (fragment != this && fragment instanceof ChatActivity) {
                     ChatActivity chatActivity = (ChatActivity) fragment;
-                    if (chatActivity.needRemovePreviousSameChatActivity && chatActivity.dialog_id == dialog_id && getTopicId() == getTopicId() && chatActivity.getChatMode() == getChatMode()) {
+                    if (chatActivity.needRemovePreviousSameChatActivity && chatActivity.dialog_id == dialog_id && chatActivity.getTopicId() == getTopicId() && chatActivity.getChatMode() == getChatMode()) {
                         hasChatInBack = true;
                         break;
                     }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyGhostPresets">Быстрый профиль</string>
+    <string name="FlexyGhostPresetFull">Полный призрак (невидимка)</string>
+    <string name="FlexyGhostPresetStealth">Скрытый ответ (читать при отправке)</string>
+    <string name="FlexyGhostPresetStories">Только истории</string>
+    <string name="FlexyGhostPresetCustom">Свой профиль</string>
+    <string name="FlexyGhostAdvancedHeader">Настройка приватности</string>
+    <string name="FlexyGhostBlockMentionsRead">Не читать упоминания и реакции</string>
+    <string name="FlexyGhostBlockReactionOnline">Уходить в офлайн после реакций и голосов</string>
+    <string name="FlexyGhostOfflineDelay">Задержка ухода в офлайн</string>
+    <string name="FlexyGhostOfflineImmediate">Мгновенно</string>
+    <string name="FlexyGhostDeletedHeader">Удалённые сообщения</string>
+    <string name="FlexyGhostKeepDeleted">Сохранять удалённые сообщения</string>
+    <string name="FlexyGhostKeepDeletedNotice">Удалённые сообщения остаются в чатах вместо исчезновения и отмечаются выбранным знаком.</string>
+</resources>

@@ -14780,7 +14780,7 @@ public class MessagesStorage extends BaseController {
                                     msg.dialog_id = dialogId;
                                     var prefs = new AyuSavePreferences(msg, currentAccount);
                                     prefs.setDialogId(dialogId);
-                                    ayuMessagesController.onMessageDeleted(prefs, true);
+                                    ayuMessagesController.onMessageDeleted(prefs, false);
                                 }
                             }
                         }

@@ -175,6 +175,49 @@ def test_storage_matches_native_backup_outside_dialog_startup_changes():
             ]:
                 assert current.count(fast_gate) == 1 and original.count(baseline_gate) == 1
                 current = current.replace(fast_gate, baseline_gate, 1)
+            # Allow synchronous AyuGram deleted-message preservation on storageQueue and in deleteMessagesByPush.
+            push_ayu_block = '''            if (NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool() && ids != null && !ids.isEmpty()) {
+                final long effectiveDialogId = channelId != 0 ? -channelId : dialogId;
+                final var ayuMessagesController = AyuMessagesController.getInstance();
+                final var messagesToSave = MessageHelper.getInstance(currentAccount).getMessagesStorageMessages(effectiveDialogId, ids);
+                final var preservedIds = new ArrayList<Integer>();
+                if (messagesToSave != null && !messagesToSave.isEmpty()) {
+                    final int nowSec = (int) (System.currentTimeMillis() / 1000);
+                    for (var msg : messagesToSave) {
+                        final long topicId = MessageObject.getTopicId(currentAccount, msg, isForum(effectiveDialogId));
+                        final var prefs = new AyuSavePreferences(msg, currentAccount, effectiveDialogId, topicId, msg.id, nowSec);
+                        if (AyuState.isDeletePermitted(effectiveDialogId, msg.id)
+                                || !AyuSavePreferences.saveDeletedMessageFor(currentAccount, effectiveDialogId, prefs.getFromUserId())) {
+                            continue;
+                        }
+                        ayuMessagesController.onMessageDeleted(prefs, false);
+                        preservedIds.add(msg.id);
+                    }
+                }
+                if (!preservedIds.isEmpty()) {
+                    AndroidUtilities.runOnUIThread(() ->
+                            getNotificationCenter().postNotificationName(AyuConstants.MESSAGES_DELETED_NOTIFICATION, effectiveDialogId, preservedIds));
+                }
+            }
+'''
+            assert current.count(push_ayu_block) == 1
+            current = current.replace(push_ayu_block, '', 1)
+            for new_sync, old_async in [
+                (
+                    '                            prefs.setDialogId(dialogIdFinal);\n'
+                    '                            ayuMessagesController.onMessageDeleted(prefs, false);',
+                    '                            prefs.setDialogId(dialogIdFinal);\n'
+                    '                            ayuMessagesController.onMessageDeleted(prefs);',
+                ),
+                (
+                    '                                prefs.setDialogId(dialogIdFinal);\n'
+                    '                                ayuMessagesController.onMessageDeleted(prefs, false);',
+                    '                                prefs.setDialogId(dialogIdFinal);\n'
+                    '                                ayuMessagesController.onMessageDeleted(prefs);',
+                ),
+            ]:
+                assert current.count(new_sync) == 1 and original.count(old_async) == 1
+                current = current.replace(new_sync, old_async, 1)
         if name == 'MessagesStorage.java':
             current = current.replace('import java.util.Arrays;\n', '', 1)
             # Allow only the in-memory precheck before reading the SQLite revision.
@@ -256,6 +299,11 @@ def test_storage_matches_native_backup_outside_dialog_startup_changes():
                 }'''
             assert current.count(new_mentions) == 1 and original.count(old_mentions) == 1
             current = current.replace(new_mentions, old_mentions, 1)
+            # Allow synchronous AyuGram save before encrypted-chat SQLite deletion.
+            old_sync_del = 'ayuMessagesController.onMessageDeleted(prefs, true);'
+            new_sync_del = 'ayuMessagesController.onMessageDeleted(prefs, false);'
+            assert current.count(new_sync_del) == 1 and original.count(old_sync_del) == 1
+            current = current.replace(new_sync_del, old_sync_del, 1)
         assert '\n'.join(line for line in current.splitlines() if line.strip()) == '\n'.join(
             line for line in original.splitlines() if line.strip()), path
 

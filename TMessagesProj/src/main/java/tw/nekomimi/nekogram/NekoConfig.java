@@ -204,6 +204,9 @@ public class NekoConfig {
     public static ConfigItem sendOnlinePacketsLocked = addConfig("sendOnlinePacketsLocked", configTypeBool, false);
     public static ConfigItem sendUploadProgressLocked = addConfig("sendUploadProgressLocked", configTypeBool, false);
     public static ConfigItem sendOfflinePacketAfterOnlineLocked = addConfig("sendOfflinePacketAfterOnlineLocked", configTypeBool, false);
+    public static ConfigItem ghostOfflineDelayMs = addConfig("ghostOfflineDelayMs", configTypeInt, 1000);
+    public static ConfigItem ghostBlockReactionOnline = addConfig("ghostBlockReactionOnline", configTypeBool, true);
+    public static ConfigItem ghostBlockMentionsRead = addConfig("ghostBlockMentionsRead", configTypeBool, true);
     // --- Ghost Mode ---
 
     static {
@@ -345,8 +348,46 @@ public class NekoConfig {
         boolean newState = !isGhostModeActive();
         setGhostMode(newState);
 
-        boolean sendOnlineNow = !newState && !sendOfflinePacketAfterOnlineLocked.Bool() && sendOfflinePacketAfterOnline.Bool();
-        AyuGhostUtils.performStatusRequest(sendOnlineNow);
+        // performStatusRequest expects `offline` (true = go offline, false = go online).
+        if (newState) {
+            AyuGhostUtils.performStatusRequest(true);
+        } else if (sendOnlinePackets.Bool()) {
+            AyuGhostUtils.performStatusRequest(false);
+        }
+    }
+
+    /** Applies a quick Ghost Mode profile: 0 = Full Ghost, 1 = Stealth Reply, 2 = Stories Only. */
+    public static void applyGhostPreset(int preset) {
+        if (preset == 0) {
+            sendReadMessagePackets.setConfigBool(false);
+            sendReadStoriesPackets.setConfigBool(false);
+            sendOnlinePackets.setConfigBool(false);
+            sendUploadProgress.setConfigBool(false);
+            sendOfflinePacketAfterOnline.setConfigBool(true);
+            markReadAfterSend.setConfigBool(false);
+            ghostBlockMentionsRead.setConfigBool(true);
+            ghostBlockReactionOnline.setConfigBool(true);
+            AyuGhostUtils.performStatusRequest(true);
+        } else if (preset == 1) {
+            sendReadMessagePackets.setConfigBool(false);
+            sendReadStoriesPackets.setConfigBool(false);
+            sendOnlinePackets.setConfigBool(false);
+            sendUploadProgress.setConfigBool(false);
+            sendOfflinePacketAfterOnline.setConfigBool(true);
+            markReadAfterSend.setConfigBool(true);
+            ghostBlockMentionsRead.setConfigBool(true);
+            ghostBlockReactionOnline.setConfigBool(true);
+            AyuGhostUtils.performStatusRequest(true);
+        } else if (preset == 2) {
+            sendReadMessagePackets.setConfigBool(true);
+            sendReadStoriesPackets.setConfigBool(false);
+            sendOnlinePackets.setConfigBool(true);
+            sendUploadProgress.setConfigBool(true);
+            sendOfflinePacketAfterOnline.setConfigBool(false);
+            ghostBlockMentionsRead.setConfigBool(false);
+            ghostBlockReactionOnline.setConfigBool(false);
+            AyuGhostUtils.performStatusRequest(false);
+        }
     }
 
     private static final List<Pair<ConfigItem, ConfigItem>> ghostToggleItems = Arrays.asList(

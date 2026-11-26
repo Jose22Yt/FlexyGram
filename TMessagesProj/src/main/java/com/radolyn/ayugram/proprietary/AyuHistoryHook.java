@@ -259,6 +259,12 @@ public abstract class AyuHistoryHook {
     }
 
     public static boolean hasContent(DeletedMessageFull messageFull) {
-        return messageFull != null && messageFull.message != null && (!TextUtils.isEmpty(messageFull.message.text) || !TextUtils.isEmpty(messageFull.message.mediaPath) || messageFull.message.documentSerialized != null);
+        return messageFull != null && messageFull.message != null && (
+                !TextUtils.isEmpty(messageFull.message.text)
+                        || !TextUtils.isEmpty(messageFull.message.mediaPath)
+                        || messageFull.message.documentSerialized != null
+                        || messageFull.message.documentType != 0
+                        || messageFull.message.fwdDate != 0
+        );
     }
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyGhostPresets">Quick profile</string>
+    <string name="FlexyGhostPresetFull">Full Ghost (invisible)</string>
+    <string name="FlexyGhostPresetStealth">Stealth Reply (read on send)</string>
+    <string name="FlexyGhostPresetStories">Stories Only</string>
+    <string name="FlexyGhostPresetCustom">Custom</string>
+    <string name="FlexyGhostAdvancedHeader">Privacy customization</string>
+    <string name="FlexyGhostBlockMentionsRead">Don\'t read mentions &amp; reactions</string>
+    <string name="FlexyGhostBlockReactionOnline">Go offline after reacting or voting</string>
+    <string name="FlexyGhostOfflineDelay">Auto-offline delay</string>
+    <string name="FlexyGhostOfflineImmediate">Immediate</string>
+    <string name="FlexyGhostDeletedHeader">Deleted messages</string>
+    <string name="FlexyGhostKeepDeleted">Keep deleted messages</string>
+    <string name="FlexyGhostKeepDeletedNotice">Deleted messages stay visible in chats instead of disappearing, marked with your chosen style.</string>
+</resources>

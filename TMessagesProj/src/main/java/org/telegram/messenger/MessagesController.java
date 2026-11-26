@@ -9524,7 +9524,7 @@ public class MessagesController extends BaseController implements NotificationCe
                         if (obj != null) {
                             var prefs = new AyuSavePreferences(obj.messageOwner, currentAccount);
                             prefs.setDialogId(dialogIdFinal);
-                            ayuMessagesController.onMessageDeleted(prefs);
+                            ayuMessagesController.onMessageDeleted(prefs, false);
                         }
                     }
                     AndroidUtilities.runOnUIThread(() -> {
@@ -9547,7 +9547,7 @@ public class MessagesController extends BaseController implements NotificationCe
                                 invalidate.add(msgId);
                                 var prefs = new AyuSavePreferences(msg, currentAccount);
                                 prefs.setDialogId(dialogIdFinal);
-                                ayuMessagesController.onMessageDeleted(prefs);
+                                ayuMessagesController.onMessageDeleted(prefs, false);
                             }
                         }
                     }
@@ -17970,6 +17970,29 @@ public class MessagesController extends BaseController implements NotificationCe
 
     protected void deleteMessagesByPush(long dialogId, ArrayList<Integer> ids, long channelId) {
         getMessagesStorage().getStorageQueue().postRunnable(() -> {
+            if (NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool() && ids != null && !ids.isEmpty()) {
+                final long effectiveDialogId = channelId != 0 ? -channelId : dialogId;
+                final var ayuMessagesController = AyuMessagesController.getInstance();
+                final var messagesToSave = MessageHelper.getInstance(currentAccount).getMessagesStorageMessages(effectiveDialogId, ids);
+                final var preservedIds = new ArrayList<Integer>();
+                if (messagesToSave != null && !messagesToSave.isEmpty()) {
+                    final int nowSec = (int) (System.currentTimeMillis() / 1000);
+                    for (var msg : messagesToSave) {
+                        final long topicId = MessageObject.getTopicId(currentAccount, msg, isForum(effectiveDialogId));
+                        final var prefs = new AyuSavePreferences(msg, currentAccount, effectiveDialogId, topicId, msg.id, nowSec);
+                        if (AyuState.isDeletePermitted(effectiveDialogId, msg.id)
+                                || !AyuSavePreferences.saveDeletedMessageFor(currentAccount, effectiveDialogId, prefs.getFromUserId())) {
+                            continue;
+                        }
+                        ayuMessagesController.onMessageDeleted(prefs, false);
+                        preservedIds.add(msg.id);
+                    }
+                }
+                if (!preservedIds.isEmpty()) {
+                    AndroidUtilities.runOnUIThread(() ->
+                            getNotificationCenter().postNotificationName(AyuConstants.MESSAGES_DELETED_NOTIFICATION, effectiveDialogId, preservedIds));
+                }
+            }
             AndroidUtilities.runOnUIThread(() -> {
                 getNotificationCenter().postNotificationName(NotificationCenter.messagesDeleted, ids, channelId, false);
                 if (channelId == 0) {

@@ -559,7 +559,7 @@ object NaConfig {
         addConfig(
             "EnableSaveDeletedMessages",
             ConfigItem.configTypeBool,
-            false
+            true
         )
     val enableSaveEditsHistory =
         addConfig(

@@ -316,7 +316,11 @@ public class MessageHelper extends BaseController {
     }
 
     public ArrayList<TLRPC.Message> getMessagesStorageMessages(long dialogId, ArrayList<Integer> messageIds) {
+        if (messageIds == null || messageIds.isEmpty()) {
+            return null;
+        }
         ArrayList<TLRPC.Message> messages = null;
+        java.util.HashSet<Integer> foundIds = null;
         SQLiteCursor cursor = null;
         try {
             String ids = TextUtils.join(",", messageIds);
@@ -329,8 +333,10 @@ public class MessageHelper extends BaseController {
                         message.readAttachPath(data, UserConfig.getInstance(currentAccount).clientUserId);
                         if (messages == null) {
                             messages = new ArrayList<>();
+                            foundIds = new java.util.HashSet<>(messageIds.size());
                         }
                         messages.add(message);
+                        foundIds.add(message.id);
                     }
                     data.reuse();
                 }
@@ -342,6 +348,41 @@ public class MessageHelper extends BaseController {
         } finally {
             if (cursor != null) {
                 cursor.dispose();
+            }
+        }
+        // Fallback to in-memory MessagesController cache for freshly received messages deleted before SQLite flush.
+        if (foundIds == null || foundIds.size() < messageIds.size()) {
+            try {
+                final MessagesController mc = getMessagesController();
+                if (mc != null) {
+                    for (int i = 0, n = messageIds.size(); i < n; i++) {
+                        int mid = messageIds.get(i);
+                        if (foundIds != null && foundIds.contains(mid)) {
+                            continue;
+                        }
+                        MessageObject cached = dialogId >= 0 ? mc.dialogMessagesByIds.get(mid) : null;
+                        if (cached == null) {
+                            ArrayList<MessageObject> list = mc.dialogMessage.get(dialogId);
+                            if (list != null) {
+                                for (int j = 0; j < list.size(); j++) {
+                                    MessageObject candidate = list.get(j);
+                                    if (candidate != null && candidate.getId() == mid) {
+                                        cached = candidate;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (cached != null && cached.messageOwner != null) {
+                            if (messages == null) {
+                                messages = new ArrayList<>();
+                            }
+                            messages.add(cached.messageOwner);
+                        }
+                    }
+                }
+            } catch (Throwable ignore) {
+                // Defensive: dialogMessage/dialogMessagesByIds are mutated on UI thread while this may run on storageQueue.
             }
         }
         return messages;

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyGhostPresets">Perfil rápido</string>
+    <string name="FlexyGhostPresetFull">Fantasma total (invisible)</string>
+    <string name="FlexyGhostPresetStealth">Sigiloso (leer al responder)</string>
+    <string name="FlexyGhostPresetStories">Solo historias invisibles</string>
+    <string name="FlexyGhostPresetCustom">Personalizado</string>
+    <string name="FlexyGhostAdvancedHeader">Personalización de privacidad</string>
+    <string name="FlexyGhostBlockMentionsRead">No leer menciones ni reacciones</string>
+    <string name="FlexyGhostBlockReactionOnline">Volver offline tras reaccionar o votar</string>
+    <string name="FlexyGhostOfflineDelay">Retardo al volver offline</string>
+    <string name="FlexyGhostOfflineImmediate">Inmediato</string>
+    <string name="FlexyGhostDeletedHeader">Mensajes eliminados</string>
+    <string name="FlexyGhostKeepDeleted">Conservar mensajes eliminados</string>
+    <string name="FlexyGhostKeepDeletedNotice">Los mensajes eliminados permanecen visibles en tus chats en lugar de borrarse, con la marca que elijas.</string>
+</resources>
