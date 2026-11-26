@@ -9,13 +9,13 @@ public final class MemberLensConfig {
     public static boolean enabled() {
         Boolean value = cached;
         if (value == null) {
-            value = tw.nekomimi.nekogram.NekoConfig.getPreferences().getBoolean(KEY, false);
+            value = tw.nekomimi.nekogram.NekoConfig.getPreferences().getBoolean(KEY,false);
             cached = value;
         }
         return value;
     }
     public static void setEnabled(boolean value) {
         cached = value;
-        tw.nekomimi.nekogram.NekoConfig.getPreferences().edit().putBoolean(KEY, value).apply();
+        tw.nekomimi.nekogram.NekoConfig.getPreferences().edit().putBoolean(KEY,value).apply();
     }
 }
