@@ -54,9 +54,12 @@ public class PlayerStyleEditor extends LinearLayout {
     private View sizeRow;
     private View radiusRow;
     private View spinRow;
+    private View spinSpeedGroup;
     private View swipeRow;
     private View positionGroup;
+    private View waveStyleGroup;
     private View backgroundGroup;
+    private View blurIntensityRow;
     private OrderList orderList;
     private PlayerMiniView miniPreview;
     private View extendRow;
@@ -78,6 +81,9 @@ public class PlayerStyleEditor extends LinearLayout {
         radiusRow = addSlider(R.string.OEPlayerCoverRadius, 0, PlayerStyle.COVER_RADIUS_MAX, 2, "",
                 PlayerStyle::coverRadiusDp, value -> AppearanceConfig.playerCoverRadius.setConfigInt(value));
         spinRow = addToggle(R.string.OEPlayerDiscSpin, AppearanceConfig.playerDiscSpin);
+        spinSpeedGroup = addSegmented(new String[]{
+                getString(R.string.OEPlayerSpinSlow), getString(R.string.OEPlayerSpinNormal), getString(R.string.OEPlayerSpinFast)
+        }, PlayerStyle::discSpinSpeed, value -> AppearanceConfig.playerDiscSpinSpeed.setConfigInt(value));
         swipeRow = addToggle(R.string.OEPlayerCoverSwipe, AppearanceConfig.playerCoverSwipe);
         extendRow = addToggle(R.string.OEPlayerCoverExtend, AppearanceConfig.playerCoverExtend);
 
@@ -100,6 +106,10 @@ public class PlayerStyleEditor extends LinearLayout {
         addToggle(R.string.OEPlayerShowActions, AppearanceConfig.playerShowActions);
         addToggle(R.string.OEPlayerShowModes, AppearanceConfig.playerShowModes);
         addToggle(R.string.OEPlayerShowWave, AppearanceConfig.playerWavy);
+        waveStyleGroup = addSegmented(new String[]{
+                getString(R.string.OEPlayerWaveSubtle), getString(R.string.OEPlayerWaveNormal), getString(R.string.OEPlayerWaveExpressive)
+        }, PlayerStyle::waveStyle, value -> AppearanceConfig.playerWaveStyle.setConfigInt(value));
+        addToggle(R.string.OEPlayerShowRemaining, AppearanceConfig.playerShowRemaining);
 
         addHeader(R.string.OEPlayerStyleButtons);
         addSegmented(new String[]{
@@ -115,6 +125,8 @@ public class PlayerStyleEditor extends LinearLayout {
         backgroundGroup = addSegmented(new String[]{
                 getString(R.string.OEPlayerBackgroundSolid), getString(R.string.OEPlayerBackgroundGradient), getString(R.string.OEPlayerBackgroundBlur)
         }, PlayerStyle::background, value -> AppearanceConfig.playerBackground.setConfigInt(value));
+        blurIntensityRow = addSlider(R.string.OEPlayerBlurIntensity, 25, 100, 5, "%",
+                PlayerStyle::blurIntensityPercent, value -> AppearanceConfig.playerBlurIntensity.setConfigInt(value));
 
         addHeader(R.string.OEPlayerStyleMini);
         miniPreview = PlayerMiniView.preview(context);
@@ -186,10 +198,13 @@ public class PlayerStyleEditor extends LinearLayout {
         setVisible(sizeRow, framed);
         setVisible(radiusRow, style == PlayerStyle.COVER_CARD);
         setVisible(spinRow, style == PlayerStyle.COVER_DISC);
+        setVisible(spinSpeedGroup, style == PlayerStyle.COVER_DISC && PlayerStyle.discSpin());
         setVisible(swipeRow, framed);
         setVisible(extendRow, style == PlayerStyle.COVER_WIDE);
         setVisible(positionGroup, framed);
+        setVisible(waveStyleGroup, PlayerStyle.wavy());
         setVisible(backgroundGroup, style != PlayerStyle.COVER_FULL);
+        setVisible(blurIntensityRow, style != PlayerStyle.COVER_FULL && PlayerStyle.background() == PlayerStyle.BACKGROUND_BLUR);
     }
 
     private static void setVisible(View view, boolean visible) {

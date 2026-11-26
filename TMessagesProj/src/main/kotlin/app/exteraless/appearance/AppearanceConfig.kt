@@ -371,6 +371,18 @@ object AppearanceConfig {
     @JvmField
     val playerMiniTop = addConfig("OEPlayerMiniTop", ConfigItem.configTypeBool, false)
 
+    @JvmField
+    val playerBlurIntensity = addConfig("OEPlayerBlurIntensity", ConfigItem.configTypeInt, 65)
+
+    @JvmField
+    val playerDiscSpinSpeed = addConfig("OEPlayerDiscSpinSpeed", ConfigItem.configTypeInt, 1)
+
+    @JvmField
+    val playerWaveStyle = addConfig("OEPlayerWaveStyle", ConfigItem.configTypeInt, 1)
+
+    @JvmField
+    val playerShowRemaining = addConfig("OEPlayerShowRemaining", ConfigItem.configTypeBool, true)
+
     @JvmStatic
     fun playerStyleItems(): List<ConfigItem> {
         ensureLoaded()
@@ -378,7 +390,8 @@ object AppearanceConfig {
             playerCoverStyle, playerCoverSize, playerCoverRadius, playerDiscSpin, playerCoverSwipe,
             playerTitleAlign, playerTitleSize, playerTitleAbove, playerOrder, playerShowActions,
             playerShowModes, playerShowLike, playerShowSource, playerWavy, playerControlsSize,
-            playerColors, playerBackground, playerCoverExtend, playerMiniCover, playerMiniShape, playerMiniProgress,
+            playerColors, playerBackground, playerCoverExtend, playerBlurIntensity, playerDiscSpinSpeed,
+            playerWaveStyle, playerShowRemaining, playerMiniCover, playerMiniShape, playerMiniProgress,
             playerMiniColors, playerMiniCompact, playerMiniArtist, playerMiniPrevious, playerMiniNext,
             playerMiniClose
         )

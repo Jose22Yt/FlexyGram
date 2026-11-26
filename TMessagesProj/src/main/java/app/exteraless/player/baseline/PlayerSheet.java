@@ -77,7 +77,9 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
 
     public static PlayerSheet instance;
 
-    private static final float[] SPEEDS = {1f, 1.2f, 1.5f, 1.7f, 2f, 0.5f};
+    private static final float[] SPEEDS = {1f, 1.25f, 1.5f, 1.75f, 2f, 0.5f, 0.75f};
+    private static Runnable pendingSleepRunnable;
+    private static boolean sleepAtTrackEnd;
     private static final CubicBezierInterpolator EMPHASIZED = new CubicBezierInterpolator(0.2, 0, 0, 1);
     private static final PathInterpolator BACK_GESTURE = new PathInterpolator(0.1f, 0.1f, 0f, 1f);
 
@@ -137,8 +139,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     private int coverStyle = PlayerStyle.COVER_CARD;
     private int[] blockOrder = PlayerStyle.order();
     private ValueAnimator spinAnimator;
+    private long spinAnimatorDuration;
     private Bitmap backdrop;
     private String backdropKey;
+    private int backdropGeneration;
     private LinearGradient backgroundGradient;
     private int backgroundGradientKey;
     private final Paint backdropPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
@@ -494,6 +498,13 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         timeLeft.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
         timeLeft.setFontFeatureSettings("tnum");
         timeLeft.setGravity(Gravity.RIGHT);
+        timeLeft.setOnClickListener(v -> {
+            AppearanceConfig.playerShowRemaining.toggleConfigBool();
+            updateTimes();
+            if (styleEditor != null) {
+                styleEditor.refresh();
+            }
+        });
         timeRow.addView(timeLeft, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
         layout.addView(timeRow);
 
@@ -579,6 +590,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     @Override
     public void show() {
         super.show();
+        AndroidUtilities.setPreferredMaxRefreshRate(getWindow());
         instance = this;
         NotificationCenter nc = NotificationCenter.getInstance(account);
         nc.addObserver(this, NotificationCenter.messagePlayingDidReset);
@@ -1115,6 +1127,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
                 dismissImmediately();
                 return;
             }
+            if (sleepAtTrackEnd && current != null && mo.getId() != current.getId()) {
+                sleepAtTrackEnd = false;
+                MediaController.getInstance().pauseMessage(mo);
+            }
             bind(mo, true);
         } else if (id == NotificationCenter.messagePlayingDidReset) {
             MessageObject mo = MediaController.getInstance().getPlayingMessageObject();
@@ -1369,7 +1385,9 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         int duration = (int) Math.round(mo.getDuration());
         int now = seeking ? (int) (duration * seekProgress) : Math.min(duration, mo.audioProgressSec);
         String a = formatTime(now);
-        String b = "−" + formatTime(Math.max(0, duration - now));
+        String b = PlayerStyle.showRemaining()
+                ? "−" + formatTime(Math.max(0, duration - now))
+                : formatTime(Math.max(0, duration));
         if (!TextUtils.equals(timeNow.getText(), a)) {
             timeNow.setText(a);
             bubble.setText(a);
@@ -1647,6 +1665,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
                 cycleSpeed();
             });
         }
+        o.add(R.drawable.msg_autodelete, getString(R.string.OEPlayerSleepTimer), () -> {
+            o.dismiss();
+            showSleepTimerMenu();
+        });
         o.addGap();
         o.add(R.drawable.msg_customize, getString(R.string.OEPlayerCustomize), () -> {
             o.dismiss();
@@ -1658,6 +1680,54 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         });
         o.setGravity(LocaleController.isRTL ? Gravity.LEFT : Gravity.RIGHT);
         o.show();
+    }
+
+    private void showSleepTimerMenu() {
+        ItemOptions o = ItemOptions.makeOptions(root, resourcesProvider, moreButton);
+        o.add(R.drawable.msg_autodelete, getString(R.string.OEPlayerSleepOff), () -> {
+            o.dismiss();
+            setSleepTimer(0, false, null);
+        });
+        final int[] minutes = {15, 30, 45, 60};
+        for (int min : minutes) {
+            final String label = min + " min";
+            o.add(R.drawable.msg_autodelete, label, () -> {
+                o.dismiss();
+                setSleepTimer(min * 60_000L, false, label);
+            });
+        }
+        o.add(R.drawable.msg_autodelete, getString(R.string.OEPlayerSleepTrackEnd), () -> {
+            o.dismiss();
+            setSleepTimer(0, true, getString(R.string.OEPlayerSleepTrackEnd));
+        });
+        o.setGravity(LocaleController.isRTL ? Gravity.LEFT : Gravity.RIGHT);
+        o.show();
+    }
+
+    private void setSleepTimer(long delayMs, boolean atTrackEnd, String label) {
+        if (pendingSleepRunnable != null) {
+            AndroidUtilities.cancelRunOnUIThread(pendingSleepRunnable);
+            pendingSleepRunnable = null;
+        }
+        sleepAtTrackEnd = atTrackEnd;
+        if (delayMs > 0) {
+            pendingSleepRunnable = () -> {
+                pendingSleepRunnable = null;
+                sleepAtTrackEnd = false;
+                MessageObject playing = MediaController.getInstance().getPlayingMessageObject();
+                if (playing != null && playing.isMusic() && !MediaController.getInstance().isMessagePaused()) {
+                    MediaController.getInstance().pauseMessage(playing);
+                }
+            };
+            AndroidUtilities.runOnUIThread(pendingSleepRunnable, delayMs);
+        }
+        if (label == null) {
+            BulletinFactory.of(root, resourcesProvider)
+                    .createSimpleBulletin(R.raw.info, getString(R.string.OEPlayerSleepCancelled)).show();
+        } else {
+            BulletinFactory.of(root, resourcesProvider)
+                    .createSimpleBulletin(R.raw.info, String.format(getString(R.string.OEPlayerSleepSet), label)).show();
+        }
     }
 
     private boolean onCoverTouch(View v, MotionEvent e) {
@@ -2064,8 +2134,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         }
         headerCenter.setVisibility(PlayerStyle.showSource() ? View.VISIBLE : View.INVISIBLE);
         seekBar.setMaxAmplitude(PlayerStyle.wavy() ? dp(4) : 0);
+        seekBar.setWaveStyle(PlayerStyle.waveStyle());
         controls.setStyle(PlayerStyle.controlsScale(), PlayerStyle.showModes());
         group.setVisibility(PlayerStyle.showActions() ? View.VISIBLE : View.GONE);
+        updateTimes();
 
         PlayerColors target = colors;
         if (PlayerStyle.themeColors()) {
@@ -2090,11 +2162,17 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     private void updateSpin() {
         boolean spin = coverStyle == PlayerStyle.COVER_DISC && PlayerStyle.discSpin()
                 && (previewMode || !MediaController.getInstance().isMessagePaused()) && !detached;
+        long targetDuration = PlayerStyle.discSpinDurationMs();
+        if (spin && spinAnimator != null && spinAnimatorDuration != targetDuration) {
+            spinAnimator.cancel();
+            spinAnimator = null;
+        }
         if (spin) {
             if (spinAnimator == null) {
+                spinAnimatorDuration = targetDuration;
                 float from = cover.getRotation() % 360f;
                 spinAnimator = ValueAnimator.ofFloat(from, from + 360f);
-                spinAnimator.setDuration(16000);
+                spinAnimator.setDuration(targetDuration);
                 spinAnimator.setRepeatCount(ValueAnimator.INFINITE);
                 spinAnimator.setInterpolator(null);
                 spinAnimator.addUpdateListener(a -> {
@@ -2107,12 +2185,14 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         } else if (spinAnimator != null) {
             spinAnimator.cancel();
             spinAnimator = null;
+            spinAnimatorDuration = 0;
         }
     }
 
     private void updateBackdrop() {
         boolean need = coverStyle != PlayerStyle.COVER_FULL && PlayerStyle.background() == PlayerStyle.BACKGROUND_BLUR;
         if (!need) {
+            backdropGeneration++;
             backdrop = null;
             backdropKey = null;
             layout.invalidate();
@@ -2122,8 +2202,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (source == null && cover.getImageReceiver().hasBitmapImage()) {
             source = cover.getImageReceiver().getBitmap();
         }
-        String key = currentKey + (source != null ? ":" + source.getWidth() + "x" + source.getHeight() : "");
+        final int intensity = PlayerStyle.blurIntensityPercent();
+        String key = currentKey + (source != null ? ":" + source.getWidth() + "x" + source.getHeight() : "") + ":b" + intensity;
         if (source == null) {
+            backdropGeneration++;
             backdrop = null;
             backdropKey = null;
             layout.invalidate();
@@ -2132,21 +2214,30 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (TextUtils.equals(key, backdropKey) && backdrop != null) {
             return;
         }
-        Bitmap small = PlayerColors.sample(source);
+        final Bitmap small = PlayerColors.sample(source);
         if (small == null) {
             return;
         }
-        Bitmap blurred = small.isMutable() ? small : small.copy(Bitmap.Config.ARGB_8888, true);
+        final Bitmap blurred = small.isMutable() ? small : small.copy(Bitmap.Config.ARGB_8888, true);
         if (blurred == null) {
             return;
         }
-        try {
-            Utilities.stackBlurBitmap(blurred, Math.max(8, Math.min(blurred.getWidth(), blurred.getHeight()) / 6));
-        } catch (Throwable ignore) {
-        }
-        backdrop = blurred;
-        backdropKey = key;
-        layout.invalidate();
+        final int generation = ++backdropGeneration;
+        final int radius = Math.max(4, Math.round(Math.min(blurred.getWidth(), blurred.getHeight()) * (intensity / 100f) / 4.5f));
+        Utilities.globalQueue.postRunnable(() -> {
+            try {
+                Utilities.stackBlurBitmap(blurred, radius);
+            } catch (Throwable ignore) {
+            }
+            AndroidUtilities.runOnUIThread(() -> {
+                if (detached || generation != backdropGeneration) {
+                    return;
+                }
+                backdrop = blurred;
+                backdropKey = key;
+                layout.invalidate();
+            });
+        });
     }
 
     private void drawBackdrop(Canvas canvas, int width, int height) {
@@ -2171,7 +2262,9 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             backdropPaint.setAlpha(255);
             canvas.drawBitmap(backdrop, backdropSrc, previewRect, backdropPaint);
             overlayPaint.setShader(null);
-            overlayPaint.setColor(ColorUtils.setAlphaComponent(colors.surface, colors.dark ? 0xa8 : 0xb4));
+            final float factor = (PlayerStyle.blurIntensityPercent() - 25f) / 75f;
+            final int overlayAlpha = Math.round((colors.dark ? 0x90 : 0x9c) + factor * 0x26);
+            overlayPaint.setColor(ColorUtils.setAlphaComponent(colors.surface, overlayAlpha));
             canvas.drawRect(previewRect, overlayPaint);
         } else if (mode == PlayerStyle.BACKGROUND_GRADIENT) {
             int key = colors.primaryContainer * 31 + height;

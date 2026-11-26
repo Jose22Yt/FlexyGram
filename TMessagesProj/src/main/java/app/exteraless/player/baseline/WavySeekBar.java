@@ -44,6 +44,8 @@ public class WavySeekBar extends View {
     private long lastFrame;
     private boolean frozen;
     private float maxAmplitude = dp(4);
+    private float wavelength = dp(34);
+    private int waveStyle = 1;
 
     public WavySeekBar(Context context) {
         super(context);
@@ -81,6 +83,16 @@ public class WavySeekBar extends View {
 
     public void setMaxAmplitude(float px) {
         maxAmplitude = px;
+        invalidate();
+    }
+
+    public void setWaveStyle(int style) {
+        int normalized = Math.max(0, Math.min(2, style));
+        if (waveStyle == normalized) {
+            return;
+        }
+        waveStyle = normalized;
+        wavelength = normalized == 0 ? dp(44) : normalized == 2 ? dp(26) : dp(34);
         invalidate();
     }
 
@@ -176,16 +188,19 @@ public class WavySeekBar extends View {
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
+        final boolean thermalLimited = org.telegram.messenger.LiteMode.isThermalPressureHigh();
         long now = SystemClock.elapsedRealtime();
-        float dt = frozen ? 0f : lastFrame == 0 ? 0.016f : Math.min(0.05f, (now - lastFrame) / 1000f);
-        lastFrame = frozen ? 0 : now;
-        float targetAmp = playing ? maxAmplitude : 0f;
+        float dt = (frozen || thermalLimited) ? 0f : lastFrame == 0 ? 0.016f : Math.min(0.05f, (now - lastFrame) / 1000f);
+        lastFrame = (frozen || thermalLimited) ? 0 : now;
+        float styleScale = waveStyle == 0 ? 0.65f : waveStyle == 2 ? 1.45f : 1f;
+        float targetAmp = (playing && !thermalLimited) ? maxAmplitude * styleScale : 0f;
         amplitude += (targetAmp - amplitude) * (1f - (float) Math.pow(0.85, dt / 0.04f));
         if (Math.abs(amplitude - targetAmp) < dpf2(0.05f)) {
             amplitude = targetAmp;
         }
         if (amplitude > 0f) {
-            phase = (phase + 6f * dt) % TAU;
+            float speed = waveStyle == 0 ? 4.5f : waveStyle == 2 ? 7.5f : 6f;
+            phase = (phase + speed * dt) % TAU;
         }
 
         float cy = getHeight() / 2f;
@@ -196,26 +211,30 @@ public class WavySeekBar extends View {
         float x = left + p * (right - left);
         float gap = dp(6);
         float waveEnd = x - gap - thumbW / 2f;
-        float lambda = dp(34);
-        float step = dp(2);
+        float lambda = wavelength;
+        float step = dp(3);
         if (waveEnd > left) {
-            path.rewind();
-            boolean first = true;
-            for (float px = left; ; px += step) {
-                boolean last = px >= waveEnd;
-                float cx = last ? waveEnd : px;
-                float y = cy + amplitude * (float) Math.sin(TAU * cx / lambda - phase);
-                if (first) {
-                    path.moveTo(cx, y);
-                    first = false;
-                } else {
-                    path.lineTo(cx, y);
+            if (amplitude <= 0.01f) {
+                canvas.drawLine(left, cy, waveEnd, cy, wavePaint);
+            } else {
+                path.rewind();
+                boolean first = true;
+                for (float px = left; ; px += step) {
+                    boolean last = px >= waveEnd;
+                    float cx = last ? waveEnd : px;
+                    float y = cy + amplitude * (float) Math.sin(TAU * cx / lambda - phase);
+                    if (first) {
+                        path.moveTo(cx, y);
+                        first = false;
+                    } else {
+                        path.lineTo(cx, y);
+                    }
+                    if (last) {
+                        break;
+                    }
                 }
-                if (last) {
-                    break;
-                }
+                canvas.drawPath(path, wavePaint);
             }
-            canvas.drawPath(path, wavePaint);
         }
         float stopX = right - dp(1);
         float restX = Math.min(stopX, x + thumbW / 2f + gap);
@@ -226,7 +245,7 @@ public class WavySeekBar extends View {
         rect.set(x - thumbW / 2f, cy - dp(14), x + thumbW / 2f, cy + dp(14));
         canvas.drawRoundRect(rect, dpf2(1.5f), dpf2(1.5f), fillPaint);
 
-        if (!frozen && (amplitude > 0f || targetAmp != amplitude)) {
+        if (!frozen && !thermalLimited && (amplitude > 0f || targetAmp != amplitude)) {
             postInvalidateOnAnimation();
         } else {
             lastFrame = 0;

@@ -65,4 +65,19 @@
     <string name="OEPlayerMiniPrevious">Botón «Anterior»</string>
     <string name="OEPlayerMiniNext">Botón «Siguiente»</string>
     <string name="OEPlayerMiniClose">Botón «Cerrar»</string>
+    <string name="OEPlayerBlurIntensity">Intensidad del desenfoque</string>
+    <string name="OEPlayerDiscSpinSpeed">Velocidad de giro</string>
+    <string name="OEPlayerSpinSlow">Lenta</string>
+    <string name="OEPlayerSpinNormal">Normal</string>
+    <string name="OEPlayerSpinFast">Rápida</string>
+    <string name="OEPlayerWaveStyle">Estilo de onda</string>
+    <string name="OEPlayerWaveSubtle">Suave</string>
+    <string name="OEPlayerWaveNormal">Normal</string>
+    <string name="OEPlayerWaveExpressive">Intensa</string>
+    <string name="OEPlayerShowRemaining">Mostrar tiempo restante</string>
+    <string name="OEPlayerSleepTimer">Temporizador de apagado</string>
+    <string name="OEPlayerSleepOff">Desactivado</string>
+    <string name="OEPlayerSleepTrackEnd">Al terminar esta pista</string>
+    <string name="OEPlayerSleepSet">Temporizador activado: %1$s</string>
+    <string name="OEPlayerSleepCancelled">Temporizador desactivado</string>
 </resources>

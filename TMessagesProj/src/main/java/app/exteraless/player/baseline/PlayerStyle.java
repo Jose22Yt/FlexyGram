@@ -173,6 +173,34 @@ public final class PlayerStyle {
         return value < BACKGROUND_SOLID || value > BACKGROUND_BLUR ? BACKGROUND_SOLID : value;
     }
 
+    public static int blurIntensityPercent() {
+        int value = item(AppearanceConfig.playerBlurIntensity).Int();
+        return Math.max(25, Math.min(100, value));
+    }
+
+    public static int discSpinSpeed() {
+        return choice(AppearanceConfig.playerDiscSpinSpeed, 2);
+    }
+
+    public static long discSpinDurationMs() {
+        switch (discSpinSpeed()) {
+            case 0:
+                return 24000L;
+            case 2:
+                return 10000L;
+            default:
+                return 16000L;
+        }
+    }
+
+    public static int waveStyle() {
+        return choice(AppearanceConfig.playerWaveStyle, 2);
+    }
+
+    public static boolean showRemaining() {
+        return item(AppearanceConfig.playerShowRemaining).Bool();
+    }
+
     private static int choice(ConfigItem item, int max) {
         int value = item(item).Int();
         return value < 0 || value > max ? 0 : value;

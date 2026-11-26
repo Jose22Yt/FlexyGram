@@ -65,4 +65,19 @@
     <string name="OEPlayerMiniPrevious">Previous track button</string>
     <string name="OEPlayerMiniNext">Next track button</string>
     <string name="OEPlayerMiniClose">Close button</string>
+    <string name="OEPlayerBlurIntensity">Blur intensity</string>
+    <string name="OEPlayerDiscSpinSpeed">Spin speed</string>
+    <string name="OEPlayerSpinSlow">Slow</string>
+    <string name="OEPlayerSpinNormal">Normal</string>
+    <string name="OEPlayerSpinFast">Fast</string>
+    <string name="OEPlayerWaveStyle">Wave style</string>
+    <string name="OEPlayerWaveSubtle">Subtle</string>
+    <string name="OEPlayerWaveNormal">Normal</string>
+    <string name="OEPlayerWaveExpressive">Expressive</string>
+    <string name="OEPlayerShowRemaining">Show remaining time</string>
+    <string name="OEPlayerSleepTimer">Sleep timer</string>
+    <string name="OEPlayerSleepOff">Off</string>
+    <string name="OEPlayerSleepTrackEnd">End of current track</string>
+    <string name="OEPlayerSleepSet">Sleep timer set: %1$s</string>
+    <string name="OEPlayerSleepCancelled">Sleep timer turned off</string>
 </resources>
