@@ -582,26 +582,36 @@ public class ActionBarPopupWindow extends PopupWindow {
                 float scale = 0.5f + reactionsEnterProgress * 0.5f;
                 canvas.scale(scale, scale, AndroidUtilities.rectTmp2.right, AndroidUtilities.rectTmp2.top);
                 super.dispatchDraw(canvas);
+                drawColorOsPopupEdge(canvas);
                 canvas.restore();
             } else {
                 super.dispatchDraw(canvas);
+                drawColorOsPopupEdge(canvas);
             }
-            if (backgroundDrawable != null && app.flexygram.effects.ChatEdgeStyle.isColorOsGlass()) {
-                final Rect bgBounds = backgroundDrawable.getBounds();
-                final float left = bgBounds.left + bgPaddings.left;
-                final float top = bgBounds.top + bgPaddings.top;
-                final float right = bgBounds.right - bgPaddings.right;
-                final float bottom = bgBounds.bottom - bgPaddings.bottom;
-                if (right > left && bottom > top) {
-                    colorOsPopupEdge = app.flexygram.effects.ChatEdgeStyle.updateReflection(colorOsPopupEdge);
-                    final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
-                    final int baseAlpha = Math.max(0, Math.min(255, backAlpha));
-                    final int edgeAlpha = reactionsEnterProgress != 1f
-                            ? Math.round(baseAlpha * reactionsEnterProgress)
-                            : baseAlpha;
-                    colorOsPopupEdge.draw(canvas, left, top, right, bottom, dp(12), dark, edgeAlpha);
-                }
+        }
+
+        private void drawColorOsPopupEdge(Canvas canvas) {
+            if (backgroundDrawable == null || hasGap || !app.flexygram.effects.ChatEdgeStyle.isColorOsGlass()) {
+                return;
             }
+            final Rect bgBounds = backgroundDrawable.getBounds();
+            final float left = bgBounds.left + bgPaddings.left;
+            final float top = bgBounds.top + bgPaddings.top;
+            final float right = bgBounds.right - bgPaddings.right;
+            final float bottom = bgBounds.bottom - bgPaddings.bottom;
+            final float width = right - left;
+            final float height = bottom - top;
+            if (width <= 0f || height <= 0f) {
+                return;
+            }
+            final int edgeAlpha = Math.max(0, Math.min(255, backAlpha));
+            if (edgeAlpha == 0) {
+                return;
+            }
+            colorOsPopupEdge = app.flexygram.effects.ChatEdgeStyle.updateReflection(colorOsPopupEdge);
+            final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
+            final float radius = Math.min(dp(12), Math.min(width, height) * 0.5f);
+            colorOsPopupEdge.draw(canvas, left, top, right, bottom, radius, dark, edgeAlpha);
         }
 
         private app.flexygram.effects.ChatEdgeReflection colorOsPopupEdge;

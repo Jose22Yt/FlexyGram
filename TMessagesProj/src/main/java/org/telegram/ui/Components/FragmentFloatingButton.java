@@ -216,29 +216,50 @@ public class FragmentFloatingButton extends FrameLayout implements FactorAnimato
     }
 
     private app.flexygram.effects.ChatEdgeReflection colorOsEdge;
+    private boolean colorOsAppliedOnBlur;
 
     @Override
     public void draw(@NonNull Canvas canvas) {
-        final boolean colorOs = app.flexygram.effects.ChatEdgeStyle.isColorOsGlass();
-        final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
         if (iBlur3Background != null) {
+            final boolean colorOs = app.flexygram.effects.ChatEdgeStyle.isColorOsGlass();
             if (colorOs) {
+                final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
                 colorOsEdge = app.flexygram.effects.ChatEdgeStyle.updateReflection(colorOsEdge);
+                colorOsAppliedOnBlur = true;
                 iBlur3Background.drawWithChatEdge(canvas, colorOsEdge, dark);
-            } else {
+            } else if (colorOsAppliedOnBlur) {
+                colorOsAppliedOnBlur = false;
                 iBlur3Background.drawWithChatEdge(canvas, null, false);
+            } else {
+                iBlur3Background.draw(canvas);
             }
         }
         super.draw(canvas);
-        if (colorOs && iBlur3Background == null) {
-            final int w = getWidth(), h = getHeight();
+    }
+
+    @Override
+    protected void dispatchDraw(@NonNull Canvas canvas) {
+        if (iBlur3Background == null && app.flexygram.effects.ChatEdgeStyle.isColorOsGlass()) {
+            final int w = getWidth();
+            final int h = getHeight();
             if (w > 0 && h > 0) {
-                colorOsEdge = app.flexygram.effects.ChatEdgeStyle.updateReflection(colorOsEdge);
-                final float r = Math.min(Math.min(w, h) * 0.5f,
-                        dp(app.exteraless.appearance.AppearanceConfig.fabCornerRadius(SIZE)));
-                colorOsEdge.draw(canvas, 0f, 0f, w, h, r, dark, 255);
+                final float l = getPaddingLeft();
+                final float t = getPaddingTop();
+                final float rBound = w - getPaddingRight();
+                final float bBound = h - getPaddingBottom();
+                final float bw = rBound - l;
+                final float bh = bBound - t;
+                if (bw > 0 && bh > 0) {
+                    final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
+                    colorOsEdge = app.flexygram.effects.ChatEdgeStyle.updateReflection(colorOsEdge);
+                    final int sizeDp = Math.max(1, Math.round(Math.min(bw, bh) / Math.max(1f, org.telegram.messenger.AndroidUtilities.density)));
+                    final float r = Math.min(Math.min(bw, bh) * 0.5f,
+                            dp(app.exteraless.appearance.AppearanceConfig.fabCornerRadius(sizeDp)));
+                    colorOsEdge.draw(canvas, l, t, rBound, bBound, r, dark, 255);
+                }
             }
         }
+        super.dispatchDraw(canvas);
     }
 
     @Override

@@ -34,7 +34,7 @@ public final class SettingsCardBackground {
             if (topRadius == bottomRadius) {
                 colorOsEdge.draw(canvas, rect, topRadius, dark, edgeAlpha);
             } else {
-                colorOsEdge.drawClipped(canvas, rect.left, rect.top, rect.right, rect.bottom, path, dark, edgeAlpha);
+                colorOsEdge.drawClipped(canvas, rect.left, rect.top, rect.right, rect.bottom, path, radii, dark, edgeAlpha);
             }
         }
     }

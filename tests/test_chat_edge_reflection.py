@@ -17,7 +17,8 @@ public class Canvas {
  public void clipPath(Path p){clips++;}
  public void drawPath(Path p,Paint paint){
   if(paint.getShader() instanceof BitmapShader){paths++;return;}
-  if(p.offsetY!=-top || paint.getStyle()!=Paint.Style.STROKE)throw new AssertionError();
+  if((!p.local && p.offsetY!=-top) || paint.getStyle()!=Paint.Style.STROKE)throw new AssertionError();
+  edge=paint;
   paths++;
  }
  public void drawRoundRect(float l,float t,float r,float b,float rx,float ry,Paint p){
@@ -55,20 +56,23 @@ public class Paint {
         'org/telegram/messenger/R.java': 'package org.telegram.messenger; public class R {public static class drawable {public static final int flexy_satin_pill_dark=1,flexy_satin_circle_dark=2,flexy_satin_pill_light=3,flexy_satin_circle_light=4;}}',
         'android/graphics/Path.java': '''package android.graphics;
 public class Path {
- public float offsetY;
- public void offset(float x,float y,Path destination){destination.offsetY=y;}
+ public enum Direction { CW }
+ public float offsetY; public boolean local;
+ public void offset(float x,float y,Path destination){destination.offsetY=y;destination.local=false;}
+ public void rewind(){local=true;}
+ public void addRoundRect(float l,float t,float r,float b,float[] radii,Direction dir){local=true;}
 }''',
         'android/os/Build.java': 'package android.os; public class Build { public static class VERSION { public static int SDK_INT=33; } }',
         'androidx/annotation/RequiresApi.java': 'package androidx.annotation; public @interface RequiresApi { int value(); }',
         'android/graphics/RuntimeShader.java': '''package android.graphics;
 public class RuntimeShader extends Shader {
- public static int creations; public int updates; public float width,height,radius;
+ public static int creations; public int updates; public float width,height,radius,rTL,rTR,rBR,rBL;
  public RuntimeShader(String source){creations++;}
  public void setFloatUniform(String name,float value){updates++;if(name.equals("radius"))radius=value;}
  public void setFloatUniform(String name,float first,float second){updates++;width=first;height=second;}
- public void setFloatUniform(String name,float a,float b,float c,float d){updates++;}
+ public void setFloatUniform(String name,float a,float b,float c,float d){updates++;rTL=a;rTR=b;rBR=c;rBL=d;}
 }''',
-        'android/graphics/Shader.java': 'package android.graphics; public class Shader { public enum TileMode { CLAMP } }',
+        'android/graphics/Shader.java': 'package android.graphics; public class Shader { public enum TileMode { CLAMP } public void setLocalMatrix(Matrix m){} }',
         'android/graphics/LinearGradient.java': '''package android.graphics;
 public class LinearGradient extends Shader {
  public static int creations; public final int[] colors; public final float[] stops; public final float height;
@@ -171,33 +175,54 @@ public class Probe {
   reflection.draw(canvas,10,0,50,40,20,false,255);
   check(BitmapFactory.count==3 && BitmapShader.count==3 && RuntimeShader.creations==1);
 
+  // ColorOS 17 Glass: STROKE-only zero interior overdraw + 4-slot shader cache + asymmetric radii without clipPath.
   reflection.setSatin(false);
   reflection.setColorOsGlass(true);
   android.os.Build.VERSION.SDK_INT=33;
   canvas.hardware=true;
+  int drawsBeforeColorOs=canvas.draws;
+  int bandsBeforeColorOs=canvas.bands;
   reflection.draw(canvas,10,20,410,100,40,true,220);
-  RuntimeShader colorOs=(RuntimeShader)canvas.paint.getShader();
-  check(colorOs!=curved && RuntimeShader.creations==2 && colorOs.width==400 && colorOs.height==80 && colorOs.radius==40 && canvas.paint.getAlpha()==220);
-  int colorOsUpdates=colorOs.updates;
-  reflection.draw(canvas,15,25,415,105,40,true,220);
-  check(colorOs==canvas.paint.getShader() && colorOs.updates==colorOsUpdates && RuntimeShader.creations==2);
-  reflection.draw(canvas,0,0,48,48,48,false,255);
-  check(colorOs.radius==24f && colorOs.width==48 && canvas.depth==0);
-  int beforeFallbackBands=canvas.bands;
+  check(canvas.draws==drawsBeforeColorOs && canvas.bands==bandsBeforeColorOs+1);
+  RuntimeShader pillShader=(RuntimeShader)canvas.edge.getShader();
+  check(pillShader!=curved && RuntimeShader.creations==2 && pillShader.width==400 && pillShader.height==80
+        && pillShader.rTL==40 && pillShader.rBR==40 && canvas.edge.getAlpha()==220);
+  // Multi-shape cache: alternating pill + circle must reuse separate slots with ZERO uniform thrashing.
+  reflection.draw(canvas,0,0,48,48,48,true,255);
+  RuntimeShader circleShader=(RuntimeShader)canvas.edge.getShader();
+  check(circleShader!=pillShader && RuntimeShader.creations==3 && circleShader.rTL==24f && circleShader.width==48);
+  int pillUpdates=pillShader.updates, circleUpdates=circleShader.updates;
+  for(int i=0;i<100;i++){
+   reflection.draw(canvas,10+i,20,410+i,100,40,true,220);
+   reflection.draw(canvas,0,i,48,48+i,48,true,255);
+  }
+  check(pillShader.updates==pillUpdates && circleShader.updates==circleUpdates && RuntimeShader.creations==3);
+  // Asymmetric settings card radii must use ColorOsGlassEdge STROKE path with ZERO clipPath!
+  int clipsBeforeCard=canvas.clips;
+  int pathsBeforeCard=canvas.paths;
+  float[] cardRadii={40,40,40,40,12,12,12,12};
+  reflection.drawClipped(canvas,0,20,400,120,new Path(),cardRadii,true,255);
+  check(canvas.clips==clipsBeforeCard && canvas.paths==pathsBeforeCard+1 && RuntimeShader.creations==4);
+  RuntimeShader cardShader=(RuntimeShader)canvas.edge.getShader();
+  check(cardShader.rTL==40 && cardShader.rTR==40 && cardShader.rBR==12 && cardShader.rBL==12);
+  // Fallback (API 32 & high thermal): zero-alloc Matrix-scaled stroke across 20 distinct heights!
   android.os.Build.VERSION.SDK_INT=32;
-  reflection.draw(canvas,0,20,200,120,24,true,255);
-  check(canvas.paint.getShader() instanceof LinearGradient && canvas.bands==beforeFallbackBands+1);
-  int beforeClippedPaths=canvas.paths;
-  reflection.drawClipped(canvas,0,20,200,120,new Path(),false,200);
-  check(canvas.paths==beforeClippedPaths+1 && canvas.depth==0);
+  int gradientsBeforeFallback=LinearGradient.creations;
+  for(int h=50;h<250;h+=10){
+   reflection.draw(canvas,0,20,200,20+h,24,true,255);
+   reflection.drawClipped(canvas,0,20,200,20+h,new Path(),cardRadii,true,255);
+  }
+  check(LinearGradient.creations==gradientsBeforeFallback+1 && canvas.clips==clipsBeforeCard);
   android.os.Build.VERSION.SDK_INT=33;
   org.telegram.messenger.LiteMode.thermalHigh=true;
   reflection.draw(canvas,0,20,200,120,24,true,255);
-  check(canvas.paint.getShader() instanceof LinearGradient);
+  check(canvas.edge.getShader() instanceof LinearGradient && canvas.depth==0);
   org.telegram.messenger.LiteMode.thermalHigh=false;
  }
 }''',
     }, [JAVA/'app/flexygram/effects/ChatEdgeReflection.java', JAVA/'app/flexygram/effects/SatinEdgeMaterial.java'])
+    src = (JAVA/'app/flexygram/effects/ChatEdgeReflection.java').read_text()
+    assert 'if (fromX > maxDepth && fromY > maxDepth)' not in src, 'diagonal circle/pill cutout bug must not return'
 
 
 def test_existing_outline_and_reflection_are_mutually_exclusive():
