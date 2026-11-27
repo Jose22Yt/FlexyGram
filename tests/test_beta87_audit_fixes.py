@@ -426,5 +426,77 @@ def test_hidden_bottlenecks_and_canvas_or_db_leaks_fixed():
     assert 'synchronized (PAINT)' in method(typeface, 'private static boolean testTypeface(')
 
 
+def test_adaptive_scroll_throttle_120hz_behavior(tmp_path):
+    probe(tmp_path, {
+        'Probe.java': '''import app.flexygram.performance.AdaptiveScrollThrottle;
+public class Probe {
+    static void check(boolean ok, String m) { if (!ok) throw new AssertionError(m); }
+    public static void main(String[] args) {
+        AdaptiveScrollThrottle t = new AdaptiveScrollThrottle();
+        // 60 Hz never skips blur or pauses heavy ops.
+        for (int i = 0; i < 10; i++) {
+            check(t.shouldInvalidateBlur(AdaptiveScrollThrottle.SCROLL_STATE_SETTLING, 300, 60f, 3f), "60hz blur");
+            check(t.updateFastFlingHeavyOps(AdaptiveScrollThrottle.SCROLL_STATE_SETTLING, 300, 60f, 3f) == AdaptiveScrollThrottle.HEAVY_OP_NOOP, "60hz heavy");
+        }
+        // 120 Hz dragging never skips blur.
+        for (int i = 0; i < 10; i++) {
+            check(t.shouldInvalidateBlur(AdaptiveScrollThrottle.SCROLL_STATE_DRAGGING, 300, 120f, 3f), "120hz drag");
+        }
+        // 120 Hz high-velocity settling alternates blur (skip, draw, skip, draw) and marks deferred on skip.
+        check(!t.shouldInvalidateBlur(AdaptiveScrollThrottle.SCROLL_STATE_SETTLING, 200, 120f, 3f), "fling skip 1");
+        check(t.shouldInvalidateBlur(AdaptiveScrollThrottle.SCROLL_STATE_SETTLING, 200, 120f, 3f), "fling draw 2");
+        check(!t.shouldInvalidateBlur(AdaptiveScrollThrottle.SCROLL_STATE_SETTLING, -200, 120f, 3f), "fling skip 3");
+        check(t.consumeDeferredBlur(), "deferred flush on idle");
+        check(!t.consumeDeferredBlur(), "second flush must be false");
+
+        // 120 Hz fast-fling heavy op pause and smooth deceleration resume.
+        check(t.updateFastFlingHeavyOps(AdaptiveScrollThrottle.SCROLL_STATE_SETTLING, 220, 120f, 3f) == AdaptiveScrollThrottle.HEAVY_OP_PAUSE, "pause on fast fling");
+        check(t.isHeavyOpsPaused(), "paused flag");
+        check(t.updateFastFlingHeavyOps(AdaptiveScrollThrottle.SCROLL_STATE_SETTLING, 220, 120f, 3f) == AdaptiveScrollThrottle.HEAVY_OP_NOOP, "already paused");
+        check(t.updateFastFlingHeavyOps(AdaptiveScrollThrottle.SCROLL_STATE_SETTLING, 30, 120f, 3f) == AdaptiveScrollThrottle.HEAVY_OP_RESUME, "resume on slow fling");
+        check(!t.isHeavyOpsPaused(), "resumed flag");
+
+        // Lifecycle release always clears paused state cleanly.
+        check(t.updateFastFlingHeavyOps(AdaptiveScrollThrottle.SCROLL_STATE_SETTLING, 250, 120f, 3f) == AdaptiveScrollThrottle.HEAVY_OP_PAUSE, "pause again");
+        check(t.releaseHeavyOps(), "release must signal resume");
+        check(!t.releaseHeavyOps(), "second release is noop");
+    }
+}'''
+    }, [JAVA / 'app/flexygram/performance/AdaptiveScrollThrottle.java'])
+
+
+def test_pass7_startup_gpu_and_memory_optimizations():
+    app = (JAVA / 'org/telegram/messenger/ApplicationLoader.java').read_text()
+    create = method(app, 'public void onCreate()')
+    assert 'if (BuildConfig.NATIVE_BASELINE_TEST) preloadStartupPreferences()' not in create
+    assert 'preloadStartupPreferences();' in create
+    assert 'DialogCell.trimMemory(level)' in method(app, 'public void onTrimMemory(int level)')
+    assert 'DialogCell.trimMemory(' in method(app, 'public void onLowMemory()')
+
+    tve = (JAVA / 'tw/nekomimi/nekogram/TextViewEffects.java').read_text()
+    tve_draw = method(tve, 'protected void onDraw(Canvas canvas)')
+    assert 'if (spoilers.isEmpty()) {' in tve_draw
+    assert 'canvas.saveLayer(unionL, unionT, unionR, unionB + padY, null);' in tve_draw
+
+    dialog_cell = (JAVA / 'org/telegram/ui/Cells/DialogCell.java').read_text()
+    assert 'private static Paint getSharedFadePaint(boolean left)' in dialog_cell
+    assert 'public static void trimMemory(int level)' in dialog_cell
+    assert 'canvas.saveLayerAlpha(nameLeft, fadeTop, nameLeft + nameWidth, fadeBottom' in dialog_cell
+    assert 'thumbBackgroundPaint' not in dialog_cell
+
+    chat = (JAVA / 'org/telegram/ui/ChatActivity.java').read_text()
+    assert 'chatPool.setMaxRecycledViews(1, 14);' in chat
+    assert 'chatScrollThrottle.updateFastFlingHeavyOps(' in chat
+    assert 'releaseFastFlingHeavyOps();' in method(chat, 'public void onPause()')
+    assert 'releaseFastFlingHeavyOps();' in method(chat, 'public void onFragmentDestroy()')
+
+    dialogs = (JAVA / 'org/telegram/ui/DialogsActivity.java').read_text()
+    assert 'dialogsScrollThrottle.shouldInvalidateBlur(' in dialogs
+    assert 'dialogsScrollThrottle.consumeDeferredBlur()' in dialogs
+
+    img = (JAVA / 'org/telegram/messenger/ImageLoader.java').read_text()
+    assert 'memoryClass >= 512 ? 112 : 80' in img
+
+
 
 

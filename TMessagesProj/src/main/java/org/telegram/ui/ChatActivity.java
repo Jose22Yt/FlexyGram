@@ -3845,6 +3845,15 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private boolean chatRecyclerReleased;
+    private final app.flexygram.performance.AdaptiveScrollThrottle chatScrollThrottle =
+            new app.flexygram.performance.AdaptiveScrollThrottle();
+
+    private void releaseFastFlingHeavyOps() {
+        if (chatScrollThrottle.releaseHeavyOps()) {
+            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 512);
+        }
+    }
+
     private final Runnable releaseChatRecycler = this::releaseFinishedChatRecycler;
     private void releaseFinishedChatRecycler() {
         if (chatRecyclerReleased || !isFinished || chatListView == null
@@ -3889,6 +3898,7 @@ public class ChatActivity extends BaseFragment implements
         app.exteraless.plugins.menus.MenuInjector.releaseMessageMenu(this);
         super.onFragmentDestroy();
         if (scrollableViewNoiseSuppressor != null) scrollableViewNoiseSuppressor.clearCapture();
+        releaseFastFlingHeavyOps();
         releaseFinishedChatRecycler();
         AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
         cancelScrollHintChecks();
@@ -7687,6 +7697,8 @@ public class ChatActivity extends BaseFragment implements
         RecyclerView.RecycledViewPool chatPool = chatListView.getRecycledViewPool();
         if (chatPool != null) {
             chatPool.setMaxRecycledViews(0, 30);
+            chatPool.setMaxRecycledViews(1, 14);
+            chatPool.setMaxRecycledViews(2, 10);
         }
         chatListView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
@@ -7763,11 +7775,15 @@ public class ChatActivity extends BaseFragment implements
                         scrolling = true;
                         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 512);
                     }
+                    releaseFastFlingHeavyOps();
                     NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startSpoilers);
                     chatListView.setOverScrollMode(RecyclerView.OVER_SCROLL_ALWAYS);
                     textSelectionHelper.stopScrolling();
                     updateVisibleRows();
                     invalidateMergedVisibleBlurredPositionsAndSources(BLUR_INVALIDATE_FLAG_SCROLL);
+                    if (chatScrollThrottle.consumeDeferredBlur() && contentView != null) {
+                        contentView.invalidateBlur();
+                    }
                     scrollByTouch = false;
                     scheduleScrollHintChecks();
                 } else {
@@ -7781,6 +7797,7 @@ public class ChatActivity extends BaseFragment implements
                         wasManualScroll = true;
                         scrollingChatListView = true;
                     } else if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                        releaseFastFlingHeavyOps();
                         if (NekoConfig.hideKeyboardOnChatScroll.Bool()) {
                             if (isKeyboardVisible()) {
                                 AndroidUtilities.hideKeyboard(getParentActivity().getCurrentFocus());
@@ -7852,8 +7869,21 @@ public class ChatActivity extends BaseFragment implements
                     }
                 }
                 if (dy != 0) {
-                    invalidateMergedVisibleBlurredPositionsAndSources(BLUR_INVALIDATE_FLAG_SCROLL);
-                    contentView.invalidateBlur();
+                    final int scrollState = recyclerView.getScrollState();
+                    if (SharedConfig.getDevicePerformanceClass() > SharedConfig.PERFORMANCE_CLASS_LOW) {
+                        final int heavyAction = chatScrollThrottle.updateFastFlingHeavyOps(
+                                scrollState, dy, AndroidUtilities.screenRefreshRate, AndroidUtilities.density);
+                        if (heavyAction == app.flexygram.performance.AdaptiveScrollThrottle.HEAVY_OP_PAUSE) {
+                            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.stopAllHeavyOperations, 512);
+                        } else if (heavyAction == app.flexygram.performance.AdaptiveScrollThrottle.HEAVY_OP_RESUME) {
+                            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 512);
+                        }
+                    }
+                    if (chatScrollThrottle.shouldInvalidateBlur(
+                            scrollState, dy, AndroidUtilities.screenRefreshRate, AndroidUtilities.density)) {
+                        invalidateMergedVisibleBlurredPositionsAndSources(BLUR_INVALIDATE_FLAG_SCROLL);
+                        contentView.invalidateBlur();
+                    }
                     hideHints(true);
                 }
                 if (dy != 0 && scrollingFloatingDate && !currentFloatingTopIsNotMessage) {
@@ -32649,6 +32679,7 @@ public class ChatActivity extends BaseFragment implements
         cancelFolderUnreadBadgeUpdate();
         cancelScrollHintChecks();
         cancelPendingScrollHistory();
+        releaseFastFlingHeavyOps();
         AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
         // Refresh the visible translations once on return, rather than scanning a hidden chat.
         translationCheckDeferred = true;

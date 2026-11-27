@@ -2123,7 +2123,7 @@ public class ImageLoader {
             : activityManager.getMemoryClass();
         int maxSize;
         if (canForce8888 = memoryClass >= 192) {
-            maxSize = 80;
+            maxSize = memoryClass >= 512 ? 112 : 80;
         } else {
             maxSize = 30;
         }

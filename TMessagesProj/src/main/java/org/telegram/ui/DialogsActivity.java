@@ -4957,6 +4957,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                     // RecyclerListView owns the pause and resumes work even on detach.
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        if (dialogsScrollThrottle.consumeDeferredBlur()) {
+                            if (contentView != null) {
+                                contentView.updateBlurContent();
+                            }
+                            if (fragmentView != null) {
+                                blur3_InvalidateBlur();
+                            }
+                        }
                         wasManualScroll = false;
                         disableActionBarScrolling = false;
                         if (waitingForScrollFinished) {
@@ -4974,7 +4982,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                     if (dx == 0 && dy == 0) historyWarmup.request();
-                    if (contentView != null && (dx != 0 || dy != 0)) {
+                    final boolean updateBlurThisFrame = dialogsScrollThrottle.shouldInvalidateBlur(
+                            recyclerView.getScrollState(), dy, AndroidUtilities.screenRefreshRate, AndroidUtilities.density);
+                    if (updateBlurThisFrame && contentView != null && (dx != 0 || dy != 0)) {
                         contentView.updateBlurContent();
                     }
                     viewPage.dialogsItemAnimator.onListScroll(-dy);
@@ -5046,7 +5056,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             fragmentView.invalidate();
                         }
                     }
-                    if (fragmentView != null) {
+                    if (updateBlurThisFrame && fragmentView != null) {
                         blur3_InvalidateBlur();
                     }
                     if (rightSlidingDialogContainer != null && rightSlidingDialogContainer.hasFragment() && viewPage.listView != null) {
@@ -15222,6 +15232,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
 
+    private final app.flexygram.performance.AdaptiveScrollThrottle dialogsScrollThrottle =
+            new app.flexygram.performance.AdaptiveScrollThrottle();
     private IBlur3Capture iBlur3Capture;
 
     private final ArrayList<RectF> iBlur3Positions = new ArrayList<>();

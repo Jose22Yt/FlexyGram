@@ -109,13 +109,32 @@ public class TextViewEffects extends LinkSpanDrawable.LinksTextView {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (spoilers.isEmpty()) {
+            updateAnimatedEmoji(false);
+            super.onDraw(canvas);
+            if (animatedEmojiDrawables != null) {
+                AnimatedEmojiSpan.drawAnimatedEmojis(canvas, getLayout(), animatedEmojiDrawables, 0, spoilers, computeVerticalScrollOffset() - AndroidUtilities.dp(6), computeVerticalScrollOffset() + computeVerticalScrollExtent(), 0, 1f);
+            }
+            return;
+        }
+
         int pl = getPaddingLeft(), pt = getPaddingTop();
+        int unionL = Integer.MAX_VALUE, unionT = Integer.MAX_VALUE;
+        int unionR = Integer.MIN_VALUE, unionB = Integer.MIN_VALUE;
 
         canvas.save();
         path.rewind();
-        for (SpoilerEffect eff : spoilers) {
-            Rect bounds = eff.getBounds();
-            path.addRect(bounds.left + pl, bounds.top + pt, bounds.right + pl, bounds.bottom + pt, Path.Direction.CW);
+        for (int i = 0, n = spoilers.size(); i < n; i++) {
+            Rect bounds = spoilers.get(i).getBounds();
+            int l = bounds.left + pl;
+            int t = bounds.top + pt;
+            int r = bounds.right + pl;
+            int b = bounds.bottom + pt;
+            path.addRect(l, t, r, b, Path.Direction.CW);
+            if (l < unionL) unionL = l;
+            if (t < unionT) unionT = t;
+            if (r > unionR) unionR = r;
+            if (b > unionB) unionB = b;
         }
         canvas.clipOutPath(path);
         updateAnimatedEmoji(false);
@@ -128,38 +147,38 @@ public class TextViewEffects extends LinkSpanDrawable.LinksTextView {
         canvas.save();
         canvas.clipPath(path);
         path.rewind();
-        if (!spoilers.isEmpty()) {
-            spoilers.get(0).getRipplePath(path);
-        }
+        spoilers.get(0).getRipplePath(path);
         canvas.clipPath(path);
         super.onDraw(canvas);
         canvas.restore();
 
-        if (!spoilers.isEmpty()) {
-            boolean useAlphaLayer = spoilers.get(0).getRippleProgress() != -1;
-            if (useAlphaLayer) {
-                canvas.saveLayer(0, 0, getMeasuredWidth(), getMeasuredHeight(), null);
-            } else {
-                canvas.save();
-            }
-            canvas.translate(getPaddingLeft(), getPaddingTop() + AndroidUtilities.dp(2));
-            for (SpoilerEffect eff : spoilers) {
-                eff.setColor(getPaint().getColor());
-                eff.draw(canvas);
-            }
-
-            if (useAlphaLayer) {
-                path.rewind();
-                spoilers.get(0).getRipplePath(path);
-                if (xRefPaint == null) {
-                    xRefPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                    xRefPaint.setColor(0xff000000);
-                    xRefPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-                }
-                canvas.drawPath(path, xRefPaint);
-            }
-            canvas.restore();
+        boolean useAlphaLayer = spoilers.get(0).getRippleProgress() != -1;
+        if (useAlphaLayer && unionL < unionR && unionT < unionB) {
+            int padY = AndroidUtilities.dp(2);
+            canvas.saveLayer(unionL, unionT, unionR, unionB + padY, null);
+        } else if (useAlphaLayer) {
+            canvas.saveLayer(0, 0, getMeasuredWidth(), getMeasuredHeight(), null);
+        } else {
+            canvas.save();
         }
+        canvas.translate(pl, pt + AndroidUtilities.dp(2));
+        for (int i = 0, n = spoilers.size(); i < n; i++) {
+            SpoilerEffect eff = spoilers.get(i);
+            eff.setColor(getPaint().getColor());
+            eff.draw(canvas);
+        }
+
+        if (useAlphaLayer) {
+            path.rewind();
+            spoilers.get(0).getRipplePath(path);
+            if (xRefPaint == null) {
+                xRefPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                xRefPaint.setColor(0xff000000);
+                xRefPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            }
+            canvas.drawPath(path, xRefPaint);
+        }
+        canvas.restore();
     }
 
     public void updateAnimatedEmoji(boolean force) {

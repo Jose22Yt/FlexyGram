@@ -574,7 +574,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         }
 
         super.onCreate();
-        if (BuildConfig.NATIVE_BASELINE_TEST) preloadStartupPreferences();
+        preloadStartupPreferences();
         // Native baseline: Android and the original UI own animation timing.
         installCrashReportFilter();
 
@@ -762,6 +762,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         app.flexygram.effects.SatinEdgeMaterial.trimMemory(level);
         app.flexygram.performance.TextLayoutPrecompute.trimMemory(level);
         app.exteraless.speech.VoskTranscriber.trimMemory(level);
+        org.telegram.ui.Cells.DialogCell.trimMemory(level);
         if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) MessagesStorage.trimWarmHistories();
         if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
             ImageLoader.clearMemoryIfInitialized();
@@ -775,6 +776,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         app.flexygram.effects.SatinEdgeMaterial.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
         app.flexygram.performance.TextLayoutPrecompute.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
         app.exteraless.speech.VoskTranscriber.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
+        org.telegram.ui.Cells.DialogCell.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
         MessagesStorage.trimWarmHistories();
         ImageLoader.clearMemoryIfInitialized();
     }

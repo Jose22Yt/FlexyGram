@@ -505,7 +505,6 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
 
     private int thumbsCount;
     private boolean hasVideoThumb;
-    private Paint thumbBackgroundPaint;
     private boolean[] thumbImageSeen = new boolean[3];
     private ImageReceiver[] thumbImage = new ImageReceiver[3];
     private boolean[] drawPlay = new boolean[3];
@@ -562,8 +561,40 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     public float nameLayoutTranslateX;
     private boolean nameLayoutEllipsizeLeft;
     private boolean nameLayoutEllipsizeByGradient;
-    private Paint fadePaint;
-    private Paint fadePaintBack;
+    private static float sharedFadePaintDensity;
+    private static Paint sharedFadePaint;
+    private static Paint sharedFadePaintBack;
+
+    private static Paint getSharedFadePaint(boolean left) {
+        final float density = AndroidUtilities.density;
+        if (sharedFadePaintDensity != density) {
+            sharedFadePaintDensity = density;
+            sharedFadePaint = null;
+            sharedFadePaintBack = null;
+        }
+        if (left) {
+            if (sharedFadePaint == null) {
+                sharedFadePaint = new Paint();
+                sharedFadePaint.setShader(new LinearGradient(0, 0, dp(24), 0, new int[]{0xffffffff, 0}, new float[]{0f, 1f}, Shader.TileMode.CLAMP));
+                sharedFadePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
+            }
+            return sharedFadePaint;
+        }
+        if (sharedFadePaintBack == null) {
+            sharedFadePaintBack = new Paint();
+            sharedFadePaintBack.setShader(new LinearGradient(0, 0, dp(24), 0, new int[]{0, 0xffffffff}, new float[]{0f, 1f}, Shader.TileMode.CLAMP));
+            sharedFadePaintBack.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
+        }
+        return sharedFadePaintBack;
+    }
+
+    public static void trimMemory(int level) {
+        if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) {
+            sharedFadePaint = null;
+            sharedFadePaintBack = null;
+            sharedFadePaintDensity = 0f;
+        }
+    }
     private boolean drawNameLock;
     private int nameMuteLeft;
     private int nameMutedIconLeft;
@@ -4385,18 +4416,12 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 nameTop -= dp(isForumCell() ? 8 : 9);
             }
             if (nameLayout != null) {
-                if (nameLayoutEllipsizeByGradient && !nameLayoutFits) {
-                    if (nameLayoutEllipsizeLeft && fadePaint == null) {
-                        fadePaint = new Paint();
-                        fadePaint.setShader(new LinearGradient(0, 0, dp(24), 0, new int[]{0xffffffff, 0}, new float[]{0f, 1f}, Shader.TileMode.CLAMP));
-                        fadePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
-                    } else if (fadePaintBack == null) {
-                        fadePaintBack = new Paint();
-                        fadePaintBack.setShader(new LinearGradient(0, 0, dp(24), 0, new int[]{0, 0xffffffff}, new float[]{0f, 1f}, Shader.TileMode.CLAMP));
-                        fadePaintBack.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
-                    }
-                    canvas.saveLayerAlpha(0, 0, getMeasuredWidth(), getMeasuredHeight(), 255, Canvas.ALL_SAVE_FLAG);
-                    canvas.clipRect(nameLeft, 0, nameLeft + nameWidth, getMeasuredHeight());
+                final boolean ellipsizeFade = nameLayoutEllipsizeByGradient && !nameLayoutFits;
+                final int fadeTop = nameTop - dp(2);
+                final int fadeBottom = nameTop + nameLayout.getHeight() + dp(2);
+                if (ellipsizeFade) {
+                    canvas.saveLayerAlpha(nameLeft, fadeTop, nameLeft + nameWidth, fadeBottom, 255, Canvas.ALL_SAVE_FLAG);
+                    canvas.clipRect(nameLeft, fadeTop, nameLeft + nameWidth, fadeBottom);
                 }
                 if (currentDialogFolderId != 0) {
                     Theme.dialogs_namePaint[paintIndex].setColor(Theme.dialogs_namePaint[paintIndex].linkColor = Theme.getColor(Theme.key_chats_nameArchived, resourcesProvider));
@@ -4410,14 +4435,15 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 SpoilerEffect.layoutDrawMaybe(nameLayout, canvas);
                 AnimatedEmojiSpan.drawAnimatedEmojis(canvas, nameLayout, animatedEmojiStackName, -.075f, null, 0, 0, 0, 1f, getAdaptiveEmojiColorFilter(0, nameLayout.getPaint().getColor()));
                 canvas.restore();
-                if (nameLayoutEllipsizeByGradient && !nameLayoutFits) {
+                if (ellipsizeFade) {
                     canvas.save();
+                    final Paint edgeFadePaint = getSharedFadePaint(nameLayoutEllipsizeLeft);
                     if (nameLayoutEllipsizeLeft) {
                         canvas.translate(nameLeft, 0);
-                        canvas.drawRect(0, 0, dp(24), getMeasuredHeight(), fadePaint);
+                        canvas.drawRect(0, fadeTop, dp(24), fadeBottom, edgeFadePaint);
                     } else {
                         canvas.translate(nameLeft + nameWidth - dp(24), 0);
-                        canvas.drawRect(0, 0, dp(24), getMeasuredHeight(), fadePaintBack);
+                        canvas.drawRect(0, fadeTop, dp(24), fadeBottom, edgeFadePaint);
                     }
                     canvas.restore();
                     canvas.restore();
@@ -4931,12 +4957,25 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 float alpha = 1f;
                 if (updateHelper.typingProgres > 0) {
                     alpha = (1f - updateHelper.typingProgres);
-                    canvas.saveLayerAlpha(0, 0, getWidth(), getHeight(), (int) (255 * alpha), Canvas.ALL_SAVE_FLAG);
                     float top;
                     if (updateHelper.typingOutToTop) {
                         top = -dp(14) * updateHelper.typingProgres;
                     } else {
                         top = dp(14) * updateHelper.typingProgres;
+                    }
+                    float tl = Float.MAX_VALUE, tt = Float.MAX_VALUE, tr = -Float.MAX_VALUE, tb = -Float.MAX_VALUE;
+                    for (int i = 0; i < thumbsCount; ++i) {
+                        if (!thumbImageSeen[i] || thumbImage[i] == null) continue;
+                        if (thumbImage[i].getImageX() < tl) tl = thumbImage[i].getImageX();
+                        if (thumbImage[i].getImageY() < tt) tt = thumbImage[i].getImageY();
+                        if (thumbImage[i].getImageX2() > tr) tr = thumbImage[i].getImageX2();
+                        if (thumbImage[i].getImageY2() > tb) tb = thumbImage[i].getImageY2();
+                    }
+                    if (tl < tr && tt < tb) {
+                        final float pad = dp(2);
+                        canvas.saveLayerAlpha(tl - pad, tt + top - pad, tr + pad, tb + top + pad, (int) (255 * alpha), Canvas.ALL_SAVE_FLAG);
+                    } else {
+                        canvas.saveLayerAlpha(0, 0, getWidth(), getHeight(), (int) (255 * alpha), Canvas.ALL_SAVE_FLAG);
                     }
                     canvas.translate(0, top);
                 }
@@ -4944,23 +4983,12 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                     if (!thumbImageSeen[i]) {
                         continue;
                     }
-                    if (thumbBackgroundPaint == null) {
-                        thumbBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                        thumbBackgroundPaint.setShadowLayer(dp(1.34f), 0, dp(0.34f), 0x18000000);
-                        thumbBackgroundPaint.setColor(0x00000000);
-                    }
                     AndroidUtilities.rectTmp.set(
                             thumbImage[i].getImageX(),
                             thumbImage[i].getImageY(),
                             thumbImage[i].getImageX2(),
                             thumbImage[i].getImageY2()
                     );
-                    //canvas.drawRoundRect(
-                    //        AndroidUtilities.rectTmp,
-                    //        thumbImage[i].getRoundRadius()[0],
-                    //        thumbImage[i].getRoundRadius()[1],
-                    //        thumbBackgroundPaint
-                    //);
                     thumbImage[i].draw(canvas);
                     if (drawSpoiler[i]) {
                         if (thumbPath == null) {
