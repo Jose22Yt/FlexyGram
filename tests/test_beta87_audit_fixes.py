@@ -546,5 +546,76 @@ def test_pass7_startup_gpu_and_memory_optimizations():
     assert 'contentView.endFolderTabTransition();' in dialogs
 
 
+def test_dialogs_restore_scroll_anchor_stays_at_newest_chats_with_hidden_archive(tmp_path):
+    source = (JAVA / 'org/telegram/ui/DialogsActivity.java').read_text()
+    restore = method(source, 'private void restoreScrollAnchor(')
+    probe(tmp_path, {'Probe.java': '''import java.util.function.IntUnaryOperator;
+public class Probe {
+    static class RecyclerView { static final int NO_POSITION = -1, SCROLL_STATE_IDLE = 0; }
+    static class View {
+        final int position, top, bottom;
+        View(int p, int t, int b) { position = p; top = t; bottom = b; }
+        int getTop() { return top; }
+        int getBottom() { return bottom; }
+    }
+    static class ListView {
+        View[] rows;
+        int paddingTop = 200, paddingBottom = 100, height = 2000, state = 0;
+        int getScrollState() { return state; }
+        int getChildCount() { return rows.length; }
+        View getChildAt(int i) { return rows[i]; }
+        int getPaddingTop() { return paddingTop; }
+        int getPaddingBottom() { return paddingBottom; }
+        int getHeight() { return height; }
+        int getChildAdapterPosition(View v) { return v.position; }
+    }
+    static class Manager {
+        int position = -1, offset = 0, calls = 0;
+        boolean hasPendingScrollPosition() { return false; }
+        void scrollToPositionWithOffset(int p, int o) { position = p; offset = o; calls++; }
+    }
+    static final int DIALOGS_TYPE_DEFAULT = 0, ARCHIVE_ITEM_STATE_HIDDEN = 0;
+    final ListView listView = new ListView();
+    final Manager layoutManager = new Manager();
+    int dialogsType = 0, archivePullViewState = 0;
+    boolean hasStories = false, hiddenArchiveFlag = true;
+    float scrollYOffset = 0f;
+    boolean hasHiddenArchive() { return hiddenArchiveFlag; }
+    RESTORE
+    static void check(boolean ok, String m) { if (!ok) throw new AssertionError(m); }
+    public static void main(String[] args) {
+        Probe p = new Probe();
+        // Case 1: Hidden archive off top, position 1 at top (offset 0), 15 new chats sync (1 -> 16) -> MUST stay at 1!
+        p.listView.rows = new View[]{ new View(0, 20, 200), new View(1, 200, 380), new View(2, 380, 560) };
+        p.restoreScrollAnchor(pos -> pos == 1 ? 16 : pos + 15, false);
+        check(p.layoutManager.position == 1 && p.layoutManager.offset == 0, "hidden archive top jumped to " + p.layoutManager.position);
+
+        // Case 2: Hidden archive + collapsed stories (negative scrollYOffset), position 1 at top -> MUST stay at 1!
+        p.hasStories = true;
+        p.scrollYOffset = -150f;
+        p.listView.rows = new View[]{ new View(1, 50, 230), new View(2, 230, 410) };
+        p.restoreScrollAnchor(pos -> pos == 1 ? 12 : pos + 11, false);
+        check(p.layoutManager.position == 1 && p.layoutManager.offset == -150, "stories collapsed top jumped to " + p.layoutManager.position);
+
+        // Case 3: Hidden archive peeking (skipArchive), 10 new chats sync -> MUST snap to 1!
+        p.hasStories = false;
+        p.scrollYOffset = 0f;
+        p.listView.rows = new View[]{ new View(0, 120, 260), new View(1, 260, 440) };
+        p.restoreScrollAnchor(pos -> pos == 1 ? 11 : pos + 10, false);
+        check(p.layoutManager.position == 1 && p.layoutManager.offset == 0, "skipArchive jumped to " + p.layoutManager.position);
+
+        // Case 4: User actually scrolled down to position 8 -> MUST preserve reading position (8 -> 18)!
+        p.listView.rows = new View[]{ new View(8, 200, 380), new View(9, 380, 560) };
+        p.restoreScrollAnchor(pos -> pos + 10, false);
+        check(p.layoutManager.position == 18 && p.layoutManager.offset == 0, "scrolled reading lost: " + p.layoutManager.position);
+
+        // Case 5: Returning from a chat at position 1 -> follows anchor cleanly.
+        p.listView.rows = new View[]{ new View(1, 200, 380), new View(2, 380, 560) };
+        p.restoreScrollAnchor(pos -> pos == 1 ? 5 : pos + 4, true);
+        check(p.layoutManager.position == 5, "returning from chat anchor: " + p.layoutManager.position);
+    }
+}'''.replace('RESTORE', restore)})
+
+
 
 

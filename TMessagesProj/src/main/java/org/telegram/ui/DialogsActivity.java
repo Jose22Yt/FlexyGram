@@ -436,6 +436,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             final boolean hiddenArchive = dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive()
                     && archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN;
             final float tabsOffset = hasStories ? 0 : scrollYOffset;
+            final int topStartPosition = hiddenArchive ? 1 : 0;
+            final int topStartMinOffset = (int) Math.min(0f, scrollYOffset) - 4;
             int anchorTop = Integer.MAX_VALUE;
             int anchorPosition = RecyclerView.NO_POSITION;
             int anchorOffset = 0;
@@ -449,11 +451,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 final boolean skipArchive = hiddenArchive && position == 0 && paddingTop - child.getBottom() + tabsOffset < 0;
                 int target;
                 if (skipArchive) {
-                    target = positions.applyAsInt(1);
+                    target = !returningFromChat ? 1 : positions.applyAsInt(1);
                     offset = (int) tabsOffset;
                 } else {
-                    // Let the live list expose new top items if the user was already at the start.
-                    target = !returningFromChat && position == 0 && offset >= 0 ? 0
+                    // Let the live list expose new top items if the user was already at the start
+                    // (position 0 normally, or position 1 right below the hidden archive row).
+                    final boolean atTop = position == topStartPosition && offset >= topStartMinOffset;
+                    target = !returningFromChat && atTop ? topStartPosition
                             : positions.applyAsInt(position);
                 }
                 if (target == RecyclerView.NO_POSITION) continue;
@@ -2226,7 +2230,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 if (holder != null) {
                     int top = holder.itemView.getTop();
                     if (parentPage.dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive() && parentPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN) {
-                        pos = Math.max(1, pos);
+                        if (pos == 0) {
+                            pos = 1;
+                            RecyclerView.ViewHolder firstDialogHolder = parentPage.listView.findViewHolderForAdapterPosition(1);
+                            top = firstDialogHolder != null ? firstDialogHolder.itemView.getTop() : lastListPadding + (int) scrollYOffset;
+                        }
                     }
                     ignoreLayout = true;
                     parentPage.layoutManager.scrollToPositionWithOffset(pos, (int) (top - lastListPadding + scrollAdditionalOffset + parentPage.pageAdditionalOffset));
@@ -2278,13 +2286,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
             ignoreLayout = false;
 
-            if (firstLayout && getMessagesController().dialogsLoaded) {
-                if (parentPage.dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive()) {
-                    ignoreLayout = true;
-                    LinearLayoutManager layoutManager = (LinearLayoutManager) getLayoutManager();
-                    layoutManager.scrollToPositionWithOffset(1, (int) scrollYOffset);
-                    ignoreLayout = false;
-                }
+            final boolean hiddenArchive = parentPage.dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive();
+            final RecyclerView.Adapter currentAdapter = getAdapter();
+            if (firstLayout && getMessagesController().dialogsLoaded
+                    && currentAdapter != null && currentAdapter.getItemCount() > (hiddenArchive ? 1 : 0)) {
+                ignoreLayout = true;
+                LinearLayoutManager layoutManager = (LinearLayoutManager) getLayoutManager();
+                layoutManager.scrollToPositionWithOffset(hiddenArchive ? 1 : 0, (int) scrollYOffset);
+                ignoreLayout = false;
                 firstLayout = false;
             }
             super.onMeasure(widthSpec, heightSpec);
