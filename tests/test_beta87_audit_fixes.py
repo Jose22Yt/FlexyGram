@@ -542,8 +542,8 @@ def test_pass7_startup_gpu_and_memory_optimizations():
     dialogs = (JAVA / 'org/telegram/ui/DialogsActivity.java').read_text()
     assert 'public void beginFolderTabTransition()' in dialogs
     assert 'public void endFolderTabTransition()' in dialogs
-    assert 'contentView.beginFolderTabTransition();' in dialogs
-    assert 'contentView.endFolderTabTransition();' in dialogs
+    assert '((ContentView) fragmentView).beginFolderTabTransition();' in dialogs
+    assert '((ContentView) fragmentView).endFolderTabTransition();' in dialogs
 
 
 def test_dialogs_restore_scroll_anchor_stays_at_newest_chats_with_hidden_archive(tmp_path):

@@ -4034,8 +4034,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     showScrollbars(false);
                     switchToCurrentSelectedMode(true);
                     animatingForward = forward;
-                    if (contentView != null) {
-                        contentView.beginFolderTabTransition();
+                    if (fragmentView instanceof ContentView) {
+                        ((ContentView) fragmentView).beginFolderTabTransition();
                     }
                 }
 
@@ -4061,8 +4061,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         viewPages[0] = viewPages[1];
                         viewPages[1] = tempPage;
                         viewPages[1].setVisibility(View.GONE);
-                        if (contentView != null) {
-                            contentView.endFolderTabTransition();
+                        if (fragmentView instanceof ContentView) {
+                            ((ContentView) fragmentView).endFolderTabTransition();
                         }
                         showScrollbars(true);
                         updateCounters(false);
