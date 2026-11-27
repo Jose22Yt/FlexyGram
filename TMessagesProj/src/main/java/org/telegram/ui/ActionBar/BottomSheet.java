@@ -1398,6 +1398,10 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
             window = getWindow();
             window.setWindowAnimations(R.style.DialogNoAnimation);
             setContentView(container, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            AndroidUtilities.setPreferredMaxRefreshRate(window);
+        }
+        if (sheetFrameRateHint == null && container != null) {
+            sheetFrameRateHint = new app.flexygram.performance.ScrollFrameRateHint(container);
         }
 
         if (useLightStatusBar && Build.VERSION.SDK_INT >= 23) {
@@ -1751,12 +1755,27 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
         }
     }
 
+    private app.flexygram.performance.ScrollFrameRateHint sheetFrameRateHint;
+
+    private void setSheetTransitionActive(boolean active) {
+        if (sheetFrameRateHint != null) {
+            sheetFrameRateHint.setScrolling(active);
+        }
+        if (useHardwareLayer && container != null) {
+            final int target = active ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_NONE;
+            if (container.getLayerType() != target) {
+                container.setLayerType(target, null);
+            }
+        }
+    }
+
     protected void cancelSheetAnimation() {
         if (currentSheetAnimation != null) {
             currentSheetAnimation.cancel();
             currentSheetAnimation = null;
         }
         currentSheetAnimationType = 0;
+        setSheetTransitionActive(false);
     }
 
     public void setOnHideListener(OnDismissListener listener) {
@@ -1774,9 +1793,7 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
         containerView.setVisibility(View.VISIBLE);
 
         if (!onCustomOpenAnimation()) {
-            if (useHardwareLayer) {
-                container.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-            }
+            setSheetTransitionActive(true);
             if (transitionFromRight) {
                 containerView.setTranslationX(dp(48));
                 containerView.setAlpha(0);
@@ -1831,9 +1848,7 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
                         if (delegate != null) {
                             delegate.onOpenAnimationEnd();
                         }
-                        if (useHardwareLayer) {
-                            container.setLayerType(View.LAYER_TYPE_NONE, null);
-                        }
+                        setSheetTransitionActive(false);
 
                         if (isFullscreen) {
                             WindowManager.LayoutParams params = getWindow().getAttributes();
@@ -1852,6 +1867,7 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
                     if (currentSheetAnimation != null && currentSheetAnimation.equals(animation)) {
                         currentSheetAnimation = null;
                         currentSheetAnimationType = 0;
+                        setSheetTransitionActive(false);
                     }
                 }
             });
@@ -2258,9 +2274,11 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
                     currentSheetAnimation.setDuration(duration = 250);
                     currentSheetAnimation.setInterpolator(CubicBezierInterpolator.EASE_OUT);
                 }
+                setSheetTransitionActive(true);
                 currentSheetAnimation.addListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
+                        setSheetTransitionActive(false);
                         if (currentSheetAnimation != null && currentSheetAnimation.equals(animation)) {
                             currentSheetAnimation = null;
                             currentSheetAnimationType = 0;
@@ -2280,6 +2298,7 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
                         if (currentSheetAnimation != null && currentSheetAnimation.equals(animation)) {
                             currentSheetAnimation = null;
                             currentSheetAnimationType = 0;
+                            setSheetTransitionActive(false);
                         }
                     }
                 });
@@ -2364,6 +2383,7 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
     }
 
     public void dismissInternal() {
+        setSheetTransitionActive(false);
         org.telegram.ui.Wallet.WalletPluginFreeze.leave(this);
         if (attachedFragment != null) {
             attachedFragment.removeSheet(this);

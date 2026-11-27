@@ -519,6 +519,32 @@ def test_pass7_startup_gpu_and_memory_optimizations():
     assert 'private static final Gson GSON = new Gson();' in regex_act
     assert 'new Gson().' not in regex_act
 
+    sheet = (JAVA / 'org/telegram/ui/ActionBar/BottomSheet.java').read_text()
+    assert 'AndroidUtilities.setPreferredMaxRefreshRate(window);' in sheet
+    assert 'private void setSheetTransitionActive(boolean active)' in sheet
+    assert 'setSheetTransitionActive(false);' in method(sheet, 'public void dismissInternal()')
+
+    alert = (JAVA / 'org/telegram/ui/ActionBar/AlertDialog.java').read_text()
+    assert 'AndroidUtilities.setPreferredMaxRefreshRate(window);' in alert
+
+    photo = (JAVA / 'org/telegram/ui/PhotoViewer.java').read_text()
+    assert 'windowLayoutParams.preferredRefreshRate = AndroidUtilities.screenMaxRefreshRate;' in photo
+
+    popup = (JAVA / 'org/telegram/ui/ActionBar/ActionBarPopupWindow.java').read_text()
+    assert 'setPopupAnimationFrameRate(finalViewGroup, true);' in popup
+    assert 'finalViewGroup.setLayerType(View.LAYER_TYPE_HARDWARE, null);' in popup
+
+    pager = (JAVA / 'org/telegram/ui/Components/ViewPagerFixed.java').read_text()
+    assert 'private void beginTabTransition()' in pager
+    assert 'private void endTabTransition()' in pager
+    assert 'endTabTransition();' in method(pager, 'protected void onDetachedFromWindow()')
+
+    dialogs = (JAVA / 'org/telegram/ui/DialogsActivity.java').read_text()
+    assert 'public void beginFolderTabTransition()' in dialogs
+    assert 'public void endFolderTabTransition()' in dialogs
+    assert 'contentView.beginFolderTabTransition();' in dialogs
+    assert 'contentView.endFolderTabTransition();' in dialogs
+
 
 
 

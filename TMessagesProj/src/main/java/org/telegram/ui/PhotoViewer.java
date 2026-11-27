@@ -4972,6 +4972,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         windowLayoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
         windowLayoutParams.gravity = Gravity.TOP | Gravity.LEFT;
         windowLayoutParams.type = WindowManager.LayoutParams.LAST_APPLICATION_WINDOW;
+        if (Float.isFinite(AndroidUtilities.screenMaxRefreshRate) && AndroidUtilities.screenMaxRefreshRate >= 30f) {
+            windowLayoutParams.preferredRefreshRate = AndroidUtilities.screenMaxRefreshRate;
+        }
         windowColorModeHdr = false;
         windowDisplayHdrCapable = null;
         if (Build.VERSION.SDK_INT >= 34) {

@@ -1012,6 +1012,7 @@ public class ActionBarPopupWindow extends PopupWindow {
             if (finalContent != null) {
                 finalContent.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             }
+            setPopupAnimationFrameRate(viewGroup, true);
             windowAnimatorSet = new AnimatorSet();
             windowAnimatorSet.playTogether(
                     ObjectAnimator.ofFloat(content, "backScaleY", 0.0f, finalScaleY),
@@ -1020,6 +1021,7 @@ public class ActionBarPopupWindow extends PopupWindow {
             windowAnimatorSet.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
+                    setPopupAnimationFrameRate(viewGroup, false);
                     if (finalContent != null) {
                         finalContent.setLayerType(View.LAYER_TYPE_NONE, null);
                     }
@@ -1049,6 +1051,21 @@ public class ActionBarPopupWindow extends PopupWindow {
             });
             windowAnimatorSet.start();
         }
+    }
+
+    private app.flexygram.performance.ScrollFrameRateHint popupFrameRateHint;
+    private View popupFrameRateOwner;
+
+    private void setPopupAnimationFrameRate(View target, boolean active) {
+        if (target == null) return;
+        if (popupFrameRateHint == null || popupFrameRateOwner != target) {
+            if (popupFrameRateHint != null) {
+                popupFrameRateHint.setScrolling(false);
+            }
+            popupFrameRateOwner = target;
+            popupFrameRateHint = new app.flexygram.performance.ScrollFrameRateHint(target);
+        }
+        popupFrameRateHint.setScrolling(active);
     }
 
     @Override
@@ -1116,6 +1133,12 @@ public class ActionBarPopupWindow extends PopupWindow {
                     content.itemAnimators.clear();
                 }
             }
+            final ViewGroup finalViewGroup = viewGroup;
+            final boolean promotedDismissLayer = finalViewGroup != null && finalViewGroup.getLayerType() == View.LAYER_TYPE_NONE;
+            if (promotedDismissLayer) {
+                finalViewGroup.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            }
+            setPopupAnimationFrameRate(finalViewGroup, true);
             windowAnimatorSet = new AnimatorSet();
             if (outEmptyTime > 0) {
                 windowAnimatorSet.playTogether(ValueAnimator.ofFloat(0, 1f));
@@ -1136,6 +1159,10 @@ public class ActionBarPopupWindow extends PopupWindow {
             windowAnimatorSet.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
+                    setPopupAnimationFrameRate(finalViewGroup, false);
+                    if (promotedDismissLayer && finalViewGroup != null) {
+                        finalViewGroup.setLayerType(View.LAYER_TYPE_NONE, null);
+                    }
                     windowAnimatorSet = null;
                     isClosingAnimated = false;
                     setFocusable(false);
@@ -1155,6 +1182,7 @@ public class ActionBarPopupWindow extends PopupWindow {
             }
             windowAnimatorSet.start();
         } else {
+            setPopupAnimationFrameRate(getContentView(), false);
             try {
                 super.dismiss();
             } catch (Exception ignore) {

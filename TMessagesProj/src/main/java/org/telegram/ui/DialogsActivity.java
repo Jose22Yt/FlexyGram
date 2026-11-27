@@ -890,6 +890,42 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         private int[] pos = new int[2];
         private final app.flexygram.performance.ScrollFrameRateHint tabSwipeFrameRateHint =
                 new app.flexygram.performance.ScrollFrameRateHint(this);
+        private final View[] promotedFolderLayers = new View[2];
+        private boolean folderTabHeavyPaused;
+
+        public void beginFolderTabTransition() {
+            tabSwipeFrameRateHint.setScrolling(true);
+            if (!folderTabHeavyPaused) {
+                folderTabHeavyPaused = true;
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.stopAllHeavyOperations, 512);
+            }
+            if (viewPages != null) {
+                for (int i = 0; i < Math.min(2, viewPages.length); i++) {
+                    final View page = viewPages[i];
+                    if (page != null && page.getLayerType() == View.LAYER_TYPE_NONE && promotedFolderLayers[i] == null) {
+                        page.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                        promotedFolderLayers[i] = page;
+                    }
+                }
+            }
+        }
+
+        public void endFolderTabTransition() {
+            tabSwipeFrameRateHint.setScrolling(false);
+            for (int i = 0; i < promotedFolderLayers.length; i++) {
+                final View page = promotedFolderLayers[i];
+                if (page != null) {
+                    promotedFolderLayers[i] = null;
+                    if (page.getLayerType() == View.LAYER_TYPE_HARDWARE) {
+                        page.setLayerType(View.LAYER_TYPE_NONE, null);
+                    }
+                }
+            }
+            if (folderTabHeavyPaused) {
+                folderTabHeavyPaused = false;
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 512);
+            }
+        }
 
         private boolean prepareForMoving(MotionEvent ev, boolean forward) {
             int id = filterTabsView.getNextPageId(forward);
@@ -899,7 +935,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             getParent().requestDisallowInterceptTouchEvent(true);
             maybeStartTracking = false;
             startedTracking = true;
-            tabSwipeFrameRateHint.setScrolling(true);
+            beginFolderTabTransition();
             startedTrackingX = (int) (ev.getX() + additionalOffset);
             actionBar.setEnabled(false);
             filterTabsView.setEnabled(false);
@@ -943,7 +979,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         tabsAnimation = null;
                     }
                     tabsAnimationInProgress = false;
-                    tabSwipeFrameRateHint.setScrolling(false);
+                    endFolderTabTransition();
                 }
                 return tabsAnimationInProgress;
             }
@@ -1656,7 +1692,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 viewPages[1].setVisibility(View.GONE);
                                 showScrollbars(true);
                                 tabsAnimationInProgress = false;
-                                tabSwipeFrameRateHint.setScrolling(false);
+                                endFolderTabTransition();
                                 maybeStartTracking = false;
                                 actionBar.setEnabled(true);
                                 filterTabsView.setEnabled(true);
@@ -1668,7 +1704,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         startedTracking = false;
                     } else {
                         maybeStartTracking = false;
-                        tabSwipeFrameRateHint.setScrolling(false);
+                        endFolderTabTransition();
                         actionBar.setEnabled(true);
                         filterTabsView.setEnabled(true);
                     }
@@ -1723,7 +1759,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         @Override
         protected void onDetachedFromWindow() {
-            tabSwipeFrameRateHint.setScrolling(false);
+            endFolderTabTransition();
             super.onDetachedFromWindow();
             if (statusDrawable != null) {
                 statusDrawable.detach();
@@ -3989,6 +4025,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     showScrollbars(false);
                     switchToCurrentSelectedMode(true);
                     animatingForward = forward;
+                    if (contentView != null) {
+                        contentView.beginFolderTabTransition();
+                    }
                 }
 
                 @Override
@@ -4013,6 +4052,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         viewPages[0] = viewPages[1];
                         viewPages[1] = tempPage;
                         viewPages[1].setVisibility(View.GONE);
+                        if (contentView != null) {
+                            contentView.endFolderTabTransition();
+                        }
                         showScrollbars(true);
                         updateCounters(false);
                         filterTabsView.stopAnimatingIndicator();

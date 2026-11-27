@@ -219,6 +219,52 @@ public class ViewPagerFixed extends FrameLayout {
         return manualScrolling != null && manualScrolling.isRunning();
     }
 
+    private final app.flexygram.performance.ScrollFrameRateHint pagerFrameRateHint =
+            new app.flexygram.performance.ScrollFrameRateHint(this);
+    private final View[] promotedTransitionLayers = new View[2];
+    private boolean tabTransitionHeavyPaused;
+
+    private void beginTabTransition() {
+        pagerFrameRateHint.setScrolling(true);
+        if (!tabTransitionHeavyPaused) {
+            tabTransitionHeavyPaused = true;
+            org.telegram.messenger.NotificationCenter.getGlobalInstance().postNotificationName(
+                    org.telegram.messenger.NotificationCenter.stopAllHeavyOperations, 512);
+        }
+        for (int i = 0; i < 2; i++) {
+            final View page = viewPages[i];
+            if (page != null && page.getLayerType() == View.LAYER_TYPE_NONE
+                    && promotedTransitionLayers[i] == null) {
+                page.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                promotedTransitionLayers[i] = page;
+            }
+        }
+    }
+
+    private void endTabTransition() {
+        pagerFrameRateHint.setScrolling(false);
+        for (int i = 0; i < promotedTransitionLayers.length; i++) {
+            final View page = promotedTransitionLayers[i];
+            if (page != null) {
+                promotedTransitionLayers[i] = null;
+                if (page.getLayerType() == View.LAYER_TYPE_HARDWARE) {
+                    page.setLayerType(View.LAYER_TYPE_NONE, null);
+                }
+            }
+        }
+        if (tabTransitionHeavyPaused) {
+            tabTransitionHeavyPaused = false;
+            org.telegram.messenger.NotificationCenter.getGlobalInstance().postNotificationName(
+                    org.telegram.messenger.NotificationCenter.startAllHeavyOperations, 512);
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        endTabTransition();
+        super.onDetachedFromWindow();
+    }
+
     private ValueAnimator manualScrolling;
     public boolean scrollToPosition(int page) {
         if (page == currentPosition || (manualScrolling != null && nextPosition == page)) {
@@ -242,6 +288,8 @@ public class ViewPagerFixed extends FrameLayout {
             setTranslationX(viewPages[1], -tX);
         }
 
+        beginTabTransition();
+        notificationsLocker.lock();
         manualScrolling = ValueAnimator.ofFloat(0, 1);
         manualScrolling.addUpdateListener(anm -> {
             float progress = (float) anm.getAnimatedValue();
@@ -274,6 +322,7 @@ public class ViewPagerFixed extends FrameLayout {
                     viewPages[1] = null;
                 }
                 manualScrolling = null;
+                endTabTransition();
                 onTabAnimationUpdate(true);
                 if (tabsView != null) {
                     tabsView.listView.invalidate();
@@ -320,6 +369,7 @@ public class ViewPagerFixed extends FrameLayout {
                     } else {
                         setTranslationX(viewPages[1], -trasnlationX);
                     }
+                    beginTabTransition();
                 }
             }
 
@@ -339,6 +389,7 @@ public class ViewPagerFixed extends FrameLayout {
                         setTranslationX(viewPages[0], 0);
                         viewPages[1] = null;
                     }
+                    endTabTransition();
                     onTabScrollEnd(currentPosition);
                     return;
                 }
@@ -793,6 +844,7 @@ public class ViewPagerFixed extends FrameLayout {
                         }
                         tabsAnimationInProgress = false;
                         maybeStartTracking = false;
+                        endTabTransition();
                         if (tabsView != null) {
                             tabsView.setEnabled(true);
                         }
@@ -802,6 +854,7 @@ public class ViewPagerFixed extends FrameLayout {
                         notificationsLocker.unlock();
                     }
                 });
+                beginTabTransition();
                 tabsAnimation.start();
                 tabsAnimationInProgress = true;
                 startedTracking = false;
@@ -867,6 +920,7 @@ public class ViewPagerFixed extends FrameLayout {
                     tabsAnimation = null;
                 }
                 tabsAnimationInProgress = false;
+                endTabTransition();
             }
             return tabsAnimationInProgress;
         }
@@ -891,6 +945,7 @@ public class ViewPagerFixed extends FrameLayout {
         if (tabsAnimation != null) {
             tabsAnimation.cancel();
         }
+        endTabTransition();
         if (viewPages[1] != null) {
             viewsByType.put(viewTypes[1], viewPages[1]);
             removePage(viewPages[1]);

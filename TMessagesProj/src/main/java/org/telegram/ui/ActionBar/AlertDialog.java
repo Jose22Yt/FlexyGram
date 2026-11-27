@@ -1366,6 +1366,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
         }
 
         window.setAttributes(params);
+        AndroidUtilities.setPreferredMaxRefreshRate(window);
 
         return rootView;
     }
