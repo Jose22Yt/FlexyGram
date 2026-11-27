@@ -4414,7 +4414,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         };
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         layoutManager.mIgnoreTopPadding = false;
+        layoutManager.setInitialPrefetchItemCount(8);
         listView.setLayoutManager(layoutManager);
+        listView.setItemViewCacheSize(10);
         listView.setGlowColor(0);
         listView.setAdapter(listAdapter);
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT));

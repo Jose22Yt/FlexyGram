@@ -1695,6 +1695,13 @@ public class EmojiView extends FrameLayout implements
             animatedEmojiTextColorFilter = new PorterDuffColorFilter(getThemedColor(Theme.key_featuredStickers_addButton), PorterDuff.Mode.SRC_IN);
         }
         emojiGridView = new EmojiGridView(context);
+        emojiGridView.setItemViewCacheSize(16);
+        RecyclerView.RecycledViewPool emojiPool = emojiGridView.getRecycledViewPool();
+        if (emojiPool != null) {
+            emojiPool.setMaxRecycledViews(0, 32);
+            emojiPool.setMaxRecycledViews(1, 32);
+            emojiPool.setMaxRecycledViews(2, 16);
+        }
         glassEngine.addScrolledView(emojiGridView);
         DefaultItemAnimator emojiItemAnimator = new DefaultItemAnimator();
         emojiItemAnimator.setAddDelay(0);
@@ -2316,6 +2323,12 @@ public class EmojiView extends FrameLayout implements
                 }
             };
             glassEngine.addScrolledView(stickersGridView);
+            stickersGridView.setItemViewCacheSize(15);
+            RecyclerView.RecycledViewPool stickersPool = stickersGridView.getRecycledViewPool();
+            if (stickersPool != null) {
+                stickersPool.setMaxRecycledViews(0, 25);
+                stickersPool.setMaxRecycledViews(1, 16);
+            }
             stickersGridView.setLayoutManager(stickersLayoutManager = new GridLayoutManager(context, 5) {
                 @Override
                 public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {

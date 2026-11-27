@@ -497,6 +497,28 @@ def test_pass7_startup_gpu_and_memory_optimizations():
     img = (JAVA / 'org/telegram/messenger/ImageLoader.java').read_text()
     assert 'memoryClass >= 512 ? 112 : 80' in img
 
+    cfg = (JAVA / 'tw/nekomimi/nekogram/config/ConfigItem.java').read_text()
+    assert 'public volatile Object value;' in cfg
+
+    emoji = (JAVA / 'org/telegram/ui/Components/EmojiView.java').read_text()
+    assert 'emojiPool.setMaxRecycledViews(0, 32);' in emoji
+    assert 'stickersPool.setMaxRecycledViews(0, 25);' in emoji
+
+    media = (JAVA / 'org/telegram/ui/Components/SharedMediaLayout.java').read_text()
+    assert 'mediaPool.setMaxRecycledViews(0, 24);' in media
+    assert 'layoutManager.setInitialPrefetchItemCount(12);' in media
+
+    profile = (JAVA / 'org/telegram/ui/ProfileActivity.java').read_text()
+    assert 'layoutManager.setInitialPrefetchItemCount(8);' in profile
+    assert 'listView.setItemViewCacheSize(10);' in profile
+
+    action = (JAVA / 'org/telegram/ui/Cells/ChatActionCell.java').read_text()
+    assert 'reactionsLayoutInBubble.x + reactionsLayoutInBubble.width + pad' in action
+
+    regex_act = (JAVA / 'tw/nekomimi/nekogram/filters/RegexFiltersSettingActivity.java').read_text()
+    assert 'private static final Gson GSON = new Gson();' in regex_act
+    assert 'new Gson().' not in regex_act
+
 
 
 

@@ -3136,7 +3136,15 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             mediaPages[a].listView.setItemAnimator(null);
             mediaPages[a].listView.setClipToPadding(false);
             mediaPages[a].listView.setSectionsType(RecyclerListView.SECTIONS_TYPE_DATE);
+            layoutManager.setInitialPrefetchItemCount(12);
             mediaPages[a].listView.setLayoutManager(layoutManager);
+            mediaPages[a].listView.setItemViewCacheSize(12);
+            RecyclerView.RecycledViewPool mediaPool = mediaPages[a].listView.getRecycledViewPool();
+            if (mediaPool != null) {
+                mediaPool.setMaxRecycledViews(0, 24);
+                mediaPool.setMaxRecycledViews(1, 18);
+                mediaPool.setMaxRecycledViews(2, 12);
+            }
             mediaPages[a].addView(mediaPages[a].listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
             mediaPages[a].animationSupportingListView = new InternalListView(context);
             mediaPages[a].animationSupportingListView.setLayoutManager(mediaPages[a].animationSupportingLayoutManager = new GridLayoutManager(context, 3) {

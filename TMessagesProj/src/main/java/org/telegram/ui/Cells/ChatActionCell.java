@@ -4076,7 +4076,17 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
         if (currentMessageObject != null && currentMessageObject.shouldDrawReactions() && (!reactionsLayoutInBubble.isSmall || transitionParams.animateChange && reactionsLayoutInBubble.animateHeight)) {
             reactionsLayoutInBubble.drawServiceShaderBackground = 1.0f;
             if (alpha < 1) {
-                canvas.saveLayerAlpha(0, 0, getWidth(), getHeight(), (int) (0xFF * alpha), Canvas.ALL_SAVE_FLAG);
+                if (reactionsLayoutInBubble.width > 0 && reactionsLayoutInBubble.height > 0) {
+                    final float pad = dp(4);
+                    canvas.saveLayerAlpha(
+                            reactionsLayoutInBubble.x - pad,
+                            reactionsLayoutInBubble.y - pad,
+                            reactionsLayoutInBubble.x + reactionsLayoutInBubble.width + pad,
+                            reactionsLayoutInBubble.y + reactionsLayoutInBubble.height + pad,
+                            (int) (0xFF * alpha), Canvas.ALL_SAVE_FLAG);
+                } else {
+                    canvas.saveLayerAlpha(0, 0, getWidth(), getHeight(), (int) (0xFF * alpha), Canvas.ALL_SAVE_FLAG);
+                }
             }
             reactionsLayoutInBubble.draw(canvas, transitionParams.animateChange ? transitionParams.animateChangeProgress : 1f, only);
             if (alpha < 1) {
@@ -4095,7 +4105,17 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
         if (currentMessageObject != null && currentMessageObject.shouldDrawReactions() && (!reactionsLayoutInBubble.isSmall || transitionParams.animateChange && reactionsLayoutInBubble.animateHeight)) {
             reactionsLayoutInBubble.drawServiceShaderBackground = 1.0f;
             if (alpha < 1) {
-                canvas.saveLayerAlpha(0, 0, getWidth(), getHeight(), (int) (0xFF * alpha), Canvas.ALL_SAVE_FLAG);
+                if (reactionsLayoutInBubble.width > 0 && reactionsLayoutInBubble.height > 0) {
+                    final float pad = dp(4);
+                    canvas.saveLayerAlpha(
+                            reactionsLayoutInBubble.x - pad,
+                            reactionsLayoutInBubble.y - pad,
+                            reactionsLayoutInBubble.x + reactionsLayoutInBubble.width + pad,
+                            reactionsLayoutInBubble.y + reactionsLayoutInBubble.height + pad,
+                            (int) (0xFF * alpha), Canvas.ALL_SAVE_FLAG);
+                } else {
+                    canvas.saveLayerAlpha(0, 0, getWidth(), getHeight(), (int) (0xFF * alpha), Canvas.ALL_SAVE_FLAG);
+                }
             }
             reactionsLayoutInBubble.drawOverlay(canvas, transitionParams.animateChange ? transitionParams.animateChangeProgress : 1f);
             if (alpha < 1) {

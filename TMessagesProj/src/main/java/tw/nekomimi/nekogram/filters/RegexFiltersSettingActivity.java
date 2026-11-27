@@ -46,6 +46,7 @@ import tw.nekomimi.nekogram.utils.AlertUtil;
 import xyz.nextalone.nagram.NaConfig;
 
 public class RegexFiltersSettingActivity extends BaseNekoSettingsActivity {
+    private static final Gson GSON = new Gson();
 
     private int filtersOptionHeaderRow;
     private int regexFiltersEnableInChatsRow;
@@ -150,7 +151,7 @@ public class RegexFiltersSettingActivity extends BaseNekoSettingsActivity {
                         ArrayList<AyuFilter.CustomFilteredUser> customFilteredUsersIncoming = null;
                         ArrayList<Long> blockedChannelsIncoming = null;
                         if (json.startsWith("[")) {
-                            AyuFilter.FilterModel[] arr = new Gson().fromJson(json, AyuFilter.FilterModel[].class);
+                            AyuFilter.FilterModel[] arr = GSON.fromJson(json, AyuFilter.FilterModel[].class);
                             if (arr != null) {
                                 sharedIncoming = new ArrayList<>();
                                 for (AyuFilter.FilterModel m : arr) {
@@ -160,7 +161,7 @@ public class RegexFiltersSettingActivity extends BaseNekoSettingsActivity {
                                 }
                             }
                         } else {
-                            TransferData data = new Gson().fromJson(json, TransferData.class);
+                            TransferData data = GSON.fromJson(json, TransferData.class);
                             if (data != null) {
                                 if (data.shared != null) {
                                     sharedIncoming = new ArrayList<>();
@@ -346,7 +347,7 @@ public class RegexFiltersSettingActivity extends BaseNekoSettingsActivity {
                         data.chats = checkChatFilters(AyuFilter.getChatFilterEntries());
                         data.customFilteredUsersData = AyuFilter.getCustomFilteredUsersDataList();
                         data.blockedChannels = AyuFilter.getAllBlockedChannelsList();
-                        String json = new Gson().toJson(data);
+                        String json = GSON.toJson(data);
                         AndroidUtilities.addToClipboard(json);
                         BulletinFactory.of(RegexFiltersSettingActivity.this).createCopyLinkBulletin().show();
                     } catch (Exception e) {

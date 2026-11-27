@@ -53,6 +53,7 @@ public final class LastFmNowPlaying {
     private static final Pattern TRACK_URL = Pattern.compile("data-track-url=\"([^\"]*)\"");
     private static final Pattern COVER = Pattern.compile("src=\"(https://lastfm-img[^\"]*)\"");
     private static final Pattern ALBUM = Pattern.compile("href=\"/music/[^/\"]+/(?!_/)([^\"]+)\"");
+    private static final Pattern TITLE = Pattern.compile("<title>([^<]*)</title>");
 
     private static final HashMap<String, Track> CACHE = new HashMap<>();
     private static final HashMap<String, Long> STAMPS = new HashMap<>();
@@ -240,7 +241,7 @@ public final class LastFmNowPlaying {
         if (html == null) {
             return "empty";
         }
-        Matcher title = Pattern.compile("<title>([^<]*)</title>").matcher(html);
+        Matcher title = TITLE.matcher(html);
         String head = html.substring(0, Math.min(160, html.length())).replaceAll("\\s+", " ");
         return "rows=" + (html.contains("chartlist-row") ? "yes" : "no")
                 + ", title=" + (title.find() ? title.group(1).trim() : "-")

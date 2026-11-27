@@ -71,6 +71,7 @@ public class PluginsActivity extends BaseFragment {
     private static final int ID_ENGINE_TOGGLE = -1;
 
     private static final int REQUEST_CODE_PICK_PLUGIN = 9781;
+    private static final Pattern USERNAME_PATTERN = Pattern.compile("@([A-Za-z][A-Za-z0-9_]{3,31})");
 
     private UniversalRecyclerView listView;
     private final List<Plugin> plugins = new ArrayList<>();
@@ -246,7 +247,7 @@ public class PluginsActivity extends BaseFragment {
      */
     private CharSequence withUsernameLink(String text) {
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
-        Matcher matcher = Pattern.compile("@([A-Za-z][A-Za-z0-9_]{3,31})").matcher(text);
+        Matcher matcher = USERNAME_PATTERN.matcher(text);
         while (matcher.find()) {
             final String username = matcher.group(1);
             builder.setSpan(new ClickableSpan() {
